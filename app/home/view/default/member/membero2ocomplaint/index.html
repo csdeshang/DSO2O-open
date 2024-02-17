@@ -1,0 +1,97 @@
+{extend name="default/base/base_member" /}
+{block name="member_main"}
+
+
+
+<form method="get" action="{:url('MemberO2oComplaint/index')}">
+            <table class="dsm-search-table">
+                <tr>
+                    <td>&nbsp;</td>
+                    <td class="w100 tr"><select name="select_complain_state">
+                            <option value="">{$Think.lang.ds_please_choose}</option>
+                            <option {if condition="$Request.param.select_complain_state !=='' && $Request.param.select_complain_state !== null && $Request.param.select_complain_state eq 0"}selected{/if} value="0">{$Think.lang.member_o2o_complaint_state_text[0]}</option>
+                            <option {if condition="$Request.param.select_complain_state !=='' && $Request.param.select_complain_state !== null && $Request.param.select_complain_state eq 1"}selected{/if} value="1">{$Think.lang.member_o2o_complaint_state_text[1]}</option>
+                        </select></td>
+                    <td class="w70 tc">
+                        <input type="submit" class="submit" value="{$Think.lang.ds_search}" />
+                    </td>
+                </tr>
+            </table>
+        </form>
+        <table class="dsm-default-table">
+            <thead>
+            <tr>
+                <th class="w10"></th>
+                <th class="w110">{$Think.lang.member_o2o_complaint_order_sn}</th>
+                <th class="w110">{$Think.lang.member_o2o_complaint_o2o_distributor_name}</th>
+                <th class="w110">{$Think.lang.member_o2o_complaint_store_name}</th>
+                <th class="w200">{$Think.lang.member_o2o_complaint_content}</th>
+                <th class="w200">{$Think.lang.member_o2o_complaint_reply}</th>
+                <th class="w110">{$Think.lang.member_o2o_complaint_addtime}</th>
+                <th class="w110">{$Think.lang.member_o2o_complaint_state}</th>
+                <th class="w110">{$Think.lang.ds_handle}</th>
+            </tr>
+            </thead>
+            <tbody>
+            {notempty name="complain_list"}
+            {foreach name="complain_list" id="val"}
+            <tr class="bd-line">
+                <td></td>
+                <td>{$val.order_sn}</td>
+                <td>{$val.o2o_distributor_name}</td>
+                <td>{$val.store_name}</td>
+                <td>{$val.o2o_complaint_content}</td>
+                <td>{$val.o2o_complaint_reply}</td>
+                <td class="goods-time">{$val.o2o_complaint_addtime|date="Y-m-d H:i:s"}</td>
+                <td>{$Think.lang.member_o2o_complaint_state_text[$val.o2o_complaint_state]}</td>
+                <td>
+                    {if !$val.o2o_order_bill_id}
+                    <a href="javascript:void(0)" dstype="btn_del_o2o_complaint" data-order-id="{$val.order_id}" />{$Think.lang.ds_del}</a>
+                    {/if}
+                </td>
+            </tr>
+            {/foreach}
+           {else /}
+            <tr>
+                <td colspan="9" class="norecord">
+                    <div class="warning-option"><i></i><span>{$Think.lang.no_record}</span></div>
+                </td>
+            </tr>
+            {/notempty}
+            </tbody>
+            <tfoot>
+            {notempty name="complain_list"}
+            <tr>
+                <td colspan="9">
+                    <div class="pagination">{$show_page|raw}</div>
+                </td>
+            </tr>
+           {/notempty}
+            </tfoot>
+        </table>
+
+
+
+
+
+
+<form id="del_form" method="post" action="{:url('MemberO2oComplaint/del')}">
+    <input id="del_order_id" name="order_id" type="hidden" />
+</form>
+
+<script type="text/javascript">
+    $(function () {
+		
+                $('[dstype="btn_del_o2o_complaint"]').on('click', function() {
+                    var order_id = $(this).attr('data-order-id');
+                    layer.confirm('{$Think.lang.ds_ensure_del}', {
+                        btn: ['确定', '取消'],
+                        title: false,
+                    }, function () {
+                        $('#del_order_id').val(order_id);
+                        ds_ajaxpost('del_form');
+                    });
+                });
+            })
+</script> 
+{/block}

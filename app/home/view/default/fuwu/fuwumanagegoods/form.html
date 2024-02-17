@@ -1,0 +1,248 @@
+{include file="default/base/fuwu_top" /} 
+<div class="seller_main">
+    {include file="default/base/fuwu_left" /}
+    <div class="seller_right">
+
+        <div class="seller_items">
+            {include file="default/base/fuwu_items" /}
+        </div>
+
+        <div class="item-publish">
+            <form method="post" id="goods_form" action="{:url('FuwuManageGoods/save')}">
+                <input type="hidden" name="o2o_fuwu_goods_id" value="{$goods.o2o_fuwu_goods_id|default=''}" />
+                <div class="dssc-form-goods">
+                    <h3 id="demo1">基本信息</h3>
+                    <dl>
+                        <dt><i class="required">*</i>分类{$Think.lang.ds_colon}</dt>
+                        <dd>
+                            <select name="o2o_fuwu_class_id" class="sgcategory">
+                                <option value="0">{$Think.lang.ds_please_choose}</option>
+                                {foreach name="o2o_fuwu_class_list" item="val" }
+                                <option value="{$val.o2o_fuwu_class_id}" {if isset($goods) && $val.o2o_fuwu_class_id==$goods.o2o_fuwu_class_id}selected{/if}>{$val.o2o_fuwu_class_name}</option>
+                                {if !empty($val.child)}
+                                {foreach name="$val.child" item="child_val" }
+                                <option value="{$child_val.o2o_fuwu_class_id}" {if isset($goods) && $child_val.o2o_fuwu_class_id==$goods.o2o_fuwu_class_id}selected{/if}>&nbsp;&nbsp;&nbsp;&nbsp;{$child_val.o2o_fuwu_class_name}</option>
+                                {/foreach}
+                                {/if}
+                                {/foreach}
+                            </select>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt><i class="required">*</i>名称{$Think.lang.ds_colon}</dt>
+                        <dd>
+                            <input name="o2o_fuwu_goods_name" type="text" class="text w400" value="{$goods.o2o_fuwu_goods_name|default=''}" />
+                            <span></span>
+                            <p class="hint"></p>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>广告词{$Think.lang.ds_colon}</dt>
+                        <dd>
+                            <textarea name="o2o_fuwu_goods_advword" class="textarea h60 w400">{$goods.o2o_fuwu_goods_advword|default=''}</textarea>
+                            <span></span>
+                            <p class="hint"></p>
+                        </dd>
+                    </dl>
+                    <h3 id="demo2">服务项目</h3>
+                    <dl ds_type="spec_dl" class="spec-bg">
+                        <dt><i class="required">*</i>项目列表{$Think.lang.ds_colon}</dt>
+                        <dd class="spec-dd">
+                            <table border="0" cellpadding="0" cellspacing="0" class="spec_table" style='width:408px;margin:0px'>
+                                <thead>
+                                <th>项目名称</th>
+                                <th class="w40">单位</th>
+                                <th class="w120">价格</th>
+                                <th class="w90">类型</th>
+                                </thead>
+                                <tbody ds_type="spec_table">
+
+                                    <tr id="spec_list_wrapper"><td colspan="4" style='text-align:center'><a href='javascript:addSpec()'>新增</a></td></tr>
+                                </tbody>
+                            </table>
+                            <p class="hint"></p>
+                        </dd>
+                    </dl>
+
+                    <dl>
+                        <dt><i class="required">*</i>封面{$Think.lang.ds_colon}</dt>
+                        <dd>
+                            <div class="dssc-goods-default-pic">
+                                <div class="goodspic-uplaod">
+                                    <div class="upload-thumb"> <img dstype="goods_image" src="{:get_o2o_fuwu_file($o2o_fuwu_organization_info.o2o_fuwu_organization_id,isset($goods)?$goods.o2o_fuwu_goods_image:'','goods_image')}"/> </div>
+                                    <input type="hidden" name="o2o_fuwu_goods_image" id="o2o_fuwu_goods_image" dstype="goods_image" value="{$goods.o2o_fuwu_goods_image|default=''}" />
+                                    <span></span>
+                                    <p class="hint"></p>
+                                    <div class="handle">
+                                        <div class="dssc-upload-btn"> <a href="javascript:void(0);"><span>
+                                                    <input type="file" hidefocus="true" size="1" class="input-file" name="file" id="goods_image">
+                                                </span>
+                                                <p><i class="iconfont">&#xe733;</i>图片上传</p>
+                                            </a> </div>
+                                        <a class="dssc-btn" dstype="show_image" href="{:url('FuwuManageGoods/pic_list',['item'=>'goods_image'])}"><i class="iconfont">&#xe72a;</i>从图片空间选择</a> <a href="javascript:void(0);" dstype="del_goods_demo" class="dssc-btn" style="display: none;"><i class="iconfont">&#xe67a;</i>关闭相册</a></div>
+                                </div>
+                            </div>
+                            <div dstype_pic="goods_image"></div>
+                        </dd>
+                    </dl>
+                    <h3 id="demo3">详情描述</h3>
+
+                    <dl>
+                        <dt>描述{$Think.lang.ds_colon}</dt>
+                        <dd id="dsProductDetails">
+                            <div class="tabs">
+
+                                <div id="panel-2" class="ui-tabs-panel ui-tabs-hide">
+                                    <div class="dssc-mobile-editor">
+                                        <div class="pannel">
+                                            <div class="control-panel" dstype="mobile_pannel">
+                                                {notempty name="$goods.o2o_fuwu_goods_body"}
+                                                {foreach name="$goods.o2o_fuwu_goods_body" item="val" }
+                                                {if $val.type == 'text'}
+                                                <div class="module m-text">
+                                                    <div class="tools"><a dstype="mp_up" href="javascript:void(0);">上移</a><a dstype="mp_down" href="javascript:void(0);">下移</a><a dstype="mp_edit" href="javascript:void(0);">{$Think.lang.ds_edit}</a><a dstype="mp_del" href="javascript:void(0);">{$Think.lang.ds_del}</a></div>
+                                                    <div class="content">
+                                                        <div class="text-div">{$val.value}</div>
+                                                    </div>
+                                                    <div class="cover"></div>
+                                                </div>
+                                                {/if}
+                                                {if $val.type == 'image'}
+                                                <div class="module m-image">
+                                                    <div class="tools"><a dstype="mp_up" href="javascript:void(0);">上移</a><a dstype="mp_down" href="javascript:void(0);">下移</a><a dstype="mp_rpl" href="javascript:void(0);">替换</a><a dstype="mp_del" href="javascript:void(0);">{$Think.lang.ds_del}</a></div>
+                                                    <div class="content">
+                                                        <div class="image-div"><img src="{$val.value}"></div>
+                                                    </div>
+                                                    <div class="cover"></div>
+                                                </div>
+                                                {/if}
+                                                {/foreach}
+                                                {/notempty}
+                                            </div>
+                                            <div class="add-btn">
+                                                <ul class="btn-wrap">
+                                                    <li><a href="javascript:void(0);" dstype="mb_add_img"><i class="iconfont">&#xe72a;</i>
+                                                            <p>图片</p>
+                                                        </a></li>
+                                                    <li><a href="javascript:void(0);" dstype="mb_add_txt"><i class="iconfont">&#xe8ed;</i>
+                                                            <p>文字</p>
+                                                        </a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                    <div class="dssc-mobile-edit-area" dstype="mobile_editor_area">
+                                        <div dstype_pic="goods_body" class="dssc-mea-img" style="display: none;"></div>
+                                        <div class="dssc-mea-text" dstype="mea_txt" style="display: none;">
+                                            <p id="meat_content_count" class="text-tip"></p>
+                                            <textarea class="textarea valid" dstype="meat_content"></textarea>
+                                            <div class="button"><a class="dssc-btn dssc-btn-blue" dstype="meat_submit" href="javascript:void(0);">{$Think.lang.ds_common_button_confirm}</a><a class="dssc-btn ml10" dstype="meat_cancel" href="javascript:void(0);">{$Think.lang.ds_cancel}</a></div>
+                                            <a class="text-close" dstype="meat_cancel" href="javascript:void(0);">X</a>
+                                        </div>
+                                    </div>
+                                    <input name="goods_body" autocomplete="off" type="hidden" value='{present name='goods'}{:json_encode($goods.o2o_fuwu_goods_body)}{/present}'>
+                                </div>
+                                <div class="dssc-upload-btn"> <a href="javascript:void(0);"><span>
+                                            <input type="file" hidefocus="true" size="1" class="input-file" name="file" id="add_album" multiple="multiple">
+                                        </span>
+                                        <p><i class="iconfont" data_type="0" dstype="add_album_i">&#xe733;</i>图片上传</p>
+                                    </a>
+                                </div>
+                            </div>
+                        </dd>
+                    </dl>
+                </div>
+                <div class="bottom tc hr32">
+                    <input type="submit" class="submit" value="{$Think.lang.ds_submit}" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<style>
+    .spec_table tbody td{padding:5px;}
+</style>
+<script src="{$Think.PLUGINS_SITE_ROOT}/jquery.ajaxContent.pack.js"></script>
+<script type="text/javascript" src="{$Think.PLUGINS_SITE_ROOT}/js/fileupload/jquery.iframe-transport.js" charset="utf-8"></script>
+<script type="text/javascript" src="{$Think.PLUGINS_SITE_ROOT}/js/fileupload/jquery.ui.widget.js" charset="utf-8"></script>
+<script type="text/javascript" src="{$Think.PLUGINS_SITE_ROOT}/js/fileupload/jquery.fileupload.js" charset="utf-8"></script>
+
+<script type="text/javascript" src="{$Think.PLUGINS_SITE_ROOT}/jquery.charCount.js"></script>
+
+
+<!--[if lt IE 8]>
+  <script src="{$Think.BASE_SITE_ROOT}/js/json2.js"></script>
+<![endif]-->
+<script src="{$Think.HOME_SITE_ROOT}/js/fuwu_manage_goods.js"></script>
+
+<script src="{$Think.PLUGINS_SITE_ROOT}/template.min.js"></script>
+<script type="text/javascript">
+var DEFAULT_GOODS_IMAGE = "{:goods_thumb(array(), 60)}";
+var GOODS_ID={$goods.o2o_fuwu_goods_id|default=0};
+var index
+$(function () {
+    var html=''
+    {present name='o2o_fuwu_goods_spec_list'}
+    {foreach name='o2o_fuwu_goods_spec_list' item='spec' key='index'}
+    html+=template.render('spec_list_html', {spec:{:json_encode($spec)},index:{$index}});
+    {/foreach}
+    index={$index};
+    {else}
+    html=template.render('spec_list_html', {spec:{},index:0});
+    index=0;
+    {/present}
+    $('#spec_list_wrapper').before(html)
+    
+
+    
+    $('#goods_form').validate({
+        errorPlacement: function (error, element) {
+            $(element).nextAll('span').append(error);
+        },
+        submitHandler: function (form) {
+            ds_ajaxpost('goods_form', 'url', "{:url('FuwuManageGoods/index')}");
+        },
+        rules: {
+            o2o_fuwu_goods_name: {
+                required: true,
+            },
+            o2o_fuwu_class_id: {
+                required: true,
+                min: 1,
+            },
+            image_path: {
+                required: true
+            }
+        },
+        messages: {
+            o2o_fuwu_goods_name: {
+                required: '<i class="iconfont">&#xe64c;</i>请填写服务名称',
+            },
+            o2o_fuwu_class_id: {
+                required: '<i class="iconfont">&#xe64c;</i>请选择服务分类',
+                min: '<i class="iconfont">&#xe64c;</i>请选择服务分类',
+            },
+            o2o_fuwu_goods_image: {
+                required: '<i class="iconfont">&#xe64c;</i>请上传封面'
+            }
+        }
+    });
+
+});
+
+function addSpec(){
+    index++
+    var html=template.render('spec_list_html', {spec:{},index:index});
+    $('#spec_list_wrapper').before(html)
+}
+</script> 
+<script type="text/html" id="spec_list_html">
+<tr>
+    <td><input type='hidden' name='o2o_fuwu_goods_spec_id[<%=index%>]' value='<%=spec.o2o_fuwu_goods_spec_id%>'><input class="text" type="text" name="o2o_fuwu_goods_spec_name[<%=index%>]" value="<%=spec.o2o_fuwu_goods_spec_name%>"></td>
+    <td><input class="text stock" type="text" name="o2o_fuwu_goods_spec_unit[<%=index%>]" value="<%=spec.o2o_fuwu_goods_spec_unit%>"></td>
+    <td><input class="text price" type="text" name="o2o_fuwu_goods_spec_price[<%=index%>]" value="<%=spec.o2o_fuwu_goods_spec_price%>"><em class="add-on"><i class="iconfont"></i></em></td>
+    <td><label><input name='o2o_fuwu_goods_spec_type[<%=index%>]' <%if(!spec.o2o_fuwu_goods_spec_type){%>checked<%}%> value='0' type='radio'>默认服务</label><label><input name='o2o_fuwu_goods_spec_type[<%=index%>]' <%if(spec.o2o_fuwu_goods_spec_type){%>checked<%}%> value='1' type='radio'>增值服务</label></td>
+</tr>
+</script> 
+{include file="default/base/mall_footer" /}

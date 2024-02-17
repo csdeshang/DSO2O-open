@@ -1,0 +1,159 @@
+{include file="public/header" /}
+
+
+
+<div class="page">
+    <div class="fixed-bar">
+        <div class="item-title">
+            <div class="subject">
+                <h3>{$Think.lang.ds_storejoin}</h3>
+                <h5></h5>
+            </div>
+            {include file="public/admin_items" /}
+        </div>
+    </div>
+
+    <form id="post_form" method="post" name="form1">
+        <table class="ds-default-table">
+            <tbody>
+            <tr class="noborder">
+                <td colspan="2" class="required"><label class="validation" for="help_title">{$Think.lang.help_title}:</label></td>
+            </tr>
+            <tr class="noborder">
+                <td class="vatop rowform"><input id="help_title" name="help_title" value="{$help.help_title}" class="txt" type="text"></td>
+                <td class="vatop tips"></td>
+            </tr>
+            <tr>
+                <td colspan="2" class="required"><label class="validation" for="help_sort">{$Think.lang.ds_sort}:</label>
+                </td>
+            </tr>
+            <tr class="noborder">
+                <td class="vatop rowform"><input type="text" value="{$help.help_sort}" name="help_sort" id="help_sort" class="txt"></td>
+                <td class="vatop tips">{$Think.lang.help_sort_tips}</td>
+            </tr>
+            <tr>
+                <td colspan="2" class="required"><label class="validation">{$Think.lang.help_info}:</label></td>
+            </tr>
+            <tr class="noborder">
+                <td colspan="2" class="vatop rowform">
+                    {:build_editor(['name'=>'help_info','content'=>htmlspecialchars_decode($help.help_info)])}
+                    <textarea name="help_info" id="help_info" style="width:100%"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" class="required">{$Think.lang.image_upload}:</td>
+            </tr>
+            <tr class="noborder">
+                <td colspan="3" id="divComUploadContainer"><input type="file" multiple="multiple" id="fileupload" name="fileupload" /></td>
+            </tr>
+            <tr>
+                <td colspan="2" class="required">{$Think.lang.help_image_list}:</td>
+            <tr>
+                <td colspan="2">
+                    <ul id="thumbnails" class="thumblists">
+                        {notempty name="pic_list"}
+                        {foreach name="pic_list" item="val"}
+                        <li id="pic_{$val.upload_id}" class="picture" >
+                            <input type="hidden" name="file_id[]" value="{$val.upload_id}" />
+                            <div class="size-64x64"><span class="thumb"><i></i><img src="{:ds_get_pic('admin/storehelp',$val.file_name)}" width="64px" height="64px"/></span></div>
+                            <p><span><a href="javascript:insert_editor('{:ds_get_pic('admin/storehelp',$val.file_name)}');">{$Think.lang.storejoin_insert}</a></span><span><a href="javascript:del_file_upload('{$val.upload_id}');">{$Think.lang.ds_del}</a></span></p>
+                        </li>
+                        {/foreach}
+                        {/notempty}
+                    </ul>
+                </td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr class="tfoot">
+                <td colspan="15" ><input class="btn" type="submit" value="{$Think.lang.ds_submit}"/></td>
+            </tr>
+            </tfoot>
+        </table>
+    </form>
+
+</div>
+<script src="{$Think.PLUGINS_SITE_ROOT}/js/jquery-file-upload/jquery.fileupload.js"></script>
+<script>
+    //按钮先执行验证再提交表单
+    $(function(){
+        $("#post_form").validate({
+            errorPlacement: function(error, element){
+                error.appendTo(element.parent().parent().prev().find('td:first'));
+            },
+            rules : {
+                help_title : {
+                    required : true
+                },
+                type_id : {
+                    required : true
+                },
+                help_sort : {
+                    required : true,
+                    digits   : true
+                },
+                help_url : {
+                    url : true
+                },
+                help_info : {
+                    required   : true
+                }
+            },
+            messages : {
+                help_title : {
+                    required : "{$Think.lang.help_title_required}"
+                },
+                type_id : {
+                    required : "{$Think.lang.type_id_required}"
+                },
+                help_sort  : {
+                    required : "{$Think.lang.help_sort_required}",
+                    digits   : "{$Think.lang.help_sort_digits}"
+                },
+                help_url : {
+                    url : "{$Think.lang.ds_url_error}"
+                },
+                help_info : {
+                    required : "{$Think.lang.help_info_required}"
+                }
+            }
+        });
+        // 图片上传
+        $('#fileupload').each(function(){
+            $(this).fileupload({
+                dataType: 'json',
+                url: "{:url('Storejoin/upload_pic',['item_id'=>$help.help_id])}",
+                done: function (e,data) {
+                    if(data != 'error'){
+                        add_uploadedfile(data.result);
+                    }
+                }
+            });
+        });
+    });
+
+    function add_uploadedfile(file){
+        var newImg = '<li id="pic_' + file.file_id + '" class="picture"><input type="hidden" name="file_id[]" value="' + file.file_id
+            + '" /><div class="size-64x64"><span class="thumb"><i></i><img src="'+ file.file_path + '" width="64px" height="64px"/></span></div><p><span><a href="javascript:insert_editor(\'' + file.file_path +
+            '\');">{$Think.lang.storejoin_insert}</a></span><span><a href="javascript:del_file_upload(' + file.file_id + ');">{$Think.lang.ds_del}</a></span></p></li>';
+        $('#thumbnails').prepend(newImg);
+    }
+   function insert_editor(file_name){
+        ue.execCommand('insertimage', {src:file_name});
+    }
+    function del_file_upload(file_id){
+        layer.confirm('{$Think.lang.ds_ensure_del}', {
+            btn: ['{$Think.lang.ds_ok}', '{$Think.lang.ds_cancel}'],
+            title: false,
+        }, function () {
+            $.getJSON(ADMINSITEURL+'/Storehelp/del_pic.html?file_id=' + file_id, function(result){
+                if(result){
+                    $('#pic_' + file_id).remove();
+                    layer.msg('{$Think.lang.ds_common_del_succ}');
+                }else{
+                    layer.alert('{$Think.lang.ds_common_del_fail}');
+                }
+            });
+        });
+    }
+</script>

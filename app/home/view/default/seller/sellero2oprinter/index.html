@@ -1,0 +1,27 @@
+{extend name="default/base/base_seller" /}
+{block name="seller_main"}
+<div class="empty-wrapper">
+    {if !$store_info.yly_machine_code}
+    <div class="empty-text">{$Think.lang.empty_o2o_printer}</div>
+    <div><a target="_blank" href="https://open-api.10ss.net/oauth/authorize?response_type=code&client_id={$Think.config.ds_config.yly_client_id}&redirect_uri={$redirect_uri|raw}&state=1" class="emtpy-btn">{$Think.lang.go_to_bind}</a></div>
+    {else}
+    {if $store_info.yly_expires_in < TIMESTAMP}
+    <div class="empty-text">{$Think.lang.rebind_o2o_printer}</div>
+    <div><a target="_blank" href="https://open-api.10ss.net/oauth/authorize?response_type=code&client_id={$Think.config.ds_config.yly_client_id}&redirect_uri={$redirect_uri|raw}&state=1" class="emtpy-btn">{$Think.lang.go_to_bind}</a></div>
+    {else}
+    <div class="empty-text">{$Think.lang.already_o2o_printer}{$store_info.yly_machine_code}</div>
+    <div><a href="javascript:void(0)" onclick="unbindPrinter()" class="emtpy-btn">{$Think.lang.go_to_unbind}</a></div>
+    {/if}
+    {/if}
+</div>
+<style>
+    .empty-wrapper{text-align: center;padding:50px 0}
+    .empty-text{font-size:14px;}
+    .emtpy-btn{display: block;border:1px solid #ff4040;color:#ff4040;border-radius:3px;width:100px;margin:20px auto}
+</style>
+<script>
+    function unbindPrinter(){
+        ds_ajaxget_confirm('{:url("seller_o2o_printer/unbind")}','{$Think.lang.unbind_confirm}')
+    }
+</script>
+{/block}

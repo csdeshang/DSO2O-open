@@ -1,0 +1,56 @@
+{include file="public/header" /}
+
+
+
+
+
+<div class="page">
+    <div class="fixed-bar">
+        <div class="item-title">
+            <div class="subject">
+                <h3>{$Think.lang.o2o_errand_class}</h3>
+                <h5></h5>
+            </div>
+            {include file="public/admin_items" /}
+        </div>
+    </div>
+
+
+    <table class="ds-default-table">
+        <thead>
+            <tr>
+                <th>{$Think.lang.o2o_errand_class_name}</th>
+                <th>{$Think.lang.o2o_errand_class_logo}</th>
+                <th>{$Think.lang.o2o_errand_class_sort_order}</th>
+                <th>{$Think.lang.o2o_errand_class_recommend}</th>
+                <th>{$Think.lang.o2o_errand_class_remark}</th>
+                <th>{$Think.lang.o2o_errand_class_item}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {foreach name="o2o_errand_class_list" item="o2o_errand_class"}
+            <tr id="ds_row_{$o2o_errand_class.o2o_errand_class_id}">
+                <td>{$o2o_errand_class.o2o_errand_class_name}</td>
+                <td class="w48 picture">
+                    {if $o2o_errand_class.o2o_errand_class_logo}
+                    <div class="size-44x44">
+                        <span class="thumb"><i></i>
+                            <img src="{:get_o2o_errand_class_logo($o2o_errand_class.o2o_errand_class_logo)}?{:microtime()}"  width="44" height="44"/>
+                        </span>
+                    </div>
+                    {/if}
+                </td>
+                <td>{$o2o_errand_class.o2o_errand_class_sort_order}</td>
+                <td>{if $o2o_errand_class.o2o_errand_class_recommend}{$Think.lang.ds_yes}{else}{$Think.lang.ds_no}{/if}</td>
+                <td>{$o2o_errand_class.o2o_errand_class_remark}</td>
+                <td>{$o2o_errand_class.o2o_errand_class_item}</td>
+                <td>
+                    <a href="javascript:dsLayerOpen('{:url('O2oErrandClass/edit',['o2o_errand_class_id'=>$o2o_errand_class.o2o_errand_class_id])}','{$Think.lang.ds_edit}-{$o2o_errand_class.o2o_errand_class_name}')" class="dsui-btn-edit"><i class="iconfont"></i>{$Think.lang.ds_edit}</a>
+                    <a href="javascript:dsLayerConfirm('{:url('O2oErrandClass/del',['o2o_errand_class_id'=>$o2o_errand_class.o2o_errand_class_id])}','您确定删除此类别吗？',{$o2o_errand_class.o2o_errand_class_id})" class="dsui-btn-del"><i class="iconfont"></i>{$Think.lang.ds_del}</a>
+                </td>
+            </tr>
+            {/foreach}
+        </tbody>
+    </table>
+    {$show_page|raw}
+</div>

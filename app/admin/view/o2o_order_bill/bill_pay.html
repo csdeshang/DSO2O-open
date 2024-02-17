@@ -1,0 +1,28 @@
+{include file="public/header" /}
+
+
+
+<div class="page">
+    
+    <div class="fixed-empty"></div>
+    <form method="post" name="form1" id="form1" action="{:url('O2oOrderBill/pay_bill',['bill_id'=>$Request.param.bill_id])}" enctype="multipart/form-data">
+        <table class="ds-default-table">
+            <tbody>
+                
+                
+                <tr>
+                    <td colspan="2" class="required"><label for="ob_admin_content">{$Think.lang.o2o_order_bill_payment_voucher}{$Think.lang.ds_colon}</label></td>
+                </tr>
+                <tr class="noborder">
+                    <td class="vatop rowform"><input name="file" type="file" /></td>
+                    <td class="vatop tips"><span class="vatop rowform"></span></td>
+                </tr>
+            </tbody>
+            <tfoot id="submit-holder">
+                <tr class="tfoot">
+                    <td colspan="2" ><a href="JavaScript:void(0);" id="dssubmit" class="btn" onclick='$("#form1").submit()'><span>{$Think.lang.ds_submit}</span></a></td>
+                </tr>
+            </tfoot>
+        </table>
+    </form>
+</div>

@@ -1,0 +1,1328 @@
+<?php
+
+use think\facade\Db;
+use GatewayClient\Gateway;
+
+/* 引用全局定义 */
+require __DIR__ . '/common_global.php';
+/* 商品相关调用 */
+require __DIR__ . '/common_goods.php';
+/* 图片上传、生成缩略图、删除等操作调用 */
+require __DIR__ . '/common_upload.php';
+/*
+ * 更换数组的键值 为了应对 ->key
+ */
+
+function ds_validate($name) {
+    $name = preg_replace_callback('/([-_]+([a-z]{1}))/i', function($matches) {
+        return strtoupper($matches[2]);
+    }, $name);
+    $class_name = '\app\common\validate\\' . ucfirst($name);
+    return new $class_name;
+}
+
+function model($name, $layer = 'model') {
+    $name = preg_replace_callback('/([-_]+([a-z]{1}))/i', function($matches) {
+        return strtoupper($matches[2]);
+    }, $name);
+    $class_name = '\app\common\\' . $layer . '\\' . ucfirst($name);
+    return new $class_name;
+}
+
+/**
+ * 去除特殊表情符号
+ * @param type $string
+ * @return type
+ */
+function removeEmojis($clean_text) {
+    // Match Emoticons
+    $regexEmoticons = '/[\x{1F600}-\x{1F64F}]/u';
+    $clean_text = preg_replace($regexEmoticons, '', $clean_text);
+
+    // Match Miscellaneous Symbols and Pictographs
+    $regexSymbols = '/[\x{1F300}-\x{1F5FF}]/u';
+    $clean_text = preg_replace($regexSymbols, '', $clean_text);
+
+    // Match Transport And Map Symbols
+    $regexTransport = '/[\x{1F680}-\x{1F6FF}]/u';
+    $clean_text = preg_replace($regexTransport, '', $clean_text);
+
+    // Match Miscellaneous Symbols
+    $regexMisc = '/[\x{2600}-\x{26FF}]/u';
+    $clean_text = preg_replace($regexMisc, '', $clean_text);
+
+    // Match Dingbats
+    $regexDingbats = '/[\x{2700}-\x{27BF}]/u';
+    $clean_text = preg_replace($regexDingbats, '', $clean_text);
+
+    return $clean_text;
+}
+
+function ds_change_arraykey($array, $key) {
+    $data = array();
+    foreach ($array as $value) {
+        $data[$value[$key]] = $value;
+    }
+    return $data;
+}
+
+/**
+ * 
+ * @param type $table 数据表
+ * @param type $field 条件对应的字段
+ * @param type $name  条件对应的值
+ * @param type $value 数值
+ * @return type
+ */
+function ds_getvalue_byname($table, $field, $name, $value) {
+    return Db::name($table)->where($field, $name)->value($value);
+}
+
+/*
+ * 编辑器内容
+ */
+
+function build_editor($params = array()) {
+    $name = isset($params['name']) ? $params['name'] : null;
+    $theme = isset($params['theme']) ? $params['theme'] : 'normal';
+    $content = isset($params['content']) ? $params['content'] : null;
+    //http://fex.baidu.com/ueditor/#start-toolbar
+    /* 指定使用哪种主题 */
+    $themes = array(
+        'normal' => "[   
+           'fullscreen', 'source', '|', 'undo', 'redo', '|',   
+           'bold', 'italic', 'underline', 'fontborder', 'strikethrough', 'superscript', 'subscript', 'removeformat', 'formatmatch', 'autotypeset', 'blockquote', 'pasteplain', '|', 'forecolor', 'backcolor', 'insertorderedlist', 'insertunorderedlist', 'selectall', 'cleardoc', '|',   
+           'rowspacingtop', 'rowspacingbottom', 'lineheight', '|',   
+           'customstyle', 'paragraph', 'fontfamily', 'fontsize', '|',   
+           'directionalityltr', 'directionalityrtl', 'indent', '|',   
+           'justifyleft', 'justifycenter', 'justifyright', 'justifyjustify', '|', 'touppercase', 'tolowercase', '|',   
+           'link', 'unlink', 'anchor', '|', 'imagenone', 'imageleft', 'imageright', 'imagecenter', '|',   
+           'emotion',  'map', 'gmap',  'insertcode', 'template',  '|',   
+           'horizontal', 'date', 'time', 'spechars', '|',   
+           'inserttable', 'deletetable', 'insertparagraphbeforetable', 'insertrow', 'deleterow', 'insertcol', 'deletecol', 'mergecells', 'mergeright', 'mergedown', 'splittocells', 'splittorows', 'splittocols', 'charts', '|',   
+           'searchreplace', 'help', 'drafts', 'charts'
+       ]", 'simple' => " ['fullscreen', 'source', 'undo', 'redo', 'bold']",
+    );
+    switch ($theme) {
+        case 'simple':
+            $theme_config = $themes['simple'];
+            break;
+        case 'normal':
+            $theme_config = $themes['normal'];
+            break;
+        default:
+            $theme_config = $themes['normal'];
+            break;
+    }
+    /* 配置界面语言 */
+    switch (config('lang.default_lang')) {
+        case 'zh-cn':
+            $lang = PLUGINS_SITE_ROOT . '/ueditor/lang/zh-cn/zh-cn.js';
+            break;
+        case 'en-us':
+            $lang = PLUGINS_SITE_ROOT . '/ueditor/lang/en/en.js';
+            break;
+        default:
+            $lang = PLUGINS_SITE_ROOT . '/ueditor/lang/zh-cn/zh-cn.js';
+            break;
+    }
+    $include_js = '<script type="text/javascript" charset="utf-8" src="' . PLUGINS_SITE_ROOT . '/ueditor/ueditor.config.js"></script> <script type="text/javascript" charset="utf-8" src="' . PLUGINS_SITE_ROOT . '/ueditor/ueditor.all.min.js""> </script><script type="text/javascript" charset="utf-8" src="' . $lang . '"></script>';
+    $content = json_encode($content);
+    $str = <<<EOT
+$include_js
+<script type="text/javascript">
+var ue = UE.getEditor('{$name}',{
+    toolbars:[{$theme_config}],
+        });
+    if($content){
+ue.ready(function() {
+       this.setContent($content);	
+})
+   }
+      
+</script>
+EOT;
+    return $str;
+}
+
+/**
+ * 
+ * @param type $code   100000表示为正确,其他为错误代码
+ * @param type $message  提示消息
+ * @param type $result  返回数据
+ * @param type $$requestMethod  返回请求Method
+ */
+function ds_json_encode($code, $message = '', $result = '', $requestMethod = '', $if_exit = true) {
+    $data = array('code' => $code, 'message' => $message, 'result' => $result, 'requestMethod' => $requestMethod);
+    if (!empty($_GET['callback'])) {
+        echo $_GET['callback'] . '(' . json_encode($data) . ')';
+    } else {
+        echo json_encode($data);
+    }
+    if ($if_exit) {
+        exit;
+    }
+}
+
+/**
+ * 规范数据返回函数
+ * @param unknown $code
+ * @param unknown $msg
+ * @param unknown $data
+ * @return multitype:unknown
+ */
+function ds_callback($code, $msg = '', $data = array()) {
+    return array('code' => $code, 'msg' => $msg, 'data' => $data);
+}
+
+/**
+ * 格式化字节大小
+ * @param  number $size 字节数
+ * @param  string $delimiter 数字和单位分隔符
+ * @return string            格式化后的带单位的大小
+ */
+function format_bytes($size, $delimiter = '') {
+    $units = array('B', 'KB', 'MB', 'GB', 'TB', 'PB');
+    for ($i = 0; $size >= 1024 && $i < 5; $i++)
+        $size /= 1024;
+    return round($size, 2) . $delimiter . $units[$i];
+}
+
+/**
+ * 消息提示，主要适用于普通页面AJAX提交的情况
+ *
+ * @param string $message 消息内容
+ * @param string $url 提示完后的URL去向
+ * @param stting $alert_type 提示类型 error/succ/notice 分别为错误/成功/警示
+ * @param string $extrajs 扩展JS
+ * @param int $time 停留时间
+ */
+function ds_show_dialog($message = '', $url = '', $alert_type = 'error', $extrajs = '', $time = 2) {
+    $message = str_replace("'", "\\'", strip_tags($message));
+
+    $paramjs = null;
+    if ($url == 'reload') {
+        $paramjs = 'window.location.reload()';
+    } elseif ($url != '') {
+        $paramjs = 'window.location.href =\'' . $url . '\'';
+    }
+    if ($paramjs) {
+        $paramjs = 'function (){' . $paramjs . '}';
+    } else {
+        $paramjs = 'null';
+    }
+    $modes = array('error' => 'alert', 'succ' => 'succ', 'notice' => 'notice', 'js' => 'js');
+    $cover = $alert_type == 'error' ? 1 : 0;
+    $extra = 'showDialog(\'' . $message . '\', \'' . $modes[$alert_type] . '\', null, ' . ($paramjs ? $paramjs : 'null') . ', ' . $cover . ', null, null, null, null, ' . (is_numeric($time) ? $time : 'null') . ', null);';
+    $extra = '<script type="text/javascript" reload="1">' . $extra . '</script>';
+    if ($extrajs != '' && substr(trim($extrajs), 0, 7) != '<script') {
+        $extrajs = '<script type="text/javascript" reload="1">' . $extrajs . '</script>';
+    }
+    $extra .= $extrajs;
+    ob_end_clean();
+    @header("Expires: -1");
+    @header("Cache-Control: no-store, private, post-check=0, pre-check=0, max-age=0", FALSE);
+    @header("Pragma: no-cache");
+    @header("Content-type: text/xml; charset=utf-8");
+
+    $string = '<?xml version="1.0" encoding="utf-8"?>' . "\r\n";
+    $string .= '<root><![CDATA[' . $message . $extra . ']]></root>';
+    echo $string;
+    exit;
+}
+
+/**
+ * 取上一步来源地址
+ *
+ * @param
+ * @return string 字符串类型的返回结果
+ */
+function get_referer() {
+    return empty($_SERVER['HTTP_REFERER']) ? '' : $_SERVER['HTTP_REFERER'];
+}
+
+/**
+ * 加密函数
+ *
+ * @param string $txt 需要加密的字符串
+ * @param string $key 密钥
+ * @return string 返回加密结果
+ */
+function ds_encrypt($txt, $key = '') {
+    if (empty($txt))
+        return $txt;
+    if (empty($key))
+        $key = md5(config('ds_config.setup_date'));
+    $chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.";
+    $ikey = "-x6g6ZWm2G9g_vr0Bo.pOq3kRIxsZ6rm";
+    $nh1 = rand(0, 64);
+    $nh2 = rand(0, 64);
+    $nh3 = rand(0, 64);
+    $ch1 = $chars{$nh1};
+    $ch2 = $chars{$nh2};
+    $ch3 = $chars{$nh3};
+    $nhnum = $nh1 + $nh2 + $nh3;
+    $knum = 0;
+    $i = 0;
+    while (isset($key{$i}))
+        $knum += ord($key{$i++});
+    $mdKey = substr(md5(md5(md5($key . $ch1) . $ch2 . $ikey) . $ch3), $nhnum % 8, $knum % 8 + 16);
+    $txt = base64_encode(TIMESTAMP . '_' . $txt);
+    $txt = str_replace(array('+', '/', '='), array('-', '_', '.'), $txt);
+    $tmp = '';
+    $j = 0;
+    $k = 0;
+    $tlen = strlen($txt);
+    $klen = strlen($mdKey);
+    for ($i = 0; $i < $tlen; $i++) {
+        $k = $k == $klen ? 0 : $k;
+        $j = ($nhnum + strpos($chars, $txt{$i}) + ord($mdKey{$k++})) % 64;
+        $tmp .= $chars{$j};
+    }
+    $tmplen = strlen($tmp);
+    $tmp = substr_replace($tmp, $ch3, $nh2 % ++$tmplen, 0);
+    $tmp = substr_replace($tmp, $ch2, $nh1 % ++$tmplen, 0);
+    $tmp = substr_replace($tmp, $ch1, $knum % ++$tmplen, 0);
+    return $tmp;
+}
+
+/**
+ * 解密函数
+ *
+ * @param string $txt 需要解密的字符串
+ * @param string $key 密匙
+ * @return string 字符串类型的返回结果
+ */
+function ds_decrypt($txt, $key = '', $ttl = 0) {
+    if (empty($txt))
+        return $txt;
+    if (empty($key))
+        $key = md5(config('ds_config.setup_date'));
+
+    $chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.";
+    $ikey = "-x6g6ZWm2G9g_vr0Bo.pOq3kRIxsZ6rm";
+    $knum = 0;
+    $i = 0;
+    $tlen = @strlen($txt);
+    while (isset($key{$i}))
+        $knum += ord($key{$i++});
+    $ch1 = @$txt{$knum % $tlen};
+    $nh1 = strpos($chars, $ch1);
+    $txt = @substr_replace($txt, '', $knum % $tlen--, 1);
+    $ch2 = @$txt{$nh1 % $tlen};
+    $nh2 = @strpos($chars, $ch2);
+    $txt = @substr_replace($txt, '', $nh1 % $tlen--, 1);
+    $ch3 = @$txt{$nh2 % $tlen};
+    $nh3 = @strpos($chars, $ch3);
+    $txt = @substr_replace($txt, '', $nh2 % $tlen--, 1);
+    $nhnum = $nh1 + $nh2 + $nh3;
+    $mdKey = substr(md5(md5(md5($key . $ch1) . $ch2 . $ikey) . $ch3), $nhnum % 8, $knum % 8 + 16);
+    $tmp = '';
+    $j = 0;
+    $k = 0;
+    $tlen = @strlen($txt);
+    $klen = @strlen($mdKey);
+    for ($i = 0; $i < $tlen; $i++) {
+        $k = $k == $klen ? 0 : $k;
+        $j = strpos($chars, $txt{$i}) - $nhnum - ord($mdKey{$k++});
+        while ($j < 0)
+            $j += 64;
+        $tmp .= $chars{$j};
+    }
+    $tmp = str_replace(array('-', '_', '.'), array('+', '/', '='), $tmp);
+    $tmp = trim(base64_decode($tmp));
+
+    if (preg_match("/\d{10}_/s", substr($tmp, 0, 11))) {
+        if ($ttl > 0 && (TIMESTAMP - (int) substr($tmp, 0, 11) > $ttl)) {
+            $tmp = null;
+        } else {
+            $tmp = substr($tmp, 11);
+        }
+    }
+    return $tmp;
+}
+
+/**
+ * 获取文件列表(所有子目录文件)
+ *
+ * @param string $path 目录
+ * @param array $file_list 存放所有子文件的数组
+ * @param array $ignore_dir 需要忽略的目录或文件
+ * @return array 数据格式的返回结果
+ */
+function read_file_list($path, &$file_list, $ignore_dir = array()) {
+    $path = rtrim($path, '/');
+    if (is_dir($path)) {
+        $handle = @opendir($path);
+        if ($handle) {
+            while (false !== ($dir = readdir($handle))) {
+                if ($dir != '.' && $dir != '..') {
+                    if (!in_array($dir, $ignore_dir)) {
+                        if (is_file($path . '/' . $dir)) {
+                            $file_list[] = $path . '/' . $dir;
+                        } elseif (is_dir($path . '/' . $dir)) {
+                            read_file_list($path . '/' . $dir, $file_list, $ignore_dir);
+                        }
+                    }
+                }
+            }
+            @closedir($handle);
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
+}
+
+/**
+ * 价格格式化
+ *
+ * @param int $price
+ * @return string    $price_format
+ */
+function ds_price_format($price) {
+    $price_format = number_format($price, 2, '.', '');
+    return $price_format;
+}
+
+/**
+ * 价格格式化
+ *
+ * @param int $price
+ * @return string    $price_format
+ */
+function ds_price_format_forlist($price) {
+    if ($price >= 10000) {
+        return number_format(floor($price / 100) / 100, 2, '.', '') . lang('ten_thousand');
+    } else {
+        return lang('currency') . $price;
+    }
+}
+
+/**
+ * 通知邮件/通知消息 内容转换函数
+ *
+ * @param string $message 内容模板
+ * @param array $param 内容参数数组
+ * @return string 通知内容
+ */
+function ds_replace_text($message, $param) {
+    if (!is_array($param))
+        return false;
+    foreach ($param as $k => $v) {
+        $message = str_replace('${' . $k . '}', $v, $message);
+    }
+    return $message;
+}
+
+/** @noinspection InconsistentLineSeparators */
+
+/**
+ * 字符串切割函数，一个字母算一个位置,一个字算2个位置
+ *
+ * @param string $string 待切割的字符串
+ * @param int $length 切割长度
+ * @param string $dot 尾缀
+ */
+function str_cut($string, $length, $dot = '') {
+    $string = str_replace(array(
+        '&nbsp;', '&amp;', '&quot;', '&#039;', '&ldquo;', '&rdquo;', '&mdash;', '&lt;', '&gt;',
+        '&middot;', '&hellip;'
+            ), array(' ', '&', '"', "'", '“', '”', '—', '<', '>', '·', '…'), $string);
+    $strlen = strlen($string);
+    if ($strlen <= $length)
+        return $string;
+    $maxi = $length - strlen($dot);
+    $strcut = '';
+
+    $n = $tn = $noc = 0;
+    while ($n < $strlen) {
+        $t = ord($string[$n]);
+        if ($t == 9 || $t == 10 || (32 <= $t && $t <= 126)) {
+            $tn = 1;
+            $n++;
+            $noc++;
+        } elseif (194 <= $t && $t <= 223) {
+            $tn = 2;
+            $n += 2;
+            $noc += 2;
+        } elseif (224 <= $t && $t < 239) {
+            $tn = 3;
+            $n += 3;
+            $noc += 2;
+        } elseif (240 <= $t && $t <= 247) {
+            $tn = 4;
+            $n += 4;
+            $noc += 2;
+        } elseif (248 <= $t && $t <= 251) {
+            $tn = 5;
+            $n += 5;
+            $noc += 2;
+        } elseif ($t == 252 || $t == 253) {
+            $tn = 6;
+            $n += 6;
+            $noc += 2;
+        } else {
+            $n++;
+        }
+        if ($noc >= $maxi)
+            break;
+    }
+    if ($noc > $maxi)
+        $n -= $tn;
+    $strcut = substr($string, 0, $n);
+    $strcut = str_replace(array('&', '"', "'", '<', '>'), array('&amp;', '&quot;', '&#039;', '&lt;', '&gt;'), $strcut);
+    return $strcut . $dot;
+}
+
+/*
+ * 重写$_SERVER['REQUREST_URI']
+ */
+
+function request_uri() {
+    if (isset($_SERVER['REQUEST_URI'])) {
+        $uri = $_SERVER['REQUEST_URI'];
+    } else {
+        if (isset($_SERVER['argv'])) {
+            $uri = $_SERVER['PHP_SELF'] . '?' . $_SERVER['argv'][0];
+        } else {
+            $uri = $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'];
+        }
+    }
+    return $uri;
+}
+
+
+function get_member_id_by_XDSKEY() {
+    $key = request()->header('X-DS-KEY');
+    if (!$key) {
+        return;
+    }
+    $mbusertoken_model = model('mbusertoken');
+    $mb_user_token_info = $mbusertoken_model->getMbusertokenInfoByToken($key);
+    if (empty($mb_user_token_info)) {
+        return;
+    } else {
+        return $mb_user_token_info['member_id'];
+    }
+}
+
+function get_member_idcard_image($member_image, $if_local = false) {
+    if ($member_image) {
+        return ds_get_pic(ATTACH_IDCARD_IMAGE, $member_image);
+    }
+
+    return '';
+}
+
+/**
+ * 取得用户头像图片
+ *
+ * @param string $member_avatar
+ * @return string
+ */
+function get_member_avatar($member_avatar) {
+    if (empty($member_avatar)) {
+        return ds_get_pic(ATTACH_COMMON,config('ds_config.default_user_portrait'));
+    } else {
+        $url = ds_get_pic(ATTACH_AVATAR, $member_avatar);
+        if ($url) {
+            return $url;
+        } else {
+            return ds_get_pic(ATTACH_COMMON,config('ds_config.default_user_portrait'));
+        }
+    }
+}
+
+function get_percent($score, $total) {
+    if ($total > 0) {
+        return $score / $total * 100;
+    }
+}
+
+/**
+ * 获取配送员头像
+ * @param type $member_avatar
+ * @param type $type
+ * @return string
+ */
+function get_o2o_distributor_file($member_avatar, $type = 'avatar') {
+    if (empty($member_avatar)) {
+        if ($type == 'avatar') {
+            return ds_get_pic(ATTACH_COMMON,config('ds_config.default_user_portrait'));
+        } else {
+            return '';
+        }
+    } else {
+        return ds_get_pic(ATTACH_O2O_DISTRIBUTOR,$member_avatar);
+    }
+}
+
+function get_o2o_fuwu_file($id, $member_avatar, $type) {
+    if (empty($member_avatar)) {
+        if ($type == 'avatar') {
+            return ds_get_pic(ATTACH_COMMON,config('ds_config.default_user_portrait'));
+        } else {
+            return '';
+        }
+    } else {
+        return ds_get_pic(ATTACH_O2O_FUWU_ORGANIZATION . '/' . $id,$member_avatar);
+    }
+}
+
+function get_o2o_fuwu_class_logo($member_avatar) {
+    if ($member_avatar) {
+        return ds_get_pic(ATTACH_O2O_FUWU_CLASS,$member_avatar);
+    }
+}
+
+function get_o2o_errand_class_logo($member_avatar) {
+    if ($member_avatar) {
+        return ds_get_pic(ATTACH_O2O_ERRAND_CLASS,$member_avatar);
+    }
+}
+
+/**
+ * 成员头像
+ * @param string $member_id
+ * @return string
+ */
+function get_member_avatar_for_id($id) {
+    $member_model=model('member');
+    $member_info=$member_model->getMemberInfoByID($id);
+    if($member_info){
+        return get_member_avatar($member_info['member_avatar']);
+    }
+}
+
+/**
+ * 取得店铺标志
+ *
+ * @param string $img 图片名
+ * @param string $type 查询类型 store_logo/store_avatar
+ * @return string
+ */
+function get_store_logo($img, $type = 'store_avatar') {
+    $linfo = explode('_', $img);
+    $store_id = $linfo['0'];
+    if ($store_id == 'alioss') {
+        $store_id = $linfo['1'];
+    }
+    if ($type == 'store_avatar') {
+        if (empty($img)) {
+            return ds_get_pic(ATTACH_COMMON, config('ds_config.default_store_avatar'));
+        } else {
+            $url = ds_get_pic(ATTACH_STORE . '/' . $store_id, $img);
+            if (!$url) {
+                return ds_get_pic(ATTACH_COMMON, config('ds_config.default_store_avatar'));
+            } else {
+                return $url;
+            }
+        }
+    } elseif ($type == 'store_logo') {
+        if (empty($img)) {
+            return ds_get_pic(ATTACH_COMMON, config('ds_config.default_store_logo'));
+        } else {
+            return ds_get_pic(ATTACH_STORE . '/' . $store_id, $img);
+        }
+    } elseif ($type == 'store_banner') {
+        if (!empty($img)) {
+            return ds_get_pic(ATTACH_STORE . '/' . $store_id, $img);
+        }
+    }
+}
+
+function get_adv_code($adv_code) {
+    $url = ds_get_pic(ATTACH_ADV, $adv_code);
+    if (!$url) {
+        return ds_get_pic(ATTACH_COMMON,config('ds_config.default_goods_image'));
+    } else {
+        return $url;
+    }
+}
+
+function get_appadv_code($adv_code) {
+    $url = ds_get_pic(ATTACH_APPADV, $adv_code);
+    if (!$url) {
+        return ds_get_pic(ATTACH_COMMON,config('ds_config.default_goods_image'));
+    } else {
+        return $url;
+    }
+}
+
+/**
+ * 获取店铺分类图标
+ * @param type $storeclass_id
+ * @return type
+ */
+function get_storeclass_pic($storeclass_pic) {
+    $url = ds_get_pic(ATTACH_STORECLASS, $storeclass_pic);
+    if (!$url) {
+        return ds_get_pic(ATTACH_COMMON,config('ds_config.default_goods_image'));
+    } else {
+        return $url;
+    }
+}
+
+/**
+ * 获取用户相册图片
+ * @param type $user_id
+ * @param type $ap_cover
+ * @return type
+ */
+function get_snsalbumpic($user_id, $ap_cover) {
+    $url = ds_get_pic(ATTACH_MALBUM . '/' . $user_id, $ap_cover);
+    if (!$url) {
+        return ds_get_pic(ATTACH_COMMON,config('ds_config.default_goods_image'));
+    } else {
+        return $url;
+    }
+}
+
+/**
+ * 获取开店申请图片
+ */
+function get_store_joinin_imageurl($image_name = '') {
+    return ds_get_pic(ATTACH_STORE_JOININ, $image_name);
+}
+
+/**
+ * 取得随机数
+ *
+ * @param int $length 生成随机数的长度
+ * @param int $numeric 是否只产生数字随机数 1是0否
+ * @return string
+ */
+function random($length, $numeric = 0) {
+    $seed = base_convert(md5(microtime() . $_SERVER['DOCUMENT_ROOT']), 16, $numeric ? 10 : 35);
+    $seed = $numeric ? (str_replace('0', '', $seed) . '012340567890') : ($seed . 'zZ' . strtoupper($seed));
+    $hash = '';
+    $max = strlen($seed) - 1;
+    for ($i = 0; $i < $length; $i++) {
+        $hash .= $seed{mt_rand(0, $max)};
+    }
+    return $hash;
+}
+
+/**
+ * sns表情标示符替换为html
+ */
+function parsesmiles($message,$type=0) {
+    if ($type==1) {
+        $chat_goods = $message;
+        $message = '<div class="dstouch-chat-product"> <a href="' . HOME_SITE_URL . '/goods/index?goods_id=' . $chat_goods['goods_id'] . '" target="_blank"><div class="goods-pic"><img src="' . $chat_goods['goods_image_url'] . '" alt=""/></div><div class="goods-info"><div class="goods-name">' . $chat_goods['goods_name'] . '</div><div class="goods-price">￥' . $chat_goods['goods_price'] . "</div></div></a> </div>";
+    } else {
+        $file = root_path() . 'extend/smilies.php';
+        if (file_exists($file)) {
+            include $file;
+            if (!empty($smilies_array) && is_array($smilies_array)) {
+                $imagesurl = PLUGINS_SITE_ROOT . '/js' . '/smilies' . '/images' . '/';
+                $replace_arr = array();
+                foreach ($smilies_array['replacearray'] AS $key => $smiley) {
+                    $replace_arr[$key] = '<img src="' . $imagesurl . $smiley['imagename'] . '" title="' . $smiley['desc'] . '" border="0" alt="' . $imagesurl . $smiley['desc'] . '" />';
+                }
+                $message = preg_replace($smilies_array['searcharray'], $replace_arr, $message);
+            }
+        }
+    }
+    return $message;
+}
+
+/**
+ * 延时加载分页功能，判断是否有更多连接和limitstart值和经过验证修改的$delay_eachnum值
+ * @param int $delay_eachnum 延时分页每页显示的条数
+ * @param int $delay_page 延时分页当前页数
+ * @param int $count 总记录数
+ * @param bool $ispage 是否在分页模式中实现延时分页(前台显示的两种不同效果)
+ * @param int $page_nowpage 分页当前页数
+ * @param int $page_eachnum 分页每页显示条数
+ * @param int $page_limitstart 分页初始limit值
+ * @return array array('hasmore'=>'是否显示更多连接','limitstart'=>'加载的limit开始值','delay_eachnum'=>'经过验证修改的$delay_eachnum值');
+ */
+function lazypage($delay_eachnum, $delay_page, $count, $ispage = false, $page_nowpage = 1, $page_eachnum = 1, $page_limitstart = 1) {
+    //是否有多余
+    $hasmore = true;
+    $limitstart = 0;
+    if ($ispage == true) {
+        if ($delay_eachnum < $page_eachnum) {//当延时加载每页条数小于分页的每页条数时候实现延时加载，否则按照普通分页程序流程处理
+            $page_totlepage = ceil($count / $page_eachnum);
+            //计算limit的开始值
+            $limitstart = $page_limitstart + ($delay_page - 1) * $delay_eachnum;
+            if ($page_totlepage > $page_nowpage) {//当前不为最后一页
+                if ($delay_page >= $page_eachnum / $delay_eachnum) {
+                    $hasmore = false;
+                }
+                //判断如果分页的每页条数与延时加载每页的条数不能整除的处理
+                if ($hasmore == false && $page_eachnum % $delay_eachnum > 0) {
+                    $delay_eachnum = $page_eachnum % $delay_eachnum;
+                }
+            } else {//当前最后一页
+                $showcount = ($page_totlepage - 1) * $page_eachnum + $delay_eachnum * $delay_page; //已经显示的记录总数
+                if ($count <= $showcount) {
+                    $hasmore = false;
+                }
+            }
+        } else {
+            $hasmore = false;
+        }
+    } else {
+        if ($count <= $delay_page * $delay_eachnum) {
+            $hasmore = false;
+        }
+        //计算limit的开始值
+        $limitstart = ($delay_page - 1) * $delay_eachnum;
+    }
+
+    return array('hasmore' => $hasmore, 'limitstart' => $limitstart, 'delay_eachnum' => $delay_eachnum);
+}
+
+/**
+ * 返回以原数组某个值为下标的新数据
+ *
+ * @param array $array
+ * @param string $key
+ * @param int $type 1一维数组2二维数组
+ * @return array
+ */
+function array_under_reset($array, $key, $type = 1) {
+    if (is_array($array)) {
+        $tmp = array();
+        foreach ($array as $v) {
+            if ($type === 1) {
+                $tmp[$v[$key]] = $v;
+            } elseif ($type === 2) {
+                $tmp[$v[$key]][] = $v;
+            }
+        }
+        return $tmp;
+    } else {
+        return $array;
+    }
+}
+
+/**
+ * KV缓存 读
+ *
+ * @param string $key 缓存名称
+ * @param boolean $callback 缓存读取失败时是否使用回调 true代表使用cache.model中预定义的缓存项 默认不使用回调
+ * @param callable $callback 传递非boolean值时 通过is_callable进行判断 失败抛出异常 成功则将$key作为参数进行回调
+ * @return mixed
+ */
+function rkcache($key, $callback = false) {
+    $value = cache($key);
+    if (empty($value) && $callback !== false) {
+        if ($callback === true) {
+            $callback = array(model('cache'), 'call');
+        }
+
+        if (!is_callable($callback)) {
+            throw new \think\Exception('Invalid rkcache callback!', 10006);
+        }
+        $value = call_user_func($callback, $key);
+        wkcache($key, $value);
+    }
+    return $value;
+}
+
+/**
+ * KV缓存 写
+ *
+ * @param string $key 缓存名称
+ * @param mixed $value 缓存数据 若设为否 则下次读取该缓存时会触发回调（如果有）
+ * @param int $expire 缓存时间 单位秒 null代表不过期
+ * @return boolean
+ */
+function wkcache($key, $value, $expire = 7200) {
+    return cache($key, $value, $expire);
+}
+
+/**
+ * KV缓存 删
+ *
+ * @param string $key 缓存名称
+ * @return boolean
+ */
+function dkcache($key) {
+    return cache($key, NULL);
+}
+
+/**
+ * 读取缓存信息
+ *
+ * @param string $key 要取得缓存键
+ * @param string $prefix 键值前缀
+ * @return array/bool
+ */
+function rcache($key = null, $prefix = '') {
+    if ($key === null || !config('ds_config.cache_open'))
+        return array();
+    if (!empty($prefix)) {
+        $name = $prefix . $key;
+    } else {
+        $name = $key;
+    }
+    $cache_info = cache($name);
+    //如果name值不存在，则默认返回 false。
+    return $cache_info;
+}
+
+/**
+ * 写入缓存
+ *
+ * @param string $key 缓存键值
+ * @param array $data 缓存数据
+ * @param string $prefix 键值前缀
+ * @param int $expire 缓存周期  单位分，0为永久缓存
+ * @return bool 返回值
+ */
+function wcache($key = null, $data = array(), $prefix = '', $expire = 3600) {
+    if ($key === null || !config('ds_config.cache_open') || !is_array($data))
+        return;
+
+    if (!empty($prefix)) {
+        $name = $prefix . $key;
+    } else {
+        $name = $key;
+    }
+    $cache_info = cache($name, $data, $expire);
+    //如果设置成功返回true，否则返回false。
+    return $cache_info;
+}
+
+/**
+ * 删除缓存
+ * @param string $key 缓存键值
+ * @param string $prefix 键值前缀
+ * @return boolean
+ */
+function dcache($key = null, $prefix = '') {
+    if ($key === null || !config('ds_config.cache_open'))
+        return true;
+    if (!empty($prefix)) {
+        $name = $prefix . $key;
+    } else {
+        $name = $key;
+    }
+    return cache($name, NULL);
+}
+
+/*
+ * 通知接单配送员
+ */
+
+function o2o_send_order($order_list) {
+    if (config('ds_config.instant_message_open')==1) {
+        // 设置GatewayWorker服务的Register服务ip和端口，请根据实际情况改成实际值(ip不能是0.0.0.0)
+        try{
+            Gateway::$registerAddress = config('ds_config.instant_message_register_url');
+            foreach($order_list as $order_info){
+                Gateway::sendToUid('5:'.$order_info['o2o_distributor_id'], json_encode(array('type'=>'addOrder','order_info'=>$order_info)));
+            }
+        }catch(\Exception $e){
+            return ds_callback(false,$e->getMessage());
+        }
+    }else{
+        return ds_callback(false,'未设置GatewayWorker gateway地址');
+    }
+    
+}
+
+/**
+ * 输出聊天信息
+ *
+ * @return string
+ */
+function get_chat() {
+    return Chat::getChatHtml();
+}
+
+/**
+ * 验证是否为平台店铺
+ *
+ * @return boolean
+ */
+function check_platform_store() {
+    return session('is_platform_store');
+}
+
+/**
+ * 验证是否为平台店铺 并且绑定了全部商品类目
+ *
+ * @return boolean
+ */
+function check_platform_store_bindingall_goodsclass() {
+
+    return check_platform_store() && session('bind_all_gc');
+}
+
+/**
+ * 生成20位编号(时间+微秒+随机数+会员ID%1000)，该值会传给第三方支付接口
+ * 长度 =12位 + 3位 + 2位 + 3位  = 20位
+ * 1000个会员同一微秒提订单，重复机率为1/100
+ * @return string
+ */
+function makePaySn($member_id) {
+    return date('ymdHis', TIMESTAMP) . sprintf('%03d', (float) microtime() * 1000) . mt_rand(10, 99) . sprintf('%03d', intval($member_id) % 1000);
+}
+
+/**
+ * 生成6位收货码
+ * @return string
+ */
+function makeO2oErrandOrderPickupCode() {
+    $order_model = model('o2o_errand_order');
+    $o2o_order_pickup_code = str_pad(strval(rand(0, 999999)), 6, '0', STR_PAD_LEFT);
+    $i = 0;
+    while ($i < 100 && $order_model->getO2oErrandOrderCount(array('o2o_errand_order_receive_code' => $o2o_order_pickup_code, 'o2o_errand_order_state' => ORDER_STATE_SEND))) {
+        $o2o_order_pickup_code = str_pad(strval(rand(0, 999999)), 6, '0', STR_PAD_LEFT);
+        $i++;
+    }
+    if ($i < 100) {
+        return $o2o_order_pickup_code;
+    } else {
+        return false;
+    }
+}
+
+/**
+ * 生成6位取货码
+ * @return string
+ */
+function makeO2oOrderPickupCode() {
+    $order_model = model('order');
+    $o2o_order_pickup_code = str_pad(strval(rand(0, 999999)), 6, '0', STR_PAD_LEFT);
+    $i = 0;
+    while ($i < 100 && $order_model->getOrderCount(array('o2o_order_pickup_code' => $o2o_order_pickup_code, 'order_state' => ORDER_STATE_DELIVER))) {
+        $o2o_order_pickup_code = str_pad(strval(rand(0, 999999)), 6, '0', STR_PAD_LEFT);
+        $i++;
+    }
+    if ($i < 100) {
+        return $o2o_order_pickup_code;
+    } else {
+        return false;
+    }
+}
+
+/**
+ * 生成6位收货码
+ * @return string
+ */
+function makeO2oOrderReceiveCode() {
+    $order_model = model('order');
+    $o2o_order_receive_code = str_pad(strval(rand(0, 999999)), 6, '0', STR_PAD_LEFT);
+    $i = 0;
+    while ($i < 100 && $order_model->getOrderCount(array('o2o_order_receive_code' => $o2o_order_receive_code, 'order_state' => ORDER_STATE_SEND))) {
+        $o2o_order_receive_code = str_pad(strval(rand(0, 999999)), 6, '0', STR_PAD_LEFT);
+        $i++;
+    }
+    if ($i < 100) {
+        return $o2o_order_receive_code;
+    } else {
+        return false;
+    }
+}
+
+/**
+ * 获得店铺状态样式名称
+ * @param $param array $store_info
+ * @return string
+ */
+function get_store_state_classname($store_info) {
+    $result = 'open';
+    if (intval($store_info['store_state']) === 1) {
+        $store_endtime = intval($store_info['store_endtime']);
+        if ($store_endtime > 0) {
+            if ($store_endtime < TIMESTAMP) {
+                $result = 'expired';
+            } elseif (($store_endtime - 864000) < TIMESTAMP) {
+                //距离到期10天
+                $result = 'expire';
+            }
+        }
+    } else {
+        $result = 'close';
+    }
+    return $result;
+}
+
+/**
+ * 将字符部分加密并输出
+ * @param unknown $str
+ * @param unknown $start 从第几个位置开始加密(从1开始)
+ * @param unknown $length 连续加密多少位
+ * @return string
+ */
+function encrypt_show($str, $start, $length) {
+    $end = $start - 1 + $length;
+    $array = str_split($str);
+    foreach ($array as $k => $v) {
+        if ($k >= $start - 1 && $k < $end) {
+            $array[$k] = '*';
+        }
+    }
+    return implode('', $array);
+}
+
+/**
+ * CURL请求
+ * @param $url 请求url地址
+ * @param $method 请求方法 get post
+ * @param null $postfields post数据数组
+ * @param array $headers 请求header信息
+ * @param bool|false $debug 调试开启 默认false
+ * @return mixed
+ */
+function http_request($url, $method = "GET", $postfields = null, $headers = array(), $debug = false) {
+    $method = strtoupper($method);
+    $ci = curl_init();
+    /* Curl settings */
+    curl_setopt($ci, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
+    curl_setopt($ci, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 6.2; WOW64; rv:34.0) Gecko/20100101 Firefox/34.0");
+    curl_setopt($ci, CURLOPT_CONNECTTIMEOUT, 60); /* 在发起连接前等待的时间，如果设置为0，则无限等待 */
+    curl_setopt($ci, CURLOPT_TIMEOUT, 7); /* 设置cURL允许执行的最长秒数 */
+    curl_setopt($ci, CURLOPT_RETURNTRANSFER, true);
+    switch ($method) {
+        case "POST":
+            curl_setopt($ci, CURLOPT_POST, true);
+            if (!empty($postfields)) {
+                $tmpdatastr = is_array($postfields) ? http_build_query($postfields) : $postfields;
+                curl_setopt($ci, CURLOPT_POSTFIELDS, $tmpdatastr);
+            }
+            break;
+        default:
+            curl_setopt($ci, CURLOPT_CUSTOMREQUEST, $method); /* //设置请求方式 */
+            break;
+    }
+    $ssl = preg_match('/^https:\/\//i', $url) ? TRUE : FALSE;
+    curl_setopt($ci, CURLOPT_URL, $url);
+    if ($ssl) {
+        curl_setopt($ci, CURLOPT_SSL_VERIFYPEER, FALSE); // https请求 不验证证书和hosts
+        curl_setopt($ci, CURLOPT_SSL_VERIFYHOST, FALSE); // 不从证书中检查SSL加密算法是否存在
+    }
+    //curl_setopt($ci, CURLOPT_HEADER, true); /*启用时会将头文件的信息作为数据流输出*/
+    curl_setopt($ci, CURLOPT_FOLLOWLOCATION, 1);
+    curl_setopt($ci, CURLOPT_MAXREDIRS, 2); /* 指定最多的HTTP重定向的数量，这个选项是和CURLOPT_FOLLOWLOCATION一起使用的 */
+    curl_setopt($ci, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ci, CURLINFO_HEADER_OUT, true);
+    /* curl_setopt($ci, CURLOPT_COOKIE, $Cookiestr); * *COOKIE带过去** */
+    $response = curl_exec($ci);
+    $requestinfo = curl_getinfo($ci);
+    $http_code = curl_getinfo($ci, CURLINFO_HTTP_CODE);
+    if ($debug) {
+        echo "=====post data======\r\n";
+        var_dump($postfields);
+        echo "=====info===== \r\n";
+        print_r($requestinfo);
+        echo "=====response=====\r\n";
+        print_r($response);
+    }
+    curl_close($ci);
+    return $response;
+}
+
+/**
+ * Layer 提交成功返回函数
+ * @param type $message
+ */
+function dsLayerOpenSuccess($msg = '', $url = '') {
+//    echo "<script>var index = parent.layer.getFrameIndex(window.name);parent.layer.close(index);parent.location.reload();</script>";
+    $url_js = empty($url) ? "parent.location.reload();" : "parent.location.href='" . $url . "';";
+
+    $str = "<script>";
+    $str .= "parent.layer.alert('" . $msg . "',{yes:function(index, layero){" . $url_js . "},cancel:function(index, layero){" . $url_js . "}});";
+    $str .= "</script>";
+    echo $str;
+    exit;
+}
+
+/**
+ * 移除微信昵称中的emoji字符
+ * @param type $nickname
+ * @return type
+ */
+function removeEmoji($nickname) {
+    $clean_text = "";
+    // Match Emoticons
+    $regexEmoticons = '/[\x{1F600}-\x{1F64F}]/u';
+    $clean_text = preg_replace($regexEmoticons, '', $nickname);
+    // Match Miscellaneous Symbols and Pictographs
+    $regexSymbols = '/[\x{1F300}-\x{1F5FF}]/u';
+    $clean_text = preg_replace($regexSymbols, '', $clean_text);
+    // Match Transport And Map Symbols
+    $regexTransport = '/[\x{1F680}-\x{1F6FF}]/u';
+    $clean_text = preg_replace($regexTransport, '', $clean_text);
+    // Match Miscellaneous Symbols
+    $regexMisc = '/[\x{2600}-\x{26FF}]/u';
+    $clean_text = preg_replace($regexMisc, '', $clean_text);
+    // Match Dingbats
+    $regexDingbats = '/[\x{2700}-\x{27BF}]/u';
+    $clean_text = preg_replace($regexDingbats, '', $clean_text);
+    //截取指定长度的昵称
+    $clean_text = ds_substing($clean_text, 0, 20);
+    return trim($clean_text);
+}
+
+/**
+ * 截取指定长度的字符
+ * @param type $string  内容
+ * @param type $start 开始
+ * @param type $length 长度
+ * @return type
+ */
+function ds_substing($string, $start = 0, $length = 80) {
+    $string = strip_tags($string);
+    $string = preg_replace('/\s/', '', $string);
+    return mb_substr($string, $start, $length);
+}
+
+/**
+ * 针对批量删除进行处理  '1,2,3' 转换为数组批量删除
+ * @param type $ids
+ * @return boolean
+ */
+function ds_delete_param($ids) {
+    //转换为数组
+    $ids_array = explode(',', $ids);
+    //数组值转为整数型
+    $ids_array = array_map("intval", $ids_array);
+    if (empty($ids_array) || in_array(0, $ids_array)) {
+        return FALSE;
+    } else {
+        return $ids_array;
+    }
+}
+
+/*
+ *  计算两组经纬度坐标 之间的距离
+ *   params ：lat1 纬度1； lng1 经度1； lat2 纬度2； lng2 经度2； len_type （1:m or 2:km);
+ *   return m or km
+ */
+
+function getDistance($lat1, $lng1, $lat2, $lng2, $len_type = 1, $decimal = 2) {
+
+
+    $radLat1 = $lat1 * PI() / 180.0;   //PI()圆周率
+    $radLat2 = $lat2 * PI() / 180.0;
+    $a = $radLat1 - $radLat2;
+    $b = ($lng1 * PI() / 180.0) - ($lng2 * PI() / 180.0);
+    $s = 2 * asin(sqrt(pow(sin($a / 2), 2) + cos($radLat1) * cos($radLat2) * pow(sin($b / 2), 2)));
+    $s = $s * 6378.137;
+    $s = round($s * 1000);
+    if ($len_type -- > 1) {
+        $s /= 1000;
+    }
+    return round($s, $decimal);
+}
+
+function word_filter_access_token(){
+    $appid=config('ds_config.word_filter_appid');
+    $secret=config('ds_config.word_filter_secret');
+    $access_token=config('ds_config.word_filter_access_token');
+    $access_token_expire=config('ds_config.word_filter_access_token_expire');
+    if(!$access_token || $access_token_expire<TIMESTAMP){
+        $res=http_request('https://aip.baidubce.com/oauth/2.0/token','POST',array(
+            'grant_type'=>'client_credentials',
+            'client_id'=>$appid,
+            'client_secret'=>$secret,
+        ));
+        $res = json_decode($res, true);
+        if(isset($res['error'])){
+            return ds_callback(false, $res['error_description']);
+        }
+        $access_token=$res['access_token'];
+        $expires_in=$res['expires_in'];
+        
+        $config_model = model('config');
+        $update_array=array(
+            'word_filter_access_token'=>$access_token,
+            'word_filter_access_token_expire'=>TIMESTAMP+$expires_in
+        );
+        $config_model->editConfig($update_array);
+    }
+    return ds_callback(true,'',$access_token);
+}
+/**
+ * 敏感词过滤
+ * @param type $text
+ * @return boolean
+ */
+function word_filter($text) {
+    $data=array();
+    $data['text']=$text;
+    $data['if_sensitive']=false;
+    if(config('ds_config.word_filter_open')!=1){
+        return ds_callback(true, '', $data);
+    }
+
+    $res=word_filter_access_token();
+    if(!$res['code']){
+        return $res;
+    }
+    $access_token=$res['data'];
+    $res=http_request('https://aip.baidubce.com/rest/2.0/solution/v1/text_censor/v2/user_defined?access_token='.$access_token,'POST',array(
+        'text'=> $text
+        ));
+    $res = json_decode($res, true);
+    if(isset($res['error_code'])){
+        return ds_callback(false, $res['error_msg']);
+    }
+    if($res['conclusionType']==2){
+        $data['if_sensitive']=true;
+        $data['sensitive_msg']=array();
+        $data['sensitive_word']=array();
+        foreach($res['data'] as $val){
+            $data['sensitive_msg'][]=$val['msg'];
+            foreach($val['hits'] as $v){
+                $data['sensitive_word']=array_merge($data['sensitive_word'],$v['words']);
+                $data['text']=str_replace($v['words'],'**',$data['text']);
+            }
+        }
+    }
+    return ds_callback(true, '', $data);
+}
+
+
+/**
+ * 敏感图过滤
+ * @param type $text
+ * @return boolean
+ */
+function image_filter($img_url) {
+    $data=array();
+    $data['if_sensitive']=false;
+    if(config('ds_config.word_filter_open')!=1){
+        return ds_callback(true, '', $data);
+    }
+    $res=word_filter_access_token();
+    if(!$res['code']){
+        return $res;
+    }
+    $access_token=$res['data'];
+    $image=imgToBase64($img_url);
+    if(empty($image)){
+        return ds_callback(false, 'image empty');
+    }
+    $res=http_request('https://aip.baidubce.com/rest/2.0/solution/v1/img_censor/v2/user_defined?access_token='.$access_token,'POST',array(
+        'image'=> $image['content']
+        ),array(
+            'Content-Type: application/x-www-form-urlencoded'
+        ));
+    $res = json_decode($res, true);
+    if(isset($res['error_code'])){
+        return ds_callback(false, $res['error_msg']);
+    }
+    if($res['conclusionType']==2){
+        $data['if_sensitive']=true;
+        $data['sensitive_msg']=array();
+        foreach($res['data'] as $val){
+            $data['sensitive_msg'][]=$val['msg'];
+        }
+    }
+    return ds_callback(true, '', $data);
+}
+
+function text_filter($text) {
+    preg_match_all('/[\x{4e00}-\x{9fa5}a-zA-Z0-9]/u',$text,$result);
+    return implode('',$result[0]);
+}

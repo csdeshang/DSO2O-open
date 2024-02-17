@@ -1,0 +1,94 @@
+{extend name="default/base/base_fuwu" /}
+{block name="fuwu_main"}
+<link rel="stylesheet" href="{$Think.PLUGINS_SITE_ROOT}/jquery.range.css">
+<script src="{$Think.PLUGINS_SITE_ROOT}/jquery.range.js"></script>
+<div class="dssc-form-default">
+    <form method="post"  enctype="multipart/form-data" id="fuwu_form"  onsubmit="ds_ajaxpost('fuwu_form','url','{:url('fuwu_manage_info/operate')}');return false;" >
+        
+        <dl>
+            <dt>主服务分类{$Think.lang.ds_colon}</dt>
+            <dd>
+                <select name="class_id_1">
+                    <option value='0'>{$Think.lang.ds_please_choose}</option>
+                    {foreach name="o2o_fuwu_class_list" item="value" }
+                    <option value="{$value.o2o_fuwu_class_id}" {if $value.o2o_fuwu_class_id==$o2o_fuwu_organization_info.o2o_fuwu_class_id_1}selected{/if}>{$value.o2o_fuwu_class_name}</option>
+                    {/foreach}
+                  </select>
+            </dd>
+        </dl>
+        <dl>
+            <dt>次服务分类{$Think.lang.ds_colon}</dt>
+            <dd>
+                <select name="class_id_2">
+                    <option value='0'>{$Think.lang.ds_please_choose}</option>
+                    {foreach name="o2o_fuwu_class_list" item="value" }
+                    <option value="{$value.o2o_fuwu_class_id}" {if $value.o2o_fuwu_class_id==$o2o_fuwu_organization_info.o2o_fuwu_class_id_2}selected{/if}>{$value.o2o_fuwu_class_name}</option>
+                    {/foreach}
+                  </select>
+            </dd>
+        </dl>
+        <dl>
+            <dt>次服务分类{$Think.lang.ds_colon}</dt>
+            <dd>
+                <select name="class_id_3">
+                    <option value='0'>{$Think.lang.ds_please_choose}</option>
+                    {foreach name="o2o_fuwu_class_list" item="value" }
+                    <option value="{$value.o2o_fuwu_class_id}" {if $value.o2o_fuwu_class_id==$o2o_fuwu_organization_info.o2o_fuwu_class_id_3}selected{/if}>{$value.o2o_fuwu_class_name}</option>
+                    {/foreach}
+                  </select>
+            </dd>
+        </dl>
+        <dl style='padding-top:20px'>
+            <dt>营业时间{$Think.lang.ds_colon}</dt>
+            <dd>
+                <div class="range">
+                    <input class="range-slider" name="organization_open_time" type="hidden" value="{$o2o_fuwu_organization_info.o2o_fuwu_organization_open_start},{$o2o_fuwu_organization_info.o2o_fuwu_organization_open_end}"/>
+                </div>
+            </dd>
+        </dl>
+        <dl>
+            <dt>收款账号{$Think.lang.ds_colon}</dt>
+            <dd>
+                <input class="w400 text" name="organization_payment_account" type="text" value="{$o2o_fuwu_organization_info.o2o_fuwu_organization_payment_account}" />
+            </dd>
+        </dl>
+        <dl>
+            <dt>简介{$Think.lang.ds_colon}</dt>
+            <dd>
+                <textarea name="organization_detail" rows="3" class="textarea w400" >{$o2o_fuwu_organization_info.o2o_fuwu_organization_detail}</textarea>
+            </dd>
+        </dl>
+        <div class="bottom">
+            <input type="submit" class="submit" value="{$Think.lang.ds_common_button_save}" />
+        </div>
+    </form>
+</div>
+
+<script>
+    $(function(){
+        $('.range-slider').jRange({
+                from: 0, to: 2880, step:30,
+                scale: ['00:00','04:00','08:00','12:00','16:00','20:00','次日00:00','04:00','08:00','12:00','16:00','20:00','24:00'],
+                format: function(value, type) {
+        	var hours = String(value).substr(0,2);
+        	var mins = String(value).substr(3,2);
+
+        	if (hours > 24) {
+        		hours = hours - 24;
+        		hours = (hours < 10 ? "0"+hours : hours);
+        		value = hours+':'+mins;
+        		var text = String('次日%s').replace('%s', value);
+        		return text;
+        	}
+        	else {
+        		return value;
+        	}
+        },
+                width: 600,
+                showLabels: true,
+                isRange : true
+            });
+    })
+</script>
+
+{/block}

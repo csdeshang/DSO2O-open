@@ -1,0 +1,25 @@
+<div class="eject_con">
+    <div id="warning" class="alert alert-error"></div>
+    <form method="post" action="{:url('MemberO2oComplaint/add',['order_id'=>$Request.param.order_id])}" id="bill_confirm_form" target="_parent">
+        <dl>
+            <dt>{$Think.lang.member_o2o_complaint_content}{$Think.lang.ds_colon}</dt>
+            <dd>
+                <textarea name="content" cols="30"></textarea>
+            </dd>
+        </dl>
+        <div class="bottom">
+            <input type="button" dstype="confirm_bill_submit" class="submit" value="{$Think.lang.ds_common_button_save}" />
+        </div>
+    </form>
+</div>
+<script>
+    $(document).ready(function () {
+
+        $('input[dstype="confirm_bill_submit" ]').click(function () {
+            if ($('#bill_confirm_form').valid()) {
+                ds_ajaxpost('bill_confirm_form', 'url', "{:url('MemberO2oComplaint/index')}");
+            }
+        });
+
+    });
+</script> 

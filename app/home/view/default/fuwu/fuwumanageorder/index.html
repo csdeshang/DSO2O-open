@@ -1,0 +1,104 @@
+{extend name="default/base/base_fuwu" /}
+{block name="fuwu_main"}
+<form method="get" action="{:url('FuwuManageOrder/index')}" target="_self">
+    <table class="search-form">
+      <tr>
+        <td>&nbsp;</td>
+        <th>订单状态</th>
+        <td class="w100"><select name="o2o_fuwu_order_state">
+            <option value="">所有订单</option>
+            <option value="10" {if condition="$Request.param.o2o_fuwu_order_state eq '10'"}selected{/if}>待付款</option>
+            <option value="20" {if condition="$Request.param.o2o_fuwu_order_state eq '20'"}selected{/if}>待服务</option>
+            <option value="30" {if condition="$Request.param.o2o_fuwu_order_state eq '30'"}selected{/if}>服务中</option>
+            <option value="40" {if condition="$Request.param.o2o_fuwu_order_state eq '40'"}selected{/if}>已完成</option>
+            <option value="0" {if condition="$Request.param.o2o_fuwu_order_state eq '0'"}selected{/if}>已取消</option>
+          </select></td>
+        <th>下单时间</th>
+        <td class="w240">
+            <input type="text" class="text w70" name="query_start_date" id="query_start_date" value="{$Request.param.query_start_date}"/><label class="add-on"><i class="iconfont">&#xe8d6;</i></label>&nbsp;&#8211;&nbsp;
+            <input type="text" class="text w70" name="query_end_date" id="query_end_date" value="{$Request.param.query_end_date}"/>
+            <label class="add-on"><i class="iconfont">&#xe8d6;</i></label></td>
+        <th>订单号</th>
+        <td class="w160"><input type="text" class="text w150" name="order_sn" value="{$Request.param.order_sn}"></td>
+        <td class="w70 tc">
+            <input type="submit" class="submit" value="{$Think.lang.ds_search}"/>
+        </td>
+      </tr>
+    </table>
+  </form>
+  <table class="dssc-default-table order">
+    <thead>
+      <tr>
+        <th class="w100">订单号</th>
+        <th class="w120">服务地点</th>
+        <th class="w100">下单时间</th>
+        <th class="w40">订单总额</th>
+        <th class="w40">订单状态</th>
+        <th class="w100">操作</th>
+      </tr>
+    </thead>
+    <tbody>
+    {notempty name="order_list"}
+    {foreach name="order_list" item="order_info"}
+      <tr>
+        <td class="bdl">{$order_info.o2o_fuwu_order_sn}</td>
+        <td>{$order_info.o2o_fuwu_order_employer_address}</td>
+        
+        <td>{$order_info.o2o_fuwu_order_add_time|date='Y-m-d H:i:s'}</td>
+        <td>￥{$order_info.o2o_fuwu_order_amount}</td>
+        <td>{$order_info.o2o_fuwu_order_state_text}</td>
+
+        <td class="bdl bdr">
+            <p><a class="dssc-btn dssc-btn-blue" href="{:url('FuwuManageOrder/view',['o2o_fuwu_order_id'=>$order_info.o2o_fuwu_order_id])}"><i class="iconfont">&#xe70b;</i>查看订单</a></p>
+  
+
+            <!--取消订单-->
+            {if $order_info.if_cancel}
+            <p class="mt5">
+                <a href="javascript:void(0)" class="dssc-btn dssc-btn-red" onclick="cancelOrder({$order_info.o2o_fuwu_order_id})"><i class="iconfont">&#xe754;</i>取消订单</a></p>
+           {/if}
+           <!--已服务-->
+            {if $order_info.if_arrange}
+            <p class="mt5">
+                <a href="javascript:void(0)" class="dssc-btn dssc-btn-green" onclick="ds_ajaxget('{:url('FuwuManageOrder/arrange',['o2o_fuwu_order_id'=>$order_info.o2o_fuwu_order_id])}','reload');"><i class="iconfont">&#xe731;</i>已安排</a></p>
+           {/if}
+           
+		  </td>
+      </tr>
+   {/foreach}
+   {else /}
+    <tr>
+        <td colspan="6" class="norecord"><div class="warning-option"><i></i><span>{$Think.lang.no_record}</span></div></td>
+      </tr>
+   {/notempty}
+    </tbody>
+    <tfoot>
+    {notempty name="order_list"}
+      <tr>
+        <td colspan="6"><div class="pagination">{$show_page|raw}</div></td>
+      </tr>
+     {/notempty}
+    </tfoot>
+  </table>
+<form id="goods_form" action="{:url('FuwuManageOrder/cancel')}">
+    <input type="hidden" name="reason" id="reason">
+    <input type="hidden" name="o2o_fuwu_order_id" id="order_id">
+</form>
+<script type="text/javascript">
+$(function(){
+    $('#query_start_date').datepicker({dateFormat: 'yy-mm-dd'});
+    $('#query_end_date').datepicker({dateFormat: 'yy-mm-dd'});
+});
+function cancelOrder(order_id){
+    layer.prompt({title: '请填写取消理由', formType: 2}, function(text, index){
+        layer.close(index);
+        $('#reason').val(text)
+        $('#order_id').val(order_id)
+        ds_ajaxpost('goods_form', 'reload');
+      })
+}
+</script>
+
+
+
+{/block}

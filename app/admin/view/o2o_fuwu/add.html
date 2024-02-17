@@ -1,0 +1,86 @@
+{include file="public/header" /}
+
+
+
+
+
+<div class="page">
+
+    <form id="store_form" method="post">
+        <table class="ds-default-table">
+            <tbody>
+                <tr class="noborder">
+                    <td class="required"><label class="validation">类型:</label></td>
+                    <td class="vatop rowform">
+                        <label><input type='radio' name='o2o_fuwu_organization_type' value='0'>个人</label>
+                        <label><input type='radio' name='o2o_fuwu_organization_type' checked="" value='1'>企业</label>
+                    </td>
+                    <td class="vatop tips"></td>
+                </tr>
+                <tr class="noborder">
+                    <td class="required w120"><label class="validation">手机号:</label></td>
+                    <td class="vatop rowform"><input type="text" value="" id="o2o_fuwu_organization_phone" name="o2o_fuwu_account_phone" class="txt" /></td>
+                    <td class="vatop tips"></td>
+                </tr>
+                <tr class="noborder">
+                    <td class="required"><label class="validation">账号:</label></td>
+                    <td class="vatop rowform"><input type="text" value="" id="o2o_fuwu_account_name" name="o2o_fuwu_account_name" class="txt" /></td>
+                    <td class="vatop tips"></td>
+                </tr>
+
+                <tr class="noborder">
+                    <td class="required"><label class="validation">登录密码:</label></td>
+                    <td class="vatop rowform"><input type="password" value="" id="o2o_fuwu_account_password" name="o2o_fuwu_account_password" class="txt" /></td>
+                    <td class="vatop tips"></td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr class="tfoot">
+                    <td colspan="15"><input class="btn" type="submit" value="{$Think.lang.ds_submit}"/></td>
+                </tr>
+            </tfoot>
+        </table>
+    </form>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $('#store_form').validate({
+            errorPlacement: function (error, element) {
+                error.appendTo(element.parentsUntil('tr').parent().find('td:last'));
+            },
+            rules: {
+                o2o_fuwu_organization_phone: {
+                    required: true,
+                    remote : "{:url('O2oFuwu/check_o2o_fuwu_account_phone')}"
+                },
+                o2o_fuwu_account_name: {
+                    required: true,
+                    minlength: 3,
+                    maxlength: 15,
+                    remote: "{:url('O2oFuwu/check_o2o_fuwu_account_name')}"
+                },
+
+                o2o_fuwu_account_password: {
+                    required: true,
+                    minlength: 6
+                }
+            },
+            messages: {
+                o2o_fuwu_organization_phone: {
+                    required: '请输入手机号',
+                    remote: '手机号已存在'
+                },
+                o2o_fuwu_account_name: {
+                    required: '请输入账号',
+                    minlength: '账号最短为3位',
+                    maxlength: '账号最长为15位',
+                    remote: '此账号已被占用，请重新输入'
+                },
+                o2o_fuwu_account_password: {
+                    required: '请输入登录密码',
+                    minlength: '登录密码长度不能小于6'
+                }
+            }
+        });
+    });
+</script>

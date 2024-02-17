@@ -1,0 +1,451 @@
+{extend name="default/base/base_home" /}
+{block name="mall_main"}
+<link rel="stylesheet" href="{$Think.HOME_SITE_ROOT}/css/member_o2o_errand.css">
+<style>
+    .member_o2o_errand_send .create-content .user-weight input{width: 100%;text-align: center;}
+    .member_o2o_errand_send .create-content .user-sel-type{width:305px}
+    .member_o2o_errand_send .create-content .goods-m{width:292px}
+    .member_o2o_errand_send .create-content .select-weight{width:305px}
+    .member_o2o_errand_send .create-content .sel-time{width:305px}
+    .member_o2o_errand_send .create-content .appoint-hours{width:50%}
+    .member_o2o_errand_send .create-content .appoint-minutes{width:50%}
+</style>
+<form id='member_o2o_errand_form' action='{:url("MemberO2oFuwuOrder/add")}'>
+    <div class="member_o2o_errand_send">
+        <div class="create-content clearfloat">
+            <div class="create-left-con">
+                <div class="user-mess">
+                    <div class="user-mess-title clearfloat">
+                        <h3 class="fl">服务地址</h3>
+                        <a class="href-look tar-explanation" href='javascript:getAddress()'>设置</a>
+                    </div>
+                    <div class="user-mess-con">
+
+                        <div class="user-from-detail clearfloat">
+                            <div class="user-trip">
+                                详细地址
+                            </div>
+                            <div class="user-from-input">
+                                <input type='hidden' name='address_id' id='address_id' value="{$address_info.address_id|default=''}" />
+                                <input readonly class="cus-input" type="text" placeholder="请输入单元、楼层、门牌号" id='o2o_fuwu_order_address' value="{$address_info.address_detail|default=''}" />
+                            </div>
+                        </div>
+                        <div class="user-from-mess clearfloat">
+                            <div class="user-trip">
+                                姓名
+
+                            </div>
+                            <div class="user-from-name">
+                                <input readonly class="cus-input" type="text" placeholder="请输入姓名" id='o2o_fuwu_order_name' value="{$address_info.address_realname|default=''}" />
+                            </div>
+                            <div class="user-trip f-tel">
+                                手机号
+
+                            </div>
+                            <div class="user-from-name">
+                                <input readonly class="cus-input" maxlength="11" type="tel" placeholder="请输入手机号" id='o2o_fuwu_order_phone' value="{$address_info.address_mob_phone|default=''}" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="user-mess">
+                    <div class="user-mess-title">
+                        <h3>服务信息</h3>
+                    </div>
+                    <div class="user-goods clearfloat">
+                        <div class="goods-type clearfloat">
+                            <div class="user-trip">
+                                默认服务
+                                <span>（必填）</span>
+                            </div>
+                            <div class="cus-select user-sel-type f">
+                                <div class="goods-m type-m select-weight-btn" onclick='openGoods()'>
+                                    <div>
+                                        <input class="goods-input" readonly="" placeholder="选择默认服务" id="default_spec_info" value="{$o2o_fuwu_goods_spec_default[0]['o2o_fuwu_goods_spec_name']}（{$o2o_fuwu_goods_spec_default[0]['o2o_fuwu_goods_spec_price']}元/{$o2o_fuwu_goods_spec_default[0]['o2o_fuwu_goods_spec_unit']}）" /> 
+                                        <i class="iconfont">&#xe689;</i>
+                                    </div>
+                                </div>
+                                <div class="select-weight select-block" id='goods_list'>
+                                    <div class="select-weight-con">
+                                        <ul>
+                                            {foreach name='o2o_fuwu_goods_spec_default' item='spec'}
+                                            <li onclick='selectGoods({:json_encode($spec,JSON_UNESCAPED_UNICODE)})'>
+                                                <a href="javascript:;">{$spec.o2o_fuwu_goods_spec_name}（{$spec.o2o_fuwu_goods_spec_price}元/{$spec.o2o_fuwu_goods_spec_unit}）</a>
+                                            </li>
+                                            {/foreach}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="user-edit-weight f">
+                                <div class="weight-subtraction" onclick="changeWeight(0,'-')">
+                                    <i class="iconfont">&#xe6dc;</i>
+                                </div>
+                                <div class="user-weight f">
+                                    <input type="number" id="quantity_0" value="1" />
+                                </div>
+                                <div class="weight-add" onclick="changeWeight(0,'+')">
+                                    <i class="iconfont">&#xe6db;</i>
+                                </div>
+                            </div>
+                        </div>
+                        {if !empty($o2o_fuwu_goods_spec_added)}
+                        {foreach name='o2o_fuwu_goods_spec_added' item='spec' key='index'}
+                        <div class="goods-type clearfloat">
+                            <div class="user-trip">
+                                {if $index==0}增值服务{else}&nbsp;{/if}
+                            </div>
+                            <div class="cus-select user-sel-type f">
+                                <div class="goods-m type-m select-weight-btn">
+                                    <div>
+                                        <input class="goods-input" readonly="" value="{$spec['o2o_fuwu_goods_spec_name']}（{$spec['o2o_fuwu_goods_spec_price']}元/{$spec['o2o_fuwu_goods_spec_unit']}）" /> 
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="user-edit-weight f">
+                                <div class="weight-subtraction" onclick="changeWeight({$index}+1,'-')">
+                                    <i class="iconfont">&#xe6dc;</i>
+                                </div>
+                                <div class="user-weight f">
+                                    <input type="number" id="quantity_{$index+1}" value="0" />
+                                </div>
+                                <div class="weight-add" onclick="changeWeight({$index}+1,'+')">
+                                    <i class="iconfont">&#xe6db;</i>
+                                </div>
+                            </div>
+                        </div>
+                        {/foreach}
+                        {/if}
+                        <div class="goods-times clearfloat">
+                            <div class="user-trip">
+                                预约时间
+                            </div>
+
+
+                            <div class="cus-select user-sel-type f" id="select_time_wrapper">
+                                <div class="select-weight-btn goods-m time-m" onclick="openTime()">
+                                    <div>
+                                        <input type='hidden' name='o2o_fuwu_order_appointment_time' id='o2o_fuwu_order_appointment_time' value="" />
+                                        <span id="appointment_time"><span style='color:#ccc'>请选择预约时间</span></span>
+                                        <i class="iconfont">&#xe689;</i>
+                                    </div>
+                                </div>
+                                <div class="sel-time select-block" id="time_list">
+                                    <div class="sel-time-main">
+                                        <div class="add-time clearfloat">
+                                            <div class="add-hours" onclick='changeHour("-")'>
+                                                <i class="iconfont">&#xe688;</i>
+                                            </div>
+                                            <div class="add-minutes" onclick='changeMinute("-")'>
+                                                <i class="iconfont">&#xe688;</i>
+                                            </div>
+                                        </div>
+                                        <div class="appoint-time clearfloat">
+                                            <div class="appoint-hours" id="appoint-hours" data-value="{:strtotime(date('Y-m-d',TIMESTAMP))}" data-start="{:strtotime(date('Y-m-d',TIMESTAMP))}">
+                                                {:date('m月d日',TIMESTAMP)}（{$week_array[date('w',TIMESTAMP)]}）
+                                            </div>
+                                            <div class="appoint-point">
+                                                
+                                            </div>
+                                            <div class="appoint-minutes" id="appoint-minutes" data-value="28800">
+                                                上午
+                                            </div>
+                                        </div>
+                                        <div class="subtraction-time clearfloat">
+                                            <div class="sub-hours" onclick='changeHour("+")'>
+                                                <i class="iconfont">&#xe689;</i>
+                                            </div>
+                                            <div class="sub-minutes" onclick='changeMinute("+")'>
+                                                <i class="iconfont">&#xe689;</i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="user-remark">
+                            <div class="user-trip">
+                                备注
+                            </div>
+                            <div class="user-remark-con">
+                                <textarea name='o2o_fuwu_order_remark' placeholder="请输入备注信息" maxlength="150"></textarea>
+                                <div class="mark-size" style='display: none'>
+                                    <span>0</span>/150
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="create-right-con" style="top: 0px;">
+                <div class="cal-fee">
+                    <div class="user-mess-title">
+                        <h3>订单费用</h3>
+                    </div>
+                    <div id='order_amount_wrapper'></div>
+                    <div class="pay-style">
+                        <div class="l-semicircle"></div>
+                        <div class="r-semicircle"></div>
+
+                        <div class="to-submit" onclick='submitForm()'>
+                            去支付
+                        </div>
+                    </div>
+                    <div class="dowload-app clearfloat">
+                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAbCAYAAAC0s0UOAAAABGdBTUEAALGPC/xhBQAAAKVJREFUKBVjXLHpiOe//39nMQABEyNzWoSfzXYWkAA3F4cMSPDrtx8gSVkmEMfT0QyMf/7+w9jQ0MDEBNICkgCBE+dvt62+ysDCCOL8+vP/P4iWsk41ERDivALWDhJABqOCyKEBZNMkQEBRDLPHz8HICsRmgsU5iKOiIF4NollAxKadxxhevfsITAyMDOw8wv/BUfzz9+8nXBzsT/m4OTJCtRn+AACBlDWMaIdVmgAAAABJRU5ErkJggg==" class="left-ding" />
+                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAbCAYAAAC0s0UOAAAABGdBTUEAALGPC/xhBQAAAKVJREFUKBVjXLHpiOe//39nMQABEyNzWoSfzXYWkAA3F4cMSPDrtx8gSVkmEMfT0QyMf/7+w9jQ0MDEBNICkgCBE+dvt62+ysDCCOL8+vP/P4iWsk41ERDivALWDhJABqOCyKEBZNMkQEBRDLPHz8HICsRmgsU5iKOiIF4NollAxKadxxhevfsITAyMDOw8wv/BUfzz9+8nXBzsT/m4OTJCtRn+AACBlDWMaIdVmgAAAABJRU5ErkJggg==" class="right-ding" />
+                        <p class="d-title">使用手机下单更方便快捷</p>
+                        <div class="d-code">
+                            <div class="left-code f">
+                                <img src="{$Think.HOME_SITE_URL}/qrcode?url={$Think.config.ds_config.h5_site_url}" />
+                                <p>扫描进入手机端</p>
+                            </div>
+                            <div class="right-code f">
+                                <img src="{:ds_get_pic(ATTACH_COMMON,$Think.config.ds_config.site_logowx)}" />
+                                <p>关注微信公众号</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <input type='hidden' name='o2o_fuwu_goods_id' value='{$Request.param.o2o_fuwu_goods_id}'>
+    <input type='hidden' name='spec_quantity_list' id='spec_quantity_list'>
+</form>    
+<script src="{$Think.PLUGINS_SITE_ROOT}/template.min.js"></script>
+<script>
+    var layer_index
+    var spec_quantity_list=new Array()
+    spec_quantity_list[0]={quantity:1,o2o_fuwu_goods_spec_id:"{$o2o_fuwu_goods_spec_default[0]['o2o_fuwu_goods_spec_id']}",o2o_fuwu_goods_spec_name:"{$o2o_fuwu_goods_spec_default[0]['o2o_fuwu_goods_spec_name']}",o2o_fuwu_goods_spec_price:"{$o2o_fuwu_goods_spec_default[0]['o2o_fuwu_goods_spec_price']}"}
+    {if !empty($o2o_fuwu_goods_spec_added)}
+    {foreach name='o2o_fuwu_goods_spec_added' item='spec' key='index'}
+    spec_quantity_list[{$index}+1]={quantity:0,o2o_fuwu_goods_spec_id:"{$spec['o2o_fuwu_goods_spec_id']}",o2o_fuwu_goods_spec_name:"{$spec['o2o_fuwu_goods_spec_name']}",o2o_fuwu_goods_spec_price:"{$spec['o2o_fuwu_goods_spec_price']}"}
+    {/foreach}
+    {/if}    
+    $(function(){
+        setTime()
+        calculAmount()
+        $(document).bind('click',
+        function(e) {
+            var e = e || window.event; //浏览器兼容性 
+            var elem = e.target || e.srcElement;
+            while (elem) { //循环判断至跟节点，防止点击的是div子元素 
+                if (elem.className && (elem.className.indexOf("select-weight-btn") != -1 || elem.className.indexOf("sel-time") != -1)) {
+                    return;
+                }
+                elem = elem.parentNode;
+            }
+            closeSelect()
+            
+        })
+    })
+    function getAddress() {
+        $.getJSON(HOMESITEURL + "/Memberaddress/index?ajax=1&o2o_errand_type=0", function (res) {
+            if (res.code != 10000) {
+                layer.msg(res.message)
+            } else {
+                var data = res.result
+                layer_index = layer.open({
+                    type: 1,
+                    title: '更换地址',
+                    closeBtn: 0, //不显示关闭按钮
+                    anim: 2,
+                    shadeClose: true, //开启遮罩关闭
+                    content: template.render('address_list_html', data)
+                })
+            }
+        })
+    }
+    function addAddress() {
+        layer.close(layer_index)
+        window.open(HOMESITEURL + "/Memberaddress/add?close=1&from=o2o_fuwu&o2o_errand_type=0")
+    }
+    function selectAddress(address) {
+        $('#address_id').val(address.id)
+        $('#o2o_fuwu_order_lng').val(address.lng)
+        $('#o2o_fuwu_order_lat').val(address.lat)
+        $('#o2o_fuwu_order_name').val(address.name)
+        $('#o2o_fuwu_order_address').val(address.address)
+        $('#o2o_fuwu_order_phone').val(address.phone)
+        layer.close(layer_index)
+    }
+    function calculAmount() {
+        var default_price=0
+        var added_price=0
+        var total_price=0
+        for(var i in spec_quantity_list){
+            if(i==0){
+                default_price=spec_quantity_list[i].o2o_fuwu_goods_spec_price*spec_quantity_list[i].quantity
+            }else{
+                added_price+=spec_quantity_list[i].o2o_fuwu_goods_spec_price*spec_quantity_list[i].quantity
+            }
+        }
+        total_price=(default_price+added_price).toFixed(2)
+        default_price=default_price.toFixed(2)
+        added_price=added_price.toFixed(2)
+        $('#order_amount_wrapper').html(template.render('order_amount_html',{done:true,result:{default_price:default_price,added_price:added_price,total_price:total_price}}))
+    }
+    function changeWeight(index,type){
+        var i=parseInt($('#quantity_'+index).val())
+        if(isNaN(i) || i<((index==0)?1:0)){
+            layer.msg('数量设置错误')
+            return
+        }
+        if(type=='-'){
+            if(i==((index==0)?1:0)){
+                return
+            }
+            i--
+        }else{
+            i++
+        }
+        $('#quantity_'+index).val(i)
+        spec_quantity_list[index]['quantity']=i
+        calculAmount()
+    }
+    function closeSelect() {
+        $('i.img-rotate').removeClass('img-rotate')
+        $('.select-block').hide()
+    }
+    function openGoods(){
+        closeSelect()
+        $('.type-m').find('i').addClass('img-rotate')
+        $('#goods_list').show()
+    }
+    function selectGoods(spec){
+        spec['quantity']=spec_quantity_list[0]['quantity']
+        spec_quantity_list.splice(0, 1, spec)
+        $('#default_spec_info').val(spec.o2o_fuwu_goods_spec_name+'（'+spec.o2o_fuwu_goods_spec_price+'元/'+spec.o2o_fuwu_goods_spec_unit+'）')
+        calculAmount()
+    }
+    function openTime(){
+        closeSelect()
+        $('.time-m').find('i').addClass('img-rotate')
+        $('#time_list').show()
+    }
+    function changeMinute(type){
+        var minute=parseInt($('#appoint-minutes').attr('data-value'))
+        if(type=='-'){
+            if(minute==28800){
+                layer.msg('超过可预约时间')
+                return
+            }
+            minute=28800
+        }else{
+            if(minute==50400){
+                layer.msg('超过可预约时间')
+                return
+            }
+            minute=50400
+        }
+        $('#appoint-minutes').attr('data-value',minute)
+        setTime()
+    }
+    function changeHour(type){
+        var start_hour=parseInt($('#appoint-hours').attr('data-start'))
+        var hour=parseInt($('#appoint-hours').attr('data-value'))
+        if(type=='-'){
+            if(hour<=start_hour){
+                layer.msg('超过可预约时间')
+                return
+            }
+            hour-=86400
+        }else{
+            if(hour>=(start_hour+86400*6)){
+                layer.msg('超过可预约时间')
+                return
+            }
+            hour+=86400
+        }
+        $('#appoint-hours').attr('data-value',hour)
+        setTime()
+    }
+    function setTime(){
+        var minute=parseInt($('#appoint-minutes').attr('data-value'))
+        var hour=parseInt($('#appoint-hours').attr('data-value'))
+        var temp=new Date()
+        temp.setTime((hour+minute)*1000)
+        $('#o2o_fuwu_order_appointment_time').val(temp.getFullYear()+'-'+(temp.getMonth()+1)+'-'+temp.getDate()+' '+temp.getHours()+':00')
+        var str,str1,str2
+        var week_array={:json_encode($week_array)};
+        var date=new Date()
+        date.setTime(hour*1000)
+        str1=strPad(date.getMonth()+1,2)+'月'+strPad(date.getDate(),2)+'日'+'（'+week_array[date.getDay()]+'）'
+        str2=(minute==28800)?'上午':'下午'
+        str=str1+str2
+        $('#appointment_time').text(str)
+        $('#appoint-hours').text(str1)
+        $('#appoint-minutes').text(str2)
+    }
+    function strPad(num, n) {
+        return (Array(n).join(0) + num).slice(-n);
+    }
+    function submitForm(){
+        if(!$('#o2o_fuwu_order_appointment_time').val()){
+            layer.msg('请选择预约时间')
+            return
+        }
+        $('#spec_quantity_list').val(JSON.stringify(spec_quantity_list))
+        var _form = $("#member_o2o_errand_form");
+        $.ajax({
+            type: "POST",
+            url: _form.attr('action'),
+            data: _form.serialize(),
+            dataType:"json",
+            success: function (res) {
+                if(res.code!=10000){
+                    layer.msg(res.message)
+                }else{
+                    window.location.href=HOMESITEURL + "/Buy/o2o_fuwu_pay?pay_sn=" + res.result.pay_sn
+                }
+            }
+        })
+    }
+</script>
+<script type="text/html" id="order_amount_html">
+    <%if(!done){%>    
+    <div class="cafee-default"> 
+        <img src="data:image/png;base64,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" /> 
+        <p>请完善订单信息</p> 
+    </div> 
+    <%}else{%>
+    <div class="user-fee-detail"> 
+        <div class="user-pay clearfloat"> 
+            <div class="fee-all"> 
+                <span class="pay-trip">默认服务费:</span> 
+                <span><%=(result.default_price)%>元</span> 
+            </div> 
+        </div> 
+        <%if(result.added_price>0){%>
+        <div class="user-pay clearfloat"> 
+            <div class="fee-all"> 
+                <span class="pay-trip">增值服务费:</span> 
+                <span><%=(result.added_price)%>元</span> 
+            </div> 
+        </div> 
+        <%}%>
+      
+        <div class="user-pay clearfloat"> 
+            <div class="fee-all"> 
+                <span class="pay-trip">您需支付:</span> 
+                <span class="pay-fee"><%=(result.total_price)%>元</span> 
+            </div> 
+        </div> 
+    </div>
+    <%}%>                
+</script>
+<script type="text/html" id="address_list_html">
+    <div class="address_list">    
+        <%for(var i in address_list){ var item=address_list[i];%>    
+        <div class="address_item" onclick="selectAddress({id:<%=item.address_id%>,lng:'<%=item.address_longitude%>',lat:'<%=item.address_latitude%>',name:'<%=item.address_realname%>',address:'<%=item.address_detail%>',phone:'<%=item.address_mob_phone%>'})">
+            <div class="address_title"><span class="address_name"><%=item.address_realname%></span><span class="address_phone"><%=item.address_mob_phone%></span></div>
+            <div class="address_content"><%=item.area_info%><%=item.address_detail%></div>
+        </div>
+        <%}%>
+        <div class="to-submit" onclick="addAddress()">新增</div>
+    </div>
+</script>
+{/block}

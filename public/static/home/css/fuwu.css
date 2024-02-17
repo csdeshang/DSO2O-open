@@ -1,0 +1,146 @@
+@charset "utf-8";
+.fl {float: left;}
+.clearfix{display: block;zoom: 1}
+.fuwu-index{background:#f5f5f5;padding-bottom:20px;}
+.fuwu-index .banner a{display: block;width:1200px;height: 340px;background-size: cover;background-position: center;}
+
+.fuwu-index .column {overflow: hidden;width: 100%;margin-top: 40px;}
+.fuwu-index .column .title {font-size: 22px;}
+.fuwu-index .column .column-ul {width: 1250px;overflow: hidden;padding-bottom: 20px}
+.fuwu-index .column .column-ul .column-li {width: 370px;background: #fff;float: left;margin-right: 45px;display: inline;height: 350px;margin-top: 20px;position: relative;text-align: center;}
+.fuwu-index .column-ul .column-li .icon-t {width: 100%;height: 180px;font-size: 0;position: relative;background-size:cover;background-repeat: no-repeat;}
+.fuwu-index .column-ul .column-li .icon-t a {position: absolute;left: 0;top: 0;right: 0;bottom: 0;width: 100%;height: 180px;background: rgba(250,250,250,0);background: #fff \9;filter: alpha(opacity=0) \9;-moz-opacity: 0 \9;-khtml-opacity: 0 \9;opacity: 0 \9;}
+.fuwu-index .column-ul .column-li .icon-t a:hover {background: rgba(0,0,0,0.1);background: #000;filter: alpha(opacity=10);-moz-opacity: 0.1;-khtml-opacity: 0.1;opacity: 0.1;}
+.fuwu-index .column-ul .column-li .t {font-size: 16px;color: #292d33;margin-top: 16px;}
+.fuwu-index .column-ul .column-li .p1 {color: #848c99;height: 43px;margin-bottom: 10px;margin-top: 2px;font-size: 14px;padding:0 20px;display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;display: box;line-clamp: 2;box-orient: vertical;overflow: hidden;}
+.fuwu-index .column-ul .column-li .check-xq {width: 165px;margin: 0 auto;}
+.fuwu-index .column-ul .column-li .check-xq a {background: #e6454a;display: block;height: 42px;line-height: 42px;font-size: 16px;color: #fff;}
+.fuwu-index .column-ul .column-li .check-xq a:hover {background: #c23a3f;text-decoration: none;}
+
+
+.fuwu-organization-index{}
+.fuwu-organization-index .filter-item-wrap .filter-item, .multiple-choice-cont {padding-top: 10px;}
+.fuwu-organization-index .filter-item-wrap .filter-name {height: 25px;width: 55px;line-height: 25px;color: #333;font-size: 12px;margin-right: 20px;font-weight: 700;overflow: hidden;}
+.fuwu-organization-index .filter-item-wrap .filter-name.letter {letter-spacing: 14px;}
+.fuwu-organization-index .filter-item-wrap .filter-option-wrap {line-height: 25px;width: 1000px;}
+.fuwu-organization-index .filter-item-wrap .checked {color: #e6454a;}
+.fuwu-organization-index .filter-item-wrap .filter-option-wrap .option {margin-right: 20px;font-size: 12px;float: left;}
+.fuwu-organization-index .filter-item-wrap .check-option i{width: 14px;height: 14px;display: inline-block;box-sizing: border-box;border: 1px solid #ddd;vertical-align: text-bottom;margin-right: 5px;line-height: 14px;}
+.fuwu-organization-index .filter-item-wrap .filter-option-wrap .option {margin-right: 20px;font-size: 12px;float: left;}
+.fuwu-organization-index .filter-item-wrap .check-option.checked i{border-color: #e6454a;background: #e6454a;}
+.fuwu-organization-index .filter-item-wrap .check-option.checked i:before{content:'\e6e7';color:#fff;font-size:12px;display: block;}
+
+.fuwu-organization-index .sort-wrap {width: 100%;}
+.fuwu-organization-index .sort-list {width: 100%;border-bottom: 2px solid #E6454A;margin-top: 20px;}
+.fuwu-organization-index .sort-item {color: #333;height: 40px;line-height: 40px;float: left;padding-left: 22px;padding-right: 22px;}
+.fuwu-organization-index .filter-item-wrap .checked {color: #e6454a;}
+.fuwu-organization-index .sort-item.checked {background: #e6454a;color: #fff;}
+
+.fuwu-organization-index .dj-info-list .cont {background: #fff;padding: 30px 0;height: 168px;border-bottom: 1px solid #f1f1f1;position: relative;}
+.fuwu-organization-index .dj-info-list .cont:hover {background: #F8F8F8;}
+.fuwu-organization-index .dj-info-list .cont .photos {width: 168px;height: 168px;background-size: cover;background-position: center;}
+.fuwu-organization-index .dj-info-list .item-1 {float: left;width: 450px;padding-left: 30px;font-size: 14px}
+.fuwu-organization-index .dj-info-list .item-1 .intr-1 {width: 100%;height: 30px;overflow: hidden;}
+.fuwu-organization-index .dj-info-list .item-1 .big-size {font-size: 20px;float: left;font-weight: 700;color: #333;}
+.fuwu-organization-index .dj-info-list .item-1 .intr-2 {margin-top: 15px;color: #333;}
+.fuwu-organization-index .dj-info-list .item-1 .intr-2.clamp{display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;display: box;line-clamp: 2;box-orient: vertical;overflow: hidden;}
+.fuwu-organization-index .dj-info-list .intr-2 .seperate {margin: 0 5px;color: #ccc;}
+.fuwu-organization-index .dj-info-list .item-3 {position: absolute;bottom: 90px;right: 0;width: 400px;}
+.fuwu-organization-index .dj-info-list .item-3 .btn {width: 156px;height: 46px;display: inline-block;background: #E6454A;border: 1px solid #E6454A;font-size: 18px;line-height: 46px;color: #fff;text-align: center;float: right;margin-left: 10px;cursor: pointer;}
+.fuwu-organization-index .dj-info-list .item-3 .appointment:hover {border-color: #c4383B;background: #c4383B;}
+.fuwu-organization-index .dj-info-list .item-3 .add-collection {background: #fff;color: #E6454A;}
+.fuwu-organization-index .dj-info-list .item-3 .add-collection:hover {background: #FFECED;color: #E6454A;}
+
+.fuwu-organization-view {font-size:14px;color:#333}
+.fuwu-organization-view .detail-wrap {width: 1200px;margin: 0 auto;margin-top: 20px;color: #333;margin-bottom: 33px;}
+.fuwu-organization-view .base-info .left {width: 240px;height: 240px;float: left;}
+.fuwu-organization-view .base-info .left .img-box {width: 240px;height: 240px;background-size: cover;background-position: center;}
+.fuwu-organization-view .base-info .right {float: left;margin-left: 33px;width: 927px;}
+.fuwu-organization-view .base-info .right .info {margin-bottom: 20px;width: 927px;}
+.fuwu-organization-view .base-info .right .info1 {height: 20px;margin-top: 10px;}
+.fuwu-organization-view .base-info .right .name {font-size: 20px;line-height: 20px;margin-right: 10px;font-weight: 700;}
+.fuwu-organization-view .base-info .right .info-item {float: left;margin-left: 20px;}
+.fuwu-organization-view .base-info .right i {width: 23px;height: 20px;display: block;margin-right: 2px;}
+.fuwu-organization-view .base-info .right .item-text {float: left;height: 20px;display: block;line-height: 20px;font-size: 14px;}
+.fuwu-organization-view .base-info .right .info2-item {float: left;}
+.fuwu-organization-view .base-info .right em {float: left;width: 30px;text-align: center;color: #ccc;}
+.fuwu-organization-view .base-info .right .label {width: 3em;margin-right: 6px;color: #999;}
+.fuwu-organization-view .base-info .right .info3-item {margin-right: 8px;}
+.fuwu-organization-view .base-info .right i {width: 18px;height: 18px;margin-right: 3px;display: block;color:#ff8800}
+.fuwu-organization-view .base-info .right .info.info4 {height:60px;margin-bottom: 0;}
+.fuwu-organization-view .base-info .right .oper-area .oper-btn {margin-left: 15px;width: 158px;height: 46px;background: #E6454A;color: #fff;text-align: center;line-height: 46px;border: 1px solid #E6454A;cursor: pointer;font-size: 18px;}
+.fuwu-organization-view .base-info .right .oper-area .oper-btn.zxjg {background: #fff;color: #E6454A;border: 1px solid #E6454A;}
+.fuwu-organization-view .base-info .right .oper-area a:first-child .oper-btn{margin-left: 0}
+.fuwu-organization-view .detail-scroll-info-wrap .tab-nav {height: 48px;background: #F5F5F5;position: relative;width: 1200px;}
+.fuwu-organization-view .detail-scroll-info-wrap .tab-nav.fixed{position: fixed;top:0;z-index: 10}
+.fuwu-organization-view .detail-scroll-info-wrap .tab-nav .nav-item {height: 48px;line-height: 48px;float: left;cursor: pointer;width: 117px;text-align: center;}
+.fuwu-organization-view .detail-scroll-info-wrap .tab-nav .nav-item.active {color: #E6454A;}
+.fuwu-organization-view .detail-scroll-info-wrap .tab-nav .span {height: 14px;margin-top: 12px;color: #999;float: left;}
+.fuwu-organization-view .detail-scroll-info-wrap .base-info-module-wrap {position: relative;}
+.fuwu-organization-view .detail-scroll-info-wrap .base-info-module {padding-top: 20px;padding-bottom: 10px;padding-left: 60px;}
+.fuwu-organization-view .detail-scroll-info-wrap .base-info-module .base-info-item {width: 24.99%;float: left;margin-bottom: 12px;}
+.fuwu-organization-view .detail-scroll-info-wrap .base-info-module .lable {color: #999;}
+
+.fuwu-organization-view .detail-photo-wrap {margin-bottom: 30px;}
+.fuwu-organization-view .module-title {border-bottom: 1px;height: 50px;border-bottom: 1px solid #ededed;position: relative;}
+.fuwu-organization-view .module-title .title {font-size: 18px;font-weight: 500;font-weight: 700;line-height: 50px;}
+.fuwu-organization-view .photo-list-wrap {padding-top: 20px;position: relative;}
+.fuwu-organization-view .photo-list {}
+.fuwu-organization-view .photo-list .photo {width: 168px;height: 168px;margin-left: 25px;margin-bottom: 10px;display: block;cursor: pointer;float: left;}
+.fuwu-organization-view .map{width:1200px;height: 700px;}
+
+.fuwu-organization-view .w-search-list {}
+.fuwu-organization-view .w-search-list li {padding: 30px 0;border-bottom: 1px solid #f5f5f5;}
+.fuwu-organization-view .w-search-list li:hover {background: #fbfbfb;}
+.fuwu-organization-view .w-search-list li .w-search-list-item {position: relative;}
+.fuwu-organization-view .w-search-list li .w-search-list-item .w-search-list-item-img-wrapper {width: 150px;height: 150px;border: 1px solid #eaeaea;float: left;}
+.fuwu-organization-view .w-search-list li .w-search-list-item .w-search-list-item-img {width: 150px;height: 150px;}
+.fuwu-organization-view .w-search-list li .w-search-list-item .w-search-list-item-info {padding-top: 7px;width: 515px;padding-left: 30px;float: left;vertical-align: middle;}
+.overflow-ellipsis {white-space: nowrap;text-overflow: ellipsis;overflow: hidden;}
+.fuwu-organization-view .w-search-list li .w-search-list-item .w-search-list-item-info h4 {line-height: 22px;font-size: 20px;}
+.fuwu-organization-view .w-search-list li .w-search-list-item .w-search-list-item-info h4 a {font-size: 20px;line-height: 22px;color: #333;font-weight: 700;font-family: PingFangSC-Medium,"Microsoft YaHei",sans-serif;}
+.fuwu-organization-view .w-search-list li .w-search-list-item .w-search-list-item-info p {color: #666;font-size: 14px;line-height: 16px;overflow: hidden;padding-top: 12px;}
+.fuwu-organization-view .w-search-list li .w-search-list-item .w-search-list-item-info .goods-desc {font-size: 16px;padding-top: 10px;display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;display: box;line-clamp: 2;box-orient: vertical;overflow: hidden;height: 32px;}
+.fuwu-organization-view .w-search-list li .w-search-list-item .w-search-list-item-info .service-type{color: #c3c3c3}
+.fuwu-organization-view .w-search-list li .w-search-list-item .w-search-list-item-num {position: absolute;right: 10px;top: 22px;}
+.fuwu-organization-view .w-search-list li .w-search-list-item .w-search-list-item-num .price-wrapper {color: #E6454A;line-height: 30px;text-align: center;}
+.fuwu-organization-view .w-search-list li .w-search-list-item .w-search-list-item-num .price-wrapper .price-num {font-size: 30px;position: relative;bottom: -2px;font-family: PingFangSC-Medium,"Microsoft YaHei",sans-serif;}
+.fuwu-organization-view .w-search-list li .w-search-list-item .w-search-list-item-num .price-wrapper .price-unit {font-family: PingFangSC-Regular,"Microsoft YaHei",sans-serif;margin-right: 2px;font-size: 16px;vertical-align: middle;}
+
+
+.fuwu-goods-view{background:#f5f5f5;padding-bottom:20px;}
+.fuwu-goods-view .lead{font-size:22px;color:#b4b4b4;height: 72px;padding-top:40px;line-height: 30px;}
+.fuwu-goods-view .lead .category{font-size:32px;color:#333;}
+.fuwu-goods-view .lead .category i{margin:0 10px;}
+.fuwu-goods-view .btn {width: 156px;height: 46px;background: #E6454A;border: 1px solid #E6454A;font-size: 18px;line-height: 46px;color: #fff;text-align: center;cursor: pointer;margin:0 auto;margin-top:20px;}
+.fuwu-goods-view .service_box {width: 1200px;box-sizing: border-box;background: rgb(255,255,255);}
+.fuwu-goods-view .service_detail {padding: 28px;margin-top:10px;}
+.fuwu-goods-view .service_detail .image{margin-top: 10px;}
+.fuwu-goods-view .service_detail .image img{max-width:100% }
+.fuwu-goods-view .service_detail .text{font-size:16px;margin-top: 10px;}
+.fuwu-goods-view .service_Price {padding: 28px;}
+.fuwu-goods-view .service_title {font-size: 24px;font-family: PingFangSC-Medium;font-weight: 500;color: rgb(51,51,51);line-height: 33px;}
+.fuwu-goods-view .priceList {width: 1144px;margin-top: 20px;}
+.fuwu-goods-view .priceList .title {width: 1144px;height: 43px;text-align: center;background: rgb(245,245,245);font-size: 16px;font-family: PingFangSC-Regular;font-weight: 400;color: rgb(51,51,51);line-height: 43px;}
+.fuwu-goods-view .priceList .table {}
+.fuwu-goods-view .priceList .table .tr {height: 43px;overflow: hidden;}
+.fuwu-goods-view .priceList .table .tr .td {width: 50%;height: 43px;line-height: 43px;text-align: center;font-size: 14px;font-family: PingFangSC-Regular;font-weight: 400;color: rgb(132,140,153);border-right: 1px solid #F5F5F5;border-bottom:1px solid #F5F5F5;float: left;box-sizing: border-box;}
+.fuwu-goods-view .priceList .table .tr .text {font-size: 14px;font-family: PingFangSC-Regular;font-weight: 400;color: rgb(51,51,51);border-left: 1px solid #F5F5F5;}
+.fuwu-goods-view .user_Review {padding: 28px;margin-top: 12px;}
+.fuwu-goods-view .infoBox {padding: 20px 0;border-top: 1px solid rgb(245,245,245);height: 109px;box-sizing: border-box;}
+.fuwu-goods-view .infoBox img {float: left;width:68px;height: 68px;border-radius: 50%;}
+.fuwu-goods-view .infoBox .content {display: inline-block;position: relative;padding-left: 24px;width: 1050px;}
+.fuwu-goods-view .infoBox .content span {display: block;margin-top: 12px;font-size: 12px;font-family: PingFangSC-Regular;font-weight: 400;color: rgba(132,140,153,1);line-height: 17px;}
+.fuwu-goods-view .infoBox .content p {display: block;margin-top: 7px;font-size: 14px;font-family: PingFangSC-Regular;font-weight: 400;color: rgba(51,51,51,1);line-height: 20px;}
+
+
+
+
+
+
+
+
+
+
+
+

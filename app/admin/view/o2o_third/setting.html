@@ -1,0 +1,70 @@
+{include file="public/header" /}
+
+
+
+<div class="page">
+    <div class="fixed-bar">
+        <div class="item-title">
+            <div class="subject">
+                <h3>{$Think.lang.o2o_third}</h3>
+                <h5></h5>
+            </div>
+            {include file="public/admin_items" /}
+        </div>
+    </div>
+
+    <form id='o2o_form' method="post"  name="form1">
+            <table class="ds-default-table">
+                <tbody>
+                    <tr class="noborder"> 
+                        <td class="required w150"><label class="validation" for="dada_open">{$Think.lang.ds_open}:</label></td>
+                        <td class="vatop rowform onoff">
+                        <label for="dada_open_1" class="cb-enable {eq name='list_config.dada_open' value='1'}selected{/eq}" title="{$Think.lang.ds_yes}"><span>{$Think.lang.ds_yes}</span></label>
+                    <label for="dada_open_0" class="cb-disable {eq name='list_config.dada_open' value='0'}selected{/eq}" title="{$Think.lang.ds_no}"><span>{$Think.lang.ds_no}</span></label>
+                    <input type="radio" id="dada_open_1" name="dada_open" value="1"  {if $list_config.dada_open=='1'}checked=checked{/if}>
+                    <input type="radio" id="dada_open_0" name="dada_open" value="0" {if $list_config.dada_open=='0'}checked=checked{/if}>
+                        </td>
+                        <td class="vatop tips">{$Think.lang.dada_open_tips}</td>
+                    </tr>
+                    <tr class="noborder"> 
+                        <td class="required w150"><label class="validation" for="dada_app_key">{$Think.lang.dada_app_key}:</label></td>
+                        <td class="vatop rowform"><input id="dada_app_key" name="dada_app_key" value="{$list_config.dada_app_key}" class="input-txt w400" type="text"></td>
+                        <td class="vatop tips">{$Think.lang.dada_app_key_tips|raw}</td>
+                    </tr>
+                    <tr class="noborder"> 
+                        <td class="required w150"><label class="validation" for="dada_app_secret">{$Think.lang.dada_app_secret}:</label></td>
+                        <td class="vatop rowform"><input id="dada_app_secret" name="dada_app_secret" value="{$list_config.dada_app_secret}" class="input-txt w400" type="password"></td>
+                        <td class="vatop tips"></td>
+                    </tr>
+                    <tr class="noborder"> 
+                        <td class="required w150"><label class="validation" for="dada_source_id">{$Think.lang.dada_source_id}:</label></td>
+                        <td class="vatop rowform"><input id="dada_source_id" name="dada_source_id" value="{$list_config.dada_source_id}" class="input-txt w400" type="text"></td>
+                        <td class="vatop tips">{if isset($res)}{if $res.status=='success'}{$Think.lang.dada_balance}{$Think.lang.ds_colon}{$res.result.deliverBalance}{else}{$res.msg}{/if}{/if}</td>
+                    </tr>
+                    <tr class="noborder"> 
+                        <td class="required w150"><label class="validation" for="gaode_key">{$Think.lang.gaode_key}:</label></td>
+                        <td class="vatop rowform"><input id="gaode_key" name="gaode_key" value="{$list_config.gaode_key}" class="input-txt w400" type="text"></td>
+                        <td class="vatop tips">{$Think.lang.gaode_key_tips|raw}</td>
+                    </tr>
+                    <tr class="noborder"> 
+                        <td class="required w150"><label class="validation" for="gaode_js_key">{$Think.lang.gaode_js_key}:</label></td>
+                        <td class="vatop rowform"><input id="gaode_js_key" name="gaode_js_key" value="{$list_config.gaode_js_key}" class="input-txt w400" type="text"></td>
+                        <td class="vatop tips">{$Think.lang.gaode_js_key_tips}</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr class="tfoot">
+                        <td colspan="15"><a href="JavaScript:void(0);" class="btn" id="submitBtn" onclick="$('#o2o_form').submit()">{$Think.lang.ds_confirm_submit}</a></td>
+                    </tr>
+                </tfoot>
+            </table>
+    </form>
+</div>
+
+
+
+
+
+
+
+

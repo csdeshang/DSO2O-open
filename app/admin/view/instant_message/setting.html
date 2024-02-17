@@ -1,0 +1,54 @@
+{include file="public/header" /}
+
+
+
+<div class="page">
+    <div class="fixed-bar">
+        <div class="item-title">
+            <div class="subject">
+                <h3>{$Think.lang.instant_message}</h3>
+                <h5></h5>
+            </div>
+            {include file="public/admin_items" /}
+        </div>
+    </div>
+
+    <form id='o2o_form' method="post"  name="form1">
+            <table class="ds-default-table">
+                <tbody>
+                    <tr class="noborder"> 
+                        <td class="required w150"><label>{$Think.lang.instant_message_open}:</label></td>
+                        <td class="vatop rowform onoff">
+                    <label for="instant_message_open_1" class="cb-enable {eq name='list_config.instant_message_open' value='1'}selected{/eq}" title="{$Think.lang.ds_open}"><span>{$Think.lang.ds_open}</span></label>
+                    <label for="instant_message_open_0" class="cb-disable {eq name='list_config.instant_message_open' value='0'}selected{/eq}" title="{$Think.lang.ds_close}"><span>{$Think.lang.ds_close}</span></label>
+                    <input type="radio" id="instant_message_open_1" name="instant_message_open" value="1"  {if $list_config.instant_message_open=='1'}checked=checked{/if}>
+                    <input type="radio" id="instant_message_open_0" name="instant_message_open" value="0" {if $list_config.instant_message_open=='0'}checked=checked{/if}></td>
+                        <td class="vatop tips"></td>
+                    </tr>
+                    <tr class="noborder"> 
+                        <td class="required w150"><label>{$Think.lang.instant_message_gateway_url}:</label></td>
+                        <td class="vatop rowform"><input id="instant_message_gateway_url" name="instant_message_gateway_url" value="{$list_config.instant_message_gateway_url}" class="input-txt w300" type="text"></td>
+                        <td class="vatop tips"></td>
+                    </tr>
+                    <tr class="noborder"> 
+                        <td class="required w150"><label>{$Think.lang.instant_message_register_url}:</label></td>
+                        <td class="vatop rowform"><input id="instant_message_register_url" name="instant_message_register_url" value="{$list_config.instant_message_register_url}" class="input-txt w300" type="text"></td>
+                        <td class="vatop tips"></td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr class="tfoot">
+                        <td colspan="15"><a href="JavaScript:void(0);" class="btn" id="submitBtn" onclick="$('#o2o_form').submit()">{$Think.lang.ds_confirm_submit}</a></td>
+                    </tr>
+                </tfoot>
+            </table>
+    </form>
+</div>
+
+
+
+
+
+
+
+

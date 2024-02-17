@@ -1,0 +1,100 @@
+{include file="public/header" /}
+<div class="page">
+    <div class="fixed-bar">
+        <div class="item-title">
+            <div class="subject">
+                <h3>{$Think.lang.instant_message}</h3>
+                <h5></h5>
+            </div>
+            {include file="public/admin_items" /}
+        </div>
+    </div>
+  <div class="fixed-empty"></div>
+
+  <form method="get" name="formSearch" id="formSearch">
+      <div class="ds-search-form">
+
+            <dl>
+                <dt>{$Think.lang.instant_message_from_type}</dt>
+                <dd><input type="text" class="text" name="f_name" value="{$Request.get.f_name}" /></dd>
+            </dl>
+            <dl>
+                <dt>{$Think.lang.instant_message_to_type}</dt>
+                <dd><input type="text" class="text" name="t_name" value="{$Request.get.t_name}" /></dd>
+            </dl>
+            <dl>
+                <dt>{$Think.lang.start_to_stop_time}</dt>
+                <dd>
+                    <input class="txt date" type="text" value="{$Request.get.add_time_from}" id="add_time_from" name="add_time_from">
+                    ~
+                    <input class="txt date" type="text" value="{$Request.get.add_time_to}" id="add_time_to" name="add_time_to"/>
+                </dd>
+            </dl>
+          
+            <div class="btn_group">
+                 <a href="javascript:$('#formSearch').submit();" id="dssubmit" class="btn " title="{$Think.lang.ds_query}">{$Think.lang.ds_query}</a>     
+                 <a href="{:url('instant_message/index')}" class="btn btn-default" title="{$Think.lang.ds_cancel}">{$Think.lang.ds_cancel}</a>
+            </div>
+        </div>
+  </form>
+  
+      
+    <table class="ds-default-table">
+      <thead>
+        <tr class="thead">
+          <th class="w24">{$Think.lang.instant_message_id}</th>
+          <th>{$Think.lang.instant_message_from_type}</th>
+          <th>{$Think.lang.instant_message_to_type}</th>
+          <th>{$Think.lang.message_content}</th>
+          <th class="w200 align-center" >{$Think.lang.instant_message_add_time}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {notempty name="instant_message_list"}
+        {foreach name="instant_message_list" item="v"}
+        <tr class="hover edit" id="ds_row_{$v.instant_message_id}">
+          <td>{$v.instant_message_id}</td>
+          <td>[{$Think.lang.instant_message_type_text[$v['instant_message_from_type']]}]{$v.instant_message_from_name}</td>
+          <td>[{$Think.lang.instant_message_type_text[$v['instant_message_to_type']]}]{$v.instant_message_to_name}</td>
+          <td>{:parsesmiles($v['instant_message'],$v['instant_message_type'])}</td>
+          <td>{$v.instant_message_add_time|date='Y-m-d H:i'}</td>
+         
+        </tr>
+ 
+        {/foreach}
+        {else /}
+        <tr class="no_data">
+          <td colspan="15">{$Think.lang.ds_no_record}</td>
+        </tr>
+        {/notempty}
+      </tbody>
+
+    </table>
+    {$show_page|raw}
+</div>
+<link rel="stylesheet" href="{$Think.CHAT_SITE_URL}/css/chat.css">
+<script type="text/javascript">
+    $(function(){
+        $('#add_time_from').datepicker({dateFormat: 'yy-mm-dd'});
+        $('#add_time_to').datepicker({dateFormat: 'yy-mm-dd'});
+    });
+   
+
+    
+    // 获得选中ID
+    function getItems() {
+        /* 获取选中的项 */
+        var items = '';
+        $('.checkitem:checked').each(function () {
+            items += this.value + ',';
+        });
+        if (items != '') {
+            items = items.substr(0, (items.length - 1));
+        }else{
+            layer.alert('{$Think.lang.please_check_the_option}', {icon: 2})  
+        }
+        return items;
+    }
+   
+</script>
+{include file="public/footer" /}

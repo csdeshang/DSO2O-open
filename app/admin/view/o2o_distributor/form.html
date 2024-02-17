@@ -1,0 +1,207 @@
+{include file="public/header" /}
+
+
+
+
+
+<div class="page">
+
+        <form id="o2o_distributor_form" method="post" name="form1" enctype="multipart/form-data">
+            <table class="ds-default-table">
+                <tbody>
+                    {if $Request.action=='add'}
+                <tr class="noborder">
+                    <td class="required w120"><label class="validation">{$Think.lang.o2o_distributor_name}:</label></td>
+                    <td class="vatop rowform"><input type="text" value="{present name='o2o_distributor_array'}{$o2o_distributor_array.o2o_distributor_name}{/present}" name="o2o_distributor_name" id="o2o_distributor_name" class="txt"></td>
+                    <td class="vatop tips"></td>
+                </tr>
+                {/if}
+                <tr class="noborder">
+                    <td class="required"><label class="validation">{$Think.lang.o2o_distributor_password}:</label></td>
+                    <td class="vatop rowform"><input type="password" value="" name="o2o_distributor_password" id="o2o_distributor_password" class="txt"></td>
+                    <td class="vatop tips">{if $Request.action=='edit'}{$Think.lang.o2o_distributor_password_tips}{/if}</td>
+                </tr>
+                
+                <tr class="noborder">
+                    <td class="required">{$Think.lang.o2o_distributor_avatar}: </td>
+                    <td class="vatop rowform">
+                        {notempty name="$o2o_distributor_array.o2o_distributor_avatar"}
+                        <span class="type-file-show"> <img class="show_image" src="{$Think.ADMIN_SITE_ROOT}/images/preview.png">
+                            <div class="type-file-preview" style="display: none;"><img id="view_img" src="{:get_o2o_distributor_file($o2o_distributor_array.o2o_distributor_avatar,'avatar')}"></div>
+                        </span>
+                        {/notempty}
+                        <span class="type-file-box">
+                            <input type='text' name='o2o_distributor_avatar' id='o2o_distributor_avatar' class='type-file-text' />
+                            <input type='button' name='button' value='上传' class='type-file-button' />
+                            <input name="_pic" type="file" class="type-file-file" id="_pic" size="30" hidefocus="true" />
+                        </span>
+                    </td>
+                    <td class="vatop tips"></td>
+                </tr>
+                <tr class="noborder">
+                    <td class="required w120"><label class="validation">{$Think.lang.o2o_distributor_realname}:</label></td>
+                    <td class="vatop rowform"><input type="text" value="{present name='o2o_distributor_array'}{$o2o_distributor_array.o2o_distributor_realname}{/present}" name="o2o_distributor_realname" id="o2o_distributor_realname" class="txt"></td>
+                    <td class="vatop tips"></td>
+                </tr>
+                <tr class="noborder">
+                    <td class="required w120"><label class="validation">{$Think.lang.o2o_distributor_phone}:</label></td>
+                    <td class="vatop rowform"><input type="text" value="{present name='o2o_distributor_array'}{$o2o_distributor_array.o2o_distributor_phone}{/present}" name="o2o_distributor_phone" id="o2o_distributor_phone" class="txt"></td>
+                    <td class="vatop tips"></td>
+                </tr>
+                <tr class="noborder">
+                    <td class="required w120"><label>{$Think.lang.o2o_distributor_email}:</label></td>
+                    <td class="vatop rowform"><input type="text" value="{present name='o2o_distributor_array'}{$o2o_distributor_array.o2o_distributor_email}{/present}" name="o2o_distributor_email" id="o2o_distributor_email" class="txt"></td>
+                    <td class="vatop tips"></td>
+                </tr>
+                <tr class="noborder">
+                    <td class="required"><label class="member_areainfo">{$Think.lang.o2o_distributor_region_name}:</label></td>
+                    <td class="vatop rowform"  colspan="2">
+                        <span  class="w400">
+                      <input type="hidden" value="{present name='o2o_distributor_array'}{$o2o_distributor_array.o2o_distributor_region_id}{/present}" name="o2o_distributor_region_id" id="_area">
+                      <input type="hidden" name="o2o_distributor_region_name" id="region" value="{present name='o2o_distributor_array'}{$o2o_distributor_array.o2o_distributor_region_name}{/present}"/>
+                        </span>
+                    </td>
+                </tr>
+                <tr class="noborder">
+                    <td class="required w120"><label>{$Think.lang.o2o_distributor_remark}:</label></td>
+                    <td class="vatop rowform"><textarea name="o2o_distributor_remark" id="o2o_distributor_remark" class="txt">{present name='o2o_distributor_array'}{$o2o_distributor_array.o2o_distributor_remark}{/present}</textarea></td>
+                    <td class="vatop tips">{$Think.lang.o2o_distributor_remark_tips}</td>
+                </tr>
+                <tr class="noborder">
+                    <td class="required w120"><label>{$Think.lang.o2o_distributor_introduce}:</label></td>
+                    <td class="vatop rowform"><textarea name="o2o_distributor_introduce" id="o2o_distributor_introduce" class="txt">{present name='o2o_distributor_array'}{$o2o_distributor_array.o2o_distributor_introduce}{/present}</textarea></td>
+                    <td class="vatop tips"></td>
+                </tr>
+                <tr class="noborder">
+                    <td class="required">{$Think.lang.o2o_distributor_identify_image}: </td>
+                    <td class="vatop rowform">
+                        {notempty name="$o2o_distributor_array.o2o_distributor_identify_image"}
+                        <span class="type-file-show"> <img class="show_image" src="{$Think.ADMIN_SITE_ROOT}/images/preview.png">
+                            <div class="type-file-preview" style="display: none;"><img id="view_img" src="{:get_o2o_distributor_file($o2o_distributor_array.o2o_distributor_identify_image,'identify')}"></div>
+                        </span>
+                        {/notempty}
+                        <span class="type-file-box">
+                            <input type='text' name='o2o_distributor_identify_image' id='o2o_distributor_identify_image' class='type-file-text' />
+                            <input type='button' name='button' value='上传' class='type-file-button' />
+                            <input name="_pic2" type="file" class="type-file-file" id="_pic2" size="30" hidefocus="true" />
+                        </span>
+                    </td>
+                    <td class="vatop tips"></td>
+                </tr>
+                <tr class="noborder">
+                    <td class="required">付款凭证: </td>
+                    <td class="vatop rowform">
+                        {notempty name="$o2o_distributor_array.o2o_distributor_deposit_image"}
+                        <span class="type-file-show"> <img class="show_image" src="{$Think.ADMIN_SITE_ROOT}/images/preview.png">
+                            <div class="type-file-preview" style="display: none;"><img id="view_img" src="{:get_o2o_distributor_file($o2o_distributor_array.o2o_distributor_deposit_image,'deposit')}"></div>
+                        </span>
+                        {/notempty}
+                        <span class="type-file-box">
+                            <input type='text' name='o2o_distributor_deposit_image' id='o2o_distributor_deposit_image' class='type-file-text' />
+                            <input type='button' name='button' value='上传' class='type-file-button' />
+                            <input name="_pic3" type="file" class="type-file-file" id="_pic3" size="30" hidefocus="true" />
+                        </span>
+                    </td>
+                    <td class="vatop tips"></td>
+                </tr>
+                <tr class="noborder">
+                    <td class="required w120"><label>已缴保证金:</label></td>
+                    <td class="vatop rowform"><input type="text" value="{present name='o2o_distributor_array'}{$o2o_distributor_array.o2o_distributor_errand_deposit}{else}{$Think.config.ds_config.o2o_errand_deposit}{/present}" name="o2o_distributor_errand_deposit" id="o2o_distributor_errand_deposit" class="txt"></td>
+                    <td class="vatop tips"></td>
+                </tr>
+                <tr class="noborder">
+                    <td class="required">{$Think.lang.o2o_distributor_state}: </td>
+                    <td class="vatop rowform">
+                        {if !isset($o2o_distributor_array) || in_array($o2o_distributor_array.o2o_distributor_state,array(0,1))}
+                        <label><input type="radio" name="o2o_distributor_state" value="0" {if isset($o2o_distributor_array) && $o2o_distributor_array.o2o_distributor_state==0}checked{/if}>{$Think.lang.o2o_distributor_state_text[0]}</label>
+                        <label><input type="radio" name="o2o_distributor_state" value="1" {if !isset($o2o_distributor_array) || $o2o_distributor_array.o2o_distributor_state==1}checked{/if}>{$Think.lang.o2o_distributor_state_text[1]}</label>
+                        {else}
+                        <label><input type="radio" name="o2o_distributor_state" value="1" {if $o2o_distributor_array.o2o_distributor_state==2}checked{/if}>{$Think.lang.o2o_distributor_state_text[1]}</label>
+                        <label><input type="radio" name="o2o_distributor_state" value="3" {if $o2o_distributor_array.o2o_distributor_state==3}checked{/if}>{$Think.lang.o2o_distributor_state_text[3]}</label>
+                        {/if}
+                        </td>
+                    <td class="vatop tips"></td>
+                </tr>
+                {if isset($o2o_distributor_array) && in_array($o2o_distributor_array.o2o_distributor_state,array(2,3))}
+                <tr>
+                    <td class="required">{$Think.lang.order_show_reason}: </td>
+                    <td class="vatop rowform">
+                        <textarea name='content'></textarea>
+                    </td>
+                </tr>
+                {/if}
+                </tbody>
+                <tfoot>
+                <tr class="tfoot">
+                    <td colspan="15" ><input class="btn" type="submit" value="{$Think.lang.ds_submit}"/></td>
+                </tr>
+                </tfoot>
+            </table>
+        </form>
+    </div>
+<script type="text/javascript" src="{$Think.PLUGINS_SITE_ROOT}/mlselection.js" charset="utf-8"></script>
+<script>
+
+    //按钮先执行验证再提交表单
+    $(function(){
+		$("#region").ds_region();
+        $("#_pic").change(function () {
+            $("#o2o_distributor_avatar").val($("#_pic").val());
+        });
+        $("#_pic2").change(function () {
+            $("#o2o_distributor_identify_image").val($("#_pic2").val());
+        });
+        $("#_pic3").change(function () {
+            $("#o2o_distributor_deposit_image").val($("#_pic3").val());
+        });
+        // 编辑分类时清除分类信息
+
+        $("#o2o_distributor_form").validate({
+            errorPlacement: function(error, element){
+                error.appendTo(element.parent().parent().find('td:last'));
+            },
+            rules : {
+                o2o_distributor_name : {
+                    required : true,
+                    remote   : {
+                        url :"{:url('o2o_distributor/ajax',['branch'=>'o2o_distributor_name'])}",
+                        type:'get',
+                        data:{
+                            o2o_distributor_name : function(){
+                                return $('#o2o_distributor_name').val();
+                            },
+                            id  : {$o2o_distributor_array.o2o_distributor_id|default=0}
+                        }
+                    }
+                },
+								o2o_distributor_phone:{
+									required : true,
+								},
+								o2o_distributor_realname:{
+									required : true,
+								},
+                o2o_distributor_password : {
+                    required  : {present name='o2o_distributor_array'}false{else}true{/present}
+                },
+
+            },
+            messages : {
+                o2o_distributor_name : {
+                    required : '{$Think.lang.o2o_distributor_name_required}',
+                    remote   : '{$Think.lang.o2o_distributor_name_remote}'
+                },
+								o2o_distributor_phone:{
+									required : '{$Think.lang.o2o_distributor_phone_required}',
+								},
+								o2o_distributor_realname:{
+									required : '{$Think.lang.o2o_distributor_realname_required}',
+								},
+                o2o_distributor_password : {
+                    required : '{$Think.lang.o2o_distributor_password_required}'
+                },
+      
+            }
+        });
+    });
+
+</script>

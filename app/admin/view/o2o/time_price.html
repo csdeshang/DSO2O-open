@@ -1,0 +1,131 @@
+{include file="public/header" /}
+
+
+
+<div class="page">
+    <div class="fixed-bar">
+        <div class="item-title">
+            <div class="subject">
+                <h3>{$Think.lang.o2o_setting}</h3>
+                <h5></h5>
+            </div>
+            {include file="public/admin_items" /}
+        </div>
+    </div>
+
+    <form id='o2o_form' method="post"  name="form1">
+            <table class="ds-default-table">
+                <tbody>
+                    {foreach name='list_config' item='item' key='i'}
+                    <tr class="noborder"> 
+                    <td> 
+                    
+                    <div class="noborder"> 
+                        <span class="required title w150">{$Think.lang.o2o_time}</span>
+                        <span class="vatop range">
+                            <input class="range-slider" name="o2o_time_price[{$i}][time]" type="hidden" value="{$item.start_time},{$item.end_time}"/>
+                        </span>
+                    </div> 
+
+
+                    <div class="noborder"> 
+                        <span class="required title w150"><span>{$Think.lang.o2o_add_price}</span></span>
+                        <span class="vatop"><input name="o2o_time_price[{$i}][price]" value="{$item.price}" class="input-txt w60" type="text"></span>
+                        <span class="vatop tips">{$Think.lang.ds_yuan}</span>
+                    </div> 
+                        <a href="JavaScript:void(0);" class="btn btn-red" onclick="$(this).parent().remove()">{$Think.lang.ds_del}</a>
+                    </td>
+                    </tr>
+                    {/foreach}
+                </tbody>
+                <tfoot>
+                    <tr class="tfoot">
+                        <td colspan="15">
+                            <a href="JavaScript:void(0);" class="btn" id="submitBtn" onclick="$('#o2o_form').submit()">{$Think.lang.ds_confirm_submit}</a>
+                            <a href="JavaScript:void(0);" class="btn btn-blue" onclick="addItem()">{$Think.lang.o2o_add_item}</a>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+    </form>
+</div>
+<style>
+    .noborder{overflow:hidden;margin-bottom: 10px}
+    .noborder > span{float:left;}
+    .noborder > span.title{display:block;width:100px}
+    #o2o_form tbody tr .btn-red{float:right;margin-top:-40px}
+    #o2o_form tbody tr:first-child .btn-red{display:none}
+    #o2o_form .range {
+        margin-bottom: 50px;
+        margin-top: 30px;
+    }
+</style>
+<script type="text/html" id="javascript_template">
+    <tr class="noborder"> 
+        <td> 
+            <div class="noborder"> 
+                <span class="required title w150">{$Think.lang.o2o_time}</span>
+                <span class="vatop range">
+                    <input class="range-slider" name="o2o_time_price[0][time]" type="hidden" value="0,1440"/>
+                </span>
+            </div> 
+            <div class="noborder"> 
+                <span class="required title w150"><span>{$Think.lang.o2o_add_price}</span></span>
+                <span class="vatop"><input name="o2o_time_price[0][price]" value="" class="input-txt w60" type="text"></span>
+                <span class="vatop tips">{$Think.lang.ds_yuan}</span>
+            </div> 
+            <a href="JavaScript:void(0);" class="btn btn-red" onclick="$(this).parent().remove()">{$Think.lang.ds_del}</a>
+        </td>
+    </tr>
+</script>
+<link rel="stylesheet" href="{$Think.PLUGINS_SITE_ROOT}/jquery.range.css">
+<script src="{$Think.PLUGINS_SITE_ROOT}/jquery.range.js"></script>
+<script>
+    $(function(){
+        initRange()
+    })
+    function initRange(){
+        $('.range-slider').jRange({
+                from: 0, to: 1440, step:60,
+                scale: ['00:00','02:00','04:00','06:00','08:00','10:00','12:00','14:00','16:00','18:00','20:00','22:00','次日00:00'],
+                format: function(value, type) {
+        	var hours = String(value).substr(0,2);
+        	var mins = String(value).substr(3,2);
+
+        	if (hours > 24) {
+        		hours = hours - 24;
+        		hours = (hours < 10 ? "0"+hours : hours);
+        		value = hours+':'+mins;
+        		var text = String('次日%s').replace('%s', value);
+        		return text;
+        	}
+        	else {
+        		return value;
+        	}
+        },
+                width: 600,
+                showLabels: true,
+                isRange : true
+            });
+    }
+    
+    var i={$i};
+    function addItem(){
+        var html=$('#javascript_template').html();
+        html='<tr class="tfoot">'+html.replace(/\[\d+\]/g,'['+(++i)+']')+'</td>';
+        $('#o2o_form tbody').append(html).find('tr:last input[type=text]').val('')
+        initRange()
+    }
+    function setFixed(_this){
+        var val=$(_this).find('input').val()
+        $(_this).parents('td').find('.if_fixed[data-if_fixed!='+val+']').hide()
+        $(_this).parents('td').find('.if_fixed[data-if_fixed='+val+']').show()
+    }
+</script>
+
+
+
+
+
+
+

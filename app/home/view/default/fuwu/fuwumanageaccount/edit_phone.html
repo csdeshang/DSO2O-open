@@ -1,0 +1,26 @@
+{extend name="default/base/base_fuwu" /}
+{block name="fuwu_main"}
+<div class="dssc-form-default">
+    <form method="post"  enctype="multipart/form-data" id="fuwu_form"  onsubmit="ds_ajaxpost('fuwu_form','url','{:url('fuwu_manage_account/edit_phone')}');return false;" >
+        
+        
+        <dl>
+            <dt>手机号{$Think.lang.ds_colon}</dt>
+            <dd>
+                <input class="w200 text" name="mobile" type="text" value="{$o2o_fuwu_account_info.o2o_fuwu_account_phone}" />
+            </dd>
+        </dl>
+        <dl>
+            <dt>登录密码{$Think.lang.ds_colon}</dt>
+            <dd>
+                <input class="w200 text" name="password" type="password" />
+            </dd>
+        </dl>
+        <div class="bottom">
+            <input type="submit" class="submit" value="{$Think.lang.ds_common_button_save}" />
+        </div>
+    </form>
+</div>
+
+
+{/block}

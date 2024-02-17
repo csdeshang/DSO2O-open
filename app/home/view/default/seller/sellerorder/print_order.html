@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" href="{$Think.HOME_SITE_ROOT}/css/seller.css" />
+        <style type="text/css">
+            body { background: #FFF none;
+            }
+        </style>
+        <script type="text/javascript" src="{$Think.PLUGINS_SITE_ROOT}/jquery-2.1.4.min.js" charset="utf-8"></script>
+        <script type="text/javascript" src="{$Think.PLUGINS_SITE_ROOT}/common.js" charset="utf-8"></script>
+        <script type="text/javascript" src="{$Think.PLUGINS_SITE_ROOT}/jquery.printarea.js" charset="utf-8"></script>
+        <title>{$Think.lang.member_printorder_print}--{$store_info.store_name}{$Think.lang.member_printorder_title}</title>
+    </head>
+
+    <body>
+        {notempty name="order_info"}
+        <div class="print-layout">
+            <div class="print-btn" id="printbtn" title="{$Think.lang.member_printorder_print_tip|raw}"><i></i><a href="javascript:void(0);">{$Think.lang.member_printorder_print}</a></div>
+            <div class="a5-size"></div>
+            <dl class="a5-tip">
+                <dt>
+                    <h1>A5</h1>
+                    <em>Size: 210mm x 148mm</em></dt>
+                <dd>{$Think.lang.member_printorder_print_tip_A5}</dd>
+            </dl>
+            <div class="a4-size"></div>
+            <dl class="a4-tip">
+                <dt>
+                    <h1>A4</h1>
+                    <em>Size: 210mm x 297mm</em></dt>
+                <dd>{$Think.lang.member_printorder_print_tip_A4}</dd>
+            </dl>
+            <div class="print-page">
+                <div id="printarea">
+                    <style>
+.logo {display: table-cell;vertical-align: middle;text-align: center;}
+.orderprint{background:#FFF;width:190mm;margin-bottom:20px;padding:10mm 10mm 8mm 10mm;color:#000000;position:relative;}
+.orderprint .top{font-family:"microsoft yahei";line-height:60px;width:190mm;height:60px;overflow:hidden;font-size:24px;}
+.orderprint .top .logo{width:200px;height:60px;float:left;}
+.orderprint .top .logo-title{text-align:left;width:450px;height:60px;float:left;margin-left:10px;overflow:hidden;}
+.orderprint .top .full-title{width:100%;text-align:center;}
+.orderprint .explain{color:#555;line-height:20px;width:100%;}
+.orderprint .seal{ position:absolute;top:30px;right:50px;}
+.orderprint .page{line-height:18px;color:#999;position:absolute;bottom:0px;left:50%;margin-left:-30px;}
+.orderprint table{font-family:Arial, Helvetica, sans-serif; font-size:12px;line-height:18px;width:100%;border-collapse:collapse;}
+.buyer-info{margin:15px 0;}
+.order-info thead th{font-weight:normal;background:#E7E7E7;text-align:center;border-bottom:solid 2px #000;border-top:solid 2px #000;padding:2px 0;}
+.order-info thead tr td{}
+.order-info tbody tr th{ background:#F7F7F7;text-align:left;padding:8px 0;text-align:center;font-weight:600; border-bottom:solid 2px #000;border-top:solid 2px #000;}
+.order-info tbody tr td{padding:8px 0;text-align:center;}
+.order-info tfoot tr th{border-bottom:solid 2px #000;padding:6px 0;text-align:left;font-weight:normal;}
+.order-info tfoot tr th span{line-height:20px;white-space:nowrap;display:inline-block;width:24%;height:20px;padding:0;margin:0;border:0;overflow:hidden;text-overflow:ellipsis;}
+.orderprint th{font-variant:normal;text-align:left}
+.w200{width:200px !important;}
+.tl{text-align:left !important;}
+.w70{width:70px !important;}
+.w40{width:40px !important;}
+                    </style>
+                    {foreach name="goods_list" item="item_v" key="item_k" }
+                    <div class="orderprint">
+                        <div class="top">
+                            {notempty name="$store_info.store_logo"}
+                            <div class="full-title">{$store_info.store_name} {$Think.lang.member_printorder_title}</div>
+                            {else /}
+                            <div class="logo" ><img src="{:get_store_logo($store_info.store_logo,'store_logo')}" width="60" height="60"/></div>
+                            <div class="logo-title">{$store_info.store_name}{$Think.lang.member_printorder_title}</div>
+                            {/notempty}
+                        </div>
+                        <table class="buyer-info">
+                            <tr>
+                                <td class="w200">{$Think.lang.member_printorder_truename}{$Think.lang.ds_colon}{$order_info['extend_order_common']['reciver_name']}</td>
+                                <td>{$Think.lang.member_printorder_tel_phone}{$Think.lang.ds_colon}{$order_info['extend_order_common']['reciver_info']['phone']}</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">{$Think.lang.member_printorder_address}{$Think.lang.ds_colon}{$order_info['extend_order_common']['reciver_info']['address']}</td>
+                            </tr>
+                            <tr>
+                                <td>{$Think.lang.member_printorder_orderno}{$Think.lang.ds_colon}{$order_info.order_sn}</td>
+                                <td>{$Think.lang.member_printorder_orderadddate}{$Think.lang.ds_colon}{$order_info.add_time|date="Y-m-d"}</td>
+                            
+                            </tr>
+                        </table>
+                        <table class="order-info">
+                            <thead>
+                                <tr>
+                                    <th class="w40">{$Think.lang.member_printorder_serialnumber}</th>
+                                    <th class="tl">{$Think.lang.member_printorder_goodsname}</th>
+                                    <th class="w70 tl">{$Think.lang.member_printorder_goodsprice}({$Think.lang.currency_zh})</th>
+                                    <th class="w50">{$Think.lang.member_printorder_goodsnum}</th>
+                                    <th class="w70 tl">{$Think.lang.member_printorder_subtotal}({$Think.lang.currency_zh})</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {foreach name="item_v" item="v" key="k" }
+                                <tr>
+                                    <td>{$k}</td>
+                                    <td class="tl">{$v.goods_name}</td>
+                                    <td class="tl">{$Think.lang.currency|raw}{$v.goods_price}</td>
+                                    <td>{$v.goods_num}</td>
+                                    <td class="tl">{$Think.lang.currency|raw}{$v.goods_all_price}</td>
+                                </tr>
+                                {/foreach}
+                                <tr>
+                                    <th></th>
+                                    <th colspan="2" class="tl">{$Think.lang.member_printorder_amountto}</th>
+                                    <th>{$goods_all_num}</th>
+                                    <th class="tl">{$Think.lang.currency|raw}{$goods_total_price}</th>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="10"><span>{$Think.lang.member_printorder_totle}{$Think.lang.ds_colon}{$Think.lang.currency|raw}{$goods_total_price}</span><span>{$Think.lang.member_printorder_freight}{$Think.lang.ds_colon}{$Think.lang.currency|raw}{$order_info.shipping_fee}</span><span>{$Think.lang.member_printorder_privilege}{$Think.lang.ds_colon}{$Think.lang.currency|raw}{$promotion_amount}</span><span>{$Think.lang.member_printorder_orderamount}{$Think.lang.ds_colon}{$Think.lang.currency|raw}{$order_info.order_amount}</span><span>{$Think.lang.member_printorder_shop}{$Think.lang.ds_colon}{$store_info.store_name}</span>
+                                        {if !empty($store_info['store_qq'])}
+                                        <span>QQ：{$store_info.store_qq}</span>
+                                        {elseif !empty($store_info['store_ww']) /}
+                                        <span>{$Think.lang.member_printorder_shopww}{$Think.lang.ds_colon}{$store_info.store_ww}</span>
+                                        {/if}
+                                    </th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        <div class="explain">
+                            {$store_info.store_printexplain}
+                        </div>
+                        {notempty name="$store_info.store_seal"}
+                        <div class="seal"><img src="{$store_info.store_seal}" onload="javascript:ResizeImage(this, 120, 120);"/></div>
+                        {/notempty}
+                        <div class="tc page">{$Think.lang.member_printorder_pagetext_1}{$item_k}{$Think.lang.member_printorder_pagetext_2}/{$Think.lang.member_printorder_pagetext_3}{:count($goods_list)}{$Think.lang.member_printorder_pagetext_2}</div>
+                    </div>
+                    {/foreach}
+                </div>
+            </div>
+        </div>
+        {/notempty}
+    </body>
+    <script>
+        var HOMESITEURL = "{$Think.HOME_SITE_URL}";
+        $(function () {
+            $("#printbtn").click(function () {
+                $("#printarea").printArea();
+            });
+        });
+
+    </script>
+</html>

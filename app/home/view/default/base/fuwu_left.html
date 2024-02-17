@@ -1,0 +1,34 @@
+<div class="seller_left">
+    <div class="seller_left_1">
+        <div class="logo">
+            <a href="{:url('FuwuManage/index')}">
+                <img src="{:get_o2o_fuwu_file(session('o2o_fuwu_organization_id'),$o2o_fuwu_organization_info.o2o_fuwu_organization_avatar,'avatar')}"/>
+            </a>
+        </div>
+        <div class="sidebar">
+            <a href="{:url('FuwuOrganization/view',['organization_id'=>session('o2o_fuwu_organization_id')])}" target="_blank"><i class="iconfont">&#xe6da;</i>前台</a>
+            {foreach name="fuwu_menu" item="menu"  key="menu_key"}
+            <a href="{$menu.url}" {if $menu_key eq $curmenu}class="active"{/if}><i class="iconfont">{$menu.ico|raw}</i>{$menu.text}</a>
+            {/foreach}
+        </div>
+        <div class="mb">
+            <a href="{:url('FuwuManageLogin/logout')}">{$Think.lang.exit}</a>
+        </div>
+    </div>
+    <div class="seller_left_2">
+        <div class="mt">
+            {foreach name="fuwu_menu" item="menu"  key="menu_key"}
+            {if $menu_key eq $curmenu}{$menu.text}{/if}
+            {/foreach}
+        </div>
+        <div class="mc">
+            {foreach name="fuwu_menu" item="menu"  key="menu_key"}
+            {if $menu_key eq $curmenu}
+            {foreach name="menu.submenu" item="submenu" }
+            <a href="{$submenu.url}" {if condition="$submenu.name eq $cursubmenu"}class="active"{/if}>{$submenu.text}</a>
+            {/foreach}
+            {/if}
+            {/foreach}
+        </div>
+    </div>
+</div>

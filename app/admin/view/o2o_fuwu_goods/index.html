@@ -1,0 +1,214 @@
+{include file="public/header" /}
+<div class="page">
+    <div class="fixed-bar">
+        <div class="item-title">
+            <div class="subject">
+                <h3>{$Think.lang.o2o_fuwu_goods}</h3>
+                <h5></h5>
+            </div>
+            {include file="public/admin_items" /}
+        </div>
+    </div>
+  <div class="fixed-empty"></div>
+
+  <form method="get" name="formSearch" id="formSearch">
+      <div class="ds-search-form">
+            <dl>
+                <dt>服务名称</dt>
+                <dd><input type="text" value="{$Request.get.search_goods_name|default=''}" name="search_goods_name" id="search_goods_name" class="txt"></dd>
+            </dl>
+ 
+
+          <dl>
+              <dt>服务机构</dt>
+              <dd><input type="text" value="{$Request.get.search_store_name|default=''}" name="search_store_name" id="search_store_name" class="txt"></dd>
+          </dl>
+          {if $type == 'allgoods'}
+          <dl>
+              
+              <dt>{$Think.lang.goods_index_show}</dt>
+              <dd>
+                  <select name="goods_state">
+                      <option value="">{$Think.lang.ds_please_choose}...</option>
+                      {foreach name="state" item="val" key="key" }
+                      <option value="{$key}" {if isset($search['goods_state']) &&  $search['goods_state'] == $key }selected{/if}>{$val}</option>
+                      {/foreach}
+                  </select>
+              </dd>
+          </dl>
+<!--          <dl>
+              <dt>等待审核</dt>
+              <dd>
+                  <select name="goods_verify">
+                      <option value=""  >{$Think.lang.ds_please_choose}...</option>
+                      {foreach name="verify" item="val" key="key"}
+                      <option value="{$key}" {if isset($search['goods_verify']) &&  $search['goods_verify'] == $key }selected{/if}>{$val}</option>
+                      {/foreach}
+                  </select>
+              </dd>
+              
+          </dl>-->
+          {/if}
+            <div class="btn_group">
+                 <a href="javascript:void(0);" id="dssubmit" class="btn " title="{$Think.lang.ds_query}">{$Think.lang.ds_query}</a>     
+                 <a href="{:url('o2o_fuwu_goods/index')}" class="btn btn-default" title="{$Think.lang.ds_cancel}">{$Think.lang.ds_cancel}</a>
+            </div>
+        </div>
+  </form>
+  
+      
+    <table class="ds-default-table">
+      <thead>
+        <tr class="thead">
+          <th class="w24"></th>
+          <th colspan="2">服务名称</th>
+          <th>{$Think.lang.goods_index_class_name}</th>
+          <th class="w72 align-center">价格(元)</th>
+          <th class="w72 align-center">商品状态</th>
+          <th class="w48 align-center">{$Think.lang.ds_recommend}</th>
+          <th class="w48">{$Think.lang.ds_sort}</th>
+          <th class="w200 align-center" >{$Think.lang.ds_handle}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {notempty name="o2o_fuwu_goods_list"}
+        {foreach name="o2o_fuwu_goods_list" item="v"}
+        <tr class="hover edit" id="ds_row_{$v.o2o_fuwu_goods_id}">
+          <td><input type="checkbox" value="{$v.o2o_fuwu_goods_id}" class="checkitem"></td>
+          <td class="w60 picture"><div class="size-56x56"><span class="thumb size-56x56"><i></i><img src="{:get_o2o_fuwu_file($v.o2o_fuwu_organization_id,$v.o2o_fuwu_goods_image,'goods_image')}" onload="javascript:ResizeImage(this,56,56);"/></span></div></td>
+          <td>
+          <dl class="goods-info"><dt class="goods-name">{$v.o2o_fuwu_goods_name}</dt>
+       
+            <dd class="goods-store">{$v.o2o_fuwu_organization_name}</dd></dl>
+            </td>
+          <td>
+            <p>{$v.o2o_fuwu_class_name}</p>
+            </td>
+          <td class="align-center">{$v.o2o_fuwu_goods_default_price}</td>
+          <td class="align-center">{$state[$v['o2o_fuwu_goods_state']]}</td>
+          <td class="align-center yes-onoff">
+                    {if $v.o2o_fuwu_goods_recommend == '0'}
+                    <a href="JavaScript:void(0);" class="disabled" ajax_branch='o2o_fuwu_goods_recommend' ds_type="inline_edit" fieldname="o2o_fuwu_goods_recommend" fieldid="{$v.o2o_fuwu_goods_id}" fieldvalue="0" title="{$Think.lang.ds_editable}"><img src="{$Think.ADMIN_SITE_ROOT}/images/treetable/transparent.gif"></a>
+                    {else /}
+                    <a href="JavaScript:void(0);" class="enabled" ajax_branch='o2o_fuwu_goods_recommend' ds_type="inline_edit" fieldname="o2o_fuwu_goods_recommend" fieldid="{$v.o2o_fuwu_goods_id}" fieldvalue="1"  title="{$Think.lang.ds_editable}"><img src="{$Think.ADMIN_SITE_ROOT}/images/treetable/transparent.gif"></a>
+                   {/if}
+                </td>
+          <td class="sort"><span class="editable"  ds_type="inline_edit" fieldname="o2o_fuwu_goods_sort_order" ajax_branch='o2o_fuwu_goods_sort_order' fieldid="{$v.o2o_fuwu_goods_id}" datatype="pint" maxvalue="255" title="{$Think.lang.ds_editable}">{$v.o2o_fuwu_goods_sort_order}</span></td>      
+          <td class="align-center">
+              
+              {if $type == 'lockup'}
+              <a href="javascript:dsLayerConfirm('{:url('o2o_fuwu_goods/goods_del',['o2o_fuwu_goods_id'=>$v.o2o_fuwu_goods_id])}','{$Think.lang.ds_ensure_del}',{$v.o2o_fuwu_goods_id})" class="dsui-btn-del"><i class="iconfont"></i>{$Think.lang.ds_del}</a>
+
+              {elseif $type == 'waitverify'}
+              <a href="javascript:void(0);" onclick="goods_verify({$v['o2o_fuwu_goods_id']});" class="dsui-btn-edit"><i class="iconfont"></i>{$Think.lang.ds_verify}</a>
+              {elseif $type == 'allgoods' /}
+              {if $v.o2o_fuwu_goods_state != 10}
+              <a href="javascript:void(0);" onclick="goods_lockup({$v['o2o_fuwu_goods_id']},10);" class="dsui-btn-del"><i class="iconfont"></i>违规下架</a>
+              {else}
+              <a href="javascript:void(0);" onclick="goods_lockup({$v['o2o_fuwu_goods_id']},1);" class="dsui-btn-edit"><i class="iconfont"></i>解除违规</a>
+              {/if}
+              {/if}
+          </td>
+
+        </tr>
+        <tr style="display:none;">
+          <td colspan="20"><div class="dssc-goods-sku ps-container"></div></td>
+        </tr>
+        {/foreach}
+        {else /}
+        <tr class="no_data">
+          <td colspan="15">{$Think.lang.ds_no_record}</td>
+        </tr>
+        {/notempty}
+      </tbody>
+      <tfoot>
+        <tr class="tfoot">
+            &nbsp;&nbsp;
+            {if $type == 'lockup'}
+            <td><input type="checkbox" class="checkall" id="checkallBottom"></td>
+            <td colspan="16"><label for="checkallBottom">{$Think.lang.ds_select_all}</label>
+                &nbsp;&nbsp;<a href="JavaScript:void(0);" class="btn btn-small" onclick="submit_delete_batch()"><span>{$Think.lang.ds_del}</span></a>
+            </td>
+            {elseif $type == 'waitverify'}
+            <td><input type="checkbox" class="checkall" id="checkallBottom"></td>
+            <td colspan="16"><label for="checkallBottom">{$Think.lang.ds_select_all}</label>
+            <a href="javascript:void(0);" class="btn btn-small" dstype="verify_batch"><span>审核</span></a>
+            </td>
+            {elseif $type == 'allgoods' /}
+            <td><input type="checkbox" class="checkall" id="checkallBottom"></td>
+            <td colspan="16"><label for="checkallBottom">{$Think.lang.ds_select_all}</label>
+            <a href="JavaScript:void(0);" class="btn btn-small" dstype="lockup_batch" data-state="10"><span>违规下架</span></a>
+            <a href="JavaScript:void(0);" class="btn btn-small" dstype="lockup_batch" data-state="1"><span>解除违规</span></a>
+            </td>
+            {/if}
+        </tr>
+      </tfoot>
+    </table>
+    {$show_page|raw}
+</div>
+<script type="text/javascript" src="{$Think.ADMIN_SITE_ROOT}/js/jquery.edit.js" charset="utf-8"></script>
+<script type="text/javascript">
+var HOMESITEURL = "{$Think.HOME_SITE_URL}";
+$(function(){
+	
+   
+    $('#dssubmit').click(function(){
+        $('#formSearch').submit();
+    });
+    
+    // 审核批量处理
+    $('a[dstype="verify_batch"]').click(function(){
+        ids_str = getItems();
+        if (ids_str) {
+            goods_verify(ids_str);
+        }
+    });
+    // 违规下架批量处理
+    $('a[dstype="lockup_batch"]').click(function(){
+        state=$(this).attr('data-state')
+        ids_str = getItems();
+        if (ids_str) {
+            goods_lockup(ids_str,state);
+        }
+    });
+
+});
+
+    // 获得选中ID
+    function getItems() {
+        /* 获取选中的项 */
+        var items = '';
+        $('.checkitem:checked').each(function () {
+            items += this.value + ',';
+        });
+        if (items != '') {
+            items = items.substr(0, (items.length - 1));
+        }else{
+            layer.alert('请勾选选项', {icon: 2})  
+        }
+        return items;
+    }
+
+    // 商品下架
+    function goods_lockup(ids_str,state) {
+        _uri = ADMINSITEURL+"/o2o_fuwu_goods/goods_lockup?o2o_fuwu_goods_id=" + ids_str+'&state='+state;
+        dsLayerConfirm(_uri,'你确认要'+(state==10?'下':'上')+'架吗？');
+    }
+    
+    // 商品审核
+    function goods_verify(ids_str) {
+        _uri = ADMINSITEURL+"/o2o_fuwu_goods/goods_verify?o2o_fuwu_goods_id=" + ids_str;
+        dsLayerOpen(_uri,'审核商品','400px','200px');
+    }
+    
+    function submit_delete(ids_str){
+        _uri = ADMINSITEURL+"/o2o_fuwu_goods/goods_del.html?o2o_fuwu_goods_id=" + ids_str;
+        dsLayerConfirm(_uri,'{$Think.lang.ds_ensure_del}');
+    }
+</script>
+
+
+
+
+
+{include file="public/footer" /}

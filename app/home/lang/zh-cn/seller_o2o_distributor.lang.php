@@ -1,0 +1,46 @@
+<?php
+$lang['image_upload']	= '图片上传';
+$lang['edit_seller_o2o']= '编辑店铺配送';
+$lang['store_o2o_open']= '开启配送';
+$lang['store_o2o_distribute_type']= '配送方式';
+$lang['store_o2o_distribute_type_0']= '平台';
+$lang['store_o2o_distribute_type_1']= '店铺';
+$lang['store_o2o_open_time']= '营业时间';
+$lang['store_o2o_distance']= '配送距离';
+$lang['store_o2o_distance_help']= '米';
+$lang['store_o2o_fee']= '配送费用';
+$lang['store_o2o_fee_help']= '元';
+$lang['store_o2o_auto_receipt']= '自动接单';
+$lang['store_o2o_auto_deliver']= '自动派单';
+$lang['store_o2o_min_cost']= '接单门槛';
+$lang['store_o2o_min_cost_help']= '元。用户下单时达到此购物金额，才能提交订单';
+$lang['store_o2o_reject_time']= '拒接时限';
+$lang['store_o2o_reject_time_help']= '分钟。若未操作手动接单，系统将会在设置时间后自动拒绝接单，默认0代表不设置';
+
+$lang['seller_o2o_distributor_list']= '配送员列表';
+$lang['o2o_distributor_name'] = '配送员账号';
+$lang['o2o_distributor_realname'] = '真实姓名';
+$lang['o2o_distributor_phone'] = '手机号';
+$lang['o2o_distributor_email'] = '邮箱';
+$lang['o2o_distributor_score'] = '评分';
+$lang['o2o_distributor_state'] = '状态';
+$lang['o2o_distributor_receipt'] = '接单';
+$lang['o2o_distributor_total_count'] = '总接单';
+$lang['o2o_distributor_average_time'] = '总用时';
+$lang['o2o_distributor_average_time_desc'] = '（分）';
+$lang['o2o_distributor_address'] = '所在地点';
+$lang['o2o_distributor_addtime'] = '添加时间';
+$lang['o2o_distributor_password'] = '密码';
+$lang['o2o_distributor_password_tips'] = '留空表示不修改';
+$lang['o2o_distributor_name_required'] = '配送员账号不能为空';
+$lang['o2o_distributor_phone_required'] = '配送员手机号不能为空';
+$lang['o2o_distributor_realname_required'] = '配送员真实姓名不能为空';
+$lang['o2o_distributor_name_remote'] = '该配送员账号已经存在了，请您换一个';
+$lang['o2o_distributor_password_required'] = '密码不能为空';
+$lang['o2o_distributor_avatar'] = '头像';
+$lang['o2o_distributor_remark'] = '备注';
+$lang['o2o_distributor_remark_tips'] = '收款账号等信息，不会公开';
+$lang['o2o_distributor_introduce'] = '介绍';
+$lang['o2o_distributor_empty'] = '不存在该配送员';
+
+return $lang;

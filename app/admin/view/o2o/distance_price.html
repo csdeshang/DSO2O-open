@@ -1,0 +1,91 @@
+{include file="public/header" /}
+
+
+
+<div class="page">
+    <div class="fixed-bar">
+        <div class="item-title">
+            <div class="subject">
+                <h3>{$Think.lang.o2o_setting}</h3>
+                <h5></h5>
+            </div>
+            {include file="public/admin_items" /}
+        </div>
+    </div>
+
+    <form id='o2o_form' method="post"  name="form1">
+            <table class="ds-default-table">
+                <tbody>
+                    {foreach name='list_config' item='item' key='i'}
+                    <tr class="noborder"> 
+                    <td> 
+                    
+
+                    <div class="noborder"> 
+                        <span class="required title w150">{$Think.lang.o2o_end_distance}</span>
+                        <span class="vatop"><input name="o2o_distance_price[{$i}][end_distance]" value="{$item.end_distance}" class="input-txt w60" type="text"></span>
+                        <span class="vatop tips">{$Think.lang.o2o_kilometre}</span>
+                    </div> 
+                    
+  
+                    <div class="noborder"> 
+                        <span class="required title w150">{$Think.lang.o2o_if_fixed}</span>
+                        <span class="vatop onoff">
+                        <label onclick="setFixed(this)" class="cb-enable {eq name='item.if_fixed' value='1'}selected{/eq}" title="{$Think.lang.ds_yes}"><input type="radio" name="o2o_distance_price[{$i}][if_fixed]" value="1"  {if $item.if_fixed=='1'}checked=checked{/if}><span>{$Think.lang.ds_yes}</span></label>
+                        <label onclick="setFixed(this)" class="cb-disable {eq name='item.if_fixed' value='0'}selected{/eq}" title="{$Think.lang.ds_no}"><input type="radio" name="o2o_distance_price[{$i}][if_fixed]" value="0" {if $item.if_fixed=='0'}checked=checked{/if}><span>{$Think.lang.ds_no}</span></label>
+                        </span>
+                        <span class="vatop tips"></span>
+                    </div> 
+                    <div class="noborder if_fixed" data-if_fixed="0" {eq name='item.if_fixed' value='1'}style="display:none"{/eq}> 
+                        <span class="required title w150">{$Think.lang.o2o_distance_interval}</span>
+                        <span class="vatop"><input name="o2o_distance_price[{$i}][interval_distance]" value="{$item.interval_distance}" class="input-txt w60" type="text"></span>
+                        <span class="vatop tips">{$Think.lang.o2o_kilometre}</span>
+                    </div> 
+                    <div class="noborder"> 
+                        <span class="required title w150"><span class="if_fixed" data-if_fixed="1" {eq name='item.if_fixed' value='0'}style="display:none"{/eq}>{$Think.lang.o2o_price}</span><span class="if_fixed" data-if_fixed="0" {eq name='item.if_fixed' value='1'}style="display:none"{/eq}>{$Think.lang.o2o_add_price}</span></span>
+                        <span class="vatop"><input name="o2o_distance_price[{$i}][price]" value="{$item.price}" class="input-txt w60" type="text"></span>
+                        <span class="vatop tips">{$Think.lang.ds_yuan}</span>
+                    </div> 
+                        <a href="JavaScript:void(0);" class="btn btn-red" onclick="$(this).parent().remove()">{$Think.lang.ds_del}</a>
+                    </td>
+                    </tr>
+                    {/foreach}
+                </tbody>
+                <tfoot>
+                    <tr class="tfoot">
+                        <td colspan="15">
+                            <a href="JavaScript:void(0);" class="btn" id="submitBtn" onclick="$('#o2o_form').submit()">{$Think.lang.ds_confirm_submit}</a>
+                            <a href="JavaScript:void(0);" class="btn btn-blue" onclick="addItem()">{$Think.lang.o2o_add_item}</a>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+    </form>
+</div>
+<style>
+    .noborder{overflow:hidden;margin-bottom: 10px}
+    .noborder > span{float:left;}
+    .noborder > span.title{display:block;width:100px}
+    #o2o_form tbody tr .btn-red{float:right;margin-top:-40px}
+    #o2o_form tbody tr:first-child .btn-red{display:none}
+</style>
+<script>
+    var i={$i};
+    function addItem(){
+        var html=$('#o2o_form tbody tr:last').html();
+        html='<tr class="tfoot">'+html.replace(/\[\d+\]/g,'['+(++i)+']')+'</td>';
+        $('#o2o_form tbody').append(html).find('tr:last input[type=text]').val('')
+    }
+    function setFixed(_this){
+        var val=$(_this).find('input').val()
+        $(_this).parents('td').find('.if_fixed[data-if_fixed!='+val+']').hide()
+        $(_this).parents('td').find('.if_fixed[data-if_fixed='+val+']').show()
+    }
+</script>
+
+
+
+
+
+
+

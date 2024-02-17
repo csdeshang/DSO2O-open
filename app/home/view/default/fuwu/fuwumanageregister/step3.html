@@ -1,0 +1,41 @@
+{include file='default/base/mall_top'/}
+<link rel="stylesheet" href="{$Think.HOME_SITE_ROOT}/css/home.css">
+<div class="header-login clearfix">
+    <div class="w1200">
+        <div class="logo">
+            <a href="{$Think.HOME_SITE_URL}"><img src="{:ds_get_pic(ATTACH_COMMON,$Think.config.ds_config.site_logo)}"/></a>
+        </div>
+    </div>
+</div>
+<div class='bg-gray2'>
+    <div class='w1200 pt20 pb20'>
+        <div class='block-wrapper'>
+            <div class='title'>创建账号</div>
+            <form id='register_form' method="post" onsubmit="submitForm();return false;">
+                <label class='input-wrapper'><span class='label'>账号类型</span><span><label><input type='radio' name='account_type' value='0' checked="">个人</label><label><input type='radio' name='account_type' value='1'>企业</label></span></label>
+                <label class='input-wrapper'><input class='input' name='user_name' type='text' placeholder="用户名"></label>
+                <label class='input-wrapper'><input class='input' name='password' type='password' placeholder="密码"></label>
+                <label class='input-wrapper'><input class='input' name='password2' type='password' placeholder="确认密码"></label>
+                <input type='hidden' value='{$Request.param.phone}' name='phone'>
+                <input type='hidden' value='{$Request.param.verify_code}' name='verify_code'>
+                <input type='submit' value='下一步' class='btn login-btn' />
+            </form>
+        </div>
+        
+    </div>
+</div>
+<style>
+    .block-wrapper{border-radius:4px;background:#fff;padding:20px 60px;font-size:14px;line-height: 1.5;margin:0 auto;width:360px;}
+    .block-wrapper .title{font-size:24px;margin-bottom: 20px;text-align: center;font-weight: bold}
+    .block-wrapper .input-wrapper{margin-bottom: 20px;border: 1px solid #e1e1e1;padding:12px;box-sizing: border-box;width:100%;display: block;border-radius: 4px;position: relative}
+    .block-wrapper .input-wrapper input[type=text],.block-wrapper .input-wrapper input[type=password]{border:0;height: 100%;width: 100%;font-size: 16px;}
+    .block-wrapper .input-wrapper.verify-code-wrapper .btn{position: absolute;right: 0;top:0;width: 80px;height: 100%;}
+    .block-wrapper .input-wrapper .label{}
+    .block-wrapper .input-wrapper input[type=radio]{margin-left: 20px;}
+</style>
+<script>
+    function submitForm(){
+        ds_ajaxpost('register_form','url','{:url('fuwu_manage_info/base')}');
+    }
+</script>
+{include file='default/base/mall_footer'/}

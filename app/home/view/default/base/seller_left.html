@@ -1,0 +1,37 @@
+<div class="seller_left">
+    <div class="seller_left_1">
+        <div class="logo">
+            <a href="{:url('Seller/index')}">
+                <img src="{if $Think.config.ds_config.seller_center_logo == ''}{$Think.BASE_SITE_ROOT}/uploads/home/common/seller_center_logo.png{else}{:ds_get_pic(ATTACH_COMMON,$Think.config.ds_config.seller_center_logo)}{/if}"/>
+            </a>
+        </div>
+        <div class="sidebar">
+            <a href="{:url('Store/index',['store_id'=>session('store_id')])}" target="_blank"><i class="iconfont">&#xe6da;</i>{$Think.lang.ds_mystroe}</a>
+            {if $Think.config.ds_config.instant_message_open eq '1'}
+            <a href="javascript:void(0);" id="chat_show_user"><i class="iconfont">&#xe71b;</i>{$Think.lang.ds_chat}</a>
+            {/if}
+            {foreach name="seller_menu" item="menu"  key="menu_key"}
+            <a href="{$menu.url}" {if $menu_key eq $curmenu}class="active"{/if}><i class="iconfont">{$menu.ico|raw}</i>{$menu.text}</a>
+            {/foreach}
+        </div>
+        <div class="mb">
+            <a href="{:url('Sellerlogin/logout')}">{$Think.lang.exit}</a>
+        </div>
+    </div>
+    <div class="seller_left_2">
+        <div class="mt">
+            {foreach name="seller_menu" item="menu"  key="menu_key"}
+            {if $menu_key eq $curmenu}{$menu.text}{/if}
+            {/foreach}
+        </div>
+        <div class="mc">
+            {foreach name="seller_menu" item="menu"  key="menu_key"}
+            {if $menu_key eq $curmenu}
+            {foreach name="menu.submenu" item="submenu" }
+            <a href="{$submenu.url}" {if condition="$submenu.name eq $cursubmenu"}class="active"{/if}>{$submenu.text}</a>
+            {/foreach}
+            {/if}
+            {/foreach}
+        </div>
+    </div>
+</div>

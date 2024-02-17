@@ -1,0 +1,130 @@
+{include file="public/header" /}
+
+
+<div class="page">
+    <div class="fixed-bar">
+        <div class="item-title">
+            <div class="subject">
+                <h3>{$Think.lang.o2o_distributor_manage}</h3>
+                <h5></h5>
+            </div>
+            {include file="public/admin_items" /}
+        </div>
+    </div>
+
+    <form method="get" name="formSearch" id="formSearch">
+        <div class="ds-search-form">
+            <dl>
+                <dd>
+                    <select name="search_field_name" >
+                        <option {if $search_field_name == 'o2o_distributor_name'}selected='selected'{/if} value="o2o_distributor_name">{$Think.lang.o2o_distributor_name}</option>
+                        <option {if $search_field_name == 'o2o_distributor_realname'}selected='selected'{/if} value="o2o_distributor_realname">{$Think.lang.o2o_distributor_realname}</option>
+                        <option {if $search_field_name == 'o2o_distributor_phone'}selected='selected'{/if} value="o2o_distributor_phone">{$Think.lang.o2o_distributor_phone}</option>
+                        <option {if $search_field_name == 'o2o_distributor_email'}selected='selected'{/if} value="o2o_distributor_email">{$Think.lang.o2o_distributor_email}</option>
+                    </select>
+                </dd>
+                <dd>
+                    <input type="text" value="{$search_field_value}" name="search_field_value" class="txt">
+                </dd>
+                
+                <dd>
+                    <select name="search_state" >
+                        <option {if condition='$Request.param.search_state eq ""'}selected='selected'{/if} value="">{$Think.lang.o2o_distributor_state}</option>
+                        {if $Request.param.verify}
+                        <option {if condition='$Request.param.search_state eq "2"'}selected='selected'{/if} value="2">{$Think.lang.o2o_distributor_state_text[2]}</option>
+                        <option {if condition='$Request.param.search_state eq "3"'}selected='selected'{/if} value="3">{$Think.lang.o2o_distributor_state_text[3]}</option>
+                        {else}
+                        <option {if condition='$Request.param.search_state eq "0"'}selected='selected'{/if} value="0">{$Think.lang.ds_disable}</option>
+                        <option {if condition='$Request.param.search_state eq "1"'}selected='selected'{/if} value="1">{$Think.lang.ds_enable}</option>
+                        {/if}
+                        
+                    </select>
+                </dd>
+                
+            </dl>
+            <div class="btn_group">
+                <input type="submit" class="btn" value="{$Think.lang.ds_search}">
+                {if $filtered}
+                <a href="{:url('o2o_distributor/index')}" class="btn btn-default" title="{$Think.lang.ds_cancel}">{$Think.lang.ds_cancel}</a>
+                {/if}
+            </div>
+        </div>
+    </form>
+    
+    <table class="ds-default-table">
+      <thead>
+        <tr class="thead">
+          <th colspan="2">{$Think.lang.o2o_distributor_name}</th>
+          <th class="align-center">{$Think.lang.o2o_distributor_realname}</th>
+          <th class="align-center">{$Think.lang.o2o_distributor_phone}</th>
+          <th class="align-center">{$Think.lang.o2o_distributor_email}</th>
+					<th class="align-center">{$Think.lang.o2o_distributor_region_name}</th>
+          {if !$Request.param.verify}    
+          <th class="align-center">{$Think.lang.o2o_distributor_score}</th>
+          <th class="align-center">{$Think.lang.o2o_distributor_receipt}</th>
+          <th class="align-center">{$Think.lang.o2o_distributor_total_count}</th>
+          <th class="align-center">{$Think.lang.o2o_distributor_average_time}{$Think.lang.o2o_distributor_average_time_desc}</th>
+          {/if}
+          <th class="align-center">{$Think.lang.o2o_distributor_state}</th>
+          <th class="align-center">{$Think.lang.o2o_distributor_addtime}</th>
+          <th class="align-center">{$Think.lang.ds_handle}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {notempty name="o2o_distributor_list"}
+        {foreach name="o2o_distributor_list" item="v" key="k" }
+        <tr class="hover member">
+          <td class="w48 picture">
+              <div class="size-44x44">
+              <span class="thumb"><i></i>
+                  <img src="{:get_o2o_distributor_file($v.o2o_distributor_avatar)}?{:microtime()}"  width="44" height="44"/>
+              </span>
+          </div>
+          </td>
+          <td><p class="name"><strong>{$v.o2o_distributor_name}</strong></p>
+              </td>
+          <td class="align-center">{$v.o2o_distributor_realname}</td>
+          <td class="align-center">{$v.o2o_distributor_phone}</td>
+          <td class="align-center">{$v.o2o_distributor_email}</td>
+					<td class="align-center">{$v.o2o_distributor_region_name}</td>
+          {if !$Request.param.verify}                                  
+          <td class="align-center">{:get_percent($v.o2o_distributor_score,5)}</td>
+          
+          <td class="align-center yes-onoff">
+              {if $v.o2o_distributor_receipt == '0'}
+                    <a href="JavaScript:void(0);" class="disabled" ><img src="{$Think.ADMIN_SITE_ROOT}/images/treetable/transparent.gif"></a>
+                    {else /}
+                    <a href="JavaScript:void(0);" class="enabled" ><img src="{$Think.ADMIN_SITE_ROOT}/images/treetable/transparent.gif"></a>
+                   {/if}
+          </td>
+          <td class="align-center">{$v.o2o_distributor_total_count}</td>
+          <td class="align-center">{$v.o2o_distributor_average_time}</td>
+          {/if}
+          <td class="align-center">{$Think.lang.o2o_distributor_state_text[$v.o2o_distributor_state]}</td>
+          <td class="align-center">{:date('Y-m-d H:i:s',$v.o2o_distributor_addtime)}</td>
+          <td class="align-center">
+              <!--<a href="javascript:dsLayerOpen('{:url('o2o_distributor/notice',['id'=>$v.o2o_distributor_id])}','{$Think.lang.o2o_distributor_notice}{$v.o2o_distributor_name}')" class="dsui-btn-view"><i class="iconfont"></i>{$Think.lang.o2o_distributor_notice}</a>-->
+              <a href="javascript:dsLayerOpen('{:url('o2o_distributor/edit',['id'=>$v.o2o_distributor_id])}','{if !$Request.param.verify}{$Think.lang.ds_edit}{else}{$Think.lang.ds_verify}{/if}{$v.o2o_distributor_name}')" class="dsui-btn-edit"><i class="iconfont"></i>{if !$Request.param.verify}{$Think.lang.ds_edit}{else}{$Think.lang.ds_verify}{/if}</a>
+              <a href="javascript:dsLayerConfirm('{:url('o2o_distributor/del',['id'=>$v.o2o_distributor_id])}','{$Think.lang.ds_ensure_del}')" class="dsui-btn-del"><i class="iconfont"></i>{$Think.lang.ds_del}</a>
+          </td>
+        </tr>
+        {/foreach}
+        {else /}
+        <tr class="no_data">
+          <td colspan="13">{$Think.lang.ds_no_record}</td>
+        </tr>
+        {/notempty}
+      </tbody>
+      
+    </table>
+    {$show_page|raw}
+</div>
+
+
+
+
+
+
+
+
+

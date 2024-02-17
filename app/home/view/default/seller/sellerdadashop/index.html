@@ -1,0 +1,183 @@
+{extend name="default/base/base_seller" /}
+{block name="seller_main"}
+<script src="https://webapi.amap.com/maps?v=1.4.15&key={$Think.config.ds_config.gaode_js_key}&plugin=AMap.Autocomplete"></script>
+<div class="dssc-form-default">
+    <form method="post"  enctype="multipart/form-data" id="store_o2o_form"  onsubmit="ds_ajaxpost('store_o2o_form','url','{:url('seller_dada_shop/index')}');return false;" >
+        <dl>
+            <dt>{$Think.lang.dada_origin_shop_id}{$Think.lang.ds_colon}</dt>
+            <dd>
+                {$dada_info.origin_shop_id|default=''}
+                <input type="hidden" name="origin_shop_id" id="origin_shop_id" value="{$dada_info.origin_shop_id|default=''}" />
+                <p class="hint">{if !isset($dada_info.origin_shop_id)}{$Think.lang.dada_origin_shop_id_empty}{/if}</p>
+            </dd>
+        </dl>
+        <dl>
+            <dt>{$Think.lang.dada_status}{$Think.lang.ds_colon}</dt>
+            <dd>
+                {if isset($dada_info.status) && $dada_info.status==1}
+                {$Think.lang.dada_status_1}
+                {else}
+                {$Think.lang.dada_status_0}
+                {/if}
+                <p class="hint"></p>
+            </dd>
+        </dl>
+        <dl>
+            <dt><i class="required">*</i>{$Think.lang.dada_station_name}{$Think.lang.ds_colon}</dt>
+            <dd>
+                <input class="w200 text" name="station_name" type="text"  id="station_name" value="{$dada_info.station_name|default=''}" />
+                <p class="hint"></p>
+            </dd>
+        </dl>
+        <dl>
+            <dt><i class="required">*</i>{$Think.lang.dada_business}{$Think.lang.ds_colon}</dt>
+            <dd>
+                <select name="business">
+                    <option value="1"{if isset($dada_info.business) && $dada_info.business==1} selected{/if}>食品小吃</option>
+                    <option value="2"{if isset($dada_info.business) && $dada_info.business==2} selected{/if}>饮料</option>
+                    <option value="3"{if isset($dada_info.business) && $dada_info.business==3} selected{/if}>鲜花</option>
+                    <option value="8"{if isset($dada_info.business) && $dada_info.business==8} selected{/if}>文印票务</option>
+                    <option value="9"{if isset($dada_info.business) && $dada_info.business==9} selected{/if}>便利店</option>
+                    <option value="13"{if isset($dada_info.business) && $dada_info.business==13} selected{/if}>水果生鲜</option>
+                    <option value="19"{if isset($dada_info.business) && $dada_info.business==19} selected{/if}>同城电商</option>
+                    <option value="20"{if isset($dada_info.business) && $dada_info.business==20} selected{/if}>医药</option>
+                    <option value="21"{if isset($dada_info.business) && $dada_info.business==21} selected{/if}>蛋糕</option>
+                    <option value="24"{if isset($dada_info.business) && $dada_info.business==24} selected{/if}>酒品</option>
+                    <option value="25"{if isset($dada_info.business) && $dada_info.business==25} selected{/if}>小商品市场</option>
+                    <option value="26"{if isset($dada_info.business) && $dada_info.business==26} selected{/if}>服装</option>
+                    <option value="27"{if isset($dada_info.business) && $dada_info.business==27} selected{/if}>汽修零配</option>
+                    <option value="28"{if isset($dada_info.business) && $dada_info.business==28} selected{/if}>数码</option>
+                    <option value="29"{if isset($dada_info.business) && $dada_info.business==29} selected{/if}>小龙虾</option>
+                    <option value="51"{if isset($dada_info.business) && $dada_info.business==51} selected{/if}>火锅</option>
+                    <option value="5"{if isset($dada_info.business) && $dada_info.business==5} selected{/if}>其他</option>
+                </select>
+                <p class="hint"></p>
+            </dd>
+        </dl>
+        <dl style="overflow:visible">
+            <dt><i class="required">*</i>{$Think.lang.dada_city_name}{$Think.lang.ds_colon}</dt>
+            <dd style="position:relative">
+                <input class="w200 text" name="city_name" type="text"  id="city_name" value="{$dada_info.city_name|default=''}" onblur="searchCityCode()" />
+                <input type="hidden" name="dada_city_code" id="dada_city_code" value="{$store_info.dada_city_code}">
+                <div id="city_code"></div>
+                <p class="hint">{$Think.lang.dada_city_name_help}</p>
+            </dd>
+        </dl>
+        <dl>
+            <dt><i class="required">*</i>{$Think.lang.dada_area_name}{$Think.lang.ds_colon}</dt>
+            <dd>
+                <input class="w200 text" name="area_name" type="text"  id="area_name" value="{$dada_info.area_name|default=''}" />
+                <p class="hint">{$Think.lang.dada_area_name_help}</p>
+            </dd>
+        </dl>
+        <dl>
+            <dt><i class="required">*</i>{$Think.lang.dada_station_address}{$Think.lang.ds_colon}</dt>
+            <dd>
+                <input class="w200 text" name="station_address" type="text"  id="station_address" value="{$dada_info.station_address|default=''}" onblur="searchAddress()" />
+                <input type="hidden" name="lng" id="lng" value="{$dada_info.lng|default=''}" />
+                <input type="hidden" name="lat" id="lat" value="{$dada_info.lat|default=''}" />
+                <div id="container" style="height:350px;width:530px"></div>
+                <p class="hint"></p>
+            </dd>
+        </dl>
+        <dl>
+            <dt><i class="required">*</i>{$Think.lang.dada_contact_name}{$Think.lang.ds_colon}</dt>
+            <dd>
+                <input class="w200 text" name="contact_name" type="text"  id="contact_name" value="{$dada_info.contact_name|default=''}" />
+                <p class="hint"></p>
+            </dd>
+        </dl>
+        <dl>
+            <dt><i class="required">*</i>{$Think.lang.dada_phone}{$Think.lang.ds_colon}</dt>
+            <dd>
+                <input class="w200 text" name="phone" type="text"  id="phone" value="{$dada_info.phone|default=''}" />
+                <p class="hint"></p>
+            </dd>
+        </dl>
+
+        <div class="bottom">
+            <input type="submit" class="submit" value="{$Think.lang.ds_submit}" />
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    var city_code={$city_code|raw};
+    var lng={$dada_info.lng|default=0};
+    var lat={$dada_info.lat|default=0};
+    var mapOption={resizeEnable: true,zoom:11}
+    if(lng && lat){
+        
+        mapOption['center']= [lng, lat]
+    }
+    var placeSearch
+    var map = new AMap.Map("container", mapOption);
+      AMap.plugin('AMap.PlaceSearch', function(){
+        var autoOptions = {
+          city: '全国'
+        }
+        placeSearch = new AMap.PlaceSearch(autoOptions);
+
+      })
+      if(lng && lat){
+          addMarker(lng, lat)
+      }else{
+          if($('#station_address').val()){
+              searchAddress()
+          }
+      }
+    //为地图注册click事件获取鼠标点击出的经纬度坐标
+    map.on('click', function(e) {
+        map.clearMap();
+        addMarker(e.lnglat.getLng(), e.lnglat.getLat())
+        
+    });
+    function searchCityCode(){
+        $('#dada_city_code').val('')
+        var city_name=$('#city_name').val()
+        var my_list=[]
+        for(var i in city_code){
+            if(city_code[i].cityName.search(city_name) != -1){
+                my_list.push(city_code[i])
+            }
+        }
+        var html=''
+        if(my_list.length>1){
+            for(var i in my_list){
+                html+='<a class="w200" href="javascript:setCityCode(\''+my_list[i].cityCode+'\',\''+my_list[i].cityName+'\')"><div>'+my_list[i].cityName+'</div></a>'
+            }
+            $('#city_code').html(html)
+            $('#city_code').show()
+        }
+        if(my_list.length==1){
+            $('#dada_city_code').val(my_list[0].cityCode)
+        }
+    }
+    function setCityCode(cityCode,cityName){
+        $('#city_name').val(cityName)
+        $('#dada_city_code').val(cityCode)
+        $('#city_code').hide()
+    }
+    function searchAddress(){
+        placeSearch.search($('#station_address').val(), function(status, result) {
+          // 搜索成功时，result即是对应的匹配数据
+          if(status=='complete' && result.info=='OK' && result.poiList.count){
+              map.clearMap();
+              addMarker(result.poiList.pois[0].location.lng, result.poiList.pois[0].location.lat)
+          }
+        })
+    }
+    function addMarker(lng,lat){
+    var marker = new AMap.Marker({
+        position: new AMap.LngLat(lng,lat),
+    });
+        map.add(marker);
+        map.setCenter([lng, lat]); //设置地图中心点
+        document.getElementById("lng").value = lng
+        document.getElementById("lat").value = lat
+    }
+</script>
+<style>
+    #city_code{position:absolute;background: #fff;border: 1px solid #e1e1e1;border-top: 0;}
+    #city_code a{padding:4px;display: block;}
+</style>
+{/block}

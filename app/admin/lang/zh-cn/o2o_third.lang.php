@@ -1,0 +1,36 @@
+<?php
+$lang['dada_status_1']='激活';
+$lang['dada_status_0']='下线';
+$lang['store_name']='店铺名称';
+$lang['seller_name']='店主账号';
+$lang['dada_origin_shop_id']='达达门店编号';
+$lang['dada_station_name']='达达门店名称';
+$lang['dada_status']='达达门店状态';
+$lang['dada_shop'] = '达达门店';
+$lang['dada_open_tips'] = '开启达达后，订单将不发送给平台配送员，而是发送给达达方';
+$lang['dada_app_key'] = '达达app_key';
+$lang['dada_app_key_tips'] = '开发者账号需与商户编号进行绑定<a href="http://newopen.imdada.cn/" target="_blank">申请地址</a>';
+$lang['dada_app_secret'] = '达达app_secret';
+$lang['dada_source_id'] = '达达商户编号';
+$lang['dada_balance'] = '运费余额';
+$lang['dada_red_packet'] = '红包余额';
+$lang['gaode_key'] = '高德地图web服务key';
+$lang['gaode_js_key'] = '高德地图web端key';
+$lang['gaode_key_tips'] = '申请Web服务类型<a href="https://lbs.amap.com/" target="_blank">申请地址</a>';
+$lang['gaode_js_key_tips'] = '申请Web端(JS API)类型';
+$lang['dada_city_code'] = '达达区号';
+$lang['dada_city_code_not_exist'] = '所填城市不存在';
+$lang['dada_city_list_help1'] = '为了用户能正常下单，请确保达达城市名称与平台地区对应';
+$lang['dada_city_name'] = '达达城市';
+$lang['platform_area_info'] = '平台地区';
+
+$lang['dada_station_name_exist']= '请尝试更换门店名称';
+$lang['dada_business']= '业务类型';
+$lang['dada_city_name']= '城市名称';
+$lang['dada_city_name_help']= '如,上海';
+$lang['dada_area_name']= '区域名称';
+$lang['dada_area_name_help']= '如,浦东新区';
+$lang['dada_station_address']= '门店地址';
+$lang['dada_contact_name']= '联系人姓名';
+$lang['dada_phone']= '联系人电话';
+return $lang;

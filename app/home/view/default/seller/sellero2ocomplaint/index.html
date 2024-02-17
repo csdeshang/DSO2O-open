@@ -1,0 +1,72 @@
+{extend name="default/base/base_seller" /}
+{block name="seller_main"}
+
+<form method="get" action="" target="_self">
+    <table class="search-form">
+        <tr>
+            <td>&nbsp;</td>
+            <td class="w100 tr"><select name="select_complain_state">
+                    <option value="">{$Think.lang.ds_please_choose}</option>
+                    <option {if condition="$Request.param.select_complain_state !=='' && $Request.param.select_complain_state !== null && $Request.param.select_complain_state eq 0"}selected{/if} value="0">{$Think.lang.seller_o2o_complaint_state_text[0]}</option>
+                    <option {if condition="$Request.param.select_complain_state !=='' && $Request.param.select_complain_state !== null && $Request.param.select_complain_state eq 1"}selected{/if} value="1">{$Think.lang.seller_o2o_complaint_state_text[1]}</option>
+                </select></td>
+            <td class="w70 tc">
+                <input type="submit" class="submit" value="{$Think.lang.ds_search}" />
+            </td>
+        </tr>
+    </table>
+</form>
+
+<table class="dssc-default-table">
+    <thead>
+        <tr>
+            <th class="w10"></th>
+            <th class="w110">{$Think.lang.seller_o2o_complaint_order_sn}</th>
+            <th class="w110">{$Think.lang.seller_o2o_complaint_o2o_distributor_name}</th>
+            <th class="w110">{$Think.lang.seller_o2o_complaint_member_name}</th>
+            <th class="w200">{$Think.lang.seller_o2o_complaint_content}</th>
+            <th class="w200">{$Think.lang.seller_o2o_complaint_reply}</th>
+            <th class="w110">{$Think.lang.seller_o2o_complaint_addtime}</th>
+            <th class="w110">{$Think.lang.seller_o2o_complaint_state}</th>
+            <th class="w110">{$Think.lang.ds_handle}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {notempty name="complain_list"}
+        {foreach name="complain_list" id="val"}
+        <tr class="bd-line">
+            <td></td>
+
+            <td>{$val.order_sn}</td>
+            <td>{$val.o2o_distributor_name}</td>
+            <td>{$val.member_name}</td>
+            <td>{$val.o2o_complaint_content}</td>
+            <td>{$val.o2o_complaint_reply}</td>
+            <td class="goods-time">{$val.o2o_complaint_addtime|date="Y-m-d H:i:s"}</td>
+            <td>{$Think.lang.seller_o2o_complaint_state_text[$val.o2o_complaint_state]}</td>
+            <td>
+                {if $val.o2o_complaint_state==0}
+                <a href="javascript:void(0)" ds_type="dialog" dialog_width="480" dialog_title="{$Think.lang.seller_o2o_complaint_reply}" dialog_id="o2o_complaint_edit" uri="{:url('SellerO2oComplaint/edit',['o2o_complaint_id'=>$val.o2o_complaint_id])}"  id="order{$val.o2o_complaint_id}_action_o2o_complaint_reply">{$Think.lang.seller_o2o_complaint_reply}</a>
+                {/if}
+            </td>
+        </tr>
+        {/foreach}
+        {else/}
+        <tr>
+            <td colspan="9" class="norecord"><div class="warning-option"><i class="iconfont">&#xe64c;</i><span>{$Think.lang.no_record}</span></div></td>
+        </tr>
+        {/notempty}
+    </tbody>
+    <tfoot>
+        {notempty name="complain_list"}
+        <tr>
+            <td colspan="9"><div class="pagination">{$show_page|raw}</div></td>
+        </tr>
+        {/notempty}
+    </tfoot>
+</table>
+
+
+
+{/block}
+

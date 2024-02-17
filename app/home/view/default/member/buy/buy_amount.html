@@ -1,0 +1,34 @@
+<div class="dsc-bottom"> <a href="javascript:void(0)" id='submitOrder' class="dsc-btn dsc-btn-acidblue fr">{$Think.lang.cart_index_submit_order}</a> </div>
+<script>
+    function submitNext() {
+        if (!SUBMIT_FORM)
+            return;
+        if(!ALLOW_ADDRESS){
+            layer.msg(ALLOW_ADDRESS_MSG);
+            return;
+        }
+        if ($('input[name="cart_id[]"]').size() == 0) {
+            layer.msg('{$Think.lang.commodity_is_invalid}');
+            return;
+        }
+        if ($('#address_id').val() == '') {
+            layer.msg('{$Think.lang.cart_step1_please_set_address}');
+                    return;
+        }
+
+        SUBMIT_FORM = false;
+        $('#order_form').submit();
+    }
+    $(function() {
+        $(document).keydown(function(e) {
+            if (e.keyCode == 13) {
+                submitNext();
+                return false;
+            }
+        });
+        $('#submitOrder').on('click', function() {
+            submitNext()
+        });
+        calcOrder();
+    });
+</script>

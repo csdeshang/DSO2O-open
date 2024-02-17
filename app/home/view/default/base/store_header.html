@@ -1,0 +1,99 @@
+<link rel="stylesheet" href="{$Think.BASE_SITE_ROOT}/static/home/default/store/styles/default/css/base.css">
+<link rel="stylesheet" href="{$Think.BASE_SITE_ROOT}/static/home/default/store/styles/default/css/shop.css">
+
+
+
+<div class="banner store-header" style="background-image: url({notempty name='store_info.store_banner'}{:ds_get_pic(ATTACH_STORE.'/'.$store_info['store_id'],$store_info['store_banner'])}{else}{$Think.BASE_SITE_ROOT}/static/home/default/store/styles/default/images/header.jpg{/notempty})">
+    <div class="banner-wrapper"></div>
+    <div class="container w1200">
+        <div class="shopguide-info">
+            <img src="{:get_store_logo($store_info['store_logo'],'store_logo')}">
+            <div class="shopguide-info-wrapper">
+                <div>
+                    <h1 class="ng-binding">
+                        <span class="shopguide-tip" title="{$store_info.store_name}">{$store_info.store_name}</span>
+                        {if !$store_info.is_platform_store}
+                        {if $store_info.business_licence_number_electronic}
+                        <a href="{$store_info.business_licence_number_electronic}" class="iconfont" target="_blank">&#xe668;</a>
+                        {/if}
+                        {else}
+                        {if $Think.config.ds_config.business_licence}
+                        <a href="{:ds_get_pic(ATTACH_COMMON,$Think.config.ds_config.business_licence)}" class="iconfont" target="_blank">&#xe668;</a>
+                        {/if}
+                        {/if}
+                    </h1>
+                </div>
+                <p class="shopguide-info-rate"></p>
+                <div class="starrating iconfont icon-star ng-isolate-scope" rate-star="">
+                    <span class="icon-star" style="width: {$store_info.store_credit_percent}%;"></span>
+                </div> 
+                (<span class="ng-binding">{$store_info.store_credit_average}</span>)
+                <p></p>
+                <p></p>
+            </div>
+            <div class="shopguide-info-extra">
+                <ul>
+                    <li class="shopguide-extra-item shopguide-extra-compete ng-scope">
+                        <div>
+                            <h2 class="color-stress ng-binding">{$store_info.store_credit_average}</h2>
+                            <p>综合评价<br><span class="color-mute ng-binding">好评率</span> 
+                                <span class="color-stress ng-binding ng-scope">{$store_info.store_credit_percent}%</span>
+                            </p>
+                        </div>
+                        {notempty name="store_info.store_credit"}
+                        <div class="evaluate-rate">
+                            {foreach name="store_info.store_credit" item="value"}
+                            <div>{$value.text}
+                            <div class="starrating iconfont icon-star ng-isolate-scope">
+                                <span class="icon-star" style="width: {:round($value.credit/5*100,2)}%;"></span>
+                            </div> 
+                            <span class="color-stress ng-binding">{$value.credit}{$Think.lang.credit_unit}</span>
+                            </div>
+                            {/foreach}
+                        </div>
+                        {/notempty}
+                    </li>
+                    <li class="shopguide-extra-item address">
+                        <p>
+                            <span class="label">商家电话：</span> <span class="ng-binding">{$store_info.store_phone}</span>
+                        </p>
+                        <p>
+                            <span class="label">商家地址：</span> <span class="ng-binding">{$store_info.store_address}</span>
+                        </p>
+                        <p>
+                            <span class="label">营业时间：</span> <span class="ng-binding">{:str_pad(intval($store_info.store_o2o_open_start/60),2,'0',STR_PAD_LEFT)}:{:str_pad(intval($store_info.store_o2o_open_start%60),2,'0',STR_PAD_LEFT)}-{:str_pad(intval($store_info.store_o2o_open_end/60),2,'0',STR_PAD_LEFT)}:{:str_pad(intval($store_info.store_o2o_open_end%60),2,'0',STR_PAD_LEFT)}</span>
+                        </p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="shopguide-server">
+            <span class=""><em>起送价</em> <em class="shopguide-server-value ng-binding">{$store_info.store_o2o_min_cost}元</em></span> 
+          
+            <span class=""><em>平均送达速度</em> <em class="shopguide-server-value ng-binding">{$store_info.store_o2o_average_time}分钟</em></span>
+        </div>
+        <a class="shopguide-favor {if $store_info.is_favorate}active{/if}" href="javascript:collect_store('{$store_info.store_id}','count','store_collect')">
+            <i class="icon-favorite ng-scope iconfont"></i>
+            <span class="ng-scope">收藏</span>
+        </a>
+    </div>
+
+</div>
+
+
+<div class="shopnav w1200">
+    <ul>
+        <li class="shopnav-tab {if $Request.controller=='Store' && $Request.action=='index'}active{/if}"><a href="{:url('Store/index',['store_id'=>$store_info.store_id])}"><span>所有商品<i></i></span></a></li>
+        <li class="shopnav-tab"><a href="{:url('Store/index',['store_id'=>$store_info.store_id])}"><span>店铺首页<i></i></span></a></li>
+        <li class="shopnav-tab"><a href="{:url('Store/goods_all',['store_id'=>$store_info.store_id])}"><span>全部商品<i></i></span></a></li>
+        {notempty name="store_navigation_list"}
+        {foreach name="store_navigation_list" item="value" }
+        {if $value.storenav_url != ''}
+        <li class="shopnav-tab"><a href="{$value.storenav_url}"><span>{$value.storenav_title}<i></i></span></a></li>
+        {else/}
+        <li class="shopnav-tab {if $value.storenav_id==$Request.param.storenav_id}active{/if}"><a href="{:url('Store/article',['store_id'=>$store_info.store_id,'storenav_id'=>$value.storenav_id])}"><span>{$value.storenav_title}<i></i></span></a></li>
+        {/if}
+        {/foreach}
+        {/notempty}
+    </ul>
+</div>

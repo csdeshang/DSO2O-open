@@ -1,0 +1,47 @@
+{extend name="default/base/base_home" /}
+{block name="mall_main"}
+<style>
+    .dsh-breadcrumb-layout{background:#f5f5f5}
+</style>
+<link rel="stylesheet" href="{$Think.HOME_SITE_ROOT}/css/fuwu.css">
+<script src="{$Think.PLUGINS_SITE_ROOT}/jquery.SuperSlide.2.1.1.js"></script>
+<div class="fuwu-index">
+    <div class="w1200">
+        {if $adv_fuwu_1}
+        <div class="banner">
+            <div class="bd">
+                <ul>
+                    {foreach name='adv_fuwu_1' item="v"}
+                    <li>
+                        <a href="{:url('Advclick/Advclick',['adv_id'=>$v['adv_id']])}" target="_blank" title="{$v.adv_title}"  style="background-image: url({:get_adv_code($v.adv_code)})"></a>
+                    </li>
+                    {/foreach}
+                </ul>
+            </div>
+        </div>
+        {/if}
+        <div class="column floor-item" id="baojie">
+            {foreach name='o2o_fuwu_class_list' item='o2o_fuwu_class'}
+            <div class="title">{$o2o_fuwu_class.o2o_fuwu_class_name}</div>
+            <ul class="column-ul">
+                {foreach name='o2o_fuwu_class.child' item='child'}
+                <li class="column-li">
+                    <div class="icon-t" style="background-image:url({:get_o2o_fuwu_class_logo($child.o2o_fuwu_class_logo)})">
+                        <a href="{:url('FuwuOrganization/index',['o2o_fuwu_class_id'=>$child.o2o_fuwu_class_id])}">
+                        </a>
+                    </div>
+                    <h3 class="t">{$child.o2o_fuwu_class_name}</h3>
+                    <p class="p1">{$child.o2o_fuwu_class_remark}</p>
+                    <p class="check-xq"><a href="{:url('FuwuOrganization/index',['class_id'=>$child.o2o_fuwu_class_id])}">查看详情</a></p>
+                </li>
+                {/foreach}
+            </ul>
+            {/foreach}
+        </div>
+    </div>
+</div>
+<script>
+    //轮播
+    jQuery(".banner").slide({mainCell: ".bd ul", autoPlay: true, delayTime: 500, interTime: 5000});
+</script>
+{/block}

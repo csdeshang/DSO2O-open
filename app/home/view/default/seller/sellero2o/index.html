@@ -1,0 +1,125 @@
+{extend name="default/base/base_seller" /}
+{block name="seller_main"}
+<link rel="stylesheet" href="{$Think.PLUGINS_SITE_ROOT}/jquery.range.css">
+<script src="{$Think.PLUGINS_SITE_ROOT}/jquery.range.js"></script>
+<div class="dssc-form-default">
+    <form method="post"  enctype="multipart/form-data" id="store_o2o_form"  onsubmit="ds_ajaxpost('store_o2o_form','url','{:url('seller_o2o/index')}');return false;" >
+        <!--        <dl>
+                    <dt>{$Think.lang.store_o2o_open}{$Think.lang.ds_colon}</dt>
+                    <dd>
+                        <input type="radio" name="store_o2o_open" value="1" id="store_o2o_open_1" {if $store_info.store_o2o_open}checked{/if}>
+                      <label for="store_o2o_open_1">{$Think.lang.ds_yes}</label>
+                        <input type="radio" name="store_o2o_open" value="0" id="store_o2o_open_0" {if !$store_info.store_o2o_open}checked{/if}>
+                      <label for="store_o2o_open_0">{$Think.lang.ds_no}</label>
+                    </dd>
+                </dl>-->
+        <dl>
+            <dt>{$Think.lang.store_o2o_receipt}{$Think.lang.ds_colon}</dt>
+            <dd>
+                <input type="radio" name="store_o2o_receipt" value="1" id="store_o2o_receipt_1" {if $store_info.store_o2o_receipt}checked{/if}>
+                       <label for="store_o2o_receipt_1">{$Think.lang.ds_yes}</label>
+                <input type="radio" name="store_o2o_receipt" value="0" id="store_o2o_receipt_0" {if !$store_info.store_o2o_receipt}checked{/if}>
+                       <label for="store_o2o_receipt_0">{$Think.lang.ds_no}</label>
+            </dd>
+        </dl>
+        <dl>
+            <dt>{$Think.lang.store_o2o_distribute_type}{$Think.lang.ds_colon}</dt>
+            <dd>
+                <input type="radio" name="store_o2o_distribute_type" value="1" id="store_o2o_distribute_type_1" {if $store_info.store_o2o_distribute_type}checked{/if}><!--如果不是自营店铺且没有平台配送支持 或者 选了店铺配送-->
+                       <label for="store_o2o_distribute_type_1">{$Think.lang.store_o2o_distribute_type_1}</label>
+                {if $o2o_open && ($store_info.store_o2o_support || $store_info.is_platform_store=='1')}
+                <input type="radio" name="store_o2o_distribute_type" value="0" id="store_o2o_distribute_type_0" {if ((!$store_info.is_platform_store && $store_info.store_o2o_support) || $store_info.is_platform_store) && !$store_info.store_o2o_distribute_type}checked{/if}><!--（如果不是自营店铺且有平台配送支持 或者 是自营店铺） 并且选了平台配送-->
+                       <label for="store_o2o_distribute_type_0">{$Think.lang.store_o2o_distribute_type_0}</label>
+                {/if}
+            </dd>
+        </dl>
+        <dl>
+            <dt>{$Think.lang.store_o2o_auto_receipt}{$Think.lang.ds_colon}</dt>
+            <dd>
+                <input type="radio" name="store_o2o_auto_receipt" value="1" id="store_o2o_auto_receipt_1" {if $store_info.store_o2o_auto_receipt}checked{/if}>
+                       <label for="store_o2o_auto_receipt_1">{$Think.lang.ds_yes}</label>
+                <input type="radio" name="store_o2o_auto_receipt" value="0" id="store_o2o_auto_receipt_0" {if !$store_info.store_o2o_auto_receipt}checked{/if}>
+                       <label for="store_o2o_auto_receipt_0">{$Think.lang.ds_no}</label>
+            </dd>
+        </dl>
+
+        <dl>
+            <dt>{$Think.lang.store_o2o_auto_deliver}{$Think.lang.ds_colon}</dt>
+            <dd>
+                <input type="radio" name="store_o2o_auto_deliver" value="1" id="store_o2o_auto_deliver_1" {if $store_info.store_o2o_auto_deliver}checked{/if}>
+                       <label for="store_o2o_auto_deliver_1">{$Think.lang.ds_yes}</label>
+                <input type="radio" name="store_o2o_auto_deliver" value="0" id="store_o2o_auto_deliver_0" {if !$store_info.store_o2o_auto_deliver}checked{/if}>
+                       <label for="store_o2o_auto_deliver_0">{$Think.lang.ds_no}</label>
+            </dd>
+        </dl>
+        <dl style='padding-top:20px'>
+            <dt>{$Think.lang.store_o2o_open_time}{$Think.lang.ds_colon}</dt>
+            <dd>
+                <div class="range">
+                    <input class="range-slider" name="store_o2o_open_time" type="hidden" value="{$store_info.store_o2o_open_start},{$store_info.store_o2o_open_end}"/>
+                </div>
+            </dd>
+        </dl>
+        <dl>
+            <dt>{$Think.lang.store_o2o_complaint_fine}{$Think.lang.ds_colon}</dt>
+            <dd>
+                <input class="w200 text" name="store_o2o_complaint_fine" type="text"  id="store_o2o_complaint_fine" value="{$store_info.store_o2o_complaint_fine}" />
+                <p class="hint">{$Think.lang.store_o2o_complaint_fine_help}</p>
+            </dd>
+        </dl>
+        <dl>
+            <dt>{$Think.lang.store_o2o_min_cost}{$Think.lang.ds_colon}</dt>
+            <dd>
+                <input class="w200 text" name="store_o2o_min_cost" type="text"  id="store_o2o_min_cost" value="{$store_info.store_o2o_min_cost}" />
+                <p class="hint">{$Think.lang.store_o2o_min_cost_help}</p>
+            </dd>
+        </dl>
+        <dl>
+            <dt>{$Think.lang.store_o2o_receipt_limit}{$Think.lang.ds_colon}</dt>
+            <dd>
+                <input class="w200 text" name="store_o2o_receipt_limit" type="text"  id="store_o2o_receipt_limit" value="{$store_info.store_o2o_receipt_limit}" />
+                <p class="hint">{$Think.lang.store_o2o_receipt_limit_help}</p>
+            </dd>
+        </dl>
+        <dl>
+            <dt>{$Think.lang.store_o2o_reject_time}{$Think.lang.ds_colon}</dt>
+            <dd>
+                <input class="w200 text" name="store_o2o_reject_time" type="text"  id="store_o2o_reject_time" value="{$store_info.store_o2o_reject_time}" />
+                <p class="hint">{$Think.lang.store_o2o_reject_time_help}</p>
+            </dd>
+        </dl>
+
+        <div class="bottom">
+            <input type="submit" class="submit" value="{$Think.lang.store_goods_class_submit}" />
+        </div>
+    </form>
+</div>
+
+<script>
+    $(function(){
+        $('.range-slider').jRange({
+                from: 0, to: 2880, step:30,
+                scale: ['00:00','04:00','08:00','12:00','16:00','20:00','次日00:00','04:00','08:00','12:00','16:00','20:00','24:00'],
+                format: function(value, type) {
+        	var hours = String(value).substr(0,2);
+        	var mins = String(value).substr(3,2);
+
+        	if (hours > 24) {
+        		hours = hours - 24;
+        		hours = (hours < 10 ? "0"+hours : hours);
+        		value = hours+':'+mins;
+        		var text = String('次日%s').replace('%s', value);
+        		return text;
+        	}
+        	else {
+        		return value;
+        	}
+        },
+                width: 600,
+                showLabels: true,
+                isRange : true
+            });
+    })
+</script>
+
+{/block}

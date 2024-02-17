@@ -1,0 +1,130 @@
+{include file="public/header" /}
+
+
+
+<div class="page">
+    <table class="search-form">
+        <tbody>
+            <tr><td>{$Think.lang.o2o_order_bill_current_settlement}&emsp;
+                    {if $bill_info.o2o_order_bill_state == O2O_ORDER_BILL_STATE_CHECK}
+                    <a class="btn btn-mini" href="javascript:dsLayerOpen('{:url('O2oOrderBill/confirm_bill',['bill_id'=>$bill_info.o2o_order_bill_id])}','{$Think.lang.o2o_order_bill_confirm}','800px','400px')"><span>{$Think.lang.o2o_order_bill_current_settlement_correct}</span></a>
+                    {elseif $bill_info.o2o_order_bill_state == $Think.O2O_ORDER_BILL_STATE_PAY /}
+                    <a class="btn btn-mini" href="javascript:dsLayerOpen('{:url('O2oOrderBill/pay_bill',['bill_id'=>$bill_info.o2o_order_bill_id])}','{$Think.lang.o2o_order_bill_pay}','800px','400px')"><span>{$Think.lang.o2o_order_bill_pay}</span></a>
+                    {/if}
+                </td></tr>
+            <tr><td>{$Think.lang.o2o_order_bill_circle}：{$bill_info.o2o_order_bill_start_time|date="Y-m-d"} &nbsp;{$Think.lang.o2o_order_bill_to}&nbsp; {$bill_info.o2o_order_bill_end_time|date="Y-m-d"}</td></tr>
+        <tr><td>{$Think.lang.o2o_order_bill_addtime}：{$bill_info.o2o_order_bill_addtime|date="Y-m-d"}</td></tr>
+        <tr><td>{$Think.lang.o2o_order_bill_current_receivables}：{$bill_info.o2o_order_bill_result_totals} = {$bill_info.o2o_order_bill_fee_totals} ({$Think.lang.o2o_order_bill_fee_totals}) + {$bill_info.o2o_order_bill_errand_distance_totals} (跑腿基础运费) + {$bill_info.o2o_order_bill_errand_weight_totals} (跑腿重量附加费) + {$bill_info.o2o_order_bill_errand_time_totals} (跑腿特殊时段费) + {$bill_info.o2o_order_bill_errand_gratuity_totals} (跑腿小费) - {$bill_info.o2o_order_bill_complaint_totals} ({$Think.lang.o2o_order_bill_complaint_totals})</td></tr>
+        <tr><td>{$Think.lang.o2o_order_bill_o2o_distributor_payment_account}：{$bill_info.o2o_distributor_payment_account}</td></tr>
+        <tr><td>{$Think.lang.o2o_order_bill_state}：{$Think.lang.o2o_order_bill_state_text[$bill_info.o2o_order_bill_state]}
+        </td></tr>
+        {if $bill_info.o2o_order_bill_remark}
+            <tr><td><b>{$Think.lang.o2o_order_bill_remark}：{$bill_info.o2o_order_bill_remark}</b>
+                </td></tr>
+            {/if}
+            {if $bill_info.o2o_order_bill_payment_voucher}
+            <tr><td><b>{$Think.lang.o2o_order_bill_payment_voucher}：<a href='{:ds_get_pic(ATTACH_STORE."/".$bill_info["store_id"]."/o2o_order_bill",$bill_info["o2o_order_bill_payment_voucher"])}' target="_blank">{$Think.lang.ds_view}</a></b>
+                </td></tr>
+            {/if}
+        </tbody>
+    </table>
+
+    <form method="get" action="" name="formSearch" id="formSearch">
+        <div class="ds-search-form">
+            <dl>
+                <dt>订单类型</dt>
+                <dd>
+                    <select name="query_type" class="querySelect">
+                        <option value="order" {if condition="$Request.get.query_type eq 'order'"}selected{/if}>配送</option>
+                        <option value="errand" {if condition="$Request.get.query_type eq 'errand'"}selected{/if}>跑腿</option>
+                    </select>
+                </dd>
+            </dl>
+            <dl>
+                <dt>{$Think.lang.o2o_order_bill_order_number}</dt>
+                <dd>
+                    <input type="text" class="text"  value="{$Request.param.query_order_no}" name="query_order_no" />
+                    <input type="hidden" value="{$Request.param.bill_id}" name="bill_id" />
+                </dd>
+            </dl>
+            <dl>
+                <dt>{$Think.lang.o2o_order_bill_transaction_time}</dt>
+                <dd>
+                    <input class="txt date" type="text" value="{$Request.param.query_start_date}" id="query_start_date" name="query_start_date">
+                    <label>~</label>
+                    <input class="txt date" type="text" value="{$Request.param.query_end_date}" id="query_end_date" name="query_end_date"/>
+                </dd>
+            </dl>
+            <div class="btn_group">
+                <a href="javascript:document.formSearch.submit();" class="btn " title="{$Think.lang.ds_query}">{$Think.lang.ds_query}</a>
+            </div>
+        </div>
+    </form>
+<table class="ds-default-table">
+    <thead>
+      <tr class="thead">
+        <th>{$Think.lang.o2o_order_bill_order_number}</th>
+            <th>{$Think.lang.o2o_order_bill_order_time}</th>
+            <th>{$Think.lang.o2o_order_bill_transaction_time}</th>
+            <th>{$Think.lang.o2o_order_bill_order_amount}</th>
+            <th>基础运费</th>
+            <th>重量附加费</th>
+            <th>特殊时段费</th>
+            <th>小费</th>
+            <th>{$Think.lang.o2o_order_bill_is_complaint}</th>
+            <th>{$Think.lang.o2o_order_bill_order_state}</th>
+        <th>{$Think.lang.ds_handle}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {notempty name="order_list"}
+      {foreach name="order_list" item="order_info"}
+      <tr class="hover">
+        <td class="w90">{$order_info.o2o_errand_order_sn}</td>
+            <td>{$order_info.o2o_errand_order_add_time|date="Y-m-d"}</td>
+            <td>{$order_info.o2o_errand_order_finish_time|date="Y-m-d"}</td>
+            <td>{$order_info.o2o_errand_order_amount}</td>
+            <td>{$order_info.o2o_errand_order_distance_price}</td>
+            <td>{$order_info.o2o_errand_order_weight_price}</td>
+            <td>{$order_info.o2o_errand_order_time_price}</td>
+            <td>{$order_info.o2o_errand_order_gratuity}</td>
+            <td>{if $order_info.order_is_complaint}{$Think.lang.ds_yes}{else}{$Think.lang.ds_no}{/if}</td>
+            <td>{$order_info.o2o_errand_order_state_text}</td>
+        <td>
+        <a href="javascript:dsLayerOpen('{:url('O2oErrandOrder/show_order',['order_id'=>$order_info.o2o_errand_order_id])}','查看跑腿订单-{$order_info.o2o_errand_order_sn}','800px','400px')" class="dsui-btn-view"><i class="iconfont"></i>{$Think.lang.ds_view}</a>
+        </td>
+      </tr>
+      {/foreach}
+      {else /}
+      <tr class="no_data">
+        <td colspan="15">{$Think.lang.ds_no_record}</td>
+      </tr>
+      {/notempty}
+    </tbody>
+    <tfoot>
+      <tr class="tfoot">
+        <td colspan="15" id="dataFuncs">{$show_page|raw}</td>
+      </tr>
+    </tfoot>
+  </table>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</div>
+<script type="text/javascript">
+          $(function() {
+              $('#query_start_date').datepicker({dateFormat: 'yy-mm-dd', minDate: "{$bill_info.o2o_order_bill_start_time|date='Y-m-d'}", maxDate: "{$bill_info.o2o_order_bill_end_time|date='Y-m-d'}"});
+              $('#query_end_date').datepicker({dateFormat: 'yy-mm-dd', minDate: "{$bill_info.o2o_order_bill_start_time|date='Y-m-d'}", maxDate: "{$bill_info.o2o_order_bill_end_time|date='Y-m-d'}"});
+          });
+</script> 

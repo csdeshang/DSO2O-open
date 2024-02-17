@@ -1,0 +1,41 @@
+{include file="public/header" /}
+
+<div class="page">
+    <form id="user_form" enctype="multipart/form-data" method="post">
+        <input type="hidden" name="cityCode" value="{$Request.param.cityCode}" />
+        <table class="ds-default-table">
+            <tbody>
+                <tr class="noborder">
+                    <td class="required w120"><label>{$Think.lang.dada_city_code}:</label></td>
+                    <td class="vatop rowform">{$Request.param.cityCode}</td>
+                    <td class="vatop tips"></td>
+                </tr>
+                <tr class="noborder">
+                    <td class="required"><label class="member_areainfo">{$Think.lang.platform_area_info}:</label></td>
+                    <td class="vatop rowform" id='area_list' colspan="2">
+                        {foreach name='area_list' item='area'}
+                        <select class='area_item' name="area_id[]">
+                                <option value="0">{$Think.lang.ds_please_choose}</option>
+                                {foreach name="parents" item="parent" key="k" }
+                                <option value="{$k}" {if condition="$k == $area.area_id"}selected{/if}>{$parent|raw}</option>
+                                {/foreach}
+                            </select>
+                        {/foreach}
+                        <a href="javascript:copyArea()">{$Think.lang.ds_add}</a>
+                    </td>
+                </tr>
+               
+            <tfoot>
+                <tr class="tfoot">
+                    <td colspan="15"><input class="btn" type="submit" value="{$Think.lang.ds_submit}"/></td>
+                </tr>
+            </tfoot>
+        </table>
+    </form>
+
+</div>    
+<script>
+    function copyArea(){
+        $("#area_list").prepend($(".area_item:last").clone());
+    }
+</script>

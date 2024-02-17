@@ -1,0 +1,43 @@
+<div class="eject_con">
+    <div id="warning" class="alert alert-error"></div>
+    <form method="post" action="{:url('FuwuManageGoods/edit_sort')}" id="sort_form">
+        <input type="hidden" name="o2o_fuwu_goods_id" value="{$Request.param.o2o_fuwu_goods_id}" />
+        <dl>
+            <dt>{$Think.lang.fuwu_manage_goods_sort_order}：</dt>
+            <dd>
+                <input type="text" class="text w80" name="o2o_fuwu_goods_sort_order" id="o2o_fuwu_goods_sort_order" value="" />
+                <p class="hint">{$Think.lang.sort_number_value}</p>
+            </dd>
+        </dl>
+        <div class="bottom">
+            <input type="submit" class="submit" value="{$Think.lang.ds_submit}"/>
+        </div>
+    </form>
+</div>
+<script>
+    $(function(){
+        $('#sort_form').validate({
+            errorLabelContainer: $('#warning'),
+            invalidHandler: function(form, validator) {
+                $('#warning').show();
+            },
+            submitHandler:function(form){
+                ds_ajaxpost('sort_form');
+            },
+            rules : {
+                o2o_fuwu_goods_sort_order : {
+                    required: true,
+                    min: 0,
+                    max: 255
+                }
+            },
+            messages : {
+                o2o_fuwu_goods_sort_order : {
+                    required: '<i class="iconfont">&#xe64c;</i>{$Think.lang.sort_number_value}',
+                    min: '<i class="iconfont">&#xe64c;</i>{$Think.lang.sort_number_value}',
+                    max: '<i class="iconfont">&#xe64c;</i>{$Think.lang.sort_number_value}'
+                }
+            }
+        });
+    });
+</script>

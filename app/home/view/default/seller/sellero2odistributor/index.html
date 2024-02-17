@@ -1,0 +1,98 @@
+{extend name="default/base/base_seller" /}
+{block name="seller_btn"}<a href="{:url('seller_o2o_distributor/add')}" class="dssc-btn dssc-btn-green"  title="{$Think.lang.ds_new}">{$Think.lang.ds_new}</a>{/block}
+{block name="seller_main"}
+
+<form method="get" action="">
+    <table class="search-form">
+        <tr>
+            <td>&nbsp;</td>
+            <th> <select name="search_field_name" >
+                    <option {if $search_field_name == 'o2o_distributor_name'}selected='selected'{/if} value="o2o_distributor_name">{$Think.lang.o2o_distributor_name}</option>
+                    <option {if $search_field_name == 'o2o_distributor_realname'}selected='selected'{/if} value="o2o_distributor_realname">{$Think.lang.o2o_distributor_realname}</option>
+                    <option {if $search_field_name == 'o2o_distributor_phone'}selected='selected'{/if} value="o2o_distributor_phone">{$Think.lang.o2o_distributor_phone}</option>
+                    <option {if $search_field_name == 'o2o_distributor_email'}selected='selected'{/if} value="o2o_distributor_email">{$Think.lang.o2o_distributor_email}</option>
+                </select>
+            </th>
+            <td class="w160"><input type="text" value="{$search_field_value}" name="search_field_value" class="text w150"></td>
+            <td class="w160">
+                <select name="search_state" >
+                    <option {if condition='$Request.param.search_state eq ""'}selected='selected'{/if} value="">{$Think.lang.o2o_distributor_state}</option>
+                    <option {if condition='$Request.param.search_state eq "0"'}selected='selected'{/if} value="0">{$Think.lang.ds_disable}</option>
+                    <option {if condition='$Request.param.search_state eq "1"'}selected='selected'{/if} value="1">{$Think.lang.ds_enable}</option>
+                </select>
+            </td>
+            <td class="tc w70">
+                <input type="submit" class="submit" value="{$Think.lang.ds_search}" />
+            </td>
+        </tr>
+    </table>
+</form>
+<table class="dssc-default-table">
+    <thead>
+        <tr>
+            <th colspan="2">{$Think.lang.o2o_distributor_name}</th>
+          <th class="align-center">{$Think.lang.o2o_distributor_realname}</th>
+          <th class="align-center">{$Think.lang.o2o_distributor_phone}</th>
+          <th class="align-center">{$Think.lang.o2o_distributor_email}</th>
+          <th class="align-center">{$Think.lang.o2o_distributor_score}</th>
+          <th class="align-center">{$Think.lang.o2o_distributor_state}</th>
+          <th class="align-center">{$Think.lang.o2o_distributor_receipt}</th>
+          <th class="align-center">{$Think.lang.o2o_distributor_total_count}</th>
+          <th class="align-center">{$Think.lang.o2o_distributor_average_time}{$Think.lang.o2o_distributor_average_time_desc}</th>
+          <th class="align-center">{$Think.lang.o2o_distributor_addtime}</th>
+          <th class="align-center">{$Think.lang.ds_handle}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {notempty name="o2o_distributor_list"}
+        {foreach name="o2o_distributor_list" item="v" key="k" }
+        <tr class="bd-line">
+            <td class="w48 picture">
+              <div class="size-44x44">
+              <span class="thumb"><i></i>
+                  <img src="{:get_o2o_distributor_file($v.o2o_distributor_avatar)}?{:microtime()}"  width="44" height="44"/>
+              </span>
+          </div>
+          </td>
+          <td><p class="name"><strong>{$v.o2o_distributor_name}</strong></p></td>
+          <td class="align-center">{$v.o2o_distributor_realname}</td>
+          <td class="align-center">{$v.o2o_distributor_phone}</td>
+          <td class="align-center">{$v.o2o_distributor_email}</td>
+          <td class="align-center">{:get_percent($v.o2o_distributor_score,5)}</td>
+          <td class="align-center yes-onoff">
+              {if $v.o2o_distributor_state == '0'}
+              <a href="JavaScript:void(0);" class="disabled" ><img src="{$Think.ADMIN_SITE_ROOT}/images/treetable/transparent.gif"></a>
+              {else /}
+              <a href="JavaScript:void(0);" class="enabled" ><img src="{$Think.ADMIN_SITE_ROOT}/images/treetable/transparent.gif"></a>
+              {/if}
+          </td>
+          <td class="align-center yes-onoff">
+              {if $v.o2o_distributor_receipt == '0'}
+              <a href="JavaScript:void(0);" class="disabled" ><img src="{$Think.ADMIN_SITE_ROOT}/images/treetable/transparent.gif"></a>
+              {else /}
+              <a href="JavaScript:void(0);" class="enabled" ><img src="{$Think.ADMIN_SITE_ROOT}/images/treetable/transparent.gif"></a>
+              {/if}
+          </td>
+          <td class="align-center">{$v.o2o_distributor_total_count}</td>
+          <td class="align-center">{$v.o2o_distributor_average_time}</td>
+          <td class="align-center">{:date('Y-m-d H:i:s',$v.o2o_distributor_addtime)}</td>
+            <td class="nscs-table-handle">
+                <span><a href="{:url('seller_o2o_distributor/edit',['id'=>$v.o2o_distributor_id])}" class="btn-blue"><i class="iconfont">&#xe731;</i><p>{$Think.lang.ds_edit}</p></a></span>
+                <span><a href="javascript:ds_ajaxget_confirm('{:url('seller_o2o_distributor/del',['id'=>$v.o2o_distributor_id])}','{$Think.lang.ds_ensure_del}');" class="btn-red"><i class="iconfont">&#xe725;</i><p>{$Think.lang.ds_del}</p></a></span>
+            </td>
+        </tr>
+        {/foreach}
+        <tr>
+            <td colspan="12"><div class="pagination"> {$show_page|raw}</div></td>
+        </tr>
+       {else /}
+        <tr>
+            <td colspan="12" class="norecord"><div class="warning-option"><i class="iconfont">&#xe64c;</i><span>{$Think.lang.no_record}</span></div></td>
+        </tr>
+       {/notempty}
+    </tbody>
+</table>
+       
+
+
+{/block}

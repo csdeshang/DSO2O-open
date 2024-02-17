@@ -1,0 +1,15 @@
+<div class="eject_con">
+    <div id="warning" class="alert alert-error"></div>
+    <form method="post" action="{:url('SellerO2oOrderBill/pay_bill',['bill_id'=>$Request.param.bill_id])}" id="bill_confirm_form" enctype="multipart/form-data">
+        <dl>
+            <dt>{$Think.lang.seller_o2o_order_bill_payment_voucher}{$Think.lang.ds_colon}</dt>
+            <dd>
+                <input name="file" type="file" />
+            </dd>
+        </dl>
+        <div class="bottom">
+            <input type="submit" dstype="confirm_bill_submit" class="submit" value="{$Think.lang.ds_common_button_save}" />
+        </div>
+    </form>
+</div>
+

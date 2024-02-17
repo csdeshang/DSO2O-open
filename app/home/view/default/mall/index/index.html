@@ -1,0 +1,109 @@
+{extend name="default/base/base_home" /}
+
+{block name="mall_main"}
+<link rel="stylesheet" href="{$Think.HOME_SITE_ROOT}/css/index.css">
+<script src="{$Think.PLUGINS_SITE_ROOT}/jquery.SuperSlide.2.1.1.js"></script>
+<div class="clear"></div>
+<!-- HomeFocusLayout Begin-->
+<div class="home-focus-layout">
+    {if $adv_index_1}
+    <div class="bd">
+        <ul>
+            {foreach name='adv_index_1' item="v"}
+            <li style="background: url({:ds_get_pic(ATTACH_ADV,$v.adv_code)}) center top no-repeat rgb(35, 35, 35); display: none;background-color: {$v.adv_bgcolor|default=''}" style="{$v.adv_style|default=''}">
+                <a href="{:url('Advclick/Advclick',['adv_id'=>$v['adv_id']])}" target="_blank" title="{$v.adv_title}">&nbsp;</a>
+            </li>
+            {/foreach}
+        </ul>
+    </div>
+    <div class="hd">
+        <ul>
+            {foreach name='adv_index_1' item="v"}
+            <li class=""></li>
+            {/foreach}
+        </ul>
+    </div>
+    {/if}
+</div>
+<!--HomeFocusLayout End-->
+
+
+<div class="w1200 mt50 mb50">
+    <ul class="index-entrance clearfix">
+        <li class="first-li">
+            <a href="{:url('showjoinin/index')}" target="_blank">
+                <h3><i class="ico iconfont">&#xe663;</i><em>我要入驻</em><i class="more iconfont">&#xe640;</i></h3>
+                <p>商家入驻,拓宽渠道,快速出单</p>
+            </a>
+        </li>
+        <li class="second-li">
+            <a href="{:url('Shopnearby/index')}" target="_blank">
+                <h3><i class="ico iconfont">&#xe60b;</i><em>我要点外卖</em><i class="more iconfont">&#xe640;</i></h3>
+                <p>快捷下单，一键点餐</p>
+            </a>
+        </li>
+        <li class="third-li">
+            <a href="{:url('Fuwu/index')}" target="_blank">
+                <h3><i class="ico iconfont">&#xe60b;</i><em>我要找服务</em><i class="more iconfont">&#xe640;</i></h3>
+                <p>家政服务，衣食无忧</p>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+<div class="wrapper mt10"></div>
+<div class="index-link wrapper">
+    <dl class="website">
+        <dt>{$Think.lang.cooperative_partner} | {$Think.lang.friendship_link}<b></b></dt>
+        <dd>
+            {notempty name="link_list"}
+            {foreach name="link_list" item="val"}
+            <a href="{$val.link_url}" target="_blank" title="{$val.link_title}">{:str_cut($val.link_title,15)}</a>
+            {/foreach}
+            {/notempty}
+        </dd>
+    </dl>
+</div>
+<div class="footer-line"></div>
+<!--首页底部保障开始-->
+
+<!--首页底部保障结束-->
+<!--StandardLayout Begin-->
+
+<!--StandardLayout End-->
+
+
+<!--首页悬浮弹窗BEGIN-->
+{if $Think.config.ds_config.fixed_suspension_state}
+<div class="fixed-suspension-layer" style="display: none;">
+    <div class="fixed-suspension-con">
+        <a href="{$Think.config.ds_config.fixed_suspension_url}" class="fixed-suspension-img">
+            <img class="lazy" src="{:ds_get_pic(ATTACH_COMMON,$Think.config.ds_config.fixed_suspension_img)}">
+        </a>
+        <div class="close-fixed-suspension"></div>
+    </div>
+</div>
+<script type="text/javascript">
+if(!localStorage.fixed_ad_layer){
+        $('.fixed-suspension-layer').show();
+}
+//悬浮广告弹出层
+$('body').on('click','.close-fixed-suspension',function(){
+        localStorage.fixed_ad_layer = true;
+        $('.fixed-suspension-layer').hide();
+});
+</script>
+{/if}
+<!--首页悬浮弹窗END-->
+
+
+<script src="{$Think.PLUGINS_SITE_ROOT}/jquery.SuperSlide.2.1.1.js"></script>
+<script>
+    //轮播
+    jQuery(".home-focus-layout").slide({mainCell: ".bd ul", autoPlay: true, delayTime: 500, interTime: 5000});
+    jQuery(".home-scroll").slide({mainCell: ".bd li", autoPage: true,autoPlay: true, delayTime: 1000, effect: "left", interTime: 5000, vis: 5});
+</script>
+
+
+{/block}

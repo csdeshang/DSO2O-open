@@ -1,0 +1,64 @@
+{include file="public/header" /}
+
+
+
+<div class="page">
+    <div class="fixed-bar">
+        <div class="item-title">
+            <div class="subject">
+                <h3>{$Think.lang.o2o_setting}</h3>
+                <h5></h5>
+            </div>
+        </div>
+    </div>
+
+    <form id='o2o_form' method="post"  name="form1">
+            <table class="ds-default-table">
+                <tbody>
+                    <tr class="noborder"> 
+                        <td class="required w150"><label class="validation" for="o2o_socket_url">{$Think.lang.o2o_socket_url}:</label></td>
+                        <td class="vatop rowform"><input id="o2o_socket_url" name="o2o_socket_url" value="{$list_config.o2o_socket_url}" class="input-txt w400" type="text"></td>
+                        <td class="vatop tips">{$Think.lang.o2o_socket_url_tips}</td>
+                    </tr>
+                    <tr class="noborder"> 
+                        <td class="required w150"><label class="validation" for="o2o_distance">{$Think.lang.o2o_distance}:</label></td>
+                        <td class="vatop rowform"><input id="o2o_distance" name="o2o_distance" value="{$list_config.o2o_distance}" class="input-txt w400" type="text"></td>
+                        <td class="vatop tips">{$Think.lang.o2o_distance_tips}</td>
+                    </tr>
+                    <tr class="noborder"> 
+                        <td class="required w150"><label class="validation" for="o2o_auto_distribute">{$Think.lang.o2o_auto_distribute}:</label></td>
+                        <td class="vatop rowform onoff">
+                        <label for="o2o_auto_distribute_1" class="cb-enable {eq name='list_config.o2o_auto_distribute' value='1'}selected{/eq}" title="{$Think.lang.ds_yes}"><span>{$Think.lang.ds_yes}</span></label>
+                    <label for="o2o_auto_distribute_0" class="cb-disable {eq name='list_config.o2o_auto_distribute' value='0'}selected{/eq}" title="{$Think.lang.ds_no}"><span>{$Think.lang.ds_no}</span></label>
+                    <input type="radio" id="o2o_auto_distribute_1" name="o2o_auto_distribute" value="1"  {if $list_config.o2o_auto_distribute=='1'}checked=checked{/if}>
+                    <input type="radio" id="o2o_auto_distribute_0" name="o2o_auto_distribute" value="0" {if $list_config.o2o_auto_distribute=='0'}checked=checked{/if}>
+                        </td>
+                        <td class="vatop tips">{$Think.lang.o2o_auto_distribute_tips}</td>
+                    </tr>
+                    <tr class="noborder"> 
+                        <td class="required w150"><label class="validation" for="o2o_fee">{$Think.lang.o2o_fee}:</label></td>
+                        <td class="vatop rowform"><input id="o2o_fee" name="o2o_fee" value="{$list_config.o2o_fee}" class="input-txt w400" type="text"></td>
+                        <td class="vatop tips">{$Think.lang.o2o_fee_tips}</td>
+                    </tr>
+										<tr class="noborder"> 
+                        <td class="required w150"><label class="validation" for="o2o_complaint_fine">{$Think.lang.o2o_complaint_fine}:</label></td>
+                        <td class="vatop rowform"><input id="o2o_complaint_fine" name="o2o_complaint_fine" value="{$list_config.o2o_complaint_fine|default=''}" class="input-txt w400" type="text"></td>
+                        <td class="vatop tips">{$Think.lang.o2o_complaint_fine_tips}</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr class="tfoot">
+                        <td colspan="15"><a href="JavaScript:void(0);" class="btn" id="submitBtn" onclick="$('#o2o_form').submit()">{$Think.lang.ds_confirm_submit}</a></td>
+                    </tr>
+                </tfoot>
+            </table>
+    </form>
+</div>
+
+
+
+
+
+
+
+

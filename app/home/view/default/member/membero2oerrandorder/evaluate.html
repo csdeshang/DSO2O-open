@@ -1,0 +1,42 @@
+<div class="eject_con">
+    <div id="warning"></div>
+    {notempty name="o2o_errand_order_info"}
+    <form action="{:url('MemberO2oErrandOrder/evaluate',['o2o_errand_order_id'=>$o2o_errand_order_info.o2o_errand_order_id])}" method="post" id="confirm_order_form">
+        <dl>
+            <dt>评分{$Think.lang.ds_colon}</dt>
+            <dd>
+                <div class="raty">
+                    <input dstype="score" name="score" type="hidden">
+                </div>
+            </dd>
+        </dl>
+        <dl>
+            <dt>评论{$Think.lang.ds_colon}</dt>
+            <dd>
+                <textarea id="comment" name="comment" class="textarea w300" ></textarea>
+            </dd>
+        </dl>
+        <div class="bottom">
+            <input type="submit" class="submit" id="confirm_yes" value="{$Think.lang.ds_ok}" />
+        </div>
+    </form>
+    {else /}
+    <p style="line-height:80px;text-align:center">{$Think.lang.check_parameters_correct}</p>
+    {/notempty}
+</div>
+<script>
+    $(document).ready(function () {
+
+    $('.raty').raty({
+        path: "{$Think.PLUGINS_SITE_ROOT}/js/jquery.raty/img",
+        click: function(score) {
+            $(this).find('[dstype="score"]').val(score);
+        }
+    });
+        $('#confirm_order_form').validate({
+            submitHandler: function (form) {
+                ds_ajaxpost('confirm_order_form');
+            }
+        });
+    });
+</script>

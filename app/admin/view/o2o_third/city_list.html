@@ -1,0 +1,54 @@
+{include file="public/header" /}
+
+
+
+
+
+<div class="page">
+    <div class="fixed-bar">
+        <div class="item-title">
+            <div class="subject">
+                <h3>{$Think.lang.o2o_third}</h3>
+                <h5></h5>
+            </div>
+            {include file="public/admin_items" /}
+        </div>
+    </div>
+    <div class="explanation" id="explanation">
+        <div class="title" id="checkZoom">
+            <h4 title="{$Think.lang.ds_explanation_tip}">{$Think.lang.ds_explanation}</h4>
+            <span id="explanationZoom" title="{$Think.lang.ds_explanation_close}" class="arrow"></span>
+        </div>
+        <ul>
+            <li>{$Think.lang.dada_city_list_help1}</li>
+        </ul>
+    </div>
+    <table class="ds-default-table">
+        <thead>
+
+            <tr class="thead">
+                <th>{$Think.lang.dada_city_code}</th>
+                <th>{$Think.lang.dada_city_name}</th>
+                <th>{$Think.lang.platform_area_info}</th>
+                <th class="align-center">{$Think.lang.ds_handle}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {foreach name="city_list" item="v" key="k" }
+            <tr class="hover">
+                <td>{$v.cityCode}</td>
+                <td>{$v.cityName}</td>
+                <td>
+                    {foreach name='v.area_list' item="area"}
+                    <div>{$area.area_name}[ID:{$area.area_id}]</div>
+                    {/foreach}
+                </td>
+                <td class="w60 align-center">
+                <a href="javascript:dsLayerOpen('{:url('O2oThird/city_edit',['cityCode'=>$v.cityCode])}','{$Think.lang.ds_edit}-{$Think.lang.dada_city_code}{$v.cityCode}')" class="dsui-btn-edit"><i class="iconfont"></i>{$Think.lang.ds_edit}</a>
+                </td>
+            </tr>
+            {/foreach}
+        </tbody>
+    </table>
+
+</div>

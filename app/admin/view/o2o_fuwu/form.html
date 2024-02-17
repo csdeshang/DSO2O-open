@@ -1,0 +1,516 @@
+{include file="public/header" /}
+
+
+
+
+
+<div class="page">
+    <div class="fixed-bar">
+        <div class="item-title">
+            <div class="subject">
+                <h3>{$Think.lang.o2o_fuwu_manage}</h3>
+                <h5></h5>
+            </div>
+            {include file="public/admin_items" /}
+        </div>
+    </div>
+    <form id="o2o_fuwu_organization_form" method="post" name="form1" enctype="multipart/form-data">
+        <table class="ds-default-table">
+            <tbody>
+                <tr class="noborder">
+                    <td class="required w120"><label class="validation">{$Think.lang.o2o_fuwu_organization_name}:</label></td>
+                    <td class="vatop "><input type="text" value="{present name='o2o_fuwu_array'}{$o2o_fuwu_array.o2o_fuwu_organization_name}{/present}" name="o2o_fuwu_organization_name" id="o2o_fuwu_organization_name" class="txt"></td>
+                    <td class="vatop tips"></td>
+                </tr>
+
+
+                <tr class="noborder">
+                    <td class="required">{$Think.lang.o2o_fuwu_organization_avatar}: </td>
+                    <td class="vatop ">
+                        {notempty name="$o2o_fuwu_array.o2o_fuwu_organization_avatar"}
+                        <span class="type-file-show"> <img class="show_image" src="{$Think.ADMIN_SITE_ROOT}/images/preview.png">
+                            <div class="type-file-preview" style="display: none;"><img id="view_img" src="{:get_o2o_fuwu_file($o2o_fuwu_array.o2o_fuwu_organization_id,$o2o_fuwu_array.o2o_fuwu_organization_avatar,'avatar')}"></div>
+                        </span>
+                        {/notempty}
+                        <span class="type-file-box">
+                            <input type='text' name='o2o_fuwu_organization_avatar' id='o2o_fuwu_organization_avatar' class='type-file-text' />
+                            <input type='button' name='button' value='上传' class='type-file-button' />
+                            <input name="_pic" type="file" class="type-file-file" id="_pic" size="30" hidefocus="true" />
+                        </span>
+                    </td>
+                    <td class="vatop tips"></td>
+                </tr>
+
+                <tr class="noborder">
+                    <td class="required w120"><label class="validation">{$Think.lang.o2o_fuwu_organization_phone}:</label></td>
+                    <td class="vatop "><input type="text" value="{present name='o2o_fuwu_array'}{$o2o_fuwu_array.o2o_fuwu_organization_phone}{/present}" name="o2o_fuwu_organization_phone" id="o2o_fuwu_organization_phone" class="txt"></td>
+                    <td class="vatop tips"></td>
+                </tr>
+                <tr class="noborder">
+                    <td class="required"><label class="validation">{$Think.lang.o2o_fuwu_organization_region_name}:</label></td>
+                    <td class="vatop "  colspan="2" id="area_" {if $Think.config.ds_config.mapak_type eq '2'}onclick="change_map()"{/if}>
+                        <span  class="w400">
+                            <input type="hidden" value="{present name='o2o_fuwu_array'}{$o2o_fuwu_array.o2o_fuwu_organization_region_id}{/present}" name="o2o_fuwu_organization_region_id" id="_area">
+                            <input type="hidden" value="{present name='o2o_fuwu_array'}{$o2o_fuwu_array.o2o_fuwu_organization_city_id}{/present}" name="o2o_fuwu_organization_city_id" id="_area_2">
+                            <input type="hidden" name="o2o_fuwu_organization_region_name" id="region" value="{present name='o2o_fuwu_array'}{$o2o_fuwu_array.o2o_fuwu_organization_region_name}{/present}"/>
+                        </span>
+                    </td>
+                </tr>
+                <tr class="noborder">
+                    <td class="required w120"><label>{$Think.lang.o2o_fuwu_organization_address}:</label></td>
+                    <td class="vatop ">
+                        <input name="o2o_fuwu_organization_lng" id="longitude" value="{$o2o_fuwu_array.o2o_fuwu_organization_lng|default=''}" type="hidden" />
+                    <input name="o2o_fuwu_organization_lat" id="latitude" value="{$o2o_fuwu_array.o2o_fuwu_organization_lat|default=''}" type="hidden" />
+                    <div id="allmap" style="width:530px;height: 350px;margin-top: 20px"></div>
+                        <input type="text" onchange="local.search($(this).val());" value="{present name='o2o_fuwu_array'}{$o2o_fuwu_array.o2o_fuwu_organization_address}{/present}" name="o2o_fuwu_organization_address" id="o2o_fuwu_organization_address" class="txt w300"></td>
+                    <td class="vatop tips"></td>
+                </tr>
+
+                <tr class="noborder">
+                    <td class="required w120"><label>{$Think.lang.o2o_fuwu_organization_birthday}:</label></td>
+                    <td class="vatop "><input type="date" value="{present name='o2o_fuwu_array'}{$o2o_fuwu_array.o2o_fuwu_organization_birthday|date='Y-m-d'}{/present}" name="o2o_fuwu_organization_birthday" id="o2o_fuwu_organization_birthday" class="txt"></td>
+                    <td class="vatop tips"></td>
+                </tr>
+
+                <tr class="noborder">
+                    <td class="required w120"><label>{$Think.lang.o2o_fuwu_organization_detail}:</label></td>
+                    <td class="vatop "><textarea name="o2o_fuwu_organization_detail" id="o2o_fuwu_organization_detail" class="txt">{present name='o2o_fuwu_array'}{$o2o_fuwu_array.o2o_fuwu_organization_detail}{/present}</textarea></td>
+                    <td class="vatop tips"></td>
+                </tr>
+
+                <tr class="noborder">
+                    <td class="required w120"><label>{$Think.lang.o2o_fuwu_class_1}:</label></td>
+                    <td class="vatop ">
+                        <select name="o2o_fuwu_class_id_1">
+                            <option value="0">{$Think.lang.ds_please_choose}...</option>
+                            {notempty name="class_list"}
+                            {foreach name="class_list" item="v" key="k" }
+                            <option {if isset($o2o_fuwu_array) && $o2o_fuwu_array.o2o_fuwu_class_id_1 == $v.o2o_fuwu_class_id}selected="selected" {/if} value="{$v.o2o_fuwu_class_id}">{$v.o2o_fuwu_class_name}</option>
+                            {/foreach}
+                            {/notempty}
+                        </select>
+                    </td>
+                    <td class="vatop tips"></td>
+                </tr>
+
+                <tr class="noborder">
+                    <td class="required w120"><label>{$Think.lang.o2o_fuwu_class_2}:</label></td>
+                    <td class="vatop ">
+                        <select name="o2o_fuwu_class_id_2">
+                            <option value="0">{$Think.lang.ds_please_choose}...</option>
+                            {notempty name="class_list"}
+                            {foreach name="class_list" item="v" key="k" }
+                            <option {if isset($o2o_fuwu_array) && $o2o_fuwu_array.o2o_fuwu_class_id_2 == $v.o2o_fuwu_class_id}selected="selected" {/if} value="{$v.o2o_fuwu_class_id}">{$v.o2o_fuwu_class_name}</option>
+                            {/foreach}
+                            {/notempty}
+                        </select>
+                    </td>
+                    <td class="vatop tips"></td>
+                </tr>
+
+                <tr class="noborder">
+                    <td class="required w120"><label>{$Think.lang.o2o_fuwu_class_3}:</label></td>
+                    <td class="vatop ">
+                        <select name="o2o_fuwu_class_id_3">
+                            <option value="0">{$Think.lang.ds_please_choose}...</option>
+                            {notempty name="class_list"}
+                            {foreach name="class_list" item="v" key="k" }
+                            <option {if isset($o2o_fuwu_array) && $o2o_fuwu_array.o2o_fuwu_class_id_3 == $v.o2o_fuwu_class_id}selected="selected" {/if} value="{$v.o2o_fuwu_class_id}">{$v.o2o_fuwu_class_name}</option>
+                            {/foreach}
+                            {/notempty}
+                        </select>
+                    </td>
+                    <td class="vatop tips"></td>
+                </tr>
+
+                <tr class="noborder">
+                    <td class="required w120"><label>{$Think.lang.o2o_fuwu_organization_open}:</label></td>
+                    <td class="vatop ">
+                        <div class="vatop range">
+                            <input class="range-slider" name="o2o_fuwu_organization_open" type="hidden" value="{present name='o2o_fuwu_array'}{$o2o_fuwu_array.o2o_fuwu_organization_open_start},{$o2o_fuwu_array.o2o_fuwu_organization_open_end}{else}540,1080{/present}"/>
+                        </div>
+                    </td>
+                    <td class="vatop tips"></td>
+                </tr>
+
+                <tr class="noborder">
+                    <td class="required">{$Think.lang.o2o_fuwu_upload_1}: </td>
+                    <td class="vatop ">
+                        {notempty name="$o2o_fuwu_upload_1_list"}
+                        <ul class="image_list">
+                            {foreach name='o2o_fuwu_upload_1_list' item='item'}
+                            <li>
+                                <a target="_blank" href='{:get_o2o_fuwu_file($o2o_fuwu_array.o2o_fuwu_organization_id,$item.o2o_fuwu_upload_url,"quality")}'><img src="{:get_o2o_fuwu_file($o2o_fuwu_array.o2o_fuwu_organization_id,$item.o2o_fuwu_upload_url,'quality')}"></a>
+                            </li>
+                            {/foreach}
+                        </ul>
+                        {/notempty}
+                    </td>
+                    <td class="vatop tips"></td>
+                </tr>
+
+                <tr class="noborder">
+                    <td class="required">{$Think.lang.o2o_fuwu_upload_2}: </td>
+                    <td class="vatop ">
+                        {notempty name="$o2o_fuwu_upload_2_list"}
+                        <ul class="image_list">
+                            {foreach name='o2o_fuwu_upload_2_list' item='item'}
+                            <li>
+                                <a target="_blank" href='{:get_o2o_fuwu_file($o2o_fuwu_array.o2o_fuwu_organization_id,$item.o2o_fuwu_upload_url,"scene")}'><img src="{:get_o2o_fuwu_file($o2o_fuwu_array.o2o_fuwu_organization_id,$item.o2o_fuwu_upload_url,'scene')}"></a>
+                            </li>
+                            {/foreach}
+                        </ul>
+                        {/notempty}
+                    </td>
+                    <td class="vatop tips"></td>
+                </tr>
+                <tr class="noborder">
+                    <td class="required">认证: </td>
+                    <td class="vatop ">
+                        <label><input type="radio" name="o2o_fuwu_organization_if_auth" value="0" {if isset($o2o_fuwu_array) && $o2o_fuwu_array.o2o_fuwu_organization_if_auth==0}checked{/if}>{$Think.lang.ds_no}</label>
+                        <label><input type="radio" name="o2o_fuwu_organization_if_auth" value="1" {if !isset($o2o_fuwu_array) || $o2o_fuwu_array.o2o_fuwu_organization_if_auth==1}checked{/if}>{$Think.lang.ds_yes}</label>
+                    </td>
+                    <td class="vatop tips"></td>
+                </tr>
+                <tr class="noborder">
+                    <td class="required">{$Think.lang.o2o_fuwu_organization_state}: </td>
+                    <td class="vatop ">
+                        {if !isset($o2o_fuwu_array) || in_array($o2o_fuwu_array.o2o_fuwu_organization_state,array(0,1))}
+                        <label><input type="radio" name="o2o_fuwu_organization_state" value="0" {if isset($o2o_fuwu_array) && $o2o_fuwu_array.o2o_fuwu_organization_state==0}checked{/if}>{$Think.lang.o2o_fuwu_organization_state_text[0]}</label>
+                        <label><input type="radio" name="o2o_fuwu_organization_state" value="1" {if !isset($o2o_fuwu_array) || $o2o_fuwu_array.o2o_fuwu_organization_state==1}checked{/if}>{$Think.lang.o2o_fuwu_organization_state_text[1]}</label>
+                        {else}
+                        <label><input type="radio" name="o2o_fuwu_organization_state" value="1" {if $o2o_fuwu_array.o2o_fuwu_organization_state==2}checked{/if}>{$Think.lang.o2o_fuwu_organization_state_text[1]}</label>
+                        <label><input type="radio" name="o2o_fuwu_organization_state" value="3" {if $o2o_fuwu_array.o2o_fuwu_organization_state==3}checked{/if}>{$Think.lang.o2o_fuwu_organization_state_text[3]}</label>
+                        {/if}
+                    </td>
+                    <td class="vatop tips"></td>
+                </tr>
+                {if isset($o2o_fuwu_array) && in_array($o2o_fuwu_array.o2o_fuwu_organization_state,array(2,3))}
+                <tr>
+                    <td class="required">{$Think.lang.order_show_reason}: </td>
+                    <td class="vatop ">
+                        <textarea name='content'></textarea>
+                    </td>
+                </tr>
+                {/if}
+            </tbody>
+            <tfoot>
+                <tr class="tfoot">
+                    <td colspan="15" ><input class="btn" type="submit" value="{$Think.lang.ds_submit}"/></td>
+                </tr>
+            </tfoot>
+        </table>
+    </form>
+</div>
+<link rel="stylesheet" href="{$Think.PLUGINS_SITE_ROOT}/jquery.range.css">
+<script src="{$Think.PLUGINS_SITE_ROOT}/jquery.range.js"></script>
+<script type="text/javascript" src="{$Think.PLUGINS_SITE_ROOT}/mlselection.js" charset="utf-8"></script>
+<!--{if $Think.config.ds_config.mapak_type eq '1'}-->
+<script type="text/javascript">
+        window._AMapSecurityConfig = {
+            securityJsCode:"{$Think.config.ds_config.gaode_jscode}",
+        }
+</script>
+<script type="text/javascript" src="//webapi.amap.com/maps?v=2.0&key={$Think.config.ds_config.gaode_ak}"></script>
+<!--{else}-->
+<script type="text/javascript" src="{$Think.HTTP_TYPE}api.map.baidu.com/api?v=2.0&ak={$Think.config.ds_config.baidu_ak}"></script>
+<!--{/if}-->
+<script>
+    function initRange() {
+        $('.range-slider').jRange({
+            from: 0, to: 2880, step: 60,
+            scale: ['00:00','04:00','08:00','12:00','16:00','20:00','次日00:00','04:00','08:00','12:00','16:00','20:00','24:00'],
+            format: function (value, type) {
+                var hours = String(value).substr(0, 2);
+                var mins = String(value).substr(3, 2);
+                if (hours > 24) {
+                    hours = hours - 24;
+                    hours = (hours < 10 ? "0" + hours : hours);
+                    value = hours + ':' + mins;
+                    var text = String('次日%s').replace('%s', value);
+                    return text;
+                } else {
+                    return value;
+                }
+            },
+            width: 600,
+            showLabels: true,
+            isRange: true
+        });
+    }
+    //按钮先执行验证再提交表单
+    $(function () {
+        initRange()
+        $("#region").ds_region();
+        $("#_pic").change(function () {
+            $("#o2o_fuwu_organization_avatar").val($("#_pic").val());
+        });
+        $("#o2o_fuwu_organization_form").validate({
+            errorPlacement: function (error, element) {
+                error.appendTo(element.parent().parent().find('td:last'));
+            },
+            rules: {
+                o2o_fuwu_organization_name: {
+                    required: true,
+                },
+                o2o_fuwu_organization_phone: {
+                    required: true,
+                },
+                o2o_fuwu_organization_region_id: {
+                    required: true,
+                },
+
+            },
+            messages: {
+                o2o_fuwu_organization_name: {
+                    required: '{$Think.lang.o2o_fuwu_organization_name_required}',
+                },
+                o2o_fuwu_organization_phone: {
+                    required: '{$Think.lang.o2o_fuwu_organization_phone_required}',
+                },
+                o2o_fuwu_organization_region_id: {
+                    required: '{$Think.lang.o2o_fuwu_organization_region_required}',
+                },
+
+            }
+        });
+    });
+
+</script>
+<script>
+    var local;
+    var map;
+    var lst_name = '';
+    function change_map() {
+        if ($("#area_ select:eq(0)").length > 0 && $("#area_ select:eq(0) option:selected").val() != '') {
+            var name = $("#area_ select:eq(0) option:selected").text();
+        }
+        if ($("#area_ select:eq(1)").length > 0 && $("#area_ select:eq(1) option:selected").val() != '') {
+            var name = $("#area_ select:eq(1) option:selected").text();
+        }
+        if ($("#area_ select:eq(2)").length > 0 && $("#area_ select:eq(2) option:selected").val() != '') {
+            var name = $("#area_ select:eq(2) option:selected").text();
+        }
+        if (name != '' && lst_name != name) {
+            lst_name = name;
+            map.setCurrentCity(name);
+            map.centerAndZoom(name, 16);
+            map.clearOverlays();
+            local.search(name);
+        }
+
+    }
+    $(function () {
+        $('#company_address').ds_region();
+        var lng = '{$o2o_fuwu_array.o2o_fuwu_organization_lng|default=""}';
+        var lat = '{$o2o_fuwu_array.o2o_fuwu_organization_lat|default=""}';
+        if({$Think.config.ds_config.mapak_type} == '1'){
+            map = new AMap.Map("allmap", {
+            	resizeEnable: true,
+            	zoom:15
+            });
+            
+            if(!lng && !lat){
+            	var map = new AMap.Map("allmap", {
+            		resizeEnable: true,
+            		zoom:15
+            	});
+            	//获取用户所在城市信息
+            		AMap.plugin("AMap.CitySearch", function () {
+            			var citySearch = new AMap.CitySearch();
+            			citySearch.getLocalCity(function (status, result) {
+            			  if (status === "complete" && result.info === "OK") {
+            				// 查询成功，result即为当前所在城市信息
+            				AMap.plugin("AMap.Geocoder", function () {
+            				  var geocoder = new AMap.Geocoder({
+            					// city 指定进行编码查询的城市，支持传入城市名、adcode 和 citycode
+            					city: result.adcode,
+            				  });
+            				  geocoder.getLocation(result.city, function(status1, result1) {
+            					  var location = result1.geocodes[0].location;
+            						var lng = location.lng;
+            						var lat = location.lat;
+            						
+            						//初始化定位
+            						var marker = new AMap.Marker({
+            							position: new AMap.LngLat(lng, lat),
+            							icon: '//api.map.baidu.com/images/marker_red_sprite.png',
+            							zoom: 15
+            						});
+            						map.add(marker);
+            						document.getElementById("longitude").value = lng;
+            						document.getElementById("latitude").value = lat;
+            						map.panTo([lng, lat]);
+                                    
+            						//搜索定位
+            						AMap.plugin(['AMap.PlaceSearch','AMap.AutoComplete'], function(){
+            							var auto = new AMap.AutoComplete({input:"o2o_fuwu_organization_address"});
+            							var placeSearch = new AMap.PlaceSearch({
+            								map: map
+            							});  //构造地点查询类
+            							auto.on("select", select);//注册监听，当选中某条记录时会触发
+            							function select(e) {
+                                            map.remove(marker);
+                                            marker = new AMap.Marker({
+                                            	position: new AMap.LngLat(e.poi.location.lng, e.poi.location.lat),
+                                            	icon: '//api.map.baidu.com/images/marker_red_sprite.png',
+                                            	zoom: 15
+                                            });
+                                            map.add(marker);
+                                            document.getElementById("longitude").value = e.poi.location.lng;
+                                            document.getElementById("latitude").value = e.poi.location.lat;
+            								placeSearch.setCity(e.poi.adcode);
+            								placeSearch.search(e.poi.name);  //关键字查询查询
+            							}
+            						});
+            						
+            						//点击定位
+            						map.on('click', function(e) {
+            							document.getElementById("longitude").value = e.lnglat.getLng();
+            							document.getElementById("latitude").value = e.lnglat.getLat();
+            							if(marker){
+            								map.remove(marker);
+            							}
+            							marker = new AMap.Marker({
+            								position: new AMap.LngLat(e.lnglat.getLng(), e.lnglat.getLat()),
+            								icon: '//api.map.baidu.com/images/marker_red_sprite.png',
+            								anchor: 'bottom-center',
+            								zoom: 15
+            							});
+            							map.add(marker);
+            						});
+            					});
+            				  
+            				});
+            				
+            			  }
+            			});
+            		  });
+            }else{
+            	
+            	map.panTo([lng, lat]);
+            	//初始化定位
+            	var marker = new AMap.Marker({
+            		position: new AMap.LngLat(lng, lat),
+            		icon: '//api.map.baidu.com/images/marker_red_sprite.png',
+            		zoom: 15
+            	});
+            	map.add(marker);
+            	document.getElementById("longitude").value = lng;
+            	document.getElementById("latitude").value = lat;
+            	
+            	//搜索定位
+            	AMap.plugin(['AMap.PlaceSearch','AMap.AutoComplete'], function(){
+            		var auto = new AMap.AutoComplete({input:"o2o_fuwu_organization_address"});
+            		var placeSearch = new AMap.PlaceSearch({
+            			map: map
+            		});  //构造地点查询类
+            		auto.on("select", select);//注册监听，当选中某条记录时会触发
+            		function select(e) {
+                        map.remove(marker);
+                        marker = new AMap.Marker({
+                        	position: new AMap.LngLat(e.poi.location.lng, e.poi.location.lat),
+                        	icon: '//api.map.baidu.com/images/marker_red_sprite.png',
+                        	zoom: 15
+                        });
+                        map.add(marker);
+                        document.getElementById("longitude").value = e.poi.location.lng;
+                        document.getElementById("latitude").value = e.poi.location.lat;
+            			placeSearch.setCity(e.poi.adcode);
+            			placeSearch.search(e.poi.name);  //关键字查询查询
+            		}
+            	});
+            	
+            	//点击定位
+            	map.on('click', function(e) {
+            		document.getElementById("longitude").value = e.lnglat.getLng();
+            		document.getElementById("latitude").value = e.lnglat.getLat();
+            		if(marker){
+            			map.remove(marker);
+            		}
+            		marker = new AMap.Marker({
+            			position: new AMap.LngLat(e.lnglat.getLng(), e.lnglat.getLat()),
+            			icon: '//api.map.baidu.com/images/marker_red_sprite.png',
+            			anchor: 'bottom-center',
+            			zoom: 15
+            		});
+            		map.add(marker);
+            	});
+            }
+        }else{
+           map = new BMap.Map("allmap");
+                   if (!lng && !lat) {
+                       var geolocation = new BMap.Geolocation();
+                       geolocation.getCurrentPosition(function (r) {
+                           if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+                               var lng = r.point.lng;
+                               var lat = r.point.lat;
+                               var point = new BMap.Point(lng, lat);
+                               map.centerAndZoom(point, 16);
+                               map.addControl(new BMap.NavigationControl());
+                               map.enableScrollWheelZoom();
+                               var marker = new BMap.Marker(point);  // 创建标注
+                               map.addOverlay(marker);              // 将标注添加到地图中
+                               marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
+                               document.getElementById("longitude").value = lng;
+                               document.getElementById("latitude").value = lat;
+           
+                           } else {
+                               layer.msg('failed' + this.getStatus());
+                           }
+                       }, {enableHighAccuracy: true})
+                   } else {
+                       var point = new BMap.Point(lng, lat);
+                       map.centerAndZoom(point, 16);
+                       map.addControl(new BMap.NavigationControl());
+                       map.enableScrollWheelZoom();
+                       var marker = new BMap.Marker(point);  // 创建标注
+                       map.addOverlay(marker);              // 将标注添加到地图中
+                       marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
+                   }
+           
+           
+                   var options = {
+                       onSearchComplete: function (results) {
+                           // 判断状态是否正确
+                           if (local.getStatus() == BMAP_STATUS_SUCCESS) {
+                               if (results.getCurrentNumPois() > 0) {
+           
+                                   map.clearOverlays();  //清除标注  或者可以把market 放入数组
+                                   var point = new BMap.Point(results.getPoi(0).point.lng, results.getPoi(0).point.lat);
+                                   var marker = new BMap.Marker(point);
+                                   map.centerAndZoom(point, 16);
+                                   map.addOverlay(marker);
+                                   marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
+           
+                                   document.getElementById("longitude").value = results.getPoi(0).point.lng;
+                                   document.getElementById("latitude").value = results.getPoi(0).point.lat;
+           
+                               }
+                           }
+                       }
+                   };
+                   local = new BMap.LocalSearch(map, options);
+                   map.addEventListener("click", function (e) {
+           //                    alert(e.point.lng + ", " + e.point.lat);
+                       map.clearOverlays();  //清除标注  或者可以把market 放入数组
+                       var point = new BMap.Point(e.point.lng, e.point.lat);
+                       var marker = new BMap.Marker(point);
+                       map.addOverlay(marker);
+                       marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
+           
+                       document.getElementById("longitude").value = e.point.lng;
+                       document.getElementById("latitude").value = e.point.lat;
+                   }); 
+        }
+        
+    })
+</script>
+<style>
+    .range {
+        margin-bottom: 50px;
+        margin-top: 30px;
+    }
+    .image_list li{width:auto !important}
+    .image_list img{max-height: 100px;}
+</style>

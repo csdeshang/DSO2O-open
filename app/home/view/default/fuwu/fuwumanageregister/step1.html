@@ -1,0 +1,25 @@
+{include file='default/base/mall_top'/}
+<link rel="stylesheet" href="{$Think.HOME_SITE_ROOT}/css/home.css">
+<div class="header-login clearfix">
+    <div class="w1200">
+        <div class="logo">
+            <a href="{$Think.HOME_SITE_URL}"><img src="{:ds_get_pic(ATTACH_COMMON,$Think.config.ds_config.site_logo)}"/></a>
+        </div>
+    </div>
+</div>
+<div class='bg-gray2'>
+    <div class='w1200 pt20 pb20'>
+        <div class='document-block'>
+            <div class='title'>{$document_info.document_title}</div>
+            <div class='content'>{:htmlspecialchars_decode($document_info.document_content)}</div>
+        </div>
+        <form id='register_form' method="post" onsubmit="ds_ajaxpost('register_form','url','{:url('fuwu_manage_register/step2')}');return false;">
+            <input type='submit' value='同意' class='btn login-btn' />
+        </form>
+    </div>
+</div>
+<style>
+    .document-block{border-radius:4px;background:#fff;padding:20px;font-size:16px;line-height: 1.5;margin-bottom: 20px;}
+    .document-block .title{font-size:24px;margin-bottom: 20px;text-align: center;font-weight: bold}
+</style>
+{include file='default/base/mall_footer'/}

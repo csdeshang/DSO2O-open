@@ -1,0 +1,87 @@
+<!doctype html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" href="{$Think.HOME_SITE_ROOT}/css/common.css">
+        <script>
+            var BASESITEROOT = "{$Think.BASE_SITE_ROOT}";
+            var HOMESITEROOT = "{$Think.HOME_SITE_ROOT}";
+            var BASESITEURL = "{$Think.BASE_SITE_URL}";
+            var HOMESITEURL = "{$Think.HOME_SITE_URL}";
+        </script>
+        <script src="{$Think.PLUGINS_SITE_ROOT}/jquery-2.1.4.min.js"></script>
+        <script src="{$Think.PLUGINS_SITE_ROOT}/layer/layer.js"></script>
+    </head>
+    <body style="min-width: unset">
+        <script src="https://webapi.amap.com/maps?v=1.4.15&key={$Think.config.ds_config.gaode_js_key}&plugin=AMap.Autocomplete"></script>
+        <input class="w200 text" name="address_detail" type="text"  id="address_detail" value="{$address_info.area_info|default=''}{$address_info.address_detail|default=''}" />
+        <a class="search-btn iconfont" href="javascript:searchAddress()">&#xe65f;</a>
+        <input type="hidden" name="lng" id="lng" value="" />
+        <input type="hidden" name="lat" id="lat" value="" />
+        <div id="container" style="height:500px;width:900px"></div>
+        <script type="text/javascript">
+            var map
+            var placeSearch
+            var mapOption = {resizeEnable: true, zoom: 11}
+            var callback='{$Request.param.callback|default=0}';
+            $(function(){
+                map = new AMap.Map("container", mapOption);
+                AMap.plugin('AMap.PlaceSearch', function () {
+                    var autoOptions = {
+                        city: '全国'
+                    }
+                    placeSearch = new AMap.PlaceSearch(autoOptions);
+
+                })
+                if ($('#address_detail').val()) {
+                    searchAddress()
+                }
+                //为地图注册click事件获取鼠标点击出的经纬度坐标
+                map.on('click', function (e) {
+                    map.clearMap();
+                    addMarker(e.lnglat.getLng(), e.lnglat.getLat())
+
+                });
+            })
+            function searchAddress() {
+                placeSearch.search($('#address_detail').val(), function (status, result) {
+                    // 搜索成功时，result即是对应的匹配数据
+                    if (status == 'complete' && result.info == 'OK' && result.poiList.count) {
+                        map.clearMap();
+                        addMarker(result.poiList.pois[0].location.lng, result.poiList.pois[0].location.lat)
+                    }
+                })
+            }
+            function addMarker(lng, lat) {
+                var marker = new AMap.Marker({
+                    position: new AMap.LngLat(lng, lat),
+                });
+                map.add(marker);
+                map.setCenter([lng, lat]); //设置地图中心点
+                document.getElementById("lng").value = lng
+                document.getElementById("lat").value = lat
+                {if isset($address_info)}
+                $.ajax({
+                    type: "POST",
+                    url: HOMESITEURL + '/Memberaddress/gaode_map.html?address_id='+{$address_info.address_id},
+                    data: {lng:lng,lat:lat},
+                    dataType:"json",
+                    success: function (res) {
+                        if (res.code == 10000) {
+                           if(callback=='1'){
+                               parent.calcDistance({$address_info.address_id})
+                           }
+                        }else{
+                            layer.msg(res.message)
+                        }
+                    }
+                });
+                {/if}
+            }
+        </script>
+        <style>
+            #address_detail{position:absolute;top:20px;left:20px;z-index: 10;border:1px solid #e1e1e1;padding:2px 5px;}
+            .search-btn{position:absolute;top:22px;left:210px;z-index: 11;}
+        </style>
+    </body>
+</html>

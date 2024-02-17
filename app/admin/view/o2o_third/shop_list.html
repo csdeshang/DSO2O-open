@@ -1,0 +1,77 @@
+{include file="public/header" /}
+
+
+
+<div class="page">
+    <div class="fixed-bar">
+        <div class="item-title">
+            <div class="subject">
+                <h3>{$Think.lang.o2o_third}</h3>
+                <h5></h5>
+            </div>
+            {include file="public/admin_items" /}
+        </div>
+    </div>
+
+    <form method="get" name="formSearch" id="formSearch">
+        <div class="ds-search-form">
+            <dl>
+                <dt>{$Think.lang.store_name}</dt>
+                <dd><input class="txt" name="keyword" value="{$Request.get.keyword}" type="text"></dd>
+            </dl> 
+
+            <div class="btn_group">
+                <a href="javascript:document.formSearch.submit();" class="btn " title="{$Think.lang.ds_query}">{$Think.lang.ds_query}</a>
+            </div>
+        </div>
+    </form>
+
+
+
+    <table class="ds-default-table">
+        <thead>
+            <tr class="thead">
+                <th>{$Think.lang.ds_store}ID</th>
+                <th>{$Think.lang.store_name}</th>
+                <th>{$Think.lang.seller_name}</th>
+                <th>{$Think.lang.dada_origin_shop_id}</th>
+                <th>{$Think.lang.dada_station_name}</th>
+                <th>{$Think.lang.dada_status}</th>
+                <th>{$Think.lang.ds_handle}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {notempty name="store_list"}
+            {foreach name="store_list" item="v"}
+            <tr class="hover">
+                <td>{$v.store_id}</td>
+                <td>{$v.store_name}</td>
+                <td>{$v.seller_name}</td>
+                <td>{if $v.dada_info}{$v.dada_info.origin_shop_id}{/if}</td>
+                <td>{if $v.dada_info}{$v.dada_info.station_name}{/if}</td>
+                <td>
+                    {if $v.dada_info}
+                    {if $v.dada_info.status==1}
+                    {$Think.lang.dada_status_1}
+                    {else}
+                    {$Think.lang.dada_status_0}
+                    {/if}
+                    {/if}
+                </td>
+                <td class="w60 align-center">
+                <a href="javascript:dsLayerOpen('{:url('O2oThird/shop_edit',['store_id'=>$v.store_id])}','{$Think.lang.ds_edit}-{$Think.lang.dada_shop}{$v.store_name}')" class="dsui-btn-edit"><i class="iconfont"></i>{$Think.lang.ds_edit}</a>
+                </td>
+            </tr>
+            {/foreach}
+            {else}
+            <tr class="no_data">
+                <td colspan="10">{$Think.lang.ds_no_record}</td>
+            </tr>
+            {/notempty}
+        </tbody>
+
+    </table>
+    {$show_page|raw}
+
+</div>
+

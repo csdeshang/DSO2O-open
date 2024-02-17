@@ -1,0 +1,94 @@
+{extend name="default/base/base_home" /}
+{block name="mall_main"}
+<link rel="stylesheet" href="{$Think.HOME_SITE_ROOT}/css/fuwu.css">
+<div class='fuwu-organization-index w1200'>
+    <div class="filter-wrap">
+        <div class="filter-item-wrap">
+            <div class="filter-item clearfix">
+                <div class="filter-name f-icon-1 fl">服务类别</div>
+                <div class="filter-option-wrap fl">
+                    <a href="{:replaceParam(array('class_id' => $o2o_fuwu_class_parent_id))}" class="option{if $o2o_fuwu_class_parent_id==$Request.param.class_id} checked{/if}">不限</a>
+                    {foreach name='o2o_fuwu_class_list' item='item'}
+                    <a href="{:replaceParam(array('class_id' => $item.o2o_fuwu_class_id))}" class="option{if $item.o2o_fuwu_class_id==$Request.param.class_id} checked{/if}">{$item.o2o_fuwu_class_name}</a>
+                    {/foreach}
+                </div>
+            </div>
+            <div class="filter-item clearfix">
+                <div class="filter-name f-icon-1 fl">机构类别</div>
+                <div class="filter-option-wrap fl">
+                    <a href="{:dropParam(array('type'))}" class="option{if !in_array($Request.param.type,array('0','1'))} checked{/if}">不限</a>
+                    <a href="{:replaceParam(array('type' => 0))}" class="option{if '0'==$Request.param.type} checked{/if}">{$Think.lang.o2o_fuwu_organization_type_text[0]}</a>
+                    <a href="{:replaceParam(array('type' => 1))}" class="option{if '1'==$Request.param.type} checked{/if}">{$Think.lang.o2o_fuwu_organization_type_text[1]}</a>
+                </div>
+            </div>
+            <div class="filter-item clearfix">
+                <div class="filter-name f-icon-1 fl">平台认证</div>
+                <div class="filter-option-wrap fl">
+                    <a href="{:dropParam(array('if_auth'))}" class="option{if !$Request.param.if_auth} checked{/if}">不限</a>
+                    <a href="{if $Request.param.if_auth}{:dropParam(array('if_auth'))}{else}{:replaceParam(array('if_auth' => 1))}{/if}" class="option check-option{if $Request.param.if_auth} checked{/if}"><i class='iconfont'></i>已认证</a>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sort-wrap">
+        <div class="sort-list clearfix">
+            <a href="{:dropParam(array('sort_key'))}" class="sort-item first{if !$Request.param.sort_key} checked{/if}">默认排序</a>
+            <a href="{:replaceParam(array('sort_key' => 'sales'))}" class="sort-item{if $Request.param.sort_key=='sales'} checked{/if}">次数最多</a>
+            <a href="{:replaceParam(array('sort_key' => 'credit'))}" class="sort-item{if $Request.param.sort_key=='credit'} checked{/if}">评分最高</a>
+        </div>
+    </div>
+    <div class="dj-info-list">
+        {if !empty($o2o_fuwu_organization_list)}
+        {foreach name='o2o_fuwu_organization_list' item='item'}
+        <div class="cont clearfix">
+            <a href="{:url('FuwuOrganization/view',['organization_id'=>$item.o2o_fuwu_organization_id])}" target="_blank">
+                <div class="photos fl" style='background-image:url({:get_o2o_fuwu_file($item.o2o_fuwu_organization_id,$item.o2o_fuwu_organization_avatar,'avatar')})'>
+                </div>
+                <div class="item-1">
+                    <p class="intr-1">
+                        <i class="big-size">{$item.o2o_fuwu_organization_name}</i>
+                    </p>
+                    <p class="intr-2">
+                        {if $item.fuwu_organization_year}
+                        {$item.fuwu_organization_year} {$Think.lang.fuwu_organization_year_text[$item.o2o_fuwu_organization_type]}
+                        <span class="seperate">/</span>
+                        {/if}
+                        {if $item.o2o_fuwu_organization_city_name}
+                        {$item.o2o_fuwu_organization_city_name}
+                        <span class="seperate">/</span>
+                        {/if}
+                        {$Think.lang.o2o_fuwu_organization_type_text[$item.o2o_fuwu_organization_type]}
+                    </p>
+                    <p class="intr-2">
+                        {$item.o2o_fuwu_organization_serve_count}次服务
+                        <span class="seperate">/</span>
+<!--                        {$item.o2o_fuwu_organization_collect_count}人收藏
+                        <span class="seperate">/</span>-->
+                        {$item.o2o_fuwu_organization_comment_count}人评论
+                    </p>
+                    <p class="intr-2 clamp">
+                        {$item.o2o_fuwu_organization_detail}
+                    </p>
+                </div>
+
+            </a>
+            <div class="item-3">
+                <a href="{:url('FuwuOrganization/view',['organization_id'=>$item.o2o_fuwu_organization_id])}" target="_blank">
+                    <span class="btn add-collection chanel-collection">查看详情</span>
+                </a>
+                <a href="{:url('FuwuOrganization/goods',['organization_id'=>$item.o2o_fuwu_organization_id])}" target="_blank"><span class="btn appointment js-open-submitClue">服务预约</span></a>
+            </div>
+        </div>
+        
+        {/foreach}
+        {else}
+        <div class="no_results">没有找到符合条件的服务机构</div>
+        {/if}
+    </div>
+    <div class="tc mt20 mb20">
+        <div class="pagination">{$show_page|raw}</div>
+      </div>
+</div>
+{/block}

@@ -1,0 +1,74 @@
+{include file='default/base/mall_top'/}
+<link rel="stylesheet" href="{$Think.HOME_SITE_ROOT}/css/home.css">
+<div class="header-login clearfix">
+    <div class="w1200">
+        <div class="logo">
+            <a href="{$Think.HOME_SITE_URL}"><img src="{:ds_get_pic(ATTACH_COMMON,$Think.config.ds_config.site_logo)}"/></a>
+        </div>
+    </div>
+</div>
+        <link rel="stylesheet" href="{$Think.HOME_SITE_ROOT}/css/seller.css">
+        <script language="JavaScript" type="text/javascript">
+            $(document).ready(function () {
+
+                //登陆表单验证
+                $("#form_login").validate({
+                    errorPlacement: function (error, element) {
+                        element.prev(".repuired").append(error);
+                    },
+                    onkeyup: false,
+                    rules: {
+                        o2o_fuwu_account_name: {
+                            required: true
+                        },
+                        o2o_fuwu_account_password: {
+                            required: true
+                        }
+                    },
+                    messages: {
+                        o2o_fuwu_account_name: {
+                            required: "<i class='iconfont'>&#xe64c;</i>{$Think.lang.login_index_username_isnull}"
+                        },
+                        o2o_fuwu_account_password: {
+                            required: "<i class='iconfont'>&#xe64c;</i>{$Think.lang.login_index_password_isnull}"
+                        }
+                    }
+                });
+                //Hide Show verification code
+                $("#hide").click(function () {
+                    $(".code").fadeOut("slow");
+                });
+                $("#captcha").focus(function () {
+                    $(".code").fadeIn("fast");
+                });
+
+            });
+        </script>
+        <div class="w1200">
+            <div class="dssc-login-container">
+                <div class="dssc-login-title">
+                    <h2>服务机构中心</h2>
+                </div>
+                <form id="form_login" action="" method="post" >
+                    <div class="input">
+                        <label>用户名</label>
+                        <span class="repuired"></span>
+                        <input name="o2o_fuwu_account_name" type="text" autocomplete="off" class="text" autofocus>
+                        <span class="ico"><i class="iconfont">&#xe702;</i></span> </div>
+                    <div class="input">
+                        <label>密码</label>
+                        <span class="repuired"></span>
+                        <input name="o2o_fuwu_account_password" type="password" autocomplete="off" class="text">
+                        <span class="ico"><i class="iconfont">&#xe67b;</i></span> 
+                    </div>
+                    <div class="input">
+                        <input type="submit" class="login-submit" value="登录">
+                    </div>
+                    <div class="mt10 fr"><a href="{:url('fuwu_manage_register/step1')}">我要入驻</a></div>
+                </form>
+            </div>
+        </div>
+        <div class="dssc-login-bg">
+        </div>
+        
+{include file='default/base/mall_footer'/}

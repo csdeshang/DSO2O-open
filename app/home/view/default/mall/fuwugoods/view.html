@@ -1,0 +1,75 @@
+{extend name="default/base/base_home" /}
+{block name="mall_main"}
+<style>
+    .dsh-breadcrumb-layout{background:#f5f5f5}
+</style>
+<link rel="stylesheet" href="{$Think.HOME_SITE_ROOT}/css/fuwu.css">
+<div class='fuwu-goods-view'>
+    <div class='w1200'>
+        <div class='lead'><span class='category'>{$o2o_fuwu_goods_info.o2o_fuwu_class_name}<i>·</i></span>{$o2o_fuwu_goods_info.o2o_fuwu_goods_name}</div>
+        <div class="service_Price service_box" id="service_Price">
+            <div class="servicePrice service_title"><span>服务价格</span></div>
+            <!-- 价格表 -->
+            <div class="priceList">
+                <div class='title'>默认服务</div>
+                <div class='table'>
+                    {foreach name='o2o_fuwu_goods_spec_default' item='spec'}
+                    <div class='tr'>
+                        <div class='td text'>{$spec.o2o_fuwu_goods_spec_name}</div>
+                        <div class='td'>{$spec.o2o_fuwu_goods_spec_price}元/{$spec.o2o_fuwu_goods_spec_unit}</div>
+                    </div>
+                    {/foreach}
+                </div>
+            </div>
+            {if !empty($o2o_fuwu_goods_spec_added)}
+            <div class="priceList">
+                <div class='title'>增值服务</div>
+                <div class='table'>
+                    <div class='tr'>
+                        {foreach name='o2o_fuwu_goods_spec_added' item='spec'}
+                        <div class='td text'>{$spec.o2o_fuwu_goods_spec_name}</div>
+                        <div class='td'>{$spec.o2o_fuwu_goods_spec_price}元/{$spec.o2o_fuwu_goods_spec_unit}</div>
+                        {/foreach}
+                    </div>
+                </div>
+            </div>
+            {/if}
+            <a href='{:url("MemberO2oFuwuOrder/buy",["o2o_fuwu_goods_id"=>$o2o_fuwu_goods_info.o2o_fuwu_goods_id])}'><div class='btn'>我要下单</div></a>
+        </div>
+        <div class="service_detail service_box">
+            <div class="service_title"><span>服务详情</span></div>
+            {foreach name='o2o_fuwu_goods_info.o2o_fuwu_goods_body' item='body'}
+            {if $body.type=='image'}
+            <div class='image'><img src='{$body.value}'></div>
+            {else}
+            <div class='text'>{$body.value}</div>
+            {/if}
+            {/foreach}
+        </div>
+        <div class="user_Review service_box" id="user_Review"> 
+            <div class="userReview service_title">
+                <span>用户评价</span>
+            </div> 
+            {if !empty($evaluate_list)}
+            {foreach name='evaluate_list' item='evaluate' key='index'}
+            <div class="infoBox" {if $index==0}style="border: 0px;"{/if}> 
+                <img src="{:get_member_avatar_for_id($evaluate.member_id)}" /> 
+                <div class="content"> 
+                    <div> 
+                        <span style="display:inline-block">{$evaluate.member_name}</span> 
+                        <span style="float:right">{$evaluate.o2o_fuwu_order_evaluate_time|date="Y-m-d"}</span> 
+                    </div> 
+                    <p>{$evaluate.o2o_fuwu_order_evaluate_content}</p> 
+                </div> 
+            </div> 
+            {/foreach}
+            {else}
+            <!--<div class="no_results">没有找到符合条件的服务评论</div>-->
+            {/if}
+        </div>
+        <div class="tc mt20 mb20">
+            <div class="pagination">{$show_page|raw}</div>
+        </div>
+    </div>
+</div>
+{/block}

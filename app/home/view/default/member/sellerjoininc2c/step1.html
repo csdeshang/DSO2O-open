@@ -1,0 +1,422 @@
+{extend name="default/base/base_joinin" /}
+{block name="joinin_main"}
+
+<!--{if $Think.config.ds_config.mapak_type eq '1'}-->
+<script type="text/javascript">
+        window._AMapSecurityConfig = {
+            securityJsCode:"{$Think.config.ds_config.gaode_jscode}",
+        }
+</script>
+<script type="text/javascript" src="//webapi.amap.com/maps?v=2.0&key={$Think.config.ds_config.gaode_ak}"></script>
+<!--{else}-->
+<script type="text/javascript" src="{$Think.HTTP_TYPE}api.map.baidu.com/api?v=2.0&ak={$Think.config.ds_config.baidu_ak}"></script>
+<!--{/if}-->
+<script>
+    var local;
+    var map;
+    var lst_name='';
+    function change_map(){
+            if($("#area_ select:eq(0)").length>0 && $("#area_ select:eq(0) option:selected").val()!=''){
+                var name=$("#area_ select:eq(0) option:selected").text();
+            }
+            if($("#area_ select:eq(1)").length>0 && $("#area_ select:eq(1) option:selected").val()!=''){
+                var name=$("#area_ select:eq(1) option:selected").text();
+            }
+            if($("#area_ select:eq(2)").length>0 && $("#area_ select:eq(2) option:selected").val()!=''){
+                var name=$("#area_ select:eq(2) option:selected").text();
+            }
+            if(name!='' && lst_name!=name){
+                lst_name=name;
+                map.setCurrentCity(name);
+                map.centerAndZoom(name,16);
+                map.clearOverlays();
+                local.search(name);
+            }
+            
+    }
+    $(function(){
+       if ({$Think.config.ds_config.mapak_type} == '1'){
+			map = new AMap.Map("allmap", {
+				resizeEnable: true,
+				zoom:15
+			});
+			//获取用户所在城市信息
+			AMap.plugin("AMap.CitySearch", function () {
+				var citySearch = new AMap.CitySearch();
+				citySearch.getLocalCity(function (status, result) {
+				  if (status === "complete" && result.info === "OK") {
+					// 查询成功，result即为当前所在城市信息
+					AMap.plugin("AMap.Geocoder", function () {
+					  var geocoder = new AMap.Geocoder({
+						// city 指定进行编码查询的城市，支持传入城市名、adcode 和 citycode
+						city: result.adcode,
+					  });
+					  geocoder.getLocation(result.city, function(status1, result1) {
+						  var location = result1.geocodes[0].location;
+						  var addComp = result1.geocodes[0].addressComponent;
+						  var province = addComp.province;//获取省份
+						  var city = addComp.city;//获取城市
+						  var district = '';//区
+							var lng = location.lng;
+							var lat = location.lat;
+							
+							document.getElementById("longitude").value = lng;
+							document.getElementById("latitude").value = lat;
+							//初始化定位
+							var marker = new AMap.Marker({
+								position: new AMap.LngLat(lng, lat),
+								icon: '//api.map.baidu.com/images/marker_red_sprite.png',
+								zoom: 15
+							});
+							map.add(marker);
+							map.panTo([lng, lat]);
+							
+							//搜索定位
+							AMap.plugin(['AMap.PlaceSearch','AMap.AutoComplete'], function(){
+								var auto = new AMap.AutoComplete({input:"company_address_detail"});
+								var placeSearch = new AMap.PlaceSearch({
+									map: map
+								});  //构造地点查询类
+								auto.on("select", select);//注册监听，当选中某条记录时会触发
+								function select(e) {
+									placeSearch.setCity(e.poi.adcode);
+									placeSearch.search(e.poi.name);  //关键字查询查询
+								}
+							});
+							
+							//点击定位
+							map.on('click', function(e) {
+								document.getElementById("longitude").value = e.lnglat.getLng();
+								document.getElementById("latitude").value = e.lnglat.getLat();
+								if(marker){
+									map.remove(marker);
+								}
+								marker = new AMap.Marker({
+									position: new AMap.LngLat(e.lnglat.getLng(), e.lnglat.getLat()),
+									icon: '//api.map.baidu.com/images/marker_red_sprite.png',
+									anchor: 'bottom-center',
+									zoom: 15
+								});
+								map.add(marker);
+							});
+						});
+					});
+				  }
+				});
+			  });
+		}else{
+			map = new BMap.Map("allmap");
+			var geolocation = new BMap.Geolocation();
+			geolocation.getCurrentPosition(function (r) {
+				if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+					var lng = r.point.lng;
+					var lat = r.point.lat;
+					var point = new BMap.Point(lng, lat);
+					map.centerAndZoom(point, 16);
+					map.addControl(new BMap.NavigationControl());
+					map.enableScrollWheelZoom();    
+					var marker = new BMap.Marker(point);  // 创建标注
+					map.addOverlay(marker);              // 将标注添加到地图中
+					marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
+					document.getElementById("longitude").value = lng;
+					document.getElementById("latitude").value = lat;
+				} else {
+					layer.msg('failed' + this.getStatus());
+				}
+			}, {enableHighAccuracy: true}) 
+			var options = {
+				onSearchComplete: function(results){
+					// 判断状态是否正确
+					if (local.getStatus() == BMAP_STATUS_SUCCESS){
+						if(results.getCurrentNumPois()>0){
+			
+							map.clearOverlays();  //清除标注  或者可以把market 放入数组
+							var point = new BMap.Point(results.getPoi(0).point.lng , results.getPoi(0).point.lat);
+							var marker = new BMap.Marker(point);
+							map.centerAndZoom(point, 16);
+							map.addOverlay(marker);
+							marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
+							
+							document.getElementById("longitude").value = results.getPoi(0).point.lng;
+							document.getElementById("latitude").value = results.getPoi(0).point.lat;
+							
+						}
+					}
+				}
+			};
+			local = new BMap.LocalSearch(map, options);
+			map.addEventListener("click", function(e){
+	//                    alert(e.point.lng + ", " + e.point.lat);
+				map.clearOverlays();  //清除标注  或者可以把market 放入数组
+				var point = new BMap.Point(e.point.lng , e.point.lat);
+				var marker = new BMap.Marker(point);
+				map.addOverlay(marker);
+				marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
+				
+				document.getElementById("longitude").value = e.point.lng;
+				document.getElementById("latitude").value = e.point.lat;
+			});
+		}
+    })
+</script>
+<div class="breadcrumb"><span class="iconfont">&#xe6ff;</span><span><a href="">{$Think.lang.homepage}</a></span> <span class="arrow">></span> <span>{$Think.lang.merchant_entry_application}</span> </div>
+<div class="main">
+    <div class="sidebar">
+        <div class="title">
+            <h3>{$Think.lang.merchant_entry_application}</h3>
+        </div>
+        <div class="content">
+            <dl>
+                <dt class="{if $sub_step == 'step0'}current{/if}"> <i class="hide"></i>{$Think.lang.enter_agreement}</dt>
+            </dl>
+            <dl show_id="0">
+                <dt onclick="show_list('0');" style="cursor: pointer;"> <i class="show"></i>{$Think.lang.submit_application}</dt>
+                <dd>
+                    <ul>
+                        <li class="{if $sub_step == 'step1'}current{/if}"><i></i>{$Think.lang.store_qualification_information}</li>
+                        <li class="{if $sub_step == 'step2'}current{/if}"><i></i>{$Think.lang.financial_qualification_information}</li>
+                        <li class="{if $sub_step == 'step3'}current{/if}"><i></i>{$Think.lang.store_operation_information}</li>
+                    </ul>
+                </dd>
+            </dl>
+            <dl>
+                <dt class="{if $sub_step == 'pay'}current{/if}"> <i class="hide"></i>{$Think.lang.contract_signing_payment}</dt>
+            </dl>
+            <dl>
+                <dt> <i class="hide"></i>{$Think.lang.store_opening}</dt>
+            </dl>
+        </div>
+        <div class="title">
+            <h3>{$Think.lang.platform_contact}</h3>
+        </div>
+        <div class="content">
+            <ul>
+                <li>{$Think.lang.phone}：{$Think.config.ds_config.site_phone}</li>
+                <li>{$Think.lang.email}：{$Think.config.ds_config.site_email}</li>
+            </ul> 
+        </div>
+    </div>
+    <div class="right-layout">
+        <div class="joinin-step">
+            <ul>
+                <li class="step1 {if $sub_step >= 'step0'}current{/if} {if $sub_step == 'pay'}current{/if}"><span>{$Think.lang.enter_agreement}</span></li>
+                <li class="{if $sub_step >= 'step1'}current{/if} {if $sub_step == 'pay'}current{/if}"><span>{$Think.lang.store_qualification_information}</span></li>
+                <li class="{if $sub_step >= 'step2'}current{/if} {if $sub_step == 'pay'}current{/if}"><span>{$Think.lang.financial_qualification_information}</span></li>
+                <li class="{if $sub_step >= 'step3'}current{/if} {if $sub_step == 'pay'}current{/if}"><span>{$Think.lang.store_operation_information}</span></li>
+                <li class="{if $sub_step >= 'step4'}current{/if} {if $sub_step == 'pay'}current{/if}"><span>{$Think.lang.contract_signing_payment}</span></li>
+                <li class="step6"><span>{$Think.lang.store_opening}</span></li>
+            </ul>
+        </div>
+        <div class="joinin-concrete">
+<!-- 公司信息 -->
+
+<div id="apply_company_info" class="apply-company-info">
+  <div class="alert">
+    <h4>{$Think.lang.matters_needing_attention}：</h4>
+    {$Think.lang.upload_information1}</div>
+  <form id="form_company_info" action="{:url('Sellerjoininc2c/step2')}" method="post" enctype="multipart/form-data" >
+    <table border="0" cellpadding="0" cellspacing="0" class="all">
+      <thead>
+        <tr>
+          <th colspan="2">{$Think.lang.store_contact_information}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th><i>*</i>{$Think.lang.offline_store_name}：</th>
+          <td><input name="company_name" type="text" class="w200"/>
+            <span></span></td>
+        </tr>
+        <tr>
+          <th><i>*</i>{$Think.lang.location}：</th>
+          <td id="area_" {if $Think.config.ds_config.mapak_type eq '2'}onclick="change_map()"{/if}>
+              <input type="hidden" value="" name="company_address" id="company_address">
+           <input type="hidden" value="" name="province_id" id="_area_1">
+           <input type="hidden" value="" name="city_id" id="_area_2">
+           <input type="hidden" value="" name="district_id" id="_area_3">
+            <span></span></td>
+        </tr>
+        <tr>
+          <th><i>*</i>{$Think.lang.detailed_address}：</th>
+          <td><input name="company_address_detail" type="text" class="w200" id="company_address_detail" {if $Think.config.ds_config.mapak_type eq '2'}onkeyup="local.search($(this).val());"{/if}>
+            <span></span>
+            <div>
+                <input name="longitude" id="longitude" type="hidden" />
+                <input name="latitude" id="latitude" type="hidden" />
+                <div id="allmap" style="width:530px;height: 350px;margin-top: 20px"></div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <th><i>*</i>{$Think.lang.contact_name}：</th>
+          <td><input name="contacts_name" type="text" class="w100" />
+            <span></span></td>
+        </tr>
+        <tr>
+          <th><i>*</i>{$Think.lang.contact_number}：</th>
+          <td><input name="contacts_phone" type="text" class="w100" />
+            <span></span></td>
+        </tr>
+        <tr>
+          <th><i>*</i>{$Think.lang.email_address}：</th>
+          <td><input name="contacts_email" type="text" class="w200" />
+            <span></span></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="20">&nbsp;</td>
+        </tr>
+      </tfoot>
+    </table>
+    <table border="0" cellpadding="0" cellspacing="0" class="all">
+      <thead>
+        <tr>
+          <th colspan="20">{$Think.lang.identification_information}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th><i>*</i>{$Think.lang.identification_number}：</th>
+          <td><input name="business_licence_number" type="text" class="w200" />
+            <span></span></td>
+        </tr>
+        <tr>
+          <th><i>*</i>{$Think.lang.identification_photo}：</th>
+          <td><input name="business_licence_number_electronic" type="file" class="w200" />
+            <span class="block"></span></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="20">&nbsp;</td>
+        </tr>
+      </tfoot>
+    </table>
+  </form>
+  <div class="bottom"><a id="btn_apply_company_next" href="javascript:;" class="btn">{$Think.lang.upload_information3}</a></div>
+</div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){
+
+    $('#company_address').ds_region();
+    $('#business_licence_address').ds_region();
+
+    $('#business_licence_start').datepicker({dateFormat: 'yy-mm-dd'});
+    $('#business_licence_end').datepicker({dateFormat: 'yy-mm-dd'});
+
+    $('#btn_apply_agreement_next').on('click', function() {
+        if($('#input_apply_agreement').prop('checked')) {
+            $('#apply_agreement').hide();
+            $('#apply_company_info').show();
+        } else {
+            layer.msg('{$Think.lang.read_agree_agreement}');
+        }
+    });
+
+    $('#form_company_info').validate({
+        errorPlacement: function(error, element){
+            element.nextAll('span').first().after(error);
+        },
+        rules : {
+            company_name: {
+                required: true,
+                maxlength: 50 
+            },
+            company_address: {
+                required: true,
+                maxlength: 50 
+            },
+            company_address_detail: {
+                required: true,
+                maxlength: 50 
+            },
+
+            company_registered_capital: {
+                required: true,
+                digits: true 
+            },
+            contacts_name: {
+                required: true,
+                maxlength: 20 
+            },
+            contacts_phone: {
+                required: true,
+                maxlength: 11, 
+                minlength: 11,
+            },
+            contacts_email: {
+                required: true,
+                email: true 
+            },
+            business_licence_number: {
+                required: true,
+                maxlength: 20
+            },
+            business_licence_address: {
+                required: true,
+                maxlength: 50
+            },
+            business_licence_start: {
+                required: true
+            },
+           
+        },
+        messages : {
+            company_name: {
+                required: '{$Think.lang.enter_company_name}',
+                maxlength: jQuery.validator.format("{$Think.lang.most_words}")
+            },
+            company_address: {
+                required: '{$Think.lang.select_area_address}',
+                maxlength: jQuery.validator.format("{$Think.lang.most_words}")
+            },
+            company_address_detail: {
+                required: '{$Think.lang.enter_company_details}',
+                maxlength: jQuery.validator.format("{$Think.lang.most_words}")
+            },
+            company_registered_capital: {
+                required: '{$Think.lang.enter_registered_capital}',
+                digits: '{$Think.lang.must_numeric}'
+            },
+            contacts_name: {
+                required: '{$Think.lang.enter_contact_name}',
+                maxlength: jQuery.validator.format("{$Think.lang.most_words}")
+            },
+            contacts_phone: {
+                required: '{$Think.lang.enter_contact_phone}',
+                maxlength: "{$Think.lang.fill_your_phone_number_correctly}",
+                minlength: "{$Think.lang.fill_your_phone_number_correctly}",
+            },
+            contacts_email: {
+                required: '{$Think.lang.enter_common_email_address}',
+                email: '{$Think.lang.fill_correct_email_address}'
+            },
+            business_licence_number: {
+                required: '{$Think.lang.enter_business_license_number}',
+                maxlength: jQuery.validator.format("{$Think.lang.most_words}")
+            },
+            business_licence_address: {
+                required: '{$Think.lang.select_location_business_license}',
+                maxlength: jQuery.validator.format("{$Think.lang.most_words}")
+            },
+            business_licence_start: {
+                required: '{$Think.lang.select_effective_date}'
+            },
+
+        }
+    });
+
+    $('#btn_apply_company_next').on('click', function() {
+        if($('#form_company_info').valid()) {
+            $('#form_company_info').submit();
+        }
+    });
+});
+</script>
+
+
+{/block}

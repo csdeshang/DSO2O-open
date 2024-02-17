@@ -1,0 +1,73 @@
+{extend name="default/base/base_fuwu" /}
+{block name="fuwu_btn"}
+                    <a href="javascript:void(0);" class="dssc-upload-btn" style='position: relative'>
+                        <span><input type="file" hidefocus="true" size="1" class="input-file" name="file" id="file" /></span>
+                        <p><i class="iconfont">&#xe733;</i>图片上传</p>
+                    </a>
+{/block}
+{block name="fuwu_main"}
+<div class='file-list'>
+{notempty name="file_list"}
+
+{foreach name="file_list" item="v"  }
+<div class='file-item' id='ds_row_{$v.o2o_fuwu_upload_id}'>
+    <a class='delete iconfont' href="javascript:void(0)" onclick="ds_ajaxget('{:url("fuwu_manage_info/del_info_file",["id"=>$v.o2o_fuwu_upload_id])}')">&#xe696;</a>
+    <img src='{$v.o2o_fuwu_upload_url_url}'>
+</div>
+{/foreach}
+
+{else /}
+<div class='null'>请点击右上角的图片上传按钮进行上传</div>
+{/notempty}
+</div>
+<script type="text/javascript" src="{$Think.PLUGINS_SITE_ROOT}/ajaxfileupload.js"></script> 
+<script src="{$Think.PLUGINS_SITE_ROOT}/template.min.js"></script>
+<script>
+    $(function () {
+        $('input[type="file"]').unbind().change(function () {
+            ajaxFileUpload();
+        });
+    });
+    function ajaxFileUpload()
+    {
+        url='{:url("fuwu_manage_info/upload_info_file")}'
+        $(document).off('change', "#file").on('change', function () {
+            $.ajaxFileUpload({
+                url: url,
+                secureuri: false,
+                fileElementId: 'file',
+                dataType: 'json',
+                data: {type: 'scene'},
+                success: function (data)
+                {
+                    if (data.code!=10000) {
+                        layer.msg(data.message)
+                    } else {
+                        $('.null').remove()
+                        $('.file-list').append(template.render('file_item_html', {v:{o2o_fuwu_upload_id:data.result.id,o2o_fuwu_upload_url_url:data.result.url}}))
+                    }
+                },
+                error: function (data, status, e)
+                {
+                    console.error(data);
+                }
+            })
+            return false;
+        });
+    }
+</script>
+<script type="text/html" id="file_item_html">
+<div class='file-item' id='ds_row_<%=v.o2o_fuwu_upload_id%>'>
+    <a class='delete iconfont' href="javascript:void(0)" onclick="ds_ajaxget('{:url("fuwu_manage_info/del_info_file")}?id=<%=v.o2o_fuwu_upload_id%>')">&#xe696;</a>
+    <img src='<%=v.o2o_fuwu_upload_url_url%>'>
+</div>
+</script>
+<style>
+    .file-list{overflow: hidden}
+    .file-list .file-item{float: left;margin-left: 20px;padding:10px;position: relative;border: 1px solid #e1e1e1}
+    .file-list .file-item img{width:200px;height: 200px;}
+    .file-list .file-item .delete{position: absolute;top:10px;right: 10px;font-size: 18px;}
+    .null{text-align: center;padding: 20px;font-size: 16px;color: #0089ff}
+</style>
+
+{/block}

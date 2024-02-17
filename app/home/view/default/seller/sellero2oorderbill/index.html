@@ -1,0 +1,90 @@
+{extend name="default/base/base_seller" /}
+{block name="seller_main"}
+
+<form method="get" action="" target="_self">
+    <table class="search-form">
+        <tr>
+            <td></td>
+            <th>{$Think.lang.seller_o2o_order_bill_state}</th>
+            <td class="w160">
+                <select name="bill_state">
+                    <option value="">{$Think.lang.ds_please_choose}</option>
+                    <option {if condition="$Request.param.bill_state !=='' && $Request.param.bill_state !== null && $Request.param.bill_state eq O2O_ORDER_BILL_STATE_CREATE"}selected{/if} value="{$Think.O2O_ORDER_BILL_STATE_CREATE}">{$Think.lang.seller_o2o_order_bill_state_text[O2O_ORDER_BILL_STATE_CREATE]}</option>
+                    <option {if condition="$Request.param.bill_state !=='' && $Request.param.bill_state !== null && $Request.param.bill_state eq O2O_ORDER_BILL_STATE_CHECK"}selected{/if} value="{$Think.O2O_ORDER_BILL_STATE_CHECK}">{$Think.lang.seller_o2o_order_bill_state_text[O2O_ORDER_BILL_STATE_CHECK]}</option>
+                    <option {if condition="$Request.param.bill_state !=='' && $Request.param.bill_state !== null && $Request.param.bill_state eq O2O_ORDER_BILL_STATE_PAY"}selected{/if} value="{$Think.O2O_ORDER_BILL_STATE_PAY}">{$Think.lang.seller_o2o_order_bill_state_text[O2O_ORDER_BILL_STATE_PAY]}</option>
+                    <option {if condition="$Request.param.bill_state !=='' && $Request.param.bill_state !== null && $Request.param.bill_state eq O2O_ORDER_BILL_STATE_SUCCESS"}selected{/if} value="{$Think.O2O_ORDER_BILL_STATE_SUCCESS}">{$Think.lang.seller_o2o_order_bill_state_text[O2O_ORDER_BILL_STATE_SUCCESS]}</option>
+                </select>
+            </td>
+            <th>{$Think.lang.seller_o2o_order_bill_circle}</th>
+            <td class="w240">
+                <input type="text" class="text w70" name="query_start_date" id="query_start_date" value="{$Request.param.query_start_date}"/>
+                <label class="add-on"><i class="iconfont">&#xe8d6;</i></label>&nbsp;&#8211;&nbsp;
+                <input type="text" class="text w70" name="query_end_date" id="query_end_date" value="{$Request.param.query_end_date}"/>
+                <label class="add-on"><i class="iconfont">&#xe8d6;</i></label>
+            </td>
+            <td class="w70 tc">
+                <input type="submit" class="submit" value="{$Think.lang.ds_common_search}" />
+            </td>
+        </tr>
+    </table>
+</form>
+
+<table class="dssc-default-table">
+            <thead>
+                <tr>
+                    <th class="w10"></th>
+                    <th>{$Think.lang.seller_o2o_order_bill_circle}</th>
+                    <th>{$Think.lang.seller_o2o_order_bill_o2o_distributor_name}</th>
+                    <th>{$Think.lang.seller_o2o_order_bill_order_totals}</th>
+                    <th>{$Think.lang.seller_o2o_order_bill_fee_totals}</th>
+                    
+                    
+                    <th>{$Think.lang.seller_o2o_order_bill_complaint_totals}</th>
+                    <th>{$Think.lang.seller_o2o_order_bill_complaint_fine_totals}</th>
+                    <th>{$Think.lang.seller_o2o_order_bill_state}</th>
+                    <th>{$Think.lang.seller_o2o_order_bill_result_totals}</th>
+                    <th class="w120">{$Think.lang.ds_handle}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {notempty name="bill_list"}
+                {foreach name="bill_list" item="bill_info" }
+                <tr class="bd-line">
+                    <td></td>
+                    
+                    <td>{$bill_info.o2o_order_bill_start_time|date="Y-m-d"} - {$bill_info.o2o_order_bill_end_time|date="Y-m-d"}</td>
+                    <td>{$bill_info.o2o_distributor_name}</td>
+                    <td>{$bill_info.o2o_order_bill_order_totals}</td>
+                    <td>{$bill_info.o2o_order_bill_fee_totals}</td>
+                    
+                    <td>{$bill_info.o2o_order_bill_complaint_totals}</td>
+                    <td>{$bill_info.o2o_order_bill_complaint_fine_totals}</td>
+                    <td>{$Think.lang.seller_o2o_order_bill_state_text[$bill_info.o2o_order_bill_state]}</td>
+                    <td>{$bill_info.o2o_order_bill_result_totals}</td>
+                    <td><a href="{:url('SellerO2oOrderBill/show_bill',['bill_id'=>$bill_info.o2o_order_bill_id])}">{$Think.lang.ds_view}</a></td>
+                </tr>
+                {/foreach}
+                {else/}
+                <tr>
+                    <td colspan="10" class="norecord"><div class="warning-option"><i class="iconfont">&#xe64c;</i><span>{$Think.lang.no_record}</span></div></td>
+                </tr>
+                {/notempty}
+            </tbody>
+            <tfoot>
+                {notempty name="bill_list"}
+                <tr>
+                    <td colspan="10"><div class="pagination">{$show_page|raw}</div></td>
+                </tr>
+                {/notempty}
+            </tfoot>
+        </table>
+        <script type="text/javascript">
+        $(function(){
+            $('#query_start_date').datepicker({dateFormat: 'yy-mm-dd'});
+            $('#query_end_date').datepicker({dateFormat: 'yy-mm-dd'});
+        });
+        </script>
+
+
+{/block}
+

@@ -1,0 +1,66 @@
+{include file='default/base/mall_top'/}
+<link rel="stylesheet" href="{$Think.HOME_SITE_ROOT}/css/home.css">
+<div class="header-login clearfix">
+    <div class="w1200">
+        <div class="logo">
+            <a href="{$Think.HOME_SITE_URL}"><img src="{:ds_get_pic(ATTACH_COMMON,$Think.config.ds_config.site_logo)}"/></a>
+        </div>
+    </div>
+</div>
+<div class='bg-gray2'>
+    <div class='w1200 pt20 pb20'>
+        <div class='block-wrapper'>
+            <div class='title'>验证手机</div>
+            <form id='register_form' method="post" onsubmit="submitForm();return false;">
+                <label class='input-wrapper'><input class='input' id='phone' name='phone' type='text' placeholder="手机号码"></label>
+                <label class='input-wrapper verify-code-wrapper'><input id='verify_code' name='verify_code' class='input' type='text' placeholder="验证码"><input id='send_auth_code' type='button' value='发送' class='btn' /></label>
+                <input type='submit' value='下一步' class='btn login-btn' />
+            </form>
+        </div>
+        
+    </div>
+</div>
+<style>
+    .block-wrapper{border-radius:4px;background:#fff;padding:20px 60px;font-size:14px;line-height: 1.5;margin:0 auto;width:360px;}
+    .block-wrapper .title{font-size:24px;margin-bottom: 20px;text-align: center;font-weight: bold}
+    .block-wrapper .input-wrapper{margin-bottom: 20px;border: 1px solid #e1e1e1;padding:12px;box-sizing: border-box;width:100%;display: block;border-radius: 4px;position: relative}
+    .block-wrapper .input-wrapper input[type=text]{border:0;height: 100%;width: 100%;font-size: 16px;}
+    .block-wrapper .input-wrapper.verify-code-wrapper .btn{position: absolute;right: 0;top:0;width: 80px;height: 100%;}
+</style>
+<script>
+    var num=60
+    var timer
+    var ALLOW_SEND=true
+    function StepTimes() {
+        num=60;
+        timer=setInterval(function(){
+            num = num - 1;
+            if (num <= 0) {
+                ALLOW_SEND = !ALLOW_SEND;
+                $('#send_auth_code').val('发送');
+                clearInterval(timer);
+            }else{
+                $('#send_auth_code').val(num+'s');
+            }
+        },1000)
+    }
+    function submitForm(){
+        ds_ajaxpost('register_form','url','{:url('fuwu_manage_register/step3')}?phone='+$('#phone').val()+'&verify_code='+$('#verify_code').val());
+    }
+    $(function(){
+        $('#send_auth_code').on('click', function() {
+            if (!ALLOW_SEND)
+                return;
+            ALLOW_SEND = !ALLOW_SEND;
+            $.getJSON("{:url('fuwu_manage_register/send_verify_code')}", {phone: $('#phone').val()}, function(data) {
+                if (data.code == 10000) {
+                    StepTimes();
+                } else {
+                    ALLOW_SEND = !ALLOW_SEND;
+                    layer.msg(data.message);
+                }
+            });
+        });
+    })
+</script>
+{include file='default/base/mall_footer'/}

@@ -1,0 +1,169 @@
+{extend name="default/base/base_seller" /}
+{block name="seller_main"}
+
+
+
+<div class="dssc-form-default">
+  <form id="o2o_distributor_form" enctype="multipart/form-data" method="post" >
+      {if $Request.action=='add'}
+    <dl>
+      <dt><i class="required">*</i>{$Think.lang.o2o_distributor_name}{$Think.lang.ds_colon}</dt>
+      <dd><input type="text" value="{present name='o2o_distributor_array'}{$o2o_distributor_array.o2o_distributor_name}{/present}" name="o2o_distributor_name" id="o2o_distributor_name" class="w200 text"><span></span>
+        <p class="hint"></p>
+      </dd>
+    </dl>
+    {/if}
+    <dl>
+      <dt>{if $Request.action=='add'}<i class="required">*</i>{/if}{$Think.lang.o2o_distributor_password}{$Think.lang.ds_colon}</dt>
+      <dd><input type="password" value="" name="o2o_distributor_password" id="o2o_distributor_password" class="w200 text"><span></span>
+        <p class="hint">{if $Request.action=='edit'}{$Think.lang.o2o_distributor_password_tips}{/if}</p>
+      </dd>
+    </dl>
+    <dl>
+            <dt>{$Think.lang.o2o_distributor_avatar}{$Think.lang.ds_colon} </dt>
+            <dd>
+                <div class="dssc-upload-thumb store-avatar">
+                    <p>
+                        <img src="{if !empty($o2o_distributor_array.o2o_distributor_avatar)}{:ds_get_pic(ATTACH_O2O_DISTRIBUTOR,$o2o_distributor_array.o2o_distributor_avatar)}{else}{:ds_get_pic(ATTACH_COMMON,$Think.config.ds_config.default_user_portrait)}{/if}" id="img_o2o_distributor_avatar" />
+                    </p>
+                </div>
+                <div class="dssc-upload-btn"> 
+                    <a href="javascript:void(0);">
+                        <span><input type="hidden" name="o2o_distributor_avatar_value" id="o2o_distributor_avatar_value" value='{present name='o2o_distributor_array'}{$o2o_distributor_array.o2o_distributor_avatar}{/present}' /><input type="file" hidefocus="true" size="1" class="input-file" name="o2o_distributor_avatar" id="o2o_distributor_avatar" /></span>
+                        <p><i class="iconfont">&#xe733;</i>{$Think.lang.image_upload}</p>
+                    </a>
+                </div>
+                <p class="hint"></p>
+            </dd>
+        </dl>
+    <dl>
+                    <dt><i class="required">*</i>{$Think.lang.o2o_distributor_realname}{$Think.lang.ds_colon}</dt>
+                    <dd><input type="text" value="{present name='o2o_distributor_array'}{$o2o_distributor_array.o2o_distributor_realname}{/present}" name="o2o_distributor_realname" id="o2o_distributor_realname" class="w200 text"><span></span>
+                    <p class="hint"></p></dd>
+                </dl>
+                <dl>
+                    <dt><i class="required">*</i>{$Think.lang.o2o_distributor_phone}{$Think.lang.ds_colon}</dt>
+                    <dd><input type="text" value="{present name='o2o_distributor_array'}{$o2o_distributor_array.o2o_distributor_phone}{/present}" name="o2o_distributor_phone" id="o2o_distributor_phone" class="w200 text"><span></span>
+                    <p class="hint"></p></dd>
+                </dl>
+                <dl>
+                    <dt>{$Think.lang.o2o_distributor_email}{$Think.lang.ds_colon}</dt>
+                    <dd><input type="text" value="{present name='o2o_distributor_array'}{$o2o_distributor_array.o2o_distributor_email}{/present}" name="o2o_distributor_email" id="o2o_distributor_email" class="w200 text"><span></span>
+                    <p class="hint"></p></dd>
+                </dl>
+                <dl>
+                    <dt>{$Think.lang.o2o_distributor_remark}{$Think.lang.ds_colon}</dt>
+                    <dd><textarea name="o2o_distributor_remark" id="o2o_distributor_remark" class="txt">{present name='o2o_distributor_array'}{$o2o_distributor_array.o2o_distributor_remark}{/present}</textarea>
+                    <td class="vatop tips">{$Think.lang.o2o_distributor_remark_tips}</dt>
+                </dl>
+                <dl>
+                    <dt>{$Think.lang.o2o_distributor_introduce}{$Think.lang.ds_colon}</dt>
+                    <dd><textarea name="o2o_distributor_introduce" id="o2o_distributor_introduce" class="txt">{present name='o2o_distributor_array'}{$o2o_distributor_array.o2o_distributor_introduce}{/present}</textarea>
+                    <p class="hint"></p></dd>
+                </dl>
+                <dl>
+                    <dt><i class="required">*</i>{$Think.lang.o2o_distributor_state}: </dt>
+                    <dd>
+                        <input id="o2o_distributor_state1" name="o2o_distributor_state" {if !isset($o2o_distributor_array) || $o2o_distributor_array.o2o_distributor_state == '1'}checked="checked"{/if} value="1" type="radio">
+                        <label for="o2o_distributor_state1" class="cb-enable {if !isset($o2o_distributor_array) || $o2o_distributor_array.o2o_distributor_state == '1'}selected{/if}" title="{$Think.lang.ds_yes}"><span>{$Think.lang.ds_yes}</span></label>
+                        <input id="o2o_distributor_state0" name="o2o_distributor_state" {if isset($o2o_distributor_array) && $o2o_distributor_array.o2o_distributor_state == '0'}checked="checked"{/if} value="0" type="radio"></dt>
+                        <label for="o2o_distributor_state0" class="cb-disable {if isset($o2o_distributor_array) && $o2o_distributor_array.o2o_distributor_state == '0'}selected{/if}" title="{$Think.lang.ds_no}"><span>{$Think.lang.ds_no}</span></label>
+                        <p class="hint"></p></dd>
+                </dl>
+
+    <div class="bottom">
+        <input type="submit" class="submit" value="{$Think.lang.ds_submit}">
+    </div>
+  </form>
+</div>
+<script type="text/javascript" src="{$Think.PLUGINS_SITE_ROOT}/ajaxfileupload.js"></script> 
+<script>
+function ajaxFileUpload(url, id)
+        {
+            $.ajaxFileUpload({
+                    url: url,
+                    secureuri: false,
+                    fileElementId: id,
+                    dataType: 'json',
+                    data: {type: id,id:{$o2o_distributor_array.o2o_distributor_id|default=0},file:$('#'+id+'_value').val()},
+                    success: function (data)
+                    {
+                        if (data.error) {
+                            alert(data.error);
+                        } else {
+                            $("#img_" + id).attr('src', data.file_path);
+                            $("#" + id+'_value').val(data.file_name);
+                        }
+                    },
+                    error: function (data, status, e)
+                    {
+                        console.error(data);
+                    }
+                })
+        }
+    //按钮先执行验证再提交表单
+    $(function(){
+        var url = '{:url("seller_o2o_distributor/image_upload")}';
+            $('#o2o_distributor_form').find('input[type="file"]').unbind().change(function () {
+                var id = $(this).attr('id');
+                ajaxFileUpload(url, id);
+            });
+
+        $("#o2o_distributor_form").validate({
+            submitHandler:function(form){
+                ds_ajaxpost('o2o_distributor_form','url','{:url('seller_o2o_distributor/index')}');
+            },
+            errorPlacement: function(error, element){
+                element.nextAll('span').first().after(error);
+            },
+            rules : {
+                o2o_distributor_name : {
+                    required : true,
+                    remote   : {
+                        url :"{:url('seller_o2o_distributor/ajax',['branch'=>'o2o_distributor_name'])}",
+                        type:'get',
+                        data:{
+                            o2o_distributor_name : function(){
+                                return $('#o2o_distributor_name').val();
+                            },
+                            id  : {$o2o_distributor_array.o2o_distributor_id|default=0}
+                        }
+                    }
+                },
+								o2o_distributor_phone:{
+									required : true,
+								},
+								o2o_distributor_realname:{
+									required : true,
+								},
+                o2o_distributor_password : {
+                    required  : {present name='o2o_distributor_array'}false{else}true{/present}
+                },
+
+            },
+            messages : {
+                o2o_distributor_name : {
+                    required : '{$Think.lang.o2o_distributor_name_required}',
+                    remote   : '{$Think.lang.o2o_distributor_name_remote}'
+                },
+								o2o_distributor_phone:{
+									required : '{$Think.lang.o2o_distributor_phone_required}',
+								},
+								o2o_distributor_realname:{
+									required : '{$Think.lang.o2o_distributor_realname_required}',
+								},
+                o2o_distributor_password : {
+                    required : '{$Think.lang.o2o_distributor_password_required}'
+                },
+      
+            }
+        });
+    });
+
+</script>
+        
+        
+
+
+
+{/block}

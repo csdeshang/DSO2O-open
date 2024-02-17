@@ -1,0 +1,314 @@
+{extend name="default/base/base_store" /}
+{block name="store_main"}
+<div class='gray_bg'>
+    <div class="w1200 pt20">
+        {notempty name="store_slide"}
+        <div class="storeslider">
+            <ul class="slides">
+                {for start="0" end="5"}
+                {notempty name="$store_slide[$i]"}
+                <li><a href="{$store_slide_url[$i]}"><img src="{:ds_get_pic(ATTACH_SLIDE,$store_slide[$i])}" width="940" height="400"></a></li>
+                {/notempty}
+                {/for}
+            </ul>
+            <a class="ctrl prev" href="javascript:void(0)">&lt;</a>
+            <a class="ctrl next" href="javascript:void(0)">&gt;</a>
+        </div>
+        {/notempty}
+        <div class="shopmenu-nav ng-isolate-scope">
+            {foreach name='storeclass_goods' item='item' key='key'}
+            <a href="javascript:scroll_cate({$key})" class="ng-binding ng-scope{if $key==0} active{/if}" data-id="{$key}">{$item.name}</a>
+            {/foreach}
+        </div>
+        {foreach name='storeclass_goods' item='item' key='key'}
+        <div class="shopmenu-list grid ng-scope"> 
+            <h3 class="shopmenu-title ng-binding" data-id="{$key}">{$item.name}</h3> 
+            {foreach name='item.foods' item='goods'}
+            <div class="shopmenu-food ng-isolate-scope"> 
+                <span class="col-1 ng-scope"><a href="{:url('Goods/index',['goods_id'=>$goods.goods_id])}"><img src="{$goods.goods_image}"></a></span> 
+                <div class="col-2 shopmenu-food-main"> 
+                    <h3 class="shopmenu-food-name ui-ellipsis ng-binding">{$goods.goods_name}</h3> 
+                    <p class="color-mute ui-ellipsis ng-binding">{$goods.goods_advword}</p> 
+                    <p></p> 
+                    <div class="starrating iconfont icon-star ng-isolate-scope"> 
+                        <span class="icon-star" style="width: {:round($goods.evaluation_good_star/5*100,2)}%;"></span> 
+                    </div> 
+                    <span class="color-mute ng-binding">({$goods.evaluation_good_star})</span> 
+                    <span class="color-mute ng-binding">已售{$goods.goods_salenum}份</span> 
+                    <p></p> 
+                </div> 
+                <span class="col-3 shopmenu-food-price color-stress ng-binding iconfont">{$goods.goods_promotion_price}</span>
+                <span class="col-4"> 
+                    <div class="ng-isolate-scope"> 
+                        <div class="ng-scope"> 
+                            <button class="shop-cartbutton ng-binding ng-scope" onclick='{if !session('member_id')}go_login(){else}{if $goods.spec_count>1}select_spec({$goods.goods_commonid},{$goods.goods_id},{$goods.goods_promotion_price},"{$goods.goods_name}",{$goods.goods_spec},this){else}select_goods({$goods.goods_id},this){/if}{/if}'>加入购物车</button> 
+                        </div> 
+                    </div>
+                </span> 
+            </div> 
+            {/foreach}
+        </div>
+        {/foreach}
+
+    </div>
+</div>
+
+<div class="cart-wrapper">
+    <div class='shop-cartbasket'>
+        <div class="ng-isolate-scope">
+            <div class="shop-grouphead single">
+                <div class="shop-grouphead-row">
+                    <a href="javascript:del_cart()">[清空]</a>
+                </div>
+            </div>
+        </div>
+        <div id="cart_list_wrapper"></div>
+        
+        <div class="shop-cartfooter">
+            <span class="icon-cart shop-carticon iconfont" id="icon_cart">
+                <span class="shop-cartpieces ng-binding ng-scope" id="store_cart_count" style="display:none">0</span>
+            </span>
+            <p class="shop-cartfooter-text price ng-binding ng-scope iconfont" id="store_cart_amount">0</p>
+       
+            <button class="shop-cartfooter-checkout ng-binding" id="checkout_btn" style='display:none' onclick="$('#form_buy').submit()">去结算 &gt;</button>
+            <button class="shop-cartfooter-checkout ng-binding disabled" id="checkout_btn_disable">{$store_info.store_o2o_min_cost}元起送</button>
+        </div>
+    </div>
+</div>
+<form action="{:url('Buy/buy_step1')}" method="POST" id="form_buy" name="form_buy">
+    <input type="hidden" value="1" name="ifcart">
+    <div id="cart_id_input"></div>
+</form>
+<div class="mask" id="mask"></div>
+<div id="spec_wrapper" class="shop-specmenu ng-scope"></div>
+<script src="{$Think.PLUGINS_SITE_ROOT}/template.min.js"></script>
+<script src="{$Think.PLUGINS_SITE_ROOT}/jquery.SuperSlide.2.1.1.js"></script>
+<script>
+    var select_goods_id
+    var select_position
+    var cart_ids
+    jQuery(".storeslider").slide({mainCell: ".slides ", autoPlay: true, delayTime: 3000});
+    get_cart_list()
+    
+    var cate_height;
+    var scroll_lock=false;
+    $(function(){
+        cate_height=$(".shopmenu-nav").eq(0).height()+16;
+        $(window).bind("scroll",function(){
+            var sTop = $(window).scrollTop();
+            if($(".shopmenu-nav").eq(0).hasClass('fixed')){
+                if(sTop<$(".shopmenu-list").eq(0).offset().top){
+                    $(".shopmenu-nav").eq(0).removeClass('fixed')
+                }
+            }else{
+                if(sTop>$(".shopmenu-nav").eq(0).offset().top){
+                    $(".shopmenu-nav").eq(0).addClass('fixed')
+                }
+            }
+
+            if(!scroll_lock){
+            
+            var max_index=$(".shopmenu-title:eq(0)").attr('data-id');
+            $(".shopmenu-title").each(function(){
+                if((($(this).offset().top)-cate_height)<=sTop){
+                    max_index=$(this).attr('data-id');
+                    
+                }
+            });
+            $(".shopmenu-nav a").removeClass('active');
+            $(".shopmenu-nav a[data-id="+max_index+"]").addClass('active');
+        }
+        })
+    })
+    function scroll_cate(id){
+        scroll_lock=true;
+        $('html,body').animate({scrollTop: (($('.shopmenu-title[data-id='+id+']').offset().top)-cate_height)},function(){
+            var time=setInterval(function(){
+                scroll_lock=false;
+                clearInterval(time);
+            },50);
+             
+        });
+        $(".shopmenu-nav a").removeClass('active');
+        $(".shopmenu-nav a[data-id="+id+"]").addClass('active');
+            
+    }
+    function get_cart_list(){
+        $.getJSON("{:url('Store/getCartList')}",{store_id : {$store_info.store_id}}, function(result){
+            data=result.result
+            cart_ids=''
+            var html=''
+            var cart_id_input=''
+            for(var i in data.cart_list){
+                if(cart_ids==''){
+                    cart_ids=data.cart_list[i].cart_id
+                }else{
+                    cart_ids+=','+data.cart_list[i].cart_id
+                }
+                cart_id_input+='<input type="hidden" value="'+data.cart_list[i].cart_id+'|'+data.cart_list[i].goods_num+'" name="cart_id[]">'
+                html+=template.render('cart_list_html', {cart:data.cart_list[i]});
+            }
+            $('#cart_id_input').html(cart_id_input)
+            $('#cart_list_wrapper').html(html)
+            $('#store_cart_amount').text(data.cart_amount)
+            $('#store_cart_count').text(data.cart_count)
+            if(data.cart_count>0){
+                $('#store_cart_count').show()
+            }else{
+                $('#store_cart_count').hide()
+            }
+            if(data.cart_amount<{$store_info.store_o2o_min_cost}){
+                $('#checkout_btn_disable').show()
+                $('#checkout_btn').hide()
+            }else{
+                $('#checkout_btn_disable').hide()
+                $('#checkout_btn').show()
+            }
+        })
+    }
+    function go_login(){
+        window.location.href='{$Think.HOME_SITE_URL}/Login/login?ref_url='+'{:urlencode($Think.HOME_SITE_URL."/Store/index/store_id/".$store_info.store_id)}'
+    }
+    function select_goods(goods_id,elm){
+        select_goods_id=goods_id
+        select_position={top:$(elm).offset().top,left:$(elm).offset().left}
+        add_cart()
+    }
+    function select_spec(goods_commonid,goods_id,goods_promotion_price,goods_name,goods_spec,elm){
+        select_goods_id=goods_id
+        select_position={top:$(elm).offset().top,left:$(elm).offset().left}
+        $.getJSON("{:url('Goods/getSpecList')}",{goods_commonid : goods_commonid}, function(result){
+            if(result.code!=10000){
+                layer.msg(result.message)
+            }else{
+                var data=result.result
+                var left=$(elm).offset().left+90+6
+                if($(elm).parents('.shopmenu-food').index()%3==0){
+                    left-=300+90+12
+                    data.over=true
+                }
+                data.goods_promotion_price=goods_promotion_price
+                data.goods_spec=goods_spec
+                $('#spec_wrapper').html(template.render('spec_html', data))
+                $('#spec_wrapper').css('top',$(elm).offset().top-8).css('left',left).show()
+                $('#mask').show()
+                
+                //选规格
+                $('[dstype="ds-spec"]').each(function(){
+                    $(this).click(function(){
+                        if ($(this).hasClass('current')) {
+                            return false;
+                        }
+                        $(this).parents('dl').find('dd').removeClass('current');
+                        $(this).addClass('current');
+                        var spec_param = data.spec_list;
+                        var spec = new Array();
+                        $('[dstype="ds-spec"].current').each(function(){
+                            spec.push($(this).attr('data-param'));
+                        });
+                        spec1 = spec.sort(function(a,b){
+                            return a-b;
+                        });
+                        var spec_sign = spec1.join('|');
+                        $.each(spec_param, function(i, n){
+                            if (n.sign == spec_sign) {
+                                select_goods_id=n.goods_id
+                                $('#spec_goods_price').text(n.goods_promotion_price);
+                            }
+                        });
+                    });
+                });
+            }
+        })
+
+    }
+    function add_cart(){
+        var CopyDiv = '<div id="cart_dot" style="top:' + select_position.top + "px;left:" + select_position.left + 'px" ></div>', topLength = $("#icon_cart").offset().top, leftLength = $("#icon_cart").offset().left;
+        $("body").append(CopyDiv), $("body").children("#cart_dot").animate({
+            "top": topLength,
+            "left": leftLength,
+            "opacity": 0
+        }, 600,'easeInBack', function() {
+            $(this).remove();
+        });
+        addcart(select_goods_id, 1, 'get_cart_list')
+        hide_spec()
+    }
+    function change_cart_quantity(goods_id,cart_id,type){
+        var quantity=parseInt($("#input_item_"+goods_id).val())
+        if(isNaN(quantity) || quantity<1){
+            layer.msg('数量错误')
+        }
+        if(type=='-'){
+            if(quantity==1){
+                cart_ids=cart_id
+                del_cart()
+                return
+            }
+            quantity--
+        }else if(type=='+'){
+            quantity++
+        }
+        addcart(goods_id, quantity, 'get_cart_list')
+    }
+    function hide_spec(){
+        $('#mask').hide()
+        $('#spec_wrapper').hide()
+    }
+    function del_cart(){
+        $.get(HOMESITEURL+'/Cart/del.html', {'cart_id': cart_ids}, function (result) {
+                    if (result.state) {
+                        get_cart_list()
+                    } else {
+                        layer.msg(result.msg);
+                    }
+                }, 'json')
+    }
+</script>
+<script type="text/html" id="cart_list_html">
+    <div class="shop-cartbasket-tablerow ng-scope">
+            <div class="cell itemname ng-binding">
+                <%=cart.goods_name%>
+            </div>
+            <div class="cell itemquantity">
+                <button onclick="change_cart_quantity(<%=cart.goods_id%>,<%=cart.cart_id%>,'-')">-</button>
+                <input class="ng-pristine ng-valid" type="number" value="<%=cart.goods_num%>" id="input_item_<%=cart.goods_id%>" onkeyup="change_cart_quantity(<%=cart.goods_id%>,<%=cart.cart_id%>,'')">
+                <button onclick="change_cart_quantity(<%=cart.goods_id%>,<%=cart.cart_id%>,'+')">+</button>
+            </div>
+            <div class="cell itemtotal ng-binding">
+                ¥<%=cart.goods_price%>
+            </div>
+        </div>
+</script>
+<script type="text/html" id="spec_html">
+    <div class="shop-specmenu-specs">
+        <%if(goods_detail.spec_name){%>
+        <%for(var i in goods_detail.spec_name){ var spec_name=goods_detail.spec_name[i];%>
+        <dl class="ng-scope">
+            <dt class="ng-binding"><%=spec_name%></dt>
+            <%for(var j in goods_detail.spec_value[i]){ var spec_value=goods_detail.spec_value[i][j];%>
+            <dd dstype="ds-spec" data-param="<%=j%>" class="ng-binding ng-scope<%if(goods_spec[j]){%> current<%}%>"><%if(i==1){%><img src="<%=goods_detail.spec_image[j]%>"/><%}%><%=spec_value%></dd>
+            <%}%>
+        </dl>
+        <%}%>
+        <%}%>
+    </div>
+    <div class="shop-specmenu-infogroup ng-scope">
+        <p>已选：
+            <span class="ng-binding">
+                <%for(var i in goods_spec){ var spec_value=goods_spec[i];%>
+                    <%=spec_value%>
+                <%}%>
+            </span>
+        </p>
+        <p class="shop-specmenu-price">
+            <span class="yen">¥</span>
+            <span class="ng-binding" id="spec_goods_price"><%=goods_promotion_price%></span>
+        </p>
+    </div>
+    <div class="shop-specmenu-infogroup buttons">
+        <button class="btn-primary ng-binding" onclick="add_cart()">选好了，加入购物车</button>
+        <a class="shop-specmenu-cancel" href="javascript:hide_spec()">不要了</a></div>
+    <div class="shop-specmenu-arrow <%if(over){%>right<%}%>"></div>
+</script>
+{/block}

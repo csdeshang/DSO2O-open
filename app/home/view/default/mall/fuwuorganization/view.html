@@ -1,0 +1,233 @@
+{extend name="default/base/base_home" /}
+{block name="mall_main"}
+<link rel="stylesheet" href="{$Think.HOME_SITE_ROOT}/css/fuwu.css">
+<div class='fuwu-organization-view w1200'>
+    <div class="detail-wrap">
+        <div class="base-info clearfix">
+            <div class="left user-header">
+                <div class="img-box" style="background-image:url({:get_o2o_fuwu_file($o2o_fuwu_organization_info.o2o_fuwu_organization_id,$o2o_fuwu_organization_info.o2o_fuwu_organization_avatar,'avatar')})"></div>
+            </div>
+            <div class="right">
+                <div class="info info1">
+                    <div class="info1-1 fl">
+                        <span class="name fl">{$o2o_fuwu_organization_info.o2o_fuwu_organization_name}</span>
+                    </div>
+                    <div class="info1-2 fr">
+                        <div class="info-item fl">
+                            <i class="iconfont fl">&#xe710;</i><span class="item-text">{$o2o_fuwu_organization_info.o2o_fuwu_organization_serve_count}次服务</span>
+                        </div>
+                        <div class="info-item collection  fl">
+                            <i class="iconfont fl">&#xe730;</i><span class="item-text">{$o2o_fuwu_organization_info.o2o_fuwu_organization_comment_count}人评论</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="info info2 clearfix">
+                    <span class="info2-item">
+                        {$o2o_fuwu_organization_info.o2o_fuwu_class_name_1}
+                    </span>
+                    {if $o2o_fuwu_organization_info.o2o_fuwu_class_name_2}
+                    <em>/</em>
+                    <span class="info2-item">
+                        {$o2o_fuwu_organization_info.o2o_fuwu_class_name_2}
+                    </span>
+                    {/if}
+                    {if $o2o_fuwu_organization_info.o2o_fuwu_class_name_3}
+                    <em>/</em>
+                    <span class="info2-item">
+                        {$o2o_fuwu_organization_info.o2o_fuwu_class_name_3}
+                    </span>
+                    {/if}
+                </div>
+                <div class="info info3 clearfix">
+                    <span class="fl label">认证：</span>
+                    <div class="info3-item fl">
+                        <i class="iconfont fl">&#xe6ea;</i> <span class="item-text">资质已认证</span>
+                    </div>
+                </div>
+                <div class="info info4 clearfix">
+                    <span class="fl label">简介：</span>
+                    <span class="info2-item">
+                        {$o2o_fuwu_organization_info.o2o_fuwu_organization_detail}
+                    </span>
+                </div>
+                <div class="oper-area clearfix">
+                    <a href='{:url('FuwuOrganization/view',['organization_id'=>$o2o_fuwu_organization_info.o2o_fuwu_organization_id])}'><div class="oper-btn yyms-btn js-yyms fl js-open-submitClue">详情信息</div></a>
+                    <a href='{:url('FuwuOrganization/goods',['organization_id'=>$o2o_fuwu_organization_info.o2o_fuwu_organization_id])}'><div class="oper-btn zxjg js-zxjg fl js-zixunjiage">服务列表</div></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="detail-scroll-info-wrap">
+        <div class="tab-nav clearfix">
+            <span data-id="info_jbzl" onclick='scroll_cate("info_jbzl")' class="nav-item active">基本资料</span>
+            <span class="span">|</span>
+            <span data-id="info_gzjl" onclick='scroll_cate("info_gzjl")' class="nav-item">资质证书</span>
+            <span class="span">|</span>
+            <span data-id="info_fwzp" onclick='scroll_cate("info_fwzp")' class="nav-item">工作实景</span>
+            <span class="span">|</span>
+            <span data-id="info_pxjl" onclick='scroll_cate("info_pxjl")' class="nav-item">所在地址</span>
+        </div>
+        <div id='scroll_content'>
+            <div data-id="info_jbzl" class="base-info-module-wrap detail-photo-wrap">
+            <ul class="base-info-module clearfix">
+                <li class="base-info-item">
+                    <span class="lable">{$Think.lang.fuwu_organization_birthday_text[$o2o_fuwu_organization_info.o2o_fuwu_organization_type]}：</span>
+                    <span class="value">{$o2o_fuwu_organization_info.o2o_fuwu_organization_birthday|date="Y-m-d"}</span>
+                </li>
+                <li class="base-info-item">
+                    <span class="lable">机构类型：</span>
+                    <span class="value">{$Think.lang.o2o_fuwu_organization_type_text[$o2o_fuwu_organization_info.o2o_fuwu_organization_type]}</span>
+                </li>
+                <li class="base-info-item">
+                    <span class="lable">联系电话：</span>
+                    <span class="value">{$o2o_fuwu_organization_info.o2o_fuwu_organization_phone}</span>
+                </li>
+                <li class="base-info-item">
+                    <span class="lable">营业时间：</span>
+                    <span class="value">{$o2o_fuwu_organization_info.o2o_fuwu_organization_open_text}</span>
+                </li>
+                <li class="base-info-item">
+                    <span class="lable">入驻日期：</span>
+                    <span class="value">{$o2o_fuwu_organization_info.o2o_fuwu_organization_add_time|date="Y-m-d"}</span>
+                </li>
+                <li class="base-info-item">
+                    <span class="lable">所在城市：</span>
+                    <span class="value">{$o2o_fuwu_organization_info.o2o_fuwu_organization_city_name}</span>
+                </li>
+                <li class="base-info-item" style='width: 50%;'>
+                    <span class="lable">详细地址：</span>
+                    <span class="value">{$o2o_fuwu_organization_info.o2o_fuwu_organization_address}</span>
+                </li>
+            </ul>
+        </div>
+        <div data-id="info_gzjl" class="detail-photo-wrap">
+            <div class="module-title">
+                <h2 class="title">资质证书</h2>
+            </div>
+            <div class="photo-list-wrap">
+                <div class="photo-list-box">
+                    <div class="photo-list clearfix" id='quality_list'>
+                        {foreach name='quality_list' item='file'}
+                        <img class="photo" layer-pid="{$file.o2o_fuwu_upload_id}" layer-src="{:get_o2o_fuwu_file($file.o2o_fuwu_organization_id,$file.o2o_fuwu_upload_url,'quality')}" src='{:get_o2o_fuwu_file($file.o2o_fuwu_organization_id,$file.o2o_fuwu_upload_url,'quality')}'>
+                             {/foreach}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div data-id="info_fwzp" class="detail-photo-wrap">
+            <div class="module-title">
+                <h2 class="title">工作实景</h2>
+            </div>
+            <div class="photo-list-wrap">
+                <div class="photo-list-box">
+                    <div class="photo-list clearfix" id='scene_list'>
+                        {foreach name='scene_list' item='file'}
+                        <img class="photo" layer-pid="{$file.o2o_fuwu_upload_id}" layer-src="{:get_o2o_fuwu_file($file.o2o_fuwu_organization_id,$file.o2o_fuwu_upload_url,'scene')}" src="{:get_o2o_fuwu_file($file.o2o_fuwu_organization_id,$file.o2o_fuwu_upload_url,'scene')}">
+                        {/foreach}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div data-id="info_pxjl" class="detail-photo-wrap">
+            <div class="module-title">
+                <h2 class="title">所在地址</h2>
+            </div>
+            <div id='allmap' class='map'></div>
+        </div>
+        </div>
+    </div>
+</div>
+<!--{if $Think.config.ds_config.mapak_type eq '1'}-->
+<script type="text/javascript">
+        window._AMapSecurityConfig = {
+            securityJsCode:"{$Think.config.ds_config.gaode_jscode}",
+        }
+</script>
+<script type="text/javascript" src="//webapi.amap.com/maps?v=2.0&key={$Think.config.ds_config.gaode_ak}"></script>
+<!--{else}-->
+<script type="text/javascript" src="{$Think.HTTP_TYPE}api.map.baidu.com/api?v=2.0&ak={$Think.config.ds_config.baidu_ak}"></script>
+<!--{/if}-->
+<script>
+    var cate_height;
+$(function () {
+    layer.photos({
+        photos: '#quality_list',
+        anim: 5
+    });
+    layer.photos({
+        photos: '#scene_list',
+        anim: 5
+    });
+
+    
+    var scroll_lock = false;
+    cate_height = $(".tab-nav").eq(0).height() + 40;
+    $(window).bind("scroll", function () {
+        var sTop = $(window).scrollTop();
+        if ($(".tab-nav").eq(0).hasClass('fixed')) {
+            if (sTop < $("#scroll_content").offset().top) {
+                $(".tab-nav").eq(0).removeClass('fixed')
+            }
+        } else {
+            if (sTop > $(".tab-nav").eq(0).offset().top) {
+                $(".tab-nav").eq(0).addClass('fixed')
+            }
+        }
+
+        if (!scroll_lock) {
+
+            var max_index = $(".detail-photo-wrap:eq(0)").attr('data-id');
+            $(".detail-photo-wrap").each(function () {
+                if ((($(this).offset().top) - cate_height) <= sTop) {
+                    max_index = $(this).attr('data-id');
+
+                }
+            });
+            $(".tab-nav .nav-item").removeClass('active');
+            $(".tab-nav .nav-item[data-id=" + max_index + "]").addClass('active');
+        }
+    })
+
+	var lng = '{$o2o_fuwu_organization_info.o2o_fuwu_organization_lng}';
+	var lat = '{$o2o_fuwu_organization_info.o2o_fuwu_organization_lat}';
+	if({$Think.config.ds_config.mapak_type} == '1'){
+		var map = new AMap.Map("allmap", {
+			resizeEnable: true,
+			zoom:15
+		});
+		//初始化定位
+		var marker = new AMap.Marker({
+			position: new AMap.LngLat(lng, lat),
+			icon: '//api.map.baidu.com/images/marker_red_sprite.png',
+			zoom: 15
+		});
+		map.add(marker);
+		map.panTo([lng, lat]);
+	}else{
+		var map = new BMap.Map("allmap");
+		
+		var point = new BMap.Point(lng, lat);
+		map.centerAndZoom(point, 16);
+		map.addControl(new BMap.NavigationControl());
+		map.enableScrollWheelZoom();
+		var marker = new BMap.Marker(point);  // 创建标注
+		map.addOverlay(marker);              // 将标注添加到地图中
+		marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
+	}
+    
+})
+function scroll_cate(id) {
+    scroll_lock = true;
+    $('html,body').animate({scrollTop: (($('.detail-photo-wrap[data-id=' + id + ']').offset().top) - cate_height)}, function () {
+        var time = setInterval(function () {
+            scroll_lock = false;
+            clearInterval(time);
+        }, 50);
+
+    });
+    $(".tab-nav .nav-item").removeClass('active');
+    $(".tab-nav .nav-item[data-id=" + id + "]").addClass('active');
+
+}
+</script>
+{/block}

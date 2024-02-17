@@ -1,0 +1,55 @@
+{include file="public/header" /}
+
+
+
+<div class="page">
+    <div class="fixed-bar">
+        <div class="item-title">
+            <div class="subject">
+                <h3>{$Think.lang.o2o_printer_setting}</h3>
+                <h5></h5>
+            </div>
+        </div>
+    </div>
+
+    <form id='o2o_form' method="post"  name="form1">
+            <table class="ds-default-table">
+                <tbody>
+                    <tr class="noborder"> 
+                        <td class="required w150"><label class="validation" for="yly_open">{$Think.lang.ds_open}:</label></td>
+                        <td class="vatop rowform onoff">
+                        <label for="yly_open_1" class="cb-enable {eq name='list_config.yly_open' value='1'}selected{/eq}" title="{$Think.lang.ds_yes}"><span>{$Think.lang.ds_yes}</span></label>
+                    <label for="yly_open_0" class="cb-disable {eq name='list_config.yly_open' value='0'}selected{/eq}" title="{$Think.lang.ds_no}"><span>{$Think.lang.ds_no}</span></label>
+                    <input type="radio" id="yly_open_1" name="yly_open" value="1"  {if $list_config.yly_open=='1'}checked=checked{/if}>
+                    <input type="radio" id="yly_open_0" name="yly_open" value="0" {if $list_config.yly_open=='0'}checked=checked{/if}>
+                        </td>
+                        <td class="vatop tips"></td>
+                    </tr>
+                    <tr class="noborder"> 
+                        <td class="required w150"><label class="validation" for="yly_client_id">{$Think.lang.yly_client_id}:</label></td>
+                        <td class="vatop rowform"><input id="yly_client_id" name="yly_client_id" value="{$list_config.yly_client_id}" class="input-txt w400" type="text"></td>
+                        <td class="vatop tips">{$Think.lang.yly_client_id_tips|raw}</td>
+                    </tr>
+                    <tr class="noborder"> 
+                        <td class="required w150"><label class="validation" for="yly_client_secret">{$Think.lang.yly_client_secret}:</label></td>
+                        <td class="vatop rowform"><input id="yly_client_secret" name="yly_client_secret" value="{$list_config.yly_client_secret}" class="input-txt w400" type="password"></td>
+                        <td class="vatop tips"></td>
+                    </tr>
+
+                </tbody>
+                <tfoot>
+                    <tr class="tfoot">
+                        <td colspan="15"><a href="JavaScript:void(0);" class="btn" id="submitBtn" onclick="$('#o2o_form').submit()">{$Think.lang.ds_confirm_submit}</a></td>
+                    </tr>
+                </tfoot>
+            </table>
+    </form>
+</div>
+
+
+
+
+
+
+
+

@@ -1,0 +1,88 @@
+{extend name="default/base/base_home" /}
+{block name="mall_main"}
+<link rel="stylesheet" href="{$Think.HOME_SITE_ROOT}/css/fuwu.css">
+<div class='fuwu-organization-view w1200'>
+    <div class="detail-wrap">
+        <div class="base-info clearfix">
+            <div class="left user-header">
+                <div class="img-box" style="background-image:url({:get_o2o_fuwu_file($o2o_fuwu_organization_info.o2o_fuwu_organization_id,$o2o_fuwu_organization_info.o2o_fuwu_organization_avatar,'avatar')})"></div>
+            </div>
+            <div class="right">
+                <div class="info info1">
+                    <div class="info1-1 fl">
+                        <span class="name fl">{$o2o_fuwu_organization_info.o2o_fuwu_organization_name}</span>
+                    </div>
+                    <div class="info1-2 fr">
+                        <div class="info-item fl">
+                            <i class="iconfont fl">&#xe710;</i><span class="item-text">{$o2o_fuwu_organization_info.o2o_fuwu_organization_serve_count}次服务</span>
+                        </div>
+                        <div class="info-item collection  fl">
+                            <i class="iconfont fl">&#xe730;</i><span class="item-text">{$o2o_fuwu_organization_info.o2o_fuwu_organization_comment_count}人评论</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="info info2 clearfix">
+                    <span class="info2-item">
+                        {$o2o_fuwu_organization_info.o2o_fuwu_class_name_1}
+                    </span>
+                    {if $o2o_fuwu_organization_info.o2o_fuwu_class_name_2}
+                    <em>/</em>
+                    <span class="info2-item">
+                        {$o2o_fuwu_organization_info.o2o_fuwu_class_name_2}
+                    </span>
+                    {/if}
+                    {if $o2o_fuwu_organization_info.o2o_fuwu_class_name_3}
+                    <em>/</em>
+                    <span class="info2-item">
+                        {$o2o_fuwu_organization_info.o2o_fuwu_class_name_3}
+                    </span>
+                    {/if}
+                </div>
+                <div class="info info3 clearfix">
+                    <span class="fl label">认证：</span>
+                    <div class="info3-item fl">
+                        <i class="iconfont fl">&#xe6ea;</i> <span class="item-text">资质已认证</span>
+                    </div>
+                </div>
+                <div class="info info4 clearfix">
+                    <span class="fl label">简介：</span>
+                    <span class="info2-item">
+                        {$o2o_fuwu_organization_info.o2o_fuwu_organization_detail}
+                    </span>
+                </div>
+                <div class="oper-area clearfix">
+                    <a href='{:url('FuwuOrganization/view',['organization_id'=>$o2o_fuwu_organization_info.o2o_fuwu_organization_id])}'><div class="oper-btn zxjg js-zxjg fl js-zixunjiage">详情信息</div></a>
+                    <a href='{:url('FuwuOrganization/goods',['organization_id'=>$o2o_fuwu_organization_info.o2o_fuwu_organization_id])}'><div class="oper-btn yyms-btn js-yyms fl js-open-submitClue">服务列表</div></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {if !empty($o2o_fuwu_goods_list)}
+    <ul class="w-search-list search-list-top">
+        {foreach name='o2o_fuwu_goods_list' item='goods'}
+        <li>
+            <div class="w-search-list-item clearfix partner-herf">
+                <a href="{:url('FuwuGoods/view',['o2o_fuwu_goods_id'=>$goods.o2o_fuwu_goods_id])}" class="w-search-list-item-img-wrapper">
+                    <img class="w-search-list-item-img lazyload" src="{:get_o2o_fuwu_file($goods.o2o_fuwu_organization_id,$goods.o2o_fuwu_goods_image,'goods_image')}" style="display: inline;">
+                </a>
+                <div class="w-search-list-item-info">
+                    <h4 class="overflow-ellipsis"><a href="{:url('FuwuGoods/view',['o2o_fuwu_goods_id'=>$goods.o2o_fuwu_goods_id])}">{$goods.o2o_fuwu_goods_name}</a></h4>
+                    <p class="goods-desc">{$goods.o2o_fuwu_goods_advword}</p> 
+                    <p class="overflow-ellipsis service-type">{$goods.o2o_fuwu_class_name}</p>
+                </div> 
+                <div class="w-search-list-item-num">
+                    <p class="price-wrapper clearfix"><span class="price-num">{$goods.o2o_fuwu_goods_default_price}<span class="price-unit">元</span></span></p>
+                </div>
+            </div>
+        </li>
+        {/foreach}
+    </ul>
+    {else}
+    <div class="no_results">没有找到符合条件的服务</div>
+    {/if}
+    <div class="tc mt20 mb20">
+        <div class="pagination">{$show_page|raw}</div>
+    </div>
+</div>
+
+{/block}

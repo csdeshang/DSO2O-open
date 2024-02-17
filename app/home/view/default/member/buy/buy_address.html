@@ -1,0 +1,79 @@
+<div class="dsc-receipt-info">
+    <div class="dsc-receipt-info-title">
+        <h3>{$Think.lang.consignee_information}</h3>
+        <a href="javascript:void(0)" ds_type="buy_edit" id="edit_reciver">[{$Think.lang.modification}]</a></div>
+    <div id="addr_list" class="dsc-candidate-items">
+        <ul>
+            <li>
+                <span class="true-name">{$address_info.address_realname}</span>
+                <span class="address">{$address_info.area_info}{$address_info.address_detail}{$address_info.house_number}</span>
+                <span class="phone"><i class="iconfont">&#xe60e;</i>{if condition="$address_info.address_mob_phone"}{$address_info.address_mob_phone}{else}{$address_info.address_tel_phone}{/if}</span>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<script type="text/javascript">
+//判断配送范围    
+    function calcDistance(addr_id){
+        layer.load(2);
+        var url = HOMESITEURL + '/Buy/calc_distance.html';
+        $.ajax({ url:url, data:{'weight_list': '{$weight_list|raw}',addr_id: addr_id},dataType:'json', success:function(data) {
+            if(data.state){
+                ALLOW_ADDRESS=true;
+                for(var store_id in data.data){
+                    $('#eachStoreFreight_'+store_id).html(data.data[store_id].o2o_fee)
+                }
+                calcOrder()
+            }else{
+                ALLOW_ADDRESS=false;
+                ALLOW_ADDRESS_MSG=data.msg;
+                if(ALLOW_ADDRESS_MSG=='convert coordinate fail'){
+                    layer.open({
+                        type: 2,
+                        title: '地图选点（请在地图上标注具体位置后关闭）',
+                        area: ['900px','500px'],
+                        fixed: false, //不固定
+                        maxmin: true,
+                        content: [HOMESITEURL + '/Memberaddress/gaode_map.html?callback=1&address_id='+addr_id, 'no']
+                    });
+                }else{
+                    layer.msg(ALLOW_ADDRESS_MSG);
+                }
+            }
+            layer.closeAll('loading');
+        },error:function(data){
+            ALLOW_ADDRESS=false;
+            ALLOW_ADDRESS_MSG='{$Think.lang.o2o_distance_request_error}';
+            layer.msg(ALLOW_ADDRESS_MSG);
+            layer.closeAll('loading');
+        }})
+    }
+//隐藏收货地址列表
+    function hideAddrList(addr_id, true_name, address, phone,house_number) {
+        $('#edit_reciver').show();
+        $("#address_id").val(addr_id);
+        $("#addr_list").html('<ul><li><span class="true-name">' + true_name + '</span><span class="address">' + address + '</span><span class="phone"><i class="iconfont">&#xe60e;</i>' + phone + '</span></li></ul>');
+        $('.current_box').removeClass('current_box');
+        ableOtherEdit();
+        $('#edit_payment').click();
+    }
+//加载收货地址列表
+    $('#edit_reciver').on('click', function() {
+        $(this).hide();
+        disableOtherEdit('{$Think.lang.save_consignee_information} ');
+        $(this).parent().parent().addClass('current_box');
+        var url = HOMESITEURL + '/Buy/load_addr.html';
+        $('#addr_list').load(url);
+    });
+    
+
+    $(function() {
+        {notempty name="$address_info.address_id"}
+            calcDistance({$address_info.address_id});
+        {else /}
+            $('#edit_reciver').click();
+        {/notempty}
+    });
+    
+</script>

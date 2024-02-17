@@ -1,0 +1,137 @@
+{extend name="default/base/base_member" /}
+{block name="member_main"}
+<div class='dsm-default-form'>
+    <div>
+        <h3>订单信息</h3>
+        <div>
+            <dl>
+                <dt>订单号</dt>
+                <dd>{$o2o_fuwu_order_info.o2o_fuwu_order_sn}</dd>
+            </dl>
+            <dl>
+                <dt>订单状态</dt>
+                <dd>{$o2o_fuwu_order_info.o2o_fuwu_order_state_text}</dd>
+            </dl>
+            <dl>
+                <dt>服务机构</dt>
+                <dd>{$o2o_fuwu_order_info.o2o_fuwu_organization_name}</dd>
+            </dl>
+            <dl>
+                <dt>默认服务费</dt>
+                <dd>￥{$o2o_fuwu_order_info.o2o_fuwu_order_default_amount}</dd>
+            </dl>
+            {if $o2o_fuwu_order_info.o2o_fuwu_order_added_amount>0}
+            <dl>
+                <dt>增值服务费</dt>
+                <dd>￥{$o2o_fuwu_order_info.o2o_fuwu_order_added_amount}</dd>
+            </dl>
+            {/if}
+            
+            <dl>
+                <dt>订单总额</dt>
+                <dd>￥{$o2o_fuwu_order_info.o2o_fuwu_order_amount}</dd>
+            </dl>
+            <dl>
+                <dt>下单时间</dt>
+                <dd>{$o2o_fuwu_order_info.o2o_fuwu_order_add_time|date='Y-m-d H:i'}</dd>
+            </dl>
+            {if $o2o_fuwu_order_info.o2o_fuwu_order_appointment_time>0}
+            <dl>
+                <dt>预约时间</dt>
+                <dd>{$o2o_fuwu_order_info.o2o_fuwu_order_appointment_time|date='Y-m-d'}&nbsp;{if intval(date('H',$o2o_fuwu_order_info.o2o_fuwu_order_appointment_time))<12}上午{else}下午{/if}</dd>
+            </dl>
+            {/if}
+            {if $o2o_fuwu_order_info.o2o_fuwu_order_payment_time>0}
+            <dl>
+                <dt>支付时间</dt>
+                <dd>{$o2o_fuwu_order_info.o2o_fuwu_order_payment_time|date='Y-m-d H:i'}</dd>
+            </dl>
+            {/if}
+            {if $o2o_fuwu_order_info.o2o_fuwu_order_arrange_time>0}
+            <dl>
+                <dt>安排时间</dt>
+                <dd>{$o2o_fuwu_order_info.o2o_fuwu_order_arrange_time|date='Y-m-d H:i'}</dd>
+            </dl>
+            {/if}
+            {if $o2o_fuwu_order_info.o2o_fuwu_order_serve_time>0}
+            <dl>
+                <dt>服务时间</dt>
+                <dd>{$o2o_fuwu_order_info.o2o_fuwu_order_serve_time|date='Y-m-d H:i'}</dd>
+            </dl>
+            {/if}
+            {if $o2o_fuwu_order_info.o2o_fuwu_order_finish_time>0}
+            <dl>
+                <dt>完成时间</dt>
+                <dd>{$o2o_fuwu_order_info.o2o_fuwu_order_finish_time|date='Y-m-d H:i'}</dd>
+            </dl>
+            {/if}
+            {if $o2o_fuwu_order_info.o2o_fuwu_order_remark}
+            <dl>
+                <dt>订单备注</dt>
+                <dd>{$o2o_fuwu_order_info.o2o_fuwu_order_remark}</dd>
+            </dl>
+            {/if}
+            {if $o2o_fuwu_order_info.o2o_fuwu_order_if_evaluate}
+            <dl>
+                <dt>评分</dt>
+                <dd>{$o2o_fuwu_order_info.o2o_fuwu_order_evaluate_score}分</dd>
+            </dl>
+            <dl>
+                <dt>评论</dt>
+                <dd>{$o2o_fuwu_order_info.o2o_fuwu_order_evaluate_content}</dd>
+            </dl>
+            {/if}
+        </div>
+    </div>
+    <div>
+        <h3>服务地点信息</h3>
+        <div>
+            <dl>
+                <dt>联系人</dt>
+                <dd>{$o2o_fuwu_order_info.o2o_fuwu_order_employer_name}</dd>
+            </dl>
+            <dl>
+                <dt>联系电话</dt>
+                <dd>{$o2o_fuwu_order_info.o2o_fuwu_order_employer_phone}</dd>
+            </dl>
+            <dl>
+                <dt>详细地址</dt>
+                <dd>{$o2o_fuwu_order_info.o2o_fuwu_order_employer_address}</dd>
+            </dl>
+        </div>
+    </div>
+    
+    <div>
+        <div>
+            <table class="dsm-default-table">
+                        
+                            <thead>
+                            <tr>
+                                <th>服务项目</th>
+                                <th>价格</th>
+                                <th>数量</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr class="bd-line">
+                                <td class="w60 picture">{$o2o_fuwu_order_info.o2o_fuwu_goods_spec_name}</td>
+                                <td class="w50pre">{$Think.lang.currency|raw}{$o2o_fuwu_order_info.o2o_fuwu_goods_spec_price}</td>
+                                <td class="w96 align-center">{$o2o_fuwu_order_info.o2o_fuwu_order_default_quantity}</td>
+                            </tr>
+                            {foreach name='o2o_fuwu_order_goods_spec_list' item="item"}
+                            <tr class="bd-line">
+                                <td class="w60 picture">{$item.o2o_fuwu_goods_spec_name}</td>
+                                <td class="w50pre">{$Think.lang.currency|raw}{$item.o2o_fuwu_goods_spec_price}</td>
+                                <td class="w96 align-center">{$item.o2o_fuwu_order_goods_spec_quantity}</td>
+                            </tr>
+                            {/foreach}
+                        </tbody>
+                    </table>
+            
+        </div>
+    </div>
+</div>
+
+
+
+{/block}

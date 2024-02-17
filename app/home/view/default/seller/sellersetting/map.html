@@ -1,0 +1,273 @@
+{extend name="default/base/base_seller" /}
+{block name="seller_main"}
+<!--{if $Think.config.ds_config.mapak_type eq '1'}-->
+<script type="text/javascript">
+        window._AMapSecurityConfig = {
+            securityJsCode:"{$Think.config.ds_config.gaode_jscode}",
+        }
+</script>
+<script type="text/javascript" src="//webapi.amap.com/maps?v=2.0&key={$Think.config.ds_config.gaode_ak}"></script>
+<!--{else}-->
+<script type="text/javascript" src="{$Think.HTTP_TYPE}api.map.baidu.com/api?v=2.0&ak={$Think.config.ds_config.baidu_ak}"></script>
+<!--{/if}-->
+<script>
+    var local;
+    var map;
+    var lst_name = '';
+    function change_map() {
+        if ($("#area_ select:eq(0)").length > 0 && $("#area_ select:eq(0) option:selected").val() != '') {
+            var name = $("#area_ select:eq(0) option:selected").text();
+        }
+        if ($("#area_ select:eq(1)").length > 0 && $("#area_ select:eq(1) option:selected").val() != '') {
+            var name = $("#area_ select:eq(1) option:selected").text();
+        }
+        if ($("#area_ select:eq(2)").length > 0 && $("#area_ select:eq(2) option:selected").val() != '') {
+            var name = $("#area_ select:eq(2) option:selected").text();
+        }
+        if (name != '' && lst_name != name) {
+            lst_name = name;
+            map.setCurrentCity(name);
+            map.centerAndZoom(name, 16);
+            map.clearOverlays();
+            local.search(name);
+        }
+
+    }
+    $(function () {
+        $('#company_address').ds_region();
+        var lng = '{$store_info.store_longitude}';
+        var lat = '{$store_info.store_latitude}';
+        if({$Think.config.ds_config.mapak_type} == '1' ){
+			map = new AMap.Map("allmap", {
+				resizeEnable: true,
+				zoom:15
+			});
+            
+			if (!lng && !lat) {
+				AMap.plugin("AMap.CitySearch", function () {
+					var citySearch = new AMap.CitySearch();
+					citySearch.getLocalCity(function (status, result) {
+					  if (status === "complete" && result.info === "OK") {
+						// 查询成功，result即为当前所在城市信息
+						AMap.plugin("AMap.Geocoder", function () {
+						  var geocoder = new AMap.Geocoder({
+							// city 指定进行编码查询的城市，支持传入城市名、adcode 和 citycode
+							city: result.adcode,
+						  });
+						  geocoder.getLocation(result.city, function(status1, result1) {
+							  var location = result1.geocodes[0].location;
+								var lng = location.lng;
+								var lat = location.lat;
+								
+								//初始化定位
+								var marker = new AMap.Marker({
+									position: new AMap.LngLat(lng, lat),
+									icon: '//api.map.baidu.com/images/marker_red_sprite.png',
+									zoom: 15
+								});
+								map.add(marker);
+								document.getElementById("longitude").value = lng;
+								document.getElementById("latitude").value = lat;
+								map.panTo([lng, lat]);
+								
+								//搜索定位
+								AMap.plugin(['AMap.PlaceSearch','AMap.AutoComplete'], function(){
+									var auto = new AMap.AutoComplete({input:"store_address"});
+                                    console.log(auto)
+									var placeSearch = new AMap.PlaceSearch({
+										map: map
+									});  //构造地点查询类
+									auto.on("select", select);//注册监听，当选中某条记录时会触发
+									function select(e) {
+										placeSearch.setCity(e.poi.adcode);
+										placeSearch.search(e.poi.name);  //关键字查询查询
+										document.getElementById("longitude").value = e.poi.location.lng;
+										document.getElementById("latitude").value = e.poi.location.lat;
+                                        map.remove(marker);
+                                        marker = new AMap.Marker({
+                                        	position: new AMap.LngLat(e.poi.location.lng, e.poi.location.lat),
+                                        	icon: '//api.map.baidu.com/images/marker_red_sprite.png',
+                                        	zoom: 15
+                                        });
+                                        map.add(marker);
+									}
+								});
+								
+								//点击定位
+								map.on('click', function(e) {
+									document.getElementById("longitude").value = e.lnglat.getLng();
+									document.getElementById("latitude").value = e.lnglat.getLat();
+									if(marker){
+										map.remove(marker);
+									}
+									marker = new AMap.Marker({
+										position: new AMap.LngLat(e.lnglat.getLng(), e.lnglat.getLat()),
+										icon: '//api.map.baidu.com/images/marker_red_sprite.png',
+										anchor: 'bottom-center',
+										zoom: 15
+									});
+									map.add(marker);
+								});
+							});
+						});
+					  }
+					});
+				  });
+				  
+			}else{
+				map.panTo([lng, lat]);
+				//初始化定位
+				var marker = new AMap.Marker({
+					position: new AMap.LngLat(lng, lat),
+					icon: '//api.map.baidu.com/images/marker_red_sprite.png',
+					zoom: 15
+				});
+				map.add(marker);
+				document.getElementById("longitude").value = lng;
+				document.getElementById("latitude").value = lat;
+				
+				//搜索定位
+				AMap.plugin(['AMap.PlaceSearch','AMap.AutoComplete'], function(){
+					var auto = new AMap.AutoComplete({input:"store_address"});
+					var placeSearch = new AMap.PlaceSearch({
+						map: map
+					});  //构造地点查询类
+					auto.on("select", select);//注册监听，当选中某条记录时会触发
+					function select(e) {
+                        map.remove(marker);
+                        marker = new AMap.Marker({
+                        	position: new AMap.LngLat(e.poi.location.lng, e.poi.location.lat),
+                        	icon: '//api.map.baidu.com/images/marker_red_sprite.png',
+                        	zoom: 15
+                        });
+                        map.add(marker);
+                        document.getElementById("longitude").value = e.poi.location.lng;
+                        document.getElementById("latitude").value = e.poi.location.lat;
+						placeSearch.setCity(e.poi.adcode);
+						placeSearch.search(e.poi.name);  //关键字查询查询
+					}
+				});
+				
+				//点击定位
+				map.on('click', function(e) {
+					document.getElementById("longitude").value = e.lnglat.getLng();
+					document.getElementById("latitude").value = e.lnglat.getLat();
+					if(marker){
+						map.remove(marker);
+					}
+					marker = new AMap.Marker({
+						position: new AMap.LngLat(e.lnglat.getLng(), e.lnglat.getLat()),
+						icon: '//api.map.baidu.com/images/marker_red_sprite.png',
+						anchor: 'bottom-center',
+						zoom: 15
+					});
+					map.add(marker);
+				});
+			}
+		}else{
+			if (!lng && !lat) {
+				map = new BMap.Map("allmap");
+				var geolocation = new BMap.Geolocation();
+				geolocation.getCurrentPosition(function (r) {
+					if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+						var lng = r.point.lng;
+						var lat = r.point.lat;
+						var point = new BMap.Point(lng, lat);
+						map.centerAndZoom(point, 16);
+						map.addControl(new BMap.NavigationControl());
+						map.enableScrollWheelZoom();
+						var marker = new BMap.Marker(point);  // 创建标注
+						map.addOverlay(marker);              // 将标注添加到地图中
+						marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
+						document.getElementById("longitude").value = lng;
+						document.getElementById("latitude").value = lat;
+	
+					} else {
+						layer.msg('failed' + this.getStatus());
+					}
+				}, {enableHighAccuracy: true})
+			} else {
+				var point = new BMap.Point(lng, lat);
+				map.centerAndZoom(point, 16);
+				map.addControl(new BMap.NavigationControl());
+				map.enableScrollWheelZoom();
+				var marker = new BMap.Marker(point);  // 创建标注
+				map.addOverlay(marker);              // 将标注添加到地图中
+				marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
+			}
+	
+	
+			var options = {
+				
+				onSearchComplete: function (results) {
+					// 判断状态是否正确
+					if (local.getStatus() == BMAP_STATUS_SUCCESS) {
+						if (results.getCurrentNumPois() > 0) {
+	
+							map.clearOverlays();  //清除标注  或者可以把market 放入数组
+							var point = new BMap.Point(results.getPoi(0).point.lng, results.getPoi(0).point.lat);
+							var marker = new BMap.Marker(point);
+							map.centerAndZoom(point, 16);
+							map.addOverlay(marker);
+							marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
+	
+							document.getElementById("longitude").value = results.getPoi(0).point.lng;
+							document.getElementById("latitude").value = results.getPoi(0).point.lat;
+	
+						}
+					}
+				}
+			};
+			local = new BMap.LocalSearch(map, options);
+			map.addEventListener("click", function (e) {
+	//                    alert(e.point.lng + ", " + e.point.lat);
+				map.clearOverlays();  //清除标注  或者可以把market 放入数组
+				var point = new BMap.Point(e.point.lng, e.point.lat);
+				var marker = new BMap.Marker(point);
+				map.addOverlay(marker);
+				marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
+	
+				document.getElementById("longitude").value = e.point.lng;
+				document.getElementById("latitude").value = e.point.lat;
+			});
+		}
+    })
+</script>
+<div class="dssc-form-default">
+    <form action="{:url('Sellersetting/map')}" method="post"  enctype="multipart/form-data" id="my_store_form">
+        <dl>
+            <dt>{$Think.lang.home}：</dt>
+            <dd id="area_" {if $Think.config.ds_config.mapak_type eq '2'}onclick="change_map()"{/if}>
+                <input type="hidden" value="{$store_info.area_info}" name="company_address" id="company_address">
+                <input type="hidden" value="" name="province_id" id="_area_1">
+                <input type="hidden" value="" name="city_id" id="_area_2">
+                <input type="hidden" value="{$store_info.region_id}" name="district_id" id="_area_3">
+                <span></span></dd>
+        </dl>
+        <dl>
+            <dt>{$Think.lang.detailed_address}：</dt>
+            <dd><input name="company_address_detail" type="text" value="{$store_info.store_address}" class="w200" id="store_address" {if $Think.config.ds_config.mapak_type eq '2'}onkeyup="local.search($(this).val());"{/if}>
+                <span></span>
+                <div>
+                    <input name="longitude" id="longitude" value="{$store_info.store_longitude}" type="hidden" />
+                    <input name="latitude" id="latitude" value="{$store_info.store_latitude}" type="hidden" />
+                    <div id="allmap" style="width:530px;height: 350px;margin-top: 20px"></div>
+                </div>
+            </dd>
+        </dl>
+        <div class="bottom">
+            <input type="submit" class="submit" value="{$Think.lang.store_goods_class_submit}" />
+        </div>
+    </form>
+</div>
+<script>
+    $(document).ready(function(){
+        $('#my_store_form').validate({
+            submitHandler:function(form){
+                ds_ajaxpost('my_store_form', 'url', "{:url('Sellersetting/map')}");
+            },
+        });
+    });
+</script>
+
+{/block}

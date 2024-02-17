@@ -1,0 +1,16 @@
+.upload_wrap{ padding: 0; border: 0 }
+.upload-button  { line-height:28px; text-decoration: none; color: #555; text-align:center;background: #F5F5F5;border:1px solid #DCDCDC;display: block; width:74px; height:28px; padding: 0px; position: absolute; z-index:1; left: 0px; }
+a:hover.upload-button { background:#E6E6E6;}
+
+
+
+.size182 {height: 182px;width: 182px;}
+.dialog_body {border: 0px;}
+.add_spec .add_link {color: #919191;}
+.add_spec .add_link:hover {color: red;}
+add_spec h2 {padding-left: 10px;}
+.f_l {float: left;}
+.mls_id {width: 0;filter: alpha(opacity=0);opacity: 0;}
+.noSelect {color: #B9B9B9 !important;}
+.goods-gallery {width: 650px;}
+.goods-gallery .list li{display: inline;float: left;margin: 5px; width:90px; height:90px;position: relative;z-index: 99;cursor: pointer; border:1px solid #ddd;}

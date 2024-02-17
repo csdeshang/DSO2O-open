@@ -1,0 +1,39 @@
+{extend name="default/base/base_fuwu" /}
+{block name="fuwu_main"}
+
+<table class="dssc-default-table">
+    <thead>
+        <tr>
+            <th class="w100">标题</th>
+            <th>内容</th>
+            <th class="w100">添加时间</th>
+        </tr>
+       
+    </thead>
+    <tbody>
+        {notempty name="msg_list"}
+        {foreach name="msg_list" item="val"}
+        <tr class="bd-line">
+            <td class="tl">{$val.o2o_fuwu_notice_title}</td>
+            <td class="tl">{$val.o2o_fuwu_notice_content}</td>
+            <td>{:date('Y-m-d H:i:s',$val.o2o_fuwu_notice_add_time)}</td>
+           
+        </tr>
+        {/foreach}
+        {else}
+        <tr>
+            <td colspan="3" class="norecord"><div class="warning-option"><i class="iconfont">&#xe64c;</i><span>{$Think.lang.no_record}</span></div></td>
+        </tr>
+        {/notempty}
+    </tbody>
+    <tfoot>
+        {notempty name="msg_list"}
+        <tr>
+            <td colspan="3"><div class="pagination">{$show_page|raw}</div></td>
+        </tr>
+        {/notempty}
+    </tfoot>
+</table>
+
+
+{/block}

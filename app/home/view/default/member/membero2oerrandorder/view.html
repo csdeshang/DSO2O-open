@@ -1,0 +1,151 @@
+{extend name="default/base/base_member" /}
+{block name="member_main"}
+<div class='dsm-default-form'>
+    <div>
+        <h3>订单信息</h3>
+        <div>
+            <dl>
+                <dt>订单号</dt>
+                <dd>{$o2o_errand_order_info.o2o_errand_order_sn}</dd>
+            </dl>
+            <dl>
+                <dt>订单状态</dt>
+                <dd>{$o2o_errand_order_info.o2o_errand_order_state_text}</dd>
+            </dl>
+            {if $o2o_errand_order_info.o2o_distributor_id}
+            <dl>
+                <dt>配送员</dt>
+                <dd>{$o2o_errand_order_info.o2o_distributor_name}</dd>
+            </dl>
+            {/if}
+            <dl>
+                <dt>基础运费</dt>
+                <dd>￥{$o2o_errand_order_info.o2o_errand_order_distance_price}</dd>
+            </dl>
+            {if $o2o_errand_order_info.o2o_errand_order_weight_price>0}
+            <dl>
+                <dt>重量附加费</dt>
+                <dd>￥{$o2o_errand_order_info.o2o_errand_order_distance_price}</dd>
+            </dl>
+            {/if}
+            {if $o2o_errand_order_info.o2o_errand_order_time_price>0}
+            <dl>
+                <dt>特殊时段费</dt>
+                <dd>￥{$o2o_errand_order_info.o2o_errand_order_time_price}</dd>
+            </dl>
+            {/if}
+            {if $o2o_errand_order_info.o2o_errand_order_gratuity>0}
+            <dl>
+                <dt>小费</dt>
+                <dd>￥{$o2o_errand_order_info.o2o_errand_order_gratuity}</dd>
+            </dl>
+            {/if}
+            <dl>
+                <dt>订单总额</dt>
+                <dd>￥{$o2o_errand_order_info.o2o_errand_order_amount}</dd>
+            </dl>
+            <dl>
+                <dt>下单时间</dt>
+                <dd>{$o2o_errand_order_info.o2o_errand_order_add_time|date='Y-m-d H:i'}</dd>
+            </dl>
+            {if $o2o_errand_order_info.o2o_errand_order_appointment_time>0}
+            <dl>
+                <dt>预约时间</dt>
+                <dd>{$o2o_errand_order_info.o2o_errand_order_appointment_time|date='Y-m-d H:i'}</dd>
+            </dl>
+            {/if}
+            {if $o2o_errand_order_info.o2o_errand_order_payment_time>0}
+            <dl>
+                <dt>支付时间</dt>
+                <dd>{$o2o_errand_order_info.o2o_errand_order_payment_time|date='Y-m-d H:i'}</dd>
+            </dl>
+            {/if}
+            {if $o2o_errand_order_info.o2o_errand_order_pickup_time>0}
+            <dl>
+                <dt>取货时间</dt>
+                <dd>{$o2o_errand_order_info.o2o_errand_order_pickup_time|date='Y-m-d H:i'}</dd>
+            </dl>
+            {/if}
+            {if $o2o_errand_order_info.o2o_errand_order_receipt_time>0}
+            <dl>
+                <dt>接单时间</dt>
+                <dd>{$o2o_errand_order_info.o2o_errand_order_receipt_time|date='Y-m-d H:i'}</dd>
+            </dl>
+            {/if}
+            {if $o2o_errand_order_info.o2o_errand_order_finish_time>0}
+            <dl>
+                <dt>完成时间</dt>
+                <dd>{$o2o_errand_order_info.o2o_errand_order_finish_time|date='Y-m-d H:i'}</dd>
+            </dl>
+            {/if}
+            {if $o2o_errand_order_info.o2o_errand_order_remark}
+            <dl>
+                <dt>订单备注</dt>
+                <dd>{$o2o_errand_order_info.o2o_errand_order_remark}</dd>
+            </dl>
+            {/if}
+            
+        </div>
+    </div>
+    <div>
+        <h3>取货点信息</h3>
+        <div>
+            <dl>
+                <dt>取货点名称</dt>
+                <dd>{$o2o_errand_order_info.o2o_errand_order_pickup_name}</dd>
+            </dl>
+            {if $o2o_errand_order_info.o2o_errand_order_pickup_phone}
+            <dl>
+                <dt>联系电话</dt>
+                <dd>{$o2o_errand_order_info.o2o_errand_order_pickup_phone}</dd>
+            </dl>
+            {/if}
+            <dl>
+                <dt>详细地址</dt>
+                <dd>{$o2o_errand_order_info.o2o_errand_order_pickup_address}</dd>
+            </dl>
+        </div>
+    </div>
+    <div>
+        <h3>收货点信息</h3>
+        <div>
+            <dl>
+                <dt>收货点名称</dt>
+                <dd>{$o2o_errand_order_info.o2o_errand_order_deliver_name}</dd>
+            </dl>
+            <dl>
+                <dt>联系电话</dt>
+                <dd>{$o2o_errand_order_info.o2o_errand_order_deliver_phone}</dd>
+            </dl>
+            <dl>
+                <dt>详细地址</dt>
+                <dd>{$o2o_errand_order_info.o2o_errand_order_deliver_address}</dd>
+            </dl>
+            
+        </div>
+    </div>
+    <div>
+        <h3>货物信息</h3>
+        <div>
+            <dl>
+                <dt>{$Think.lang.o2o_errand_order_detail_text[$o2o_errand_order_info.o2o_errand_order_type]}</dt>
+                <dd>{$o2o_errand_order_info.o2o_errand_order_detail}</dd>
+            </dl>
+            <dl>
+                <dt>货物价值</dt>
+                <dd>{$Think.lang.o2o_errand_order_goods_price_label_text[$o2o_errand_order_info.o2o_errand_order_type]}￥{$o2o_errand_order_info.o2o_errand_order_goods_price}</dd>
+            </dl>
+            {if $o2o_errand_order_info.o2o_errand_order_weight>0}
+            <dl>
+                <dt>重量</dt>
+                <dd>{$o2o_errand_order_info.o2o_errand_order_weight}公斤</dd>
+            </dl>
+            {/if}
+            
+        </div>
+    </div>
+</div>
+
+
+
+{/block}

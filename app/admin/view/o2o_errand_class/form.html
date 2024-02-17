@@ -1,0 +1,112 @@
+{include file="public/header" /}
+
+<div class="page">
+    <form class="" id="user_form" method="post" enctype="multipart/form-data">
+        <div class="ds-default-table">
+            <table>
+                <tbody>
+                    
+                    <tr class="noborder">
+                        <td class="required w120">{$Think.lang.o2o_errand_class_name}</td>
+                        <td class="vatop rowform">
+                            <input type="text" name="o2o_errand_class_name" id="o2o_errand_class_name" value="{$o2o_errand_class.o2o_errand_class_name|default=''}" class="w200"/>
+                        </td>
+                        <td class="vatop tips"></td>
+                    </tr>
+                    <tr class="noborder">
+                    <td class="required">{$Think.lang.o2o_errand_class_logo}: </td>
+                    <td class="vatop rowform">
+                        {notempty name="$o2o_errand_class.o2o_errand_class_logo"}
+                        <span class="type-file-show"> <img class="show_image" src="{$Think.ADMIN_SITE_ROOT}/images/preview.png">
+                            <div class="type-file-preview" style="display: none;"><img id="view_img" src="{:get_o2o_errand_class_logo($o2o_errand_class.o2o_errand_class_logo)}"></div>
+                        </span>
+                        {/notempty}
+                        <span class="type-file-box">
+                            <input type='text' name='o2o_errand_class_logo' id='o2o_errand_class_logo' class='type-file-text' />
+                            <input type='button' name='button' id='button' value='上传' class='type-file-button' />
+                            <input name="_pic" type="file" class="type-file-file" id="_pic" size="30" hidefocus="true" />
+                        </span>
+                    </td>
+                    <td class="vatop tips"></td>
+                </tr>
+                <tr class="noborder">
+                        <td class="required w120">{$Think.lang.o2o_errand_class_remark}</td>
+                        <td class="vatop rowform">
+                            <input type="text" name="o2o_errand_class_remark" id="o2o_errand_class_remark" value="{$o2o_errand_class.o2o_errand_class_remark|default=''}" class="w200"/>
+                        </td>
+                        <td class="vatop tips"></td>
+                    </tr>
+                    <tr class="noborder">
+                        <td class="required w120">{$Think.lang.o2o_errand_class_item}</td>
+                        <td class="vatop rowform">
+                            <textarea name="o2o_errand_class_item">{$o2o_errand_class.o2o_errand_class_item|default=''}</textarea>
+                        </td>
+                        <td class="vatop tips">{$Think.lang.o2o_errand_class_item_tips}</td>
+                    </tr>
+                <tr class="noborder">
+                        <td class="required w120">{$Think.lang.o2o_errand_class_recommend}</td>
+                        <td class="vatop onoff">
+                            <label class="cb-enable {if isset($o2o_errand_class) && $o2o_errand_class.o2o_errand_class_recommend}selected{/if}" title="{$Think.lang.ds_yes}"><input type="radio" name="o2o_errand_class_recommend" value="1"  {if isset($o2o_errand_class) && $o2o_errand_class.o2o_errand_class_recommend}checked=checked{/if}><span>{$Think.lang.ds_yes}</span></label>
+                            <label class="cb-disable {if !isset($o2o_errand_class) || !$o2o_errand_class.o2o_errand_class_recommend}selected{/if}" title="{$Think.lang.ds_no}"><input type="radio" name="o2o_errand_class_recommend" value="0" {if !isset($o2o_errand_class) || !$o2o_errand_class.o2o_errand_class_recommend}checked=checked{/if}><span>{$Think.lang.ds_no}</span></label>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr class="noborder">
+                        <td class="required w120">{$Think.lang.o2o_errand_class_sort_order}</td>
+                        <td class="vatop rowform">
+                            <input type="text" name="o2o_errand_class_sort_order" id="o2o_errand_class_sort_order" value="{$o2o_errand_class.o2o_errand_class_sort_order|default='255'}" class="w200"/>
+                        </td>
+                        <td></td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                <tr class="tfoot">
+                    <td></td>
+                    <td>
+                       <input class="btn" type="submit" value="{$Think.lang.ds_submit}"/>
+                    </td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    $(function(){
+        $("#_pic").change(function () {
+            $("#o2o_errand_class_logo").val($("#_pic").val());
+        });
+        $('#user_form').validate({
+            errorPlacement: function(error, element) {
+                error.appendTo(element.parent().parent().find('td:last'));
+            },
+            rules: {
+                o2o_errand_class_name :{
+                    required: true,
+                },
+                o2o_errand_class_sort_order :{
+                    required: true,
+                    digits:true,
+                    max: 255,
+                    min:0,
+                }
+                
+                 
+            },
+            messages: {
+                o2o_errand_class_name :{
+                   required: '必填',
+                },
+                o2o_errand_class_sort_order :{
+                    required: '必填',
+                    digits: '输入数字范围为0~255，数字越小越靠前',
+                    max: '输入小于等于255的数'
+                }
+            }
+        });
+        
+    });
+    
+    
+</script>

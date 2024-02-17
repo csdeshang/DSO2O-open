@@ -1,0 +1,17 @@
+{block name="seller_top"}{include file='default/base/seller_top'/}{/block}
+<div class="seller_main">
+    {block name="seller_left"}{include file='default/base/seller_left'/}{/block}
+    <div class="seller_right">
+        <div class="seller_items">
+        {block name="seller_items"}{include file='default/base/seller_items'/}{/block}
+        {block name="seller_btn"}{/block}
+        </div>
+        <div class="p20">
+            {if isset($store_closed) && $store_closed}
+            <div class="alert mt10"> <strong>您的店铺已被关闭,原因是：{$store_closed}。</strong> 请联系系统管理员进行开通!</div>
+            {/if}
+            {block name="seller_main"}{/block}
+        </div>
+    </div>
+</div>
+{block name="mall_footer"}{include file='default/base/mall_footer'/}{/block}

@@ -1,0 +1,41 @@
+{include file="public/header" /}
+
+
+
+<div class="page">
+    <div class="fixed-bar">
+        <div class="item-title">
+            <div class="subject">
+                <h3>{$Think.lang.o2o_errand_setting}</h3>
+                <h5></h5>
+            </div>
+            {include file="public/admin_items" /}
+        </div>
+    </div>
+
+    <form id='o2o_form' method="post"  name="form1">
+            <table class="ds-default-table">
+                <tbody>
+                    <tr class="noborder"> 
+                        <td class="required w150"><label>跑腿保证金:</label></td>
+                        <td class="vatop rowform"><input id="o2o_errand_deposit" name="o2o_errand_deposit" value="{$list_config.o2o_errand_deposit}" class="input-txt" type="text">{$Think.lang.ds_yuan}</td>
+                        <td class="vatop tips">配送员必须缴纳保证金才能接跑腿订单</td>
+                    </tr>
+                    
+                </tbody>
+                <tfoot>
+                    <tr class="tfoot">
+                        <td colspan="15"><a href="JavaScript:void(0);" class="btn" id="submitBtn" onclick="$('#o2o_form').submit()">{$Think.lang.ds_confirm_submit}</a></td>
+                    </tr>
+                </tfoot>
+            </table>
+    </form>
+</div>
+
+
+
+
+
+
+
+

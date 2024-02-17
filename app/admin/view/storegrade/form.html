@@ -1,0 +1,90 @@
+{include file="public/header" /}
+
+<div class="page">
+    <div class="ds-default-table">
+        <form  id="storegrade_form"  method="post">
+            <table>
+                <tbody>
+                    <tr class="noborder">
+                        <td class="required w120">{$Think.lang.storegrade_name}</td>
+                        <td class="vatop rowform"><input type="text" name="storegrade_name" id="storegrade_name" value="{$storegrade.storegrade_name|default=''}" class="w200"/></td>
+                    </tr>
+
+                    <tr class="noborder">
+                        <td class="required w120">{$Think.lang.storegrade_goods_limit}</td>
+                        <td class="vatop rowform"><input type="text" name="storegrade_goods_limit" id="storegrade_goods_limit" value="{$storegrade.storegrade_goods_limit|default='0'}" class="w200"/></td>
+                    </tr>
+
+                    <tr class="noborder">
+                        <td class="required w120">{$Think.lang.storegrade_album_limit}</td>
+                        <td class="vatop rowform"><input type="text" name="storegrade_album_limit" id="storegrade_album_limit" value="{$storegrade.storegrade_album_limit|default='0'}" class="w200"/></td>
+                    </tr>
+                    <tr class="noborder">
+                        <td class="required w120">{$Think.lang.storegrade_price}</td>
+                        <td class="vatop rowform"><input type="text" name="storegrade_price" id="storegrade_price" value="{$storegrade.storegrade_price|default=''}" class="w200"/></td>
+                    </tr>
+                    <tr class="noborder">
+                        <td class="required w120">{$Think.lang.storegrade_description}</td>
+                        <td class="vatop rowform"><input type="text" name="storegrade_description" id="storegrade_description" value="{$storegrade.storegrade_description|default=''}" class="w200"/></td>
+                    </tr>
+                    <tr class="noborder">
+                        <td class="required w120">{$Think.lang.storegrade_sort}</td>
+                        <td class="vatop rowform"><input type="text" name="storegrade_sort" id="storegrade_sort" value="{$storegrade.storegrade_sort|default='255'}" class="w200"/></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr class="tfoot">
+                        <td colspan="15"><input class="btn" type="submit" value="{$Think.lang.ds_submit}"/></td>
+                    </tr>
+                </tfoot>
+            </table>       
+        </form>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $(function(){
+        $('#storegrade_form').validate({
+            errorPlacement: function(error, element) {
+                error.appendTo(element.parent().parent().find('td:last'));
+            },
+            rules: {
+                storegrade_name :{
+                    required: true
+                }, 
+                storegrade_sort :{
+                    required: true,
+                    number :true,
+                    range:[1,255]
+                },
+                storegrade_goods_limit :{
+                    digits:true
+                },
+                storegrade_album_limit :{
+                    digits:true
+                }
+            },
+            messages: {
+                storegrade_name :{
+                   required : '必填'
+                },    
+                storegrade_sort :{
+                    required : '必填',
+                    number :'{$Think.lang.ds_sort_number}',
+                    range: '{$Think.lang.ds_range_0_255}'
+                },
+                storegrade_goods_limit :{
+                    digits:'请输入数字'
+                },
+                storegrade_album_limit :{
+                    digits:'请输入数字'
+                }
+            }
+        });
+        
+    });
+    
+    
+</script>

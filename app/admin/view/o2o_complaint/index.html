@@ -1,0 +1,78 @@
+{include file="public/header" /}
+
+
+
+<div class="page">
+   
+    <div class="fixed-empty"></div>
+    <form method="get" action="" target="" name="formSearch" id="formSearch">
+        <div class="ds-search-form">
+            <dl>
+                <dt>状态</dt>
+                <dd>
+                    <select name="select_complain_state">
+                    <option value="">{$Think.lang.ds_please_choose}</option>
+                    <option {if condition="$Request.param.select_complain_state !=='' && $Request.param.select_complain_state !== null && $Request.param.select_complain_state eq 0"}selected{/if} value="0">{$Think.lang.seller_o2o_complaint_state_text[0]}</option>
+                    <option {if condition="$Request.param.select_complain_state !=='' && $Request.param.select_complain_state !== null && $Request.param.select_complain_state eq 1"}selected{/if} value="1">{$Think.lang.seller_o2o_complaint_state_text[1]}</option>
+                </select>
+                </dd>
+            </dl>
+            
+            
+            <div class="btn_group">
+                <a href="javascript:document.formSearch.submit();" class="btn " title="">{$Think.lang.ds_query}</a>
+                
+            </div>
+        </div>
+    </form>
+
+    
+    
+    
+    <table class="ds-default-table">
+        <thead>
+            <tr class="thead">
+            <th class="w110">{$Think.lang.seller_o2o_complaint_order_sn}</th>
+            <th class="w110">{$Think.lang.seller_o2o_complaint_o2o_distributor_name}</th>
+            <th class="w110">{$Think.lang.seller_o2o_complaint_member_name}</th>
+            <th class="w200">{$Think.lang.seller_o2o_complaint_content}</th>
+            <th class="w200">{$Think.lang.seller_o2o_complaint_reply}</th>
+            <th class="w110">{$Think.lang.seller_o2o_complaint_addtime}</th>
+            <th class="w110">{$Think.lang.seller_o2o_complaint_state}</th>
+                <th class="align-center">{$Think.lang.ds_handle}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {notempty name="complain_list"}
+            {foreach name="complain_list" item="val"}
+            <tr class="hover">
+
+            <td>{$val.order_sn}</td>
+            <td>{$val.o2o_distributor_name}</td>
+            <td>{$val.member_name}</td>
+            <td>{$val.o2o_complaint_content}</td>
+            <td>{$val.o2o_complaint_reply}</td>
+            <td class="goods-time">{$val.o2o_complaint_addtime|date="Y-m-d H:i:s"}</td>
+            <td>{$Think.lang.seller_o2o_complaint_state_text[$val.o2o_complaint_state]}</td>
+                <td class="align-center">
+                    {if $val.o2o_complaint_state==0}
+                    <a href="javascript:dsLayerOpen('{:url('O2oComplaint/edit',['o2o_complaint_id'=>$val.o2o_complaint_id])}','回复投诉')" class="dsui-btn-view"><i class="iconfont"></i>回复</a>
+                    {/if}
+                </td>
+            </tr>
+            {/foreach}
+            {else /}
+            <tr class="no_data">
+                <td colspan="15">{$Think.lang.ds_no_record}</td>
+            </tr>
+            {/notempty}
+        </tbody>
+        {notempty name="complain_list"}
+        <tfoot>
+            <tr class="tfoot">
+                <td colspan="15" id="dataFuncs">{$show_page|raw}</td>
+            </tr>
+        </tfoot>
+        {/notempty}
+    </table>
+</div>

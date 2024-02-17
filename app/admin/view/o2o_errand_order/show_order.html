@@ -1,0 +1,101 @@
+{include file="public/header" /}
+
+
+
+
+
+<div class="page">
+    <table class="ds-default-table order">
+        <tbody>
+            <tr class="space">
+                <th colspan="2">{$Think.lang.order_detail}</th>
+            </tr>
+            <tr>
+                <th>{$Think.lang.order_info}</th>
+            </tr>
+            <tr>
+                <td colspan="2"><ul>
+                        <li>
+                            <strong>{$Think.lang.order_number}:</strong>{$order_info.o2o_errand_order_sn}
+                        </li>
+                        <li><strong>{$Think.lang.order_state}:</strong>{$order_info.o2o_errand_order_state_text}</li>
+                        <li><strong>{$Think.lang.order_total_price}:</strong><span class="red_common">{$Think.lang.currency}{$order_info.o2o_errand_order_amount} </span></li>
+                        <li><strong>基础运费:</strong>{$Think.lang.currency}{$order_info.o2o_errand_order_distance_price}</li>
+                        {if $order_info.o2o_errand_order_weight_price>0}<li><strong>重量附加费:</strong>{$Think.lang.currency}{$order_info.o2o_errand_order_weight_price}</li>{/if}
+                        {if $order_info.o2o_errand_order_time_price>0}<li><strong>特殊时段费:</strong>{$Think.lang.currency}{$order_info.o2o_errand_order_time_price}</li>{/if}
+                        {if $order_info.o2o_errand_order_gratuity>0}<li><strong>小费:</strong>{$Think.lang.currency}{$order_info.o2o_errand_order_gratuity}</li>{/if}
+                    </ul></td>
+            </tr>
+            <tr>
+                <td><ul>
+                        <li><strong>{$Think.lang.buyer_name}{$Think.lang.ds_colon}</strong>{$order_info.member_name}</li>
+                        {if $order_info.o2o_distributor_id}
+                        <li><strong>{$Think.lang.o2o_distributor}{$Think.lang.ds_colon}</strong>{$order_info.o2o_distributor_realname}({$order_info.o2o_distributor_phone})</li>
+                        {/if}
+                        <li><strong>{$Think.lang.order_time}{$Think.lang.ds_colon}</strong>{$order_info.o2o_errand_order_add_time|date='Y-m-d H:i:s'}</li>
+                        {if isset($order_info.o2o_errand_order_appointment_time) && $order_info.o2o_errand_order_appointment_time>0}
+                        <li><strong>预约时间{$Think.lang.ds_colon}</strong>{$order_info.o2o_errand_order_appointment_time|date='Y-m-d H:i:s'}</li>
+                        {/if}
+                        {if isset($order_info.o2o_errand_order_payment_time) && $order_info.o2o_errand_order_payment_time>0}
+                        <li><strong>{$Think.lang.payment_time}{$Think.lang.ds_colon}</strong>{$order_info.o2o_errand_order_payment_time|date='Y-m-d H:i:s'}</li>
+                        {/if}
+                        {if isset($order_info.o2o_errand_order_receipt_time) && $order_info.o2o_errand_order_receipt_time>0}
+                        <li><strong>接单时间{$Think.lang.ds_colon}</strong>{$order_info.o2o_errand_order_receipt_time|date='Y-m-d H:i:s'}</li>
+                        {/if}
+                        {if isset($order_info.o2o_errand_order_pickup_time) && $order_info.o2o_errand_order_pickup_time>0}
+                        <li><strong>取货时间{$Think.lang.ds_colon}</strong>{$order_info.o2o_errand_order_pickup_time|date='Y-m-d H:i:s'}</li>
+                        {/if}
+
+                        {if isset($order_info.o2o_errand_order_finish_time) && $order_info.o2o_errand_order_finish_time>0}
+                        <li><strong>{$Think.lang.complate_time}{$Think.lang.ds_colon}</strong>{$order_info.o2o_errand_order_finish_time|date='Y-m-d H:i:s'}</li>
+                        {/if}
+                        {if $order_info.o2o_errand_order_remark != ''}
+                        <li><strong>{$Think.lang.buyer_message}{$Think.lang.ds_colon}</strong>{$order_info.o2o_errand_order_remark}</li>
+                        {/if}
+                    </ul></td>
+            </tr>
+            <tr>
+                <th>取货点信息</th>
+            </tr>
+            <tr>
+                <td><ul>
+                        <li><strong>取货点名称{$Think.lang.ds_colon}</strong>{$order_info.o2o_errand_order_pickup_name}</li>
+                        <li><strong>{$Think.lang.tel_phone}{$Think.lang.ds_colon}</strong>{$order_info.o2o_errand_order_pickup_phone|default=''}</li>
+                        <li><strong>{$Think.lang.address}{$Think.lang.ds_colon}</strong>{$order_info.o2o_errand_order_pickup_address|default=''}</li>
+                    </ul></td>
+            </tr>
+            <tr>
+                <th>收货点信息</th>
+            </tr>
+            <tr>
+                <td><ul>
+                        <li><strong>收货点名称{$Think.lang.ds_colon}</strong>{$order_info.o2o_errand_order_deliver_name}</li>
+                        <li><strong>{$Think.lang.tel_phone}{$Think.lang.ds_colon}</strong>{$order_info.o2o_errand_order_deliver_phone|default=''}</li>
+                        <li><strong>{$Think.lang.address}{$Think.lang.ds_colon}</strong>{$order_info.o2o_errand_order_deliver_address|default=''}</li>
+                    </ul></td>
+            </tr>
+
+            <tr>
+                <th>{$Think.lang.product_info}</th>
+            </tr>
+            <tr>
+                <td><table class="ds-default-table goods ">
+                        <tbody>
+                            <tr>
+                                <th>{$Think.lang.product_info}</th>
+                                <th class="align-center">价值</th>
+                                <th class="align-center">重量</th>
+                            </tr>
+                            <tr>
+                                <td class="w60 picture">{$order_info.o2o_errand_order_detail}</td>
+                                <td class="w50pre">不超过{$Think.lang.currency}{$order_info.o2o_errand_order_goods_price}</td>
+                                <td class="w96 align-center">{$order_info.o2o_errand_order_weight}公斤</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>

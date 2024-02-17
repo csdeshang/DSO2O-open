@@ -1,0 +1,91 @@
+@charset "utf-8";
+/* CSS Document */
+/* ===============
+ * 重新定义Html元素
+ * =============== */
+html, body, div, ul, ol, li, dl, dt, dd, h1, h2, h3, h4, h5, h6, pre, form, p, blockquote, fieldset, input{padding: 0; margin: 0; }
+h1, h2, h3, h4, h5, h6, pre, code, address, caption, cite, code, em, strong, table, th, td{font-size: 1em; font-style: normal; font-weight: normal; }
+strong{font-weight: bold; }
+ul, ol{list-style: none outside none; }
+fieldset, img{border: medium none; }
+caption, th{text-align: left; }
+table{border-collapse: collapse; border-spacing: 0; }
+body{font: 12px/150% "Hiragino Sans GB", "Microsoft Yahei", arial, 宋体, "Helvetica Neue", Helvetica, STHeiTi, sans-serif; color: #666666; background: #FFF none repeat scroll 0 0; margin: 0; padding: 0; }
+i, cite, em{font-style: normal; }
+/* ==========================
+ * 为旧版本浏览器格式化Html5元素
+ * ========================== */
+article, aside, dialog, footer, header, section, footer, nav, figure, menu{display:block; }
+/* ==========================
+ * 常用宽度、高度、边距、边框属性
+ * ========================== */
+.w{width: 100% }
+.wrapper{width: 1200px; margin: auto; }
+.fl{float: left; }
+.fr{float: right; }
+.block{display: block; }
+.none{display: none; }
+.goods-price em{color:#1e89e0; }
+
+/* ==========================
+ * 广告区域布局样式
+ * ========================== */
+.ads-topbanner-layout{text-align: center; display: block; width: 100%; overflow: hidden; }
+/* 公用导航区域
+-------------------------------------- */
+.public-nav-layout .all-category .category{margin-top: -2px; }
+/* 首页焦点区域
+-------------------------------------- */
+.home-focus-layout{width: 100%; height:400px; position: relative; z-index: 1; }
+/* 满屏背静切换焦点图 */
+.home-focus-layout .bd ul{width: 100%; height: 400px; position: relative; z-index: 1; }
+.home-focus-layout .bd li{width: 100%; height: 100%; position: absolute; z-index: 1; top: 0; left: 0; }
+.home-focus-layout .bd li a{display: block; width:776px; height:270px; text-indent:-9999px; margin-left: -388px; position: absolute; z-index: 2; left: 50%; }
+.home-focus-layout .hd{font-size: 0; *word-spacing:-1px/*IE6、7*/; text-align: center; display:block; list-style:none; width:600px; height: 6px; padding:7px 8px ; margin-left: -325px; position:absolute; left:50%; top: 360px; z-index: 9; }
+.home-focus-layout .hd li{background:#fff;width:12px;height:12px;vertical-align: top; letter-spacing: normal; word-spacing: normal; display: inline-block; *display:inline; list-style:none;border-radius: 50%; margin-left:4px;overflow: hidden; cursor: pointer; *zoom:1;}
+.home-focus-layout .hd .on{background: #F30; }
+
+.index-entrance{}
+.index-entrance ul{}
+.index-entrance li{width:400px;height: 170px;position: relative;float:left}
+.index-entrance li h3{width:100%;height:30px;color: #fff;font-size: 24px;text-align: center;font-weight: 400;}
+.index-entrance li a{display: block;padding: 56px 0;}
+.index-entrance li i{display:block;width:30px;height:30px;float:left;margin-right:6px;line-height:30px;font-size:30px;}
+.index-entrance li i.ico{margin-left:120px;}
+.index-entrance li em{float:left;line-height:30px;}
+.index-entrance li.first-li{background-color: #658ff7;}
+.index-entrance li.second-li{background-color: #F54C45}
+.index-entrance li.third-li{background-color: #FFBD27}
+.index-entrance .first-li:hover {box-shadow: 0 25px 20px -15px rgba(101, 142, 247, 0.25);}
+.index-entrance .second-li:hover {box-shadow: 0 25px 20px -15px rgba(245, 76, 69, 0.25);}
+.index-entrance .third-li:hover {box-shadow: 0 25px 20px -15px rgba(245, 76, 69, 0.25);}
+.index-entrance li p{margin-top: 10px;font-size: 16px;color: rgba(255,255,255,0.80);text-align: center;line-height: 16px;}
+.index-entrance li:before {content: '';position: absolute;top: 0;left: 0;bottom: 0;right: 0;z-index: -1;transition: all 0.1s;}
+.index-entrance .first-li:before {background-color:  #658ff7;}
+.index-entrance .second-li:before {background-color: #F54C45;}
+.index-entrance .third-li:before {background: #FFBD27;}
+.index-entrance li:hover::before {transform: scaleY(1.05);}
+
+/*首页楼层广告*/
+.floor-banner{margin:10px auto; width: 1200px; overflow: hidden; }
+.floor-banner a{width: 1200px;display: table-cell;text-align: center}
+/*区块左侧广告*/
+
+.footer-line{border-top: 4px solid #e7e7e7; font-family: "微软雅黑"; margin-top:20px; min-width: 1190px; padding: 0; }
+/* 友情链接 */
+.index-link{width: 1200px; margin-top:10px; font-size:14px;}
+.website{height: 50px; line-height: 50px; border: 1px solid #eee; }
+.website dt, .website dd{float: left; }
+.website dt{position: relative; width: 140px; text-align: center; background: #eee; }
+.website dt b{position: absolute; top: 50%; right: -7px; margin-top: -7px; border-style: solid; border-width: 7px 0 7px 7px; border-color: transparent transparent transparent #eee; overflow: hidden; }
+.website dd{width:1020px; height:50px; text-overflow: ellipsis; white-space: nowrap;overflow:hidden; margin-left:10px;}
+.website dd a{margin: 0 5px; }
+
+
+/*首页悬浮窗-BEGIN*/
+.fixed-suspension-layer{ position: fixed; top: 0; left: 0;right: 0; bottom: 0; z-index:100000; background: rgba(0,0,0,.5); text-align: center;}
+.fixed-suspension-layer .fixed-suspension-con{ width: 800px; height: 500px; margin: 0 auto; position: absolute; left: 50%; top: 50%; margin-left: -400px; margin-top: -250px;}
+.fixed-suspension-layer .fixed-suspension-con .fixed-suspension-img{ display: block; text-align: center; max-width: 800px; max-height: 500px;}
+.fixed-suspension-layer .fixed-suspension-con .fixed-suspension-img img{ max-width: 100%; max-height: 100%;}
+.close-fixed-suspension{ position: absolute; width: 36px; height: 36px; top: -40px; z-index: 2; background: url(../images/close-fixed-suspension.png); background-size: cover; right: -40px; cursor: pointer;}
+/*首页悬浮窗-END*/

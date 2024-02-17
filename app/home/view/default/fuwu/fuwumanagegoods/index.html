@@ -1,0 +1,75 @@
+{extend name="default/base/base_fuwu" /}
+{block name="fuwu_main"}
+
+<table class="dssc-default-table">
+    <thead>
+        <tr ds_type="table_header">
+            <th class="w50">&nbsp;</th>
+            <th coltype="editable" column="goods_name" checker="check_required" inputwidth="230px">服务名称</th>
+            <th class="w100">价格</th>
+            <th class="w100">分类</th>
+            <th class="w100">{$Think.lang.fuwu_manage_goods_sort_order}</th>
+            <th class="w200">{$Think.lang.ds_handle}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {notempty name="goods_list"}
+        {foreach name="goods_list" item="val" }
+        <tr id="ds_row_{$val.o2o_fuwu_goods_id}">
+            <td><div class="pic-thumb"><a href="{:url('FuwuGoods/view',['o2o_fuwu_goods_id'=>$val.o2o_fuwu_goods_id])}" target="_blank"><img src="{:get_o2o_fuwu_file($val.o2o_fuwu_organization_id,$val.o2o_fuwu_goods_image,'goods_image')}"/></a></div></td>
+            <td class="tl">{$val.o2o_fuwu_goods_name}</td>
+            <td><span>{$Think.lang.currency|raw}{$val.o2o_fuwu_goods_default_price}</span></td>
+            <td><span>{$val.o2o_fuwu_class_name}</span></td>
+            <td>
+                <a href="javascript:void(0);" dstype="sort" data-param="{urls:'{:url('FuwuManageGoods/edit_sort',['o2o_fuwu_goods_id'=>$val.o2o_fuwu_goods_id])}'}">{$val.o2o_fuwu_goods_sort_order}<i class="iconfont">&#xe731;</i></a>
+            </td>
+            <td class="dscs-table-handle">
+                
+                <span><a href="{:url('FuwuManageGoods/edit',['o2o_fuwu_goods_id'=>$val.o2o_fuwu_goods_id])}" class="btn-blue"><i class="iconfont">&#xe731;</i>
+                        <p>{$Think.lang.ds_edit}</p>
+                    </a></span> 
+                <span><a href="javascript:void(0);" onclick="ds_ajaxget_confirm('{:url('FuwuManageGoods/del',['o2o_fuwu_goods_id'=>$val.o2o_fuwu_goods_id])}','{$Think.lang.ds_ensure_del}');" class="btn-red"><i class="iconfont">&#xe725;</i>
+                        <p>{$Think.lang.ds_del}</p>
+                    </a></span>
+                {if in_array($val.o2o_fuwu_goods_state,array(0,1)) }
+                <span class="tip"><a href="javascript:void(0)" onclick="ds_ajaxget('{:url('FuwuManageGoods/show',['o2o_fuwu_goods_id'=>$val['o2o_fuwu_goods_id'],'o2o_fuwu_goods_state'=>$val.o2o_fuwu_goods_state?0:1])}','remove',{$val.o2o_fuwu_goods_id})" class="btn-orange"><i class="iconfont">&#xe768;</i>
+                        <p>{$Think.lang.fuwu_manage_goods_state_text[$val.o2o_fuwu_goods_state]}</p>
+                    </a></span>
+                {/if}
+            </td>
+        </tr>
+ 
+        {/foreach}
+        {else /}
+        <tr>
+            <td colspan="5" class="norecord"><div class="warning-option"><i class="iconfont">&#xe64c;</i><span>{$Think.lang.no_record}</span></div></td>
+        </tr>
+        {/notempty}
+    </tbody>
+    <tfoot>
+        {notempty name="goods_list"}
+        <tr>
+            <td colspan="5"><div class="pagination"> {$show_page|raw}</div></td>
+        </tr>
+        {/notempty}
+    </tfoot>
+</table>
+
+<script>
+    $(function () {
+        $('a[dstype="sort"]').click(function () {
+            var _items = '';
+            $('.checkitem:checked').each(function () {
+                _items = $(this).val();
+            });
+            _items = _items.substr(0, (_items.length - 1));
+    
+            var data_str = '';
+            eval('data_str = ' + $(this).attr('data-param'));
+    
+            ajax_form('ajax_jingle', '设置排序', data_str.urls + '&inajax=1', '480');
+        });
+    });
+</script>
+
+{/block}
