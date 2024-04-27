@@ -12,11 +12,11 @@
                     <dt>{$Think.lang.buyer_application_refund}</dt>
                     <dd class="bg"></dd>
                 </dl>
-                <dl class="{if $refund.seller_time > 0}current{/if}">
+                <dl class="{if $refund.refundreturn_seller_time > 0}current{/if}">
                     <dt>{$Think.lang.merchant_process_refund_application}</dt>
                     <dd class="bg"> </dd>
                 </dl>
-                <dl class="{if $refund.admin_time > 0}current{/if}">
+                <dl class="{if $refund.refundreturn_admin_time > 0}current{/if}">
                     <dt>{$Think.lang.refund_complete}</dt>
                     <dd class="bg"> </dd>
                 </dl>
@@ -42,7 +42,7 @@
             </dl>
             <dl>
                 <dt>{$Think.lang.refund_instructions}：</dt>
-                <dd> {$refund.buyer_message} </dd>
+                <dd> {$refund.refundreturn_buyer_message} </dd>
             </dl>
             <dl>
                 <dt>{$Think.lang.credentials_upload}：</dt>
@@ -64,10 +64,10 @@
                     <dt><i class="required">*</i>{$Think.lang.refund_seller_confirm}{$Think.lang.ds_colon}</dt>
                     <dd>
                         <label class="mr20">
-                            <input type="radio" class="radio vm" name="seller_state" value="2" />
+                            <input type="radio" class="radio vm" name="refundreturn_seller_state" value="2" />
                             {$Think.lang.refund_state_yes}</label>
                         <label>
-                            <input type="radio" class="radio vm" name="seller_state" value="3" />
+                            <input type="radio" class="radio vm" name="refundreturn_seller_state" value="3" />
                             {$Think.lang.refund_state_no}</label>
                         <span class="error"></span>
                     </dd>
@@ -75,7 +75,7 @@
                 <dl>
                     <dt><i class="required">*</i>{$Think.lang.refund_message}{$Think.lang.ds_colon}</dt>
                     <dd>
-                        <textarea name="seller_message" rows="2" class="textarea w300"></textarea>
+                        <textarea name="refundreturn_seller_message" rows="2" class="textarea w300"></textarea>
                         <span class="error"></span>
                         <p class="hint">{$Think.lang.refund_seller_desc}<br>
                             {$Think.lang.return_amount_buyer}<br>
@@ -103,21 +103,21 @@
                 error.appendTo(element.parentsUntil('dl').find('span.error'));
             },
             submitHandler: function (form) {
-                ds_ajaxpost('post_form', 'url', "{:url('Sellerrefund/index', ['lock' =>$refund.order_lock])}")
+                ds_ajaxpost('post_form', 'url', "{:url('Sellerrefund/index')}")
             },
             rules: {
-                seller_state: {
+                refundreturn_seller_state: {
                     required: true
                 },
-                seller_message: {
+                refundreturn_seller_message: {
                     required: true
                 }
             },
             messages: {
-                seller_state: {
+                refundreturn_seller_state: {
                     required: '<i class="iconfont">&#xe64c;</i>{$Think.lang.refund_seller_confirm_null}'
                 },
-                seller_message: {
+                refundreturn_seller_message: {
                     required: '<i class="iconfont">&#xe64c;</i>{$Think.lang.refund_message_null}'
                 }
             }

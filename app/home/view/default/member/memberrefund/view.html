@@ -21,11 +21,11 @@
                     <dt>{$Think.lang.buyer_request_refund}</dt>
                     <dd class="bg"></dd>
                 </dl>
-                <dl class="{if $refund.seller_time > 0}current{/if}">
+                <dl class="{if $refund.refundreturn_seller_time > 0}current{/if}">
                     <dt>{$Think.lang.merchant_processing_refund_application}</dt>
                     <dd class="bg"> </dd>
                 </dl>
-                <dl class="{if $refund.admin_time > 0}current{/if}">
+                <dl class="{if $refund.refundreturn_admin_time > 0}current{/if}">
                     <dt>{$Think.lang.platform_review}</dt>
                     <dd class="bg"> </dd>
                 </dl>
@@ -46,7 +46,7 @@
                 </dl>
                 <dl>
                     <dt>{$Think.lang.refund_instructions}：</dt>
-                    <dd>{$refund.buyer_message} </dd>
+                    <dd>{$refund.refundreturn_buyer_message} </dd>
                 </dl>
                 <dl>
                     <dt>{$Think.lang.upload_voucher}：</dt>
@@ -65,25 +65,25 @@
                 <h3>{$Think.lang.merchant_refund_processing}</h3>
                 <dl>
                     <dt>{$Think.lang.refund_state}{$Think.lang.ds_colon}</dt>
-                    <dd>{$state_array[$refund['seller_state']]}</dd>
+                    <dd>{$refund.refundreturn_seller_state_desc}</dd>
                 </dl>
-                {if $refund.seller_time > 0}
+                {if $refund.refundreturn_seller_time > 0}
                 <dl>
                     <dt>{$Think.lang.refund_seller_message}{$Think.lang.ds_colon}</dt>
-                    <dd>{$refund.seller_message} </dd>
+                    <dd>{$refund.refundreturn_seller_message} </dd>
                 </dl>
                 {/if}
-                {if $refund.seller_state == 2}
+                {if $refund.refundreturn_seller_state == 2}
                 <h3>{$Think.lang.refund_check_shopping_mall}</h3>
                 <dl>
                     <dt>{$Think.lang.platform_confirmation}{$Think.lang.ds_colon}</dt>
-                    <dd>{$admin_array[$refund['refund_state']]}</dd>
+                    <dd>{$refund.refundreturn_admin_state_desc}</dd>
                 </dl>
                 {/if}
-                {if $refund.admin_time > 0}
+                {if $refund.refundreturn_admin_time > 0}
                 <dl>
                     <dt>{$Think.lang.remarks_platform}{$Think.lang.ds_colon}</dt>
-                    <dd>{$refund.admin_message} </dd>
+                    <dd>{$refund.refundreturn_admin_message} </dd>
                 </dl>
                 {/if}<div class="bottom"><a href="javascript:history.go(-1);" class="dsm-btn"><i class="iconfont">&#xe74e;</i>{$Think.lang.returns_list}</a></div>
             </div>

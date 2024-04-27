@@ -20,7 +20,6 @@ class  Sellerrefund extends BaseSeller {
     public function initialize() {
         parent::initialize();
         Lang::load(base_path() . 'home/lang/'.config('lang.default_lang').'/sellerrefund.lang.php');
-        $this->getRefundStateArray();
     }
 
     /**
@@ -44,24 +43,19 @@ class  Sellerrefund extends BaseSeller {
         if (trim($add_time_from) != '') {
             $add_time_from=strtotime($add_time_from);
             if ($add_time_from !== false) {
-                $condition[] = array('add_time', '>=', $add_time_from);
+                $condition[] = array('refundreturn_add_time', '>=', $add_time_from);
             }
         }
         if (trim($add_time_to) != '') {
             $add_time_to=strtotime($add_time_to)+86399;
             if ($add_time_to !== false) {
-                $condition[] = array('add_time', '<=', $add_time_to);
+                $condition[] = array('refundreturn_add_time', '<=', $add_time_to);
             }
         }
-        $seller_state = intval(input('state'));
-        if ($seller_state > 0) {
-            $condition[]=array('seller_state','=',$seller_state);
+        $refundreturn_seller_state = intval(input('state'));
+        if ($refundreturn_seller_state > 0) {
+            $condition[]=array('refundreturn_seller_state','=',$refundreturn_seller_state);
         }
-        $order_lock = intval(input('lock'));
-        if ($order_lock != 1) {
-            $order_lock = 2;
-        }
-        $condition[]=array('order_lock','=',$order_lock);
         $refund_list = $refundreturn_model->getRefundList($condition, 10);
         $page=$refundreturn_model->page_info->render();
 
@@ -72,7 +66,7 @@ class  Sellerrefund extends BaseSeller {
         /* 设置卖家当前菜单 */
         $this->setSellerCurMenu('seller_refund');
         /* 设置卖家当前栏目 */
-        $this->setSellerCurItem($order_lock);
+        $this->setSellerCurItem('seller_refund');
 
         return View::fetch($this->template_dir.'index');
     }
@@ -86,9 +80,10 @@ class  Sellerrefund extends BaseSeller {
         $condition = array();
         $condition[]=array('store_id','=',session('store_id'));
         $condition[]=array('refund_id','=',intval(input('param.refund_id')));
-        $refund_list = $refundreturn_model->getRefundList($condition);
-
-        $refund = $refund_list[0];
+        $refund = $refundreturn_model->getRefundreturnInfo($condition);
+        if(empty($refund)){
+            $this->error(lang('param_error'));
+        }
 
 
         if (!request()->isPost()) {
@@ -116,24 +111,24 @@ class  Sellerrefund extends BaseSeller {
             $this->setSellerCurItem('');
             return View::fetch($this->template_dir.'edit');
         } else {
-            if ($refund['seller_state'] != '1') {//检查状态,防止页面刷新不及时造成数据错误
+            if ($refund['refundreturn_seller_state'] != '1') {//检查状态,防止页面刷新不及时造成数据错误
                 ds_json_encode(10001,lang('param_error'));
             }
             $order_id = $refund['order_id'];
             $refund_array = array();
-            $refund_array['seller_time'] = TIMESTAMP;
-            $refund_array['seller_state'] = input('post.seller_state'); //卖家处理状态:1为待审核,2为同意,3为不同意
-            $refund_array['seller_message'] = input('post.seller_message');
-            if ($refund_array['seller_state'] == '3') {
-                $refund_array['refund_state'] = '3'; //状态:1为处理中,2为待管理员处理,3为已完成
+            $refund_array['refundreturn_seller_time'] = TIMESTAMP;
+            $refund_array['refundreturn_seller_state'] = input('post.refundreturn_seller_state'); //卖家处理状态:1为待审核,2为同意,3为不同意
+            $refund_array['refundreturn_seller_message'] = input('post.refundreturn_seller_message');
+            if ($refund_array['refundreturn_seller_state'] == '3') {
+                $refund_array['refundreturn_admin_state'] = '3'; //状态:1为处理中,2为待管理员处理,3为已完成
             } else {
-                $refund_array['seller_state'] = '2';
-                $refund_array['refund_state'] = '2';
+                $refund_array['refundreturn_seller_state'] = '2';
+                $refund_array['refundreturn_admin_state'] = '2';
             }
             $state = $refundreturn_model->editRefundreturn($condition, $refund_array);
 
             if ($state) {
-                if ($refund_array['seller_state'] == '3' && $refund['order_lock'] == '2') {
+                if ($refund_array['refundreturn_seller_state'] == '3') {
                     $refundreturn_model->editOrderUnlock($order_id); //订单解锁
                 }
                 $this->recordSellerlog(lang('refund_processing') . $refund['refund_sn']);
@@ -183,9 +178,11 @@ class  Sellerrefund extends BaseSeller {
         $condition = array();
         $condition[]=array('store_id','=',session('store_id'));
         $condition[]=array('refund_id','=',intval(input('param.refund_id')));
-        $refund_list = $refundreturn_model->getRefundList($condition);
-
-        $refund = $refund_list[0];
+        $refund = $refundreturn_model->getRefundreturnInfo($condition);
+        if(empty($refund)){
+            $this->error(lang('param_error'));
+        }
+        
         View::assign('refund', $refund);
         $info['buyer'] = array();
         if (!empty($refund['pic_info'])) {
@@ -211,31 +208,6 @@ class  Sellerrefund extends BaseSeller {
         return View::fetch($this->template_dir.'view');
     }
 
-    function getRefundStateArray($type = 'all') {
-        $state_array = array(
-            '1' => lang('refund_state_confirm'),
-            '2' => lang('refund_state_yes'),
-            '3' => lang('refund_state_no')
-        ); //卖家处理状态:1为待审核,2为同意,3为不同意
-        View::assign('state_array', $state_array);
-
-        $admin_array = array(
-            '1' => lang('in_processing'),
-            '2' => lang('to_processed'),
-            '3' => lang('has_been_completed'),
-            '4' => lang('refund_state_no')
-        ); //确认状态:1为买家或卖家处理中,2为待平台管理员处理,3为退款退货已完成
-        View::assign('admin_array', $admin_array);
-
-        $state_data = array(
-            'seller' => $state_array,
-            'admin' => $admin_array
-        );
-        if ($type == 'all') {
-            return $state_data; //返回所有
-        }
-        return $state_data[$type];
-    }
     /**
      * 用户中心右边，小导航
      *
@@ -246,14 +218,9 @@ class  Sellerrefund extends BaseSeller {
     function getSellerItemList() {
         $menu_array = array(
             array(
-                'name' => '2',
-                'text' => lang('before_refund'),
-                'url' => url('Sellerrefund/index',['lock'=>2])
-            ),
-            array(
-                'name' => '1',
-                'text' => lang('after_refund'),
-                'url' => url('Sellerrefund/index',['lock'=>1])
+                'name' => 'seller_refund',
+                'text' => '退款',
+                'url' => (string) url('Sellerrefund/index')
             ),
         );
         return $menu_array;

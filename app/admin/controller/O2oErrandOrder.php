@@ -4,7 +4,6 @@ namespace app\admin\controller;
 use think\facade\View;
 use think\facade\Lang;
 use think\facade\Db;
-use GatewayClient\Gateway;
 /**
  * ============================================================================
  * DSO2O多用户商城
@@ -32,10 +31,12 @@ class  O2oErrandOrder extends AdminControl {
         $order_list = $order_model->getO2oErrandOrderList($condition,'*', 10);
         View::assign('show_page', $order_model->page_info->render());
         
+        $logic_errand_order = model('errandorder','logic');
+        
         foreach ($order_list as $order_id => $order_info) {
-            $order_list[$order_id]['o2o_errand_order_state_text']= $order_model->getO2oErrandOrderStateText($order_info['o2o_errand_order_state']);
-            $btn_list=$order_model->getO2oErrandOrderBtn($order_info,'admin');
-            $order_list[$order_id]= array_merge($order_list[$order_id],$btn_list);
+            $order_list[$order_id]['o2o_errand_order_state_text'] = $order_model->getO2oErrandOrderStateText($order_info['o2o_errand_order_state']);
+            $btn_list = $logic_errand_order->getO2oErrandOrderBtn($order_info, 'admin');
+            $order_list[$order_id] = array_merge($order_list[$order_id], $btn_list);
         }
 
         View::assign('order_list', $order_list);
@@ -84,8 +85,8 @@ class  O2oErrandOrder extends AdminControl {
      */
     private function _order_cancel($order_info) {
         $order_id = $order_info['o2o_errand_order_id'];
-        $order_model = $order_model = model('o2o_errand_order');;
-        $result=$order_model->cancelO2oErrandOrder(array('o2o_errand_order_id'=>$order_id),'admin');
+        $logic_errand_order = model('errandorder','logic');
+        $result=$logic_errand_order->cancelO2oErrandOrder(array('o2o_errand_order_id'=>$order_id),'admin');
         if(!$result['code']){
             ds_json_encode(10001, $result['msg']);
         }else{
@@ -101,7 +102,8 @@ class  O2oErrandOrder extends AdminControl {
     private function _order_receive_pay($order_info, $post) {
         $order_id = $order_info['o2o_errand_order_id'];
         $order_model = $order_model = model('o2o_errand_order');
-        $btn_list=$order_model->getO2oErrandOrderBtn($order_info,'admin');
+        $logic_errand_order = model('errandorder','logic');
+        $btn_list=$logic_errand_order->getO2oErrandOrderBtn($order_info,'admin');
         if (!$btn_list['if_pay']) {
             return ds_callback(false, '无权操作');
         }
@@ -122,14 +124,14 @@ class  O2oErrandOrder extends AdminControl {
         } else {
             Db::startTrans();
             try {
-            $order_model->payO2oErrandOrder($order_info['o2o_errand_order_sn'],$post['payment_code'],$post['trade_no'], 'admin',$post['payment_time']);
-        } catch (\Exception $e) {
-            Db::rollback();
-            return ds_callback(false, $e->getMessage());
-        }
-        Db::commit();
-            $this->log('将订单改为已收款状态,' . lang('order_number') . ':' . $order_info['o2o_errand_order_sn'], 1);
-            return $result;
+                $logic_errand_order->payO2oErrandOrder($order_info['o2o_errand_order_sn'], $post['payment_code'], $post['trade_no'], 'admin', $post['payment_time']);
+                Db::commit();
+                $this->log('将订单改为已收款状态,' . lang('order_number') . ':' . $order_info['o2o_errand_order_sn'], 1);
+                return ds_callback(true, '修改成功');
+            } catch (\Exception $e) {
+                Db::rollback();
+                return ds_callback(false, $e->getMessage());
+            }
         }
     }
 
@@ -205,24 +207,27 @@ class  O2oErrandOrder extends AdminControl {
         //配送员列表
         $o2o_distributor_model = model('o2o_distributor');
         $condition = array();
+        //上线配送员
         $condition[] = array('o2o_distributor_state','=',1);
         $condition[] = array('store_id','=',0);
-        $condition[] = array('o2o_distributor_region_id','=',$order_info['o2o_errand_order_deliver_region_id']);
-        $o2o_distributor_list = $o2o_distributor_model->getO2oDistributorList($condition, '*', 10);
-        if(config('ds_config.instant_message_open')){
-            Gateway::$registerAddress = config('ds_config.instant_message_register_url');
+        $condition[] = array('o2o_distributor_lng','>',0);
+        $condition[] = array('o2o_distributor_lat','>',0);
+        
+        $order = 'o2o_distributor_addtime asc';
+        $field = '*';
+        //如果传了位置经纬度，则按照经纬度的距离排序
+        $lat = floatval(input('param.lat'));
+        $lng = floatval(input('param.lng'));
+        if($lat>0 && $lng>0){
+            $field.= ',(2 * 6378.137* ASIN(SQRT(POW(SIN(PI()*(' . $lat . '-o2o_distributor_lat)/360),2)+COS(PI()*' . $lat . '/180)* COS(o2o_distributor_lat * PI()/180)*POW(SIN(PI()*(' . $lng . '-o2o_distributor_lng)/360),2)))) as poi_distance';
+            $order = 'poi_distance asc';
         }
+        
+        $o2o_distributor_list = $o2o_distributor_model->getO2oDistributorList($condition, $field, 10,$order);
         foreach ($o2o_distributor_list as $key => $val) {
             $o2o_distributor_list[$key]['o2o_distributor_avatar'] = get_o2o_distributor_file($val['o2o_distributor_avatar'],'avatar');
             $o2o_distributor_list[$key]['count_wait'] = $order_model->getO2oErrandOrderCount(array(array('o2o_errand_order_receipt_time','>', strtotime(date('Y-m-d 0:0:0'))), array('o2o_distributor_id' ,'=', $val['o2o_distributor_id']), array('o2o_errand_order_state','in', [ORDER_STATE_DELIVER, ORDER_STATE_SEND])));
             $o2o_distributor_list[$key]['count_complete'] = $order_model->getO2oErrandOrderCount(array(array('o2o_errand_order_receipt_time','>', strtotime(date('Y-m-d 0:0:0'))), array('o2o_distributor_id' ,'=', $val['o2o_distributor_id']), array('o2o_errand_order_state','in', [ORDER_STATE_SUCCESS])));
-            $state=0;
-            if(config('ds_config.instant_message_open')){
-                if(Gateway::isUidOnline('5:'.$val['o2o_distributor_id'])){
-                    $state=1;
-                }
-            }
-            $o2o_distributor_list[$key]['state'] = $state;
         }
         ds_json_encode(10000, '', $o2o_distributor_list);
     }

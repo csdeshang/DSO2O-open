@@ -32,7 +32,7 @@ class  Payment extends BaseMall {
 
             $logic_buy = model('buyvirtual', 'logic');
 		}elseif($virtual==3){
-            $logic_buy = model('o2o_errand_order');
+            $logic_buy = model('errandorder', 'logic');
         }elseif($virtual==4){
             $logic_buy = model('o2o_fuwu_order');
         } elseif($virtual==2){

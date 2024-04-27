@@ -63,8 +63,9 @@
                 <th>商品名称</th>
                 <th>{$Think.lang.refund_order_buyer}</th>
                 <th class="align-center">{$Think.lang.refund_buyer_add_time}</th>
-                <th class="align-center">商家审核时间</th>
                 <th class="align-center">{$Think.lang.refund_order_refund}</th>
+                <th class="align-center">商家审核</th>
+                <th class="align-center">平台确认</th>
                 <th class="align-center">{$Think.lang.ds_handle}</th>
             </tr>
         </thead>
@@ -72,16 +73,20 @@
         <tbody>
             {foreach name="refund_list" item="val" key="key" }
             <tr class="bd-line" >
-                <td>{$val.order_sn}</td>
+                <td>{$val.order_sn}<a href="javascript:dsLayerOpen('{:url('Order/show_order',['order_id'=>$val.order_id])}','{$Think.lang.ds_view}{$Think.lang.ds_order}-{$val.order_sn}')">[{$Think.lang.ds_view}]</a></td>
                 <td>{$val.refund_sn}</td>
                 <td>{$val.store_name}</td>
                 <td>{$val.goods_name}</td>
                 <td>{$val.buyer_name}</td>
-                <td class="align-center">{$val.add_time|date="Y-m-d H:i:s"}</td>
-                <td class="align-center">{$val.seller_time|date="Y-m-d H:i:s"}</td>
+                <td class="align-center">{$val.refundreturn_add_time|date="Y-m-d H:i:s"}</td>
                 <td class="align-center">{$val.refund_amount}</td>
+                <td class="align-center">{$val.refundreturn_seller_state_desc}</td>
+                <td class="align-center">{$val.refundreturn_admin_state_desc}</td>
                 <td class="align-center">
+                    <a href="javascript:dsLayerOpen('{:url('Refund/view',['refund_id'=>$val.refund_id])}','查看订单-{$val.order_sn}')" class="dsui-btn-view"><i class="iconfont"></i>{$Think.lang.ds_view}</a>
+                    {if $val.refundreturn_admin_state eq '2'}
                     <a href="javascript:dsLayerOpen('{:url('Refund/edit',['refund_id'=>$val.refund_id])}','退款订单-{$val.order_sn}')" class="dsui-btn-add">{$Think.lang.ds_verify}</a>
+                    {/if}
                 </td>
             </tr>
            {/foreach}

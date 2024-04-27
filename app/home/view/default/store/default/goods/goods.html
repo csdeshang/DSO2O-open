@@ -643,7 +643,7 @@
         // 规格选择
         $('dl[dstype="ds-spec"]').find('a').each(function(){
             $(this).click(function(){
-                if ($(this).hasClass('hovered') || $(this).hasClass('disable')) {
+                if ($(this).hasClass('hovered')) {
                     return false;
                 }
                 $(this).parents('ul:first').find('a').removeClass('hovered');

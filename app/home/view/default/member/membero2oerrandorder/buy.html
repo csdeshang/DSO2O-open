@@ -49,7 +49,9 @@
                                 </div>
                             </div>
                         </div>
+                        <!--{if $Think.config.ds_config.mapak_type neq '0'}-->
                         <div id='allmap'></div>
+                        <!--{/if}-->
                     </div>
                     </div>
                 </div>
@@ -217,10 +219,13 @@
 </script>
 <script type="text/javascript" src="//webapi.amap.com/maps?v=2.0&key={$Think.config.ds_config.gaode_ak}"></script>
 <!--{/if}-->
+<!--{if $Think.config.ds_config.mapak_type eq '2'}-->
+<script type="text/javascript" src="{$Think.HTTP_TYPE}api.map.baidu.com/api?v=2.0&ak={$Think.config.ds_config.baidu_ak}"></script>
+<!--{/if}-->
 <script>
         //定位
 		var poi=false
-		if({$Think.config.ds_config.mapak_type} == '1'){
+		if('{$Think.config.ds_config.mapak_type}' === '1'){
 			var map = new AMap.Map("allmap", {
 				resizeEnable: true,
 				zoom:15
@@ -247,7 +252,8 @@
 					}
 				})
 			})
-		}else{
+		}
+                if('{$Think.config.ds_config.mapak_type}' === '2'){
 			var ds_bmap=new initBmap({BMAP_AK:'{$Think.config.ds_config.baidu_ak}'})
 			  ds_bmap.getPosition(function (res) {
 			  if (res.code === 10000) {
@@ -299,7 +305,7 @@
             layer.msg('请输入门店名称')
             return
         }
-		if({$Think.config.ds_config.mapak_type} == '1'){
+		if('{$Think.config.ds_config.mapak_type}' === '1'){
 			//搜索定位
 			AMap.plugin('AMap.PlaceSearch', function(){
 				var autoOptions = {
@@ -312,7 +318,8 @@
 				})
 			})
 			
-		}else{
+		}
+                if('{$Think.config.ds_config.mapak_type}' === '2'){
 			ds_bmap.getPointNearby(poi.lat+','+poi.lng,keyword,function(res){
 			    if (res.status == 0) {
 			        $('#nearby_list_wrapper').html(template.render('nearby_list_html', {address_list:res.results}))

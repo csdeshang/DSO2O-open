@@ -57,8 +57,8 @@
           <th colspan="2">{$Think.lang.o2o_distributor_name}</th>
           <th class="align-center">{$Think.lang.o2o_distributor_realname}</th>
           <th class="align-center">{$Think.lang.o2o_distributor_phone}</th>
-          <th class="align-center">{$Think.lang.o2o_distributor_email}</th>
-					<th class="align-center">{$Think.lang.o2o_distributor_region_name}</th>
+          <th class="align-center">可用资金</th>
+          <th class="align-center">冻结资金</th>
           {if !$Request.param.verify}    
           <th class="align-center">{$Think.lang.o2o_distributor_score}</th>
           <th class="align-center">{$Think.lang.o2o_distributor_receipt}</th>
@@ -85,8 +85,8 @@
               </td>
           <td class="align-center">{$v.o2o_distributor_realname}</td>
           <td class="align-center">{$v.o2o_distributor_phone}</td>
-          <td class="align-center">{$v.o2o_distributor_email}</td>
-					<td class="align-center">{$v.o2o_distributor_region_name}</td>
+          <td class="align-center">{$v.o2o_distributor_avaliable_money}</td>
+	  <td class="align-center">{$v.o2o_distributor_freeze_money}</td>
           {if !$Request.param.verify}                                  
           <td class="align-center">{:get_percent($v.o2o_distributor_score,5)}</td>
           

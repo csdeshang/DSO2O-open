@@ -66,14 +66,10 @@ class  Sellerplate extends BaseSeller {
             );
             View::assign('plate_info', $plate_info);
             // 是否能使用编辑器
-            if (check_platform_store()) { // 平台店铺可以使用编辑器
-                $editor_multimedia = true;
-            } else {    // 三方店铺需要
                 $editor_multimedia = false;
                 if ($this->store_grade['storegrade_function'] == 'editor_multimedia') {
                     $editor_multimedia = true;
                 }
-            }
             View::assign('editor_multimedia', $editor_multimedia);
             /* 设置卖家当前菜单 */
             $this->setSellerCurMenu('sellerplate');

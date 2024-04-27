@@ -24,6 +24,9 @@ class  Sellergoodsadd extends BaseSeller
         parent::initialize();
         error_reporting(E_ERROR | E_WARNING);
         Lang::load(base_path() . 'home/lang/'.config('lang.default_lang').'/sellergoodsadd.lang.php');
+        if (empty($this->store_info['store_latitude'])) {
+            $this->error(lang('store_goods_no_store_latitude'), url('Sellersetting/map'));
+        }
     }
 
     /**
@@ -52,9 +55,6 @@ class  Sellergoodsadd extends BaseSeller
      */
     public function add_step_one()
     {
-		if(empty($this->store_info['store_latitude'])){
-			$this->error(lang('store_goods_no_store_latitude'), url('Sellersetting/map'));
-		}
         // 实例化商品分类模型
         $goodsclass_model = model('goodsclass');
         // 商品分类
@@ -99,7 +99,6 @@ class  Sellergoodsadd extends BaseSeller
         }
 
         // 如果不是自营店铺或者自营店铺未绑定全部商品类目，读取绑定分类
-        if (!check_platform_store_bindingall_goodsclass()) {
             //商品分类  支持批量显示分类
             $storebindclass_model = model('storebindclass');
             $goods_class = model('goodsclass')->getGoodsclassForCacheModel();
@@ -129,7 +128,6 @@ class  Sellergoodsadd extends BaseSeller
                     }
                 }
             }
-        }
 
         // 更新常用分类信息
         $goods_class = $goodsclass_model->getGoodsclassLineForTag($gc_id);
@@ -298,7 +296,6 @@ class  Sellergoodsadd extends BaseSeller
 
             $common_array['plateid_top'] = intval(input('post.plate_top')) > 0 ? intval(input('post.plate_top')) : '';
             $common_array['plateid_bottom'] = intval(input('post.plate_bottom')) > 0 ? intval(input('post.plate_bottom')) : '';
-            $common_array['is_platform_store'] = in_array(session('store_id'), model('store')->getOwnShopIds()) ? 1 : 0;
 
             // 保存数据
             $common_id = $goods_model->addGoodsCommon($common_array);
@@ -340,7 +337,6 @@ class  Sellergoodsadd extends BaseSeller
                         $goods['goods_commend'] = $common_array['goods_commend'];
                         $goods['goods_if_required'] = $common_array['goods_if_required'];
                         $goods['goods_stcids'] = $common_array['goods_stcids'];
-                        $goods['is_platform_store'] = $common_array['is_platform_store'];
                         $goods_id = $goods_model->addGoods($goods);
                         $type_model->addGoodsType($goods_id, $common_id, array(
                             'cate_id' => input('post.cate_id'), 'type_id' => input('post.type_id'), 'attr' => input('post.attr/a')
@@ -381,7 +377,6 @@ class  Sellergoodsadd extends BaseSeller
                     $goods['goods_commend'] = $common_array['goods_commend'];
                     $goods['goods_if_required'] = $common_array['goods_if_required'];
                     $goods['goods_stcids'] = $common_array['goods_stcids'];
-                    $goods['is_platform_store'] = $common_array['is_platform_store'];
                     $goods_id = $goods_model->addGoods($goods);
                     $type_model->addGoodsType($goods_id, $common_id, array(
                         'cate_id' => input('post.cate_id'), 'type_id' => input('post.type_id'), 'attr' => input('post.attr/a')

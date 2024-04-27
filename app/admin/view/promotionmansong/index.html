@@ -75,9 +75,6 @@
                 <td class="align-left"><span>{$val.mansong_name}</span></td>
                 <td class="align-left"><a
                         href="{:url('home/Store/index',['store_id'=>$val.store_id])}"><span>{$val.store_name}</span></a>
-                    {present name="flippedOwnShopIds[$val.store_id]"}
-                    <span class="ownshop">[自营]</span>
-                    {/present}
                 </td>
                 <td class="align-center"><span>{$val.mansong_starttime|date="Y-m-d"}</span></td>
                 <td class="align-center"><span>{$val.mansong_endtime|date="Y-m-d"}</span></td>

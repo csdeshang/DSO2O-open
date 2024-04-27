@@ -128,7 +128,7 @@ class  Buy extends BaseMember {
         $condition = array();
         $condition[] = array('pay_sn','=',$pay_sn);
         $condition[] = array('order_state','in',array_values(array(ORDER_STATE_NEW, ORDER_STATE_PAY)));
-        $order_list = $order_model->getOrderList($condition, '', 'order_id,order_state,payment_code,order_amount,rcb_amount,pd_amount,order_sn', '', 0, array(), true);
+        $order_list = $order_model->getOrderList($condition);
         if (empty($order_list)) {
             $this->error(lang('no_order_paid_was_found'), 'home/Memberorder/index');
         }

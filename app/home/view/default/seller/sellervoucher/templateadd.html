@@ -10,7 +10,6 @@
                     <span></span>
                 </dd>
             </dl>
-            {if !$isPlatformStore}
             <dl>
                 <dt><i class="required">*</i>{$Think.lang.store_classification}</dt>
                 <dd>
@@ -23,19 +22,12 @@
                     <span></span>
                 </dd>
             </dl>
-            {else /}
-            <input type="hidden" name="storeclass_id" value="{$store_info.storeclass_id}"/>
-           {/if}
             <dl>
                 <dt><em class="pngFix"></em>{$Think.lang.voucher_template_enddate}{$Think.lang.ds_colon}</dt>
                 <dd>
                     <input type="text" class="text w70" id="txt_template_enddate" name="txt_template_enddate" value="" readonly><em class="add-on"><i class="iconfont">&#xe8d6;</i></em>
                     <span></span><p class="hint">
-                    {if $isPlatformStore}
-                    {$Think.lang.blank_defaults}
-                    {else /}
                     {$Think.lang.voucher_template_enddate_tip}{$quotainfo.voucherquota_starttime|date="Y-m-d"} ~ {$quotainfo.voucherquota_endtime|date="Y-m-d"}
-                   {/if}
                 </p>
                 </dd>
             </dl>
@@ -121,8 +113,8 @@
             <dl>
                 <dt><em class="pngFix"></em>{$Think.lang.ds_status}{$Think.lang.ds_colon}</dt>
                 <dd>
-                    <input type="radio" value="{$templatestate_arr.usable.0}" name="tstate" {$t_info.vouchertemplate_state == $templatestate_arr.usable.0?'checked':''}> {$templatestate_arr.usable.1}
-                    <input type="radio" value="{$templatestate_arr.disabled.0}" name="tstate" {$t_info.vouchertemplate_state == $templatestate_arr.disabled.0 ?'checked':''}> {$templatestate_arr.disabled.1}
+                    <input type="radio" value="1" name="tstate" {$t_info.vouchertemplate_state == 1 ?'checked':''}> 有效
+                    <input type="radio" value="2" name="tstate" {$t_info.vouchertemplate_state == 2 ?'checked':''}> 无效
                 </dd>
             </dl>
             {/if}
@@ -140,11 +132,9 @@
         $('#customimg_preview').show();
     {/notempty}
     {/present}
-        {if !$isPlatformStore}
     var year = {:date('Y',$quotainfo.voucherquota_endtime)};
     var month = {:date('m',$quotainfo.voucherquota_endtime)};
     var day = {:date('d',$quotainfo.voucherquota_endtime)};
-        {/if}
     $(document).ready(function(){
         //日期控件
         $('#txt_template_enddate').datepicker({dateFormat: 'yy-mm-dd'});
@@ -155,9 +145,7 @@
         currDate.setDate(date);
         
         $('#txt_template_enddate').datepicker( "option", "minDate", currDate);
-            {if !$isPlatformStore}
-            $('#txt_template_enddate').datepicker( "option", "maxDate", new Date(year,month-1,day));
-        {/if}
+        $('#txt_template_enddate').datepicker( "option", "maxDate", new Date(year,month-1,day));
 
 
         $('#txt_template_enddate').val("{present name='t_info'}{if $t_info.vouchertemplate_enddate}{:date('Y-m-d',$t_info.vouchertemplate_enddate)}{/if}{/present}");

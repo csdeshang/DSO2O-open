@@ -40,7 +40,6 @@ $lang['store_show_order_receiver']		= '收&nbsp;&nbsp;货&nbsp;&nbsp;人';
 $lang['store_show_order_receiver_address']	= '收货地址';
 $lang['store_show_order_mobile']			= '手机号码';
 $lang['seller_order_o2o_order_distance']='配送距离';
-$lang['seller_order_distributor_state_confirm']='配送员当前不在线，确定要将订单指派给他吗？';
 $lang['seller_order_distributor_receipt_confirm']='配送员关闭接单，确定要将订单指派给他吗？';
 $lang['seller_order_distributor_deliver_confirm']='你确定要将订单指派给该配送员吗？';
 return $lang;

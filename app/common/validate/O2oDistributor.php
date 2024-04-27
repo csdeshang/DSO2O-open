@@ -33,8 +33,6 @@ class  O2oDistributor extends Validate {
         'o2o_distributor_new_order_shock_remind' => 'require|in:0,1',
         'o2o_distributor_urge_order_ring_remind' => 'require|in:0,1',
         'o2o_distributor_urge_order_shock_remind' => 'require|in:0,1',
-        'o2o_distributor_receipt_limit' => 'require|min:0',
-        'o2o_distributor_auto_receipt' => 'require|in:0,1',
     ];
     protected $regex = ['mobile' => '^1[0-9]{10}$'];
     protected $message = [
@@ -53,18 +51,6 @@ class  O2oDistributor extends Validate {
         'o2o_distributor_introduce.max' => '自我介绍长度必须小于255',
         'o2o_distributor_remark.max' => '备注长度必须小于255',
         'o2o_distributor_payment_account.max' => '收款账号长度必须小于500',
-        'o2o_distributor_new_order_ring_remind.in' => '新单铃声提醒错误',
-        'o2o_distributor_new_order_ring_remind.require' => '新单铃声提醒必选',
-        'o2o_distributor_new_order_shock_remind.in' => '新单震动提醒错误',
-        'o2o_distributor_new_order_shock_remind.require' => '新单震动提醒必选',
-        'o2o_distributor_urge_order_ring_remind.in' => '催单铃声提醒错误',
-        'o2o_distributor_urge_order_ring_remind.require' => '催单铃声提醒必选',
-        'o2o_distributor_urge_order_shock_remind.in' => '催单震动提醒错误',
-        'o2o_distributor_urge_order_shock_remind.require' => '催单震动提醒必选',
-        'o2o_distributor_receipt_limit.min' => '接单上限错误',
-        'o2o_distributor_receipt_limit.require' => '接单上限必填',
-        'o2o_distributor_auto_receipt.in' => '自动接单错误',
-        'o2o_distributor_auto_receipt.require' => '自动接单必选',
     ];
     protected $scene = [
         'o2o_distributor_login' => ['o2o_distributor_name', 'o2o_distributor_password'],
@@ -76,7 +62,6 @@ class  O2oDistributor extends Validate {
         'o2o_distributor_update_phone' => ['o2o_distributor_phone'],
         'o2o_distributor_update_email' => ['o2o_distributor_email'],
         'o2o_distributor_update_password' => ['o2o_distributor_password'],
-        'o2o_distributor_update_set' => ['o2o_distributor_new_order_ring_remind', 'o2o_distributor_new_order_shock_remind', 'o2o_distributor_urge_order_ring_remind', 'o2o_distributor_urge_order_shock_remind', 'o2o_distributor_receipt_limit', 'o2o_distributor_auto_receipt',],
     ];
 
 }

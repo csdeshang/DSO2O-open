@@ -27,10 +27,8 @@
             <dd>
                 <input type="radio" name="store_o2o_distribute_type" value="1" id="store_o2o_distribute_type_1" {if $store_info.store_o2o_distribute_type}checked{/if}><!--如果不是自营店铺且没有平台配送支持 或者 选了店铺配送-->
                        <label for="store_o2o_distribute_type_1">{$Think.lang.store_o2o_distribute_type_1}</label>
-                {if $o2o_open && ($store_info.store_o2o_support || $store_info.is_platform_store=='1')}
-                <input type="radio" name="store_o2o_distribute_type" value="0" id="store_o2o_distribute_type_0" {if ((!$store_info.is_platform_store && $store_info.store_o2o_support) || $store_info.is_platform_store) && !$store_info.store_o2o_distribute_type}checked{/if}><!--（如果不是自营店铺且有平台配送支持 或者 是自营店铺） 并且选了平台配送-->
+                <input type="radio" name="store_o2o_distribute_type" value="0" id="store_o2o_distribute_type_0" {if !$store_info.store_o2o_distribute_type}checked{/if}><!--（如果不是自营店铺且有平台配送支持 或者 是自营店铺） 并且选了平台配送-->
                        <label for="store_o2o_distribute_type_0">{$Think.lang.store_o2o_distribute_type_0}</label>
-                {/if}
             </dd>
         </dl>
         <dl>
@@ -40,16 +38,6 @@
                        <label for="store_o2o_auto_receipt_1">{$Think.lang.ds_yes}</label>
                 <input type="radio" name="store_o2o_auto_receipt" value="0" id="store_o2o_auto_receipt_0" {if !$store_info.store_o2o_auto_receipt}checked{/if}>
                        <label for="store_o2o_auto_receipt_0">{$Think.lang.ds_no}</label>
-            </dd>
-        </dl>
-
-        <dl>
-            <dt>{$Think.lang.store_o2o_auto_deliver}{$Think.lang.ds_colon}</dt>
-            <dd>
-                <input type="radio" name="store_o2o_auto_deliver" value="1" id="store_o2o_auto_deliver_1" {if $store_info.store_o2o_auto_deliver}checked{/if}>
-                       <label for="store_o2o_auto_deliver_1">{$Think.lang.ds_yes}</label>
-                <input type="radio" name="store_o2o_auto_deliver" value="0" id="store_o2o_auto_deliver_0" {if !$store_info.store_o2o_auto_deliver}checked{/if}>
-                       <label for="store_o2o_auto_deliver_0">{$Think.lang.ds_no}</label>
             </dd>
         </dl>
         <dl style='padding-top:20px'>

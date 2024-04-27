@@ -17,16 +17,24 @@ use think\facade\Db;
  */
 class  O2oFuwuMoneyLog extends BaseModel {
 
+    
     const TYPE_BILL=1;
+    //提现
     const TYPE_WITHDRAW=2;
+    //管理员调整
     const TYPE_ADMIN=3;
+    //审核,用于提现,不管审核失败还是通过
     const TYPE_VERIFY=4;
     const TYPE_DEPOSIT_OUT=5;
     const TYPE_DEPOSIT_IN=6;
     
+    //有效
     const STATE_VALID=1;
+    //待审核
     const STATE_WAIT=2;
+    //同意
     const STATE_AGREE=3;
+    //拒绝
     const STATE_REJECT=4;
     
     public $page_info;

@@ -78,7 +78,7 @@ class  Login extends BaseMall {
                     ds_json_encode(10001, lang('login_index_account_stop'));
                 }
                 //执行登录,赋值操作
-                $member_model->createSession($member_info);
+                $member_model->createSession($member_info,'login');
                 //是否有卖家账户
                 $seller_model = model('seller');
                 $seller_info = $seller_model->getSellerInfo(array('member_id' => $member_info['member_id']));
@@ -179,7 +179,7 @@ class  Login extends BaseMall {
 
             
             if (!isset($member_info['error'])) {
-                $member_model->createSession($member_info, true);
+                $member_model->createSession($member_info, 'register');
                 ds_json_encode(10000,lang('login_usersave_regist_success'), '','',false);
             } else {
                 ds_json_encode(10001,$member_info['error']);

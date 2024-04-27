@@ -7,6 +7,7 @@
 namespace app\home\controller;
 use think\facade\View;
 use think\facade\Lang;
+use think\facade\Db;
 /**
  * ============================================================================
  * DSO2O多用户商城
@@ -52,24 +53,8 @@ class  BaseSeller extends BaseMall {
             }
 
             // 店铺等级
-            if (session('is_platform_store')) {
-                $this->store_grade = array(
-                    'storegrade_id' => '0',
-                    'storegrade_name' => lang('exclusive_grade_stores'),
-                    'storegrade_goods_limit' => '0',
-                    'storegrade_album_limit' => '0',
-                    'storegrade_space_limit' => '999999999',
-                    'storegrade_template_number' => '6',
-                    // 'storegrade_template' => 'default|style1|style2|style3|style4|style5',
-                    'storegrade_price' => '0.00',
-                    'storegrade_description' => '',
-                    'storegrade_function' => 'editor_multimedia',
-                    'storegrade_sort' => '255',
-                );
-            } else {
                 $store_grade = rkcache('storegrade', true);
                 $this->store_grade = @$store_grade[$this->store_info['grade_id']];
-            }
             if (session('seller_is_admin') !== 1 && request()->controller() !== 'Seller' && request()->controller() !== 'Sellerlogin') {
                 if (!in_array(request()->controller(), session('seller_limits'))) {
                     $this->error(lang('have_no_legalpower'), 'Seller/index');
@@ -105,19 +90,35 @@ class  BaseSeller extends BaseMall {
      * @param $storecost_remark 费用备注
      */
     protected function recordStorecost($storecost_price, $storecost_remark) {
-        // 平台店铺不记录店铺费用
-        if (check_platform_store()) {
-            return false;
+
+        
+        Db::startTrans();
+        try {
+            $storecost_model = model('storecost');
+            $param = array();
+            $param['storecost_store_id'] = session('store_id');
+            $param['storecost_seller_id'] = session('seller_id');
+            $param['storecost_price'] = $storecost_price;
+            $param['storecost_remark'] = $storecost_remark;
+            $param['storecost_state'] = 0;
+            $param['storecost_time'] = TIMESTAMP;
+            $storecost_model->addStorecost($param);
+            $storemoneylog_model = model('storemoneylog');
+            //扣除店铺费用
+            $data = array(
+                'store_id' => session('store_id'),
+                'storemoneylog_type' => $storemoneylog_model::TYPE_ORDER_SUCCESS,
+                'storemoneylog_state' => $storemoneylog_model::STATE_VALID,
+                'storemoneylog_add_time' => TIMESTAMP,
+                'store_avaliable_money' => -$storecost_price,
+                'storemoneylog_desc' => $storecost_remark,
+            );
+            $storemoneylog_model->changeStoremoney($data);
+            Db::commit();
+        } catch (Exception $ex) {
+            Db::rollback();
         }
-        $storecost_model = model('storecost');
-        $param = array();
-        $param['storecost_store_id'] = session('store_id');
-        $param['storecost_seller_id'] = session('seller_id');
-        $param['storecost_price'] = $storecost_price;
-        $param['storecost_remark'] = $storecost_remark;
-        $param['storecost_state'] = 0;
-        $param['storecost_time'] = TIMESTAMP;
-        $storecost_model->addStorecost($param);
+
 
         // 发送店铺消息
         $param = array();
@@ -150,6 +151,7 @@ class  BaseSeller extends BaseMall {
                 );
         model('cron')->addCron(array('cron_exetime'=>TIMESTAMP,'cron_type'=>'sendStoremsg','cron_value'=>serialize($param)));
     }
+    
 
     /**
      * 添加到任务队列
@@ -248,7 +250,6 @@ class  BaseSeller extends BaseMall {
                 'submenu' => array(
                     array('name' => 'sellerorder', 'text' => lang('order_physical_transaction'), 'controller' => 'Sellerorder', 'url' => url('Sellerorder/index'),),
                     array('name' => 'sellerevaluate', 'text' => lang('evaluation_management'), 'controller' => 'Sellerevaluate', 'url' => url('Sellerevaluate/index'),),
-                    array('name' => 'Sellerbill', 'text' => lang('physical_settlement'), 'controller' => 'Sellerbill', 'url' => url('Sellerbill/index'),),
                 )
             ),
             'Sellerpromotionxianshi' =>
@@ -335,15 +336,12 @@ class  BaseSeller extends BaseMall {
                 'url' => url('seller_o2o_distributor/index'),
                 'submenu' => array(
                     array('name' => 'seller_o2o_distributor', 'text' => lang('baseseller_o2o_distributor_magage'), 'controller' => 'seller_o2o_distributor', 'url' => url('seller_o2o_distributor/index'),),
-                    array('name' => 'seller_o2o_order_bill', 'text' => lang('baseseller_o2o_order_bill'), 'controller' => 'seller_o2o_order_bill', 'url' => url('seller_o2o_order_bill/index'),),
                     array('name' => 'seller_o2o_complaint', 'text' => lang('baseseller_o2o_complaint'), 'controller' => 'seller_o2o_complaint', 'url' => url('seller_o2o_complaint/index'),),
                 )
             ),
         );
-        if (!$store_info['is_platform_store']) {
             $menu_list['seller']['submenu'] = array_merge(array(array('name' => 'seller_money', 'text' => lang('store_money'), 'action' => null, 'controller' => 'Sellermoney', 'url' => (string) url('Sellermoney/index'),), array('name' => 'seller_deposit', 'text' => lang('store_deposit'), 'action' => null, 'controller' => 'Sellerdeposit', 'url' => (string) url('Sellerdeposit/index'),),array('name' => 'sellerinfo', 'text' => lang('store_information'), 'action' => null, 'controller' => 'Sellerinfo', 'url' => (string) url('Sellerinfo/index'),),), $menu_list['seller']['submenu']);
             $menu_list['selleraccount']['submenu'] = array_merge(array(array('name' => 'sellercost', 'text' => lang('store_consumption'), 'action' => null, 'controller' => 'Sellercost', 'url' => (string) url('Sellercost/cost_list'),)), $menu_list['selleraccount']['submenu']);
-        }
         if (config('ds_config.inviter_open')) {
             $menu_list['sellerinviter'] = array(
                 'ico'=>'&#xe6ed;',

@@ -1,6 +1,6 @@
 <div class="dss-info">
     <div class="title">
-        <h4>{if $store_info.is_platform_store}<em>{$Think.lang.platform_store}</em>{else}<img src="{$Think.HOME_SITE_ROOT}/images/store_grade/{$store_info.grade_id}.png" class="pngFix">{/if}&nbsp;<a href="{:url('Store/index',['store_id'=>$store_info.store_id])}" >{$store_info.store_name}</a>
+        <h4><img src="{$Think.HOME_SITE_ROOT}/images/store_grade/{$store_info.grade_id}.png" class="pngFix">&nbsp;<a href="{:url('Store/index',['store_id'=>$store_info.store_id])}" >{$store_info.store_name}</a>
         <span member_id="{$store_info.member_id}"></span>
         {if isset($store_info['member_id']) || !empty($store_info.store_qq) || !empty($store_info.store_ww)}
                 {notempty name="store_info.store_qq"}
@@ -58,14 +58,8 @@
         <dl>
             <dt><span class="t_adjust">营业执照</span><span>：</span></dt>
             <dd>
-                {if !$store_info.is_platform_store}
                 {if $store_info.business_licence_number_electronic}
                 <a href="{$store_info.business_licence_number_electronic}" target="_blank">查看</a>
-                {/if}
-                {else}
-                {if $Think.config.ds_config.business_licence}
-                <a href="{:ds_get_pic(ATTACH_COMMON,$Think.config.ds_config.business_licence)}" target="_blank">查看</a>
-                {/if}
                 {/if}
             </dd>
         </dl>

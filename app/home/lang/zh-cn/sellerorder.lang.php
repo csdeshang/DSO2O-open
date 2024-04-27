@@ -8,7 +8,6 @@ $lang['store_order_o2o_order_pickup_code_require']='取货码不能为空';
 $lang['seller_order_pickup_order_title']='请输入6位取货码';
 $lang['seller_order_pickup_order']='订单取货';
 $lang['seller_order_distributor_deliver_confirm']='你确定要将订单指派给该配送员吗？';
-$lang['seller_order_distributor_state_confirm']='配送员当前不在线，确定要将订单指派给他吗？';
 $lang['seller_order_distributor_receipt_confirm']='配送员关闭接单，确定要将订单指派给他吗？';
 $lang['seller_order_deliver_order_notice'] = '【店铺】给您派单，订单号%s';
 $lang['seller_order_distributor_not_exist']='配送员不存在';

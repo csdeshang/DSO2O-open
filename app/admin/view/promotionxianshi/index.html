@@ -78,9 +78,6 @@
                 <td class="align-left"><span>{$val.xianshi_name}</span></td>
                 <td class="align-left"><a
                         href="{:url('home/Store/index',['store_id'=>$val.store_id])}"><span>{$val.store_name}</span></a>
-                    {present name="flippedOwnShopIds[$val.store_id]"}
-                    <span class="ownshop">[自营]</span>
-                    {/present}
                 </td>
                 <td class="align-center"><span>{$val.xianshi_starttime|date="Y-m-d H:i"}</span></td>
                 <td class="align-center"><span>{$val.xianshi_end_time|date="Y-m-d H:i"}</span></td>

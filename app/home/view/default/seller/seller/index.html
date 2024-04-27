@@ -24,7 +24,6 @@
                     </strong>
                 </dd>
             </dl>
-            {if !session('is_platform_store')}
             <div class="detail-rate">
                 <h5> <strong>{$Think.lang.store_dynamic_evaluation}{$Think.lang.ds_colon}</strong> {$Think.lang.compared_industry} </h5>
                 <ul>
@@ -33,7 +32,6 @@
                     {/foreach}
                 </ul>
             </div>
-            {/if}
         </div>
     </div>
     <div class="seller-cont">
@@ -109,9 +107,7 @@
                 <ul>
                     <li><a href="{:url('Sellerorder/index',['state_type'=>'state_new'])}">{$Think.lang.store_order_pay} <strong id="ds_payment"></strong></a></li>
                     <li><a href="{:url('Sellerorder/index',['state_type'=>'state_pay'])}">{$Think.lang.store_shipped} <strong id="ds_delivery"></strong></a></li>
-                    <li><a href="{:url('Sellerrefund/index',['lock'=>'2'])}"> {$Think.lang.pre_sale_refund}<strong id="ds_refund_lock"></strong></a></li>
-                    <li><a href="{:url('Sellerrefund/index',['lock'=>'1'])}"> {$Think.lang.after_sale_refund}<strong id="ds_refund"></strong></a></li>
-                    <li><a href="{:url('Sellerbill/index',['bill_state'=>'1'])}"> {$Think.lang.bill_confirmed}<strong id="ds_bill_confirm"></strong></a></li>
+                    <li><a href="{:url('Sellerrefund/index')}"> {$Think.lang.pre_sale_refund}<strong id="ds_refund"></strong></a></li>
                 </ul>
             </div>
         </div>
@@ -194,7 +190,7 @@
                     <dd class="right-info">
                         <p class="p-name">
                             <a href="{:url('Sellerpromotionxianshi/index')}">{$Think.lang.store_xianshi}</a>
-                            <em>({if session('is_platform_store') || !empty($xianshiquota_info)}{$Think.lang.store_open}{else/}{$Think.lang.store_not_open}{/if})</em>
+                            <em>({if !empty($xianshiquota_info)}{$Think.lang.store_open}{else/}{$Think.lang.store_not_open}{/if})</em>
                         </p>
                         <p class="p-info">{$Think.lang.store_xianshi_info}</p>
                         {notempty name="xianshiquota_info"}
@@ -209,7 +205,7 @@
                     <dd class="right-info">
                         <p class="p-name">
                             <a href="{:url('Sellerpromotionmansong/index')}">{$Think.lang.store_mansong}</a>
-                            <em>({if session('is_platform_store') || !empty($mansongquota_info)}{$Think.lang.store_open}{else/}{$Think.lang.store_not_open}{/if})</em>
+                            <em>({if !empty($mansongquota_info)}{$Think.lang.store_open}{else/}{$Think.lang.store_not_open}{/if})</em>
                         </p>
                         <p class="p-info">{$Think.lang.store_mansong_info}</p>
                         {notempty name="xianshiquota_info"}
@@ -230,7 +226,7 @@
                     <dd class="right-info">
                         <p class="p-name">
                             <a href="{:url('Sellervoucher/templatelist')}">{$Think.lang.store_voucher}</a>
-                            <em>({if session('is_platform_store') || !empty($voucherquota_info)}{$Think.lang.store_open}{else/}{$Think.lang.store_not_open}{/if})</em>
+                            <em>({if !empty($voucherquota_info)}{$Think.lang.store_open}{else/}{$Think.lang.store_not_open}{/if})</em>
                         </p>
                         <p class="p-info">{$Think.lang.store_voucher_info}</p>
                         {notempty name="voucherquota_info"}

@@ -8,7 +8,8 @@
         }
 </script>
 <script type="text/javascript" src="//webapi.amap.com/maps?v=2.0&key={$Think.config.ds_config.gaode_ak}"></script>
-<!--{else}-->
+<!--{/if}-->
+<!--{if $Think.config.ds_config.mapak_type eq '2'}-->
 <script type="text/javascript" src="{$Think.HTTP_TYPE}api.map.baidu.com/api?v=2.0&ak={$Think.config.ds_config.baidu_ak}"></script>
 <!--{/if}-->
 <script>
@@ -35,7 +36,7 @@
             
     }
     $(function(){
-       if ({$Think.config.ds_config.mapak_type} == '1'){
+       if ('{$Think.config.ds_config.mapak_type}' === '1'){
 			map = new AMap.Map("allmap", {
 				resizeEnable: true,
 				zoom:15
@@ -104,7 +105,8 @@
 				  }
 				});
 			  });
-		}else{
+		}
+                if ('{$Think.config.ds_config.mapak_type}' === '2'){
 			map = new BMap.Map("allmap");
 			var geolocation = new BMap.Geolocation();
 			geolocation.getCurrentPosition(function (r) {
@@ -240,11 +242,13 @@
           <th><i>*</i>{$Think.lang.detailed_address}：</th>
           <td><input name="company_address_detail" type="text" class="w200" id="company_address_detail" {if $Think.config.ds_config.mapak_type eq '2'}onkeyup="local.search($(this).val());"{/if}>
             <span></span>
+              <!--{if $Think.config.ds_config.mapak_type neq '0'}-->
             <div>
                 <input name="longitude" id="longitude" type="hidden" />
                 <input name="latitude" id="latitude" type="hidden" />
                 <div id="allmap" style="width:530px;height: 350px;margin-top: 20px"></div>
             </div>
+              <!--{/if}-->
           </td>
         </tr>
         <tr>

@@ -5,7 +5,6 @@ namespace app\home\controller;
 use think\facade\View;
 use think\facade\Lang;
 use think\facade\Db;
-use GatewayClient\Gateway;
 /**
  * ============================================================================
  * DSO2O多用户商城
@@ -66,6 +65,10 @@ class Sellerorder extends BaseSeller {
         }
 
         $order_list = $order_model->getOrderList($condition, 10, '*', 'order_id desc', '', array('order_goods', 'order_common', 'member'));
+        
+        $refundreturn_model = model('refundreturn');
+        $order_list = $refundreturn_model->getGoodsRefundList($order_list);
+        
         View::assign('show_page', $order_model->page_info->render());
 
         //页面中显示那些操作
@@ -78,7 +81,7 @@ class Sellerorder extends BaseSeller {
             $order_info['if_spay_price'] = $order_model->getOrderOperateState('spay_price', $order_info);
 
             //显示锁定中
-            $order_info['if_lock'] = $order_model->getOrderOperateState('lock', $order_info);
+            $order_info['if_order_refund_lock'] = $order_model->getOrderOperateState('order_refund_lock', $order_info);
 
             //显示接单
             $order_info['if_receipt'] = $order_model->getOrderOperateState('receipt', $order_info);
@@ -133,7 +136,7 @@ class Sellerorder extends BaseSeller {
         if (!$o2o_distributor_info) {
             ds_json_encode(10001, lang('seller_order_distributor_not_exist'));
         }
-        $order_info = $order_model->getOrderInfo(array('order_id' => $order_id, 'store_id' => session('store_id'), 'order_state' => ORDER_STATE_RECEIPT, 'refund_state' => 0, 'lock_state' => 0,));
+        $order_info = $order_model->getOrderInfo(array('order_id' => $order_id, 'store_id' => session('store_id'), 'order_state' => ORDER_STATE_RECEIPT, 'refund_state' => 0, 'order_refund_lock_state' => 0,));
         if (!$order_info) {
             ds_json_encode(10001, lang('store_order_none_exist'));
         }
@@ -148,7 +151,7 @@ class Sellerorder extends BaseSeller {
             $update_order['o2o_order_deliver_time'] = TIMESTAMP;
             $update_order['o2o_order_source'] = 2;
             $update = $order_model->editOrder($update_order, array(
-                'order_id' => $order_info['order_id'], 'order_state' => ORDER_STATE_RECEIPT, 'refund_state' => 0, 'lock_state' => 0,
+                'order_id' => $order_info['order_id'], 'order_state' => ORDER_STATE_RECEIPT, 'refund_state' => 0, 'order_refund_lock_state' => 0,
             ));
             if (!$update) {
                 throw new \think\Exception(lang('seller_order_edit_order_fail'), 10006);
@@ -184,10 +187,6 @@ class Sellerorder extends BaseSeller {
 
         $order_info = array_merge($order_info, $update_order);
         $order_info = $order_model->formatO2oOrder($this->store_info, $order_info);
-        if(config('ds_config.instant_message_open')){
-            Gateway::$registerAddress = config('ds_config.instant_message_register_url');
-            Gateway::sendToGroup('distributor', json_encode(array('type'=>'addOrder','order' => $order_info)));
-        }
         ds_json_encode(10000, lang('ds_common_op_succ'), array('order_info' => $order_info));
     }
 
@@ -259,28 +258,32 @@ class Sellerorder extends BaseSeller {
         $o2o_distributor_model = model('o2o_distributor');
         $condition = array();
         $condition[] = array('o2o_distributor_state', '=', 1);
-        if ($order_info['o2o_order_distributor_type'] == 1) {
-            $condition[] = array('store_id', '=', session('store_id'));
-        } else {
-            $condition[] = array('store_id', '=', 0);
-            $condition[] = array('o2o_distributor_region_id', '=', $this->store_info['region_id']);
+        $condition[] = array('o2o_distributor_lng','>',0);
+        $condition[] = array('o2o_distributor_lat','>',0);
+        
+        //判断是否只能指定店铺下的配送员
+//        if ($order_info['o2o_order_distributor_type'] == 1) {
+//            $condition[] = array('store_id', '=', session('store_id'));
+//        } else {
+//            $condition[] = array('store_id', '=', 0);
+//        }
+        
+        $order = 'o2o_distributor_addtime asc';
+        $field = '*';
+        //如果传了位置经纬度，则按照经纬度的距离排序
+        $lat = floatval(input('param.lat'));
+        $lng = floatval(input('param.lng'));
+        if($lat>0 && $lng>0){
+            $field.= ',(2 * 6378.137* ASIN(SQRT(POW(SIN(PI()*(' . $lat . '-o2o_distributor_lat)/360),2)+COS(PI()*' . $lat . '/180)* COS(o2o_distributor_lat * PI()/180)*POW(SIN(PI()*(' . $lng . '-o2o_distributor_lng)/360),2)))) as poi_distance';
+            $order = 'poi_distance asc';
         }
-        $o2o_distributor_list = $o2o_distributor_model->getO2oDistributorList($condition, '*', 10);
-        if(config('ds_config.instant_message_open')){
-            Gateway::$registerAddress = config('ds_config.instant_message_register_url');
-        }
+        
+        $o2o_distributor_list = $o2o_distributor_model->getO2oDistributorList($condition, $field, 10,$order);
         foreach ($o2o_distributor_list as $key => $val) {
             
             $o2o_distributor_list[$key]['o2o_distributor_avatar'] = get_o2o_distributor_file($val['o2o_distributor_avatar'], 'avatar');
             $o2o_distributor_list[$key]['count_wait'] = $order_model->getOrderCount(array(array('o2o_order_deliver_time', '>', strtotime(date('Y-m-d 0:0:0'))), array('o2o_distributor_id', '=', $val['o2o_distributor_id']), array('order_state', 'in', [ORDER_STATE_DELIVER, ORDER_STATE_SEND])));
             $o2o_distributor_list[$key]['count_complete'] = $order_model->getOrderCount(array(array('o2o_order_deliver_time', '>', strtotime(date('Y-m-d 0:0:0'))), array('o2o_distributor_id', '=', $val['o2o_distributor_id']), array('order_state', 'in', [ORDER_STATE_SUCCESS])));
-            $state=0;
-            if(config('ds_config.instant_message_open')){
-                if(Gateway::isUidOnline('5:'.$val['o2o_distributor_id'])){
-                    $state=1;
-                }
-            }
-            $o2o_distributor_list[$key]['state'] = $state;
         }
         ds_json_encode(10000, '', $o2o_distributor_list);
     }
@@ -298,7 +301,7 @@ class Sellerorder extends BaseSeller {
             ds_json_encode(10001, lang('store_order_o2o_order_pickup_code_length_error'));
         }
         $order_model = model('order');
-        $order_info = $order_model->getOrderInfo(array('order_state' => ORDER_STATE_DELIVER, 'o2o_order_pickup_code' => $o2o_order_pickup_code, 'store_id' => session('store_id'), 'refund_state' => 0, 'lock_state' => 0,));
+        $order_info = $order_model->getOrderInfo(array('order_state' => ORDER_STATE_DELIVER, 'o2o_order_pickup_code' => $o2o_order_pickup_code, 'store_id' => session('store_id'), 'refund_state' => 0, 'order_refund_lock_state' => 0,));
         if (empty($order_info)) {
             ds_json_encode(10001, lang('store_order_none_exist'));
         }
@@ -336,7 +339,7 @@ class Sellerorder extends BaseSeller {
             $update_order['o2o_order_receipt_time'] = TIMESTAMP;
 
             $update = $order_model->editOrder($update_order, array(
-                'order_id' => $order_info['order_id'], 'order_state' => ORDER_STATE_PAY, 'refund_state' => 0, 'lock_state' => 0,
+                'order_id' => $order_info['order_id'], 'order_state' => ORDER_STATE_PAY, 'refund_state' => 0, 'order_refund_lock_state' => 0,
             ));
             //派单给达达
             if ($order_info['o2o_third'] == 'dada') {
@@ -433,7 +436,7 @@ class Sellerorder extends BaseSeller {
         $condition = array();
         $condition[] = array('order_id', '=', $order_id);
         $condition[] = array('store_id', '=', session('store_id'));
-        $order_info = $order_model->getOrderInfo($condition, array('order_common', 'order_goods', 'member'));
+        $order_info = $order_model->getOrderInfo($condition, array('order_common', 'order_goods', 'member', 'orderlog'));
         if (empty($order_info)) {
             $this->error(lang('store_order_none_exist'));
         }
@@ -441,15 +444,11 @@ class Sellerorder extends BaseSeller {
         $refundreturn_model = model('refundreturn');
         $order_list = array();
         $order_list[$order_id] = $order_info;
-        $order_list = $refundreturn_model->getGoodsRefundList($order_list, 1); //订单商品的退款退货显示
+        $order_list = $refundreturn_model->getGoodsRefundList($order_list); //订单商品的退款退货显示
         $order_info = $order_list[$order_id];
-        $refund_all = isset($order_info['refund_list'][0]) ? $order_info['refund_list'][0] : '';
-        if (!empty($refund_all) && $refund_all['seller_state'] < 3) {//订单全部退款商家审核状态:1为待审核,2为同意,3为不同意
-            View::assign('refund_all', $refund_all);
-        }
 
         //显示锁定中
-        $order_info['if_lock'] = $order_model->getOrderOperateState('lock', $order_info);
+        $order_info['if_order_refund_lock'] = $order_model->getOrderOperateState('order_refund_lock', $order_info);
 
         //显示调整运费
         $order_info['if_modify_price'] = $order_model->getOrderOperateState('modify_price', $order_info);
@@ -481,10 +480,6 @@ class Sellerorder extends BaseSeller {
             $order_info['order_confirm_day'] = $order_info['delay_time'] + config('ds_config.order_auto_receive_day') * 24 * 3600;
         }
 
-        //如果订单已取消，取得取消原因、时间，操作人
-        if ($order_info['order_state'] == ORDER_STATE_CANCEL) {
-            $order_info['close_info'] = $order_model->getOrderlogInfo(array('order_id' => $order_info['order_id']), 'log_id desc');
-        }
 
         foreach ($order_info['extend_order_goods'] as $value) {
             $value['image_240_url'] = goods_cthumb($value['goods_image'], 240, $value['store_id']);
@@ -576,7 +571,7 @@ class Sellerorder extends BaseSeller {
             $update_order['order_state'] = ORDER_STATE_SEND;
             $update_order['o2o_order_pickup_time'] = TIMESTAMP;
             $update = $order_model->editOrder($update_order, array(
-                'order_id' => $order_info['order_id'], 'order_state' => ORDER_STATE_DELIVER, 'refund_state' => 0, 'lock_state' => 0,
+                'order_id' => $order_info['order_id'], 'order_state' => ORDER_STATE_DELIVER, 'refund_state' => 0, 'order_refund_lock_state' => 0,
             ));
             if (!$update) {
                 throw new \think\Exception(lang('seller_order_edit_order_fail'), 10006);
@@ -596,10 +591,6 @@ class Sellerorder extends BaseSeller {
         }
         $order_info = array_merge($order_info, $update_order);
         $order_info = $order_model->formatO2oOrder($this->store_info, $order_info);
-        if(config('ds_config.instant_message_open')){
-            Gateway::$registerAddress = config('ds_config.instant_message_register_url');
-            Gateway::sendToGroup('distributor', json_encode(array('type'=>'editOrder','order' => $order_info)));
-        }
         ds_json_encode(10000, lang('ds_common_op_succ'), array('order_info' => $order_info));
     }
     

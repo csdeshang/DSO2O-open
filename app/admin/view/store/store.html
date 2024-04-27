@@ -42,16 +42,6 @@
                 </dd>
             </dl>
             <dl>
-                <dt>{$Think.lang.store_o2o_support}</dt>
-                <dd>
-                    <select name="store_o2o_support">
-                        <option value="">{$Think.lang.ds_please_choose}...</option>
-                        <option value="0" {if condition="$Request.param.store_o2o_support eq '0'"}selected{/if}>{$Think.lang.ds_no}</option>
-                        <option value="1" {if condition="$Request.param.store_o2o_support eq '1'"}selected{/if}>{$Think.lang.ds_yes}</option>
-                    </select>
-                </dd>
-            </dl>
-            <dl>
                 <dt>店铺</dt>
                 <dd><input type="text" value="{$Request.param.store_name}" name="store_name" id="store_name" class="txt"></dd>
             </dl>
@@ -70,7 +60,6 @@
           <th class="w60">{$Think.lang.store_id}</th>
           <th class="w60">{$Think.lang.store_user_name}</th>
           <th class="w60">店主卖家账号</th>
-	  <th class="w120">{$Think.lang.store_o2o_support}</th>
           <th class="w60">{$Think.lang.ds_store_money}</th>
           <th class="w60">{$Think.lang.ds_store_deposit}</th>
           <th class="align-center w36">{$Think.lang.belongs_level}</th>
@@ -90,13 +79,6 @@
           <td>{$v.store_id}</td>
           <td>{$v.member_name}</td>
           <td>{$v.seller_name}</td>
-          <td class="align-center yes-onoff">
-              {if $v.store_o2o_support == '0'}
-              <a href="JavaScript:void(0);" class="disabled" ajax_branch='store_o2o_support' ds_type="inline_edit" fieldname="store_o2o_support" fieldid="{$v.store_id}" fieldvalue="0" title="{$Think.lang.ds_editable}"><img src="{$Think.ADMIN_SITE_ROOT}/images/treetable/transparent.gif"></a>
-              {else /}
-              <a href="JavaScript:void(0);" class="enabled" ajax_branch='store_o2o_support' ds_type="inline_edit" fieldname="store_o2o_support" fieldid="{$v.store_id}" fieldvalue="1" title="{$Think.lang.ds_editable}"><img src="{$Think.ADMIN_SITE_ROOT}/images/treetable/transparent.gif"></a>
-              {/if}
-          </td>
           <td class="align-center"><p>{$Think.lang.available}:&nbsp;<strong class="red">{$v.store_avaliable_money}</strong>&nbsp;{$Think.lang.currency_zh}</p>
             <p>{$Think.lang.freeze}:&nbsp;<strong class="red">{$v.store_freeze_money}</strong>&nbsp;{$Think.lang.currency_zh}</p>
           </td>

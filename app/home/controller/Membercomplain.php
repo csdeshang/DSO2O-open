@@ -101,16 +101,6 @@ class  Membercomplain extends BaseMember {
         if (empty($complain_subject_list)) {
             $this->error(lang('complain_subject_error'));
         }
-        $refundreturn_model = model('refundreturn');
-        $order_info['extend_order_goods'] = $order_info['goods_list'];
-        $order_list[$order_id] = $order_info;
-        $order_list = $refundreturn_model->getGoodsRefundList($order_list);
-
-        if (isset($order_list[$order_id]['extend_complain'][$goods_id]) && intval($order_list[$order_id]['extend_complain'][$goods_id]) == 1) {//退款投诉
-            $complainsubject_model = model('complainsubject');
-            $complain_subject = $complainsubject_model->getComplainsubject(array('complainsubject_id' => 1)); //投诉主题
-            $complain_subject_list = array_merge($complain_subject, $complain_subject_list);
-        }
         View::assign('subject_list', $complain_subject_list);
         View::assign('goods_id', $goods_id);
         View::assign('goods_list', $order_info['goods_list']);

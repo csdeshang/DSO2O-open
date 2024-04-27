@@ -1,6 +1,6 @@
 {extend name="default/base/base_seller" /}
 {block name="seller_btn"}
-{if $isPlatformStore || config('ds_config.promotion_mansong_price')==0}
+{if config('ds_config.promotion_mansong_price')==0}
 <a class="dssc-btn dssc-btn-green" href="{:url('Sellerpromotionmansong/mansong_add')}"><i class="iconfont">&#xe6db;</i>{$Think.lang.mansong_add}</a>
 {else}
 {notempty name="current_mansong_quota"}
@@ -13,7 +13,7 @@
 {/block}
 
 {block name="seller_main"}
-{if $isPlatformStore || config('ds_config.promotion_mansong_price')==0}
+{if config('ds_config.promotion_mansong_price')==0}
 <div class="alert alert-block mt10">
     <ul>
         <li>1、{$Think.lang.mansong_explain1}</li>

@@ -326,7 +326,8 @@ class  Payment
             }
             Db::startTrans();
             try {
-                model('o2o_errand_order')->payO2oErrandOrder($out_trade_no, $payment_code, $trade_no,'system');
+                $logic_errand_order = model('errandorder','logic');
+                $logic_errand_order->payO2oErrandOrder($out_trade_no, $payment_code, $trade_no,'system');
             } catch (\Exception $e) {
                 Db::rollback();
                 return ds_callback(false, $e->getMessage());

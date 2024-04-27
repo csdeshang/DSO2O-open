@@ -1,2 +1,7 @@
 {include file="public/header" /}
+<!--{if $Think.config.ds_config.mapak_type eq '1'}-->
+{include file='../../home/view/default/seller/sellerorder/distributor_list_gaode'/}
+<!--{/if}-->
+<!--{if $Think.config.ds_config.mapak_type eq '2'}-->
 {include file='../../home/view/default/seller/sellerorder/distributor_list'/}
+<!--{/if}-->

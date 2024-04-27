@@ -391,28 +391,6 @@ class Buy_1 {
         }
     }
 
-    /**
-     * 输出有货到付款时，在线支付和货到付款及每种支付下商品数量和详细列表
-     * @param $buy_list 商品列表
-     * @return 返回 以支付方式为下标分组的商品列表
-     */
-    public function getOfflineGoodsPay($buy_list) {
-        //以支付方式为下标，存放购买商品
-        $buy_goods_list = array();
-        $offline_pay = model('payment')->getPaymentOpenInfo(array(array('payment_code', '=', 'offline')));
-        if ($offline_pay) {
-            //下单里包括平台自营商品并且平台已开启货到付款，则显示货到付款项及对应商品数量,取出支持货到付款的店铺ID组成的数组，目前就一个，DEFAULT_PLATFORM_STORE_ID
-            $offline_store_id_array = model('store')->getOwnShopIds();
-            foreach ($buy_list as $value) {
-                if (in_array($value['store_id'], $offline_store_id_array)) {
-                    $buy_goods_list['offline'][] = $value;
-                } else {
-                    $buy_goods_list['online'][] = $value;
-                }
-            }
-        }
-        return $buy_goods_list;
-    }
 
     /**
      * 计算每个店铺(所有店铺级优惠活动)总共优惠多少金额
@@ -770,35 +748,6 @@ class Buy_1 {
         return !empty($inv) ? serialize($inv) : serialize(array());
     }
 
-    /**
-     * 计算本次下单中每个店铺订单是货到付款还是线上支付,店铺ID=>付款方式[online在线支付offline货到付款]
-     * @param array $store_id_array 店铺ID数组
-     * @param boolean $if_offpay 是否支持货到付款 true/false
-     * @param string $pay_name 付款方式 online/offline
-     * @return array
-     */
-    public function getStorePayTypeList($store_id_array, $if_offpay, $pay_name) {
-        $store_pay_type_list = array();
-        if ($pay_name == 'online') {
-            foreach ($store_id_array as $store_id) {
-                $store_pay_type_list[$store_id] = 'online';
-            }
-        } else {
-            $offline_pay = model('payment')->getPaymentOpenInfo(array(array('payment_code', '=', 'offline')));
-            if ($offline_pay) {
-                //下单里包括平台自营商品并且平台已开启货到付款
-                $offline_store_id_array = model('store')->getOwnShopIds();
-                foreach ($store_id_array as $store_id) {
-                    //if (in_array($store_id,$offline_store_id_array)) {
-                    $store_pay_type_list[$store_id] = 'offline';
-                    //} else {
-                    //    $store_pay_type_list[$store_id] = 'online';
-                    //}
-                }
-            }
-        }
-        return $store_pay_type_list;
-    }
 
     /**
      * 直接购买时返回最新的在售商品信息（需要在售）

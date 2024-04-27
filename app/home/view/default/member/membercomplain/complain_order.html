@@ -35,7 +35,7 @@
                         <li>{$Think.lang.payment_order_number}{$Think.lang.ds_colon}<span>{$return_info.pay_sn}</span></li>
                         {/if}
                         <li>{$Think.lang.payment_method}：<span>{$return_info.payment_name}</span> </li>
-                        <li>{$Think.lang.member_order_time}{$Think.lang.ds_colon}<span>{$return_info.add_time|date="Y-m-d H:i:s"}</span></li>
+                        <li>{$Think.lang.member_order_time}{$Think.lang.ds_colon}<span>{$return_info.refundreturn_add_time|date="Y-m-d H:i:s"}</span></li>
                         {gt name="return_info.payment_time" value="0"}
                         <li>{$Think.lang.member_show_order_pay_time}{$Think.lang.ds_colon}<span>{$return_info.payment_time|date="Y-m-d H:i:s"}</span></li>
                         {/gt}

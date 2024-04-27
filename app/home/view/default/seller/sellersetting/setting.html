@@ -12,12 +12,13 @@
             <dt>{$Think.lang.store_name}：</dt>
             <dd>
                 <input type="text" value="{$store_info.store_name}" name="store_name" class="text w400">
+                <span></span>
             </dd>
         </dl>
         <dl>
             <dt>{$Think.lang.store_setting_store_zy}{$Think.lang.ds_colon}</dt>
             <dd>
-                <textarea name="store_mainbusiness" rows="2" class="textarea w400"  maxlength="50" >{$store_info.store_mainbusiness}</textarea>
+                <textarea name="store_mainbusiness" rows="2" class="textarea w400">{$store_info.store_mainbusiness}</textarea>
                 <p class="hint">{$Think.lang.store_create_store_zy_hint}</p>
             </dd>
         </dl>
@@ -159,6 +160,29 @@
         });
     });
 
+    $('#my_store_form').validate({
+        submitHandler:function(form){
+            ds_ajaxpost('my_store_form');
+        },
+        errorPlacement: function(error, element){
+            var error_td = element.parent('dd').children('span');
+            error_td.append(error);
+        },
+        rules : {
+            store_name: {
+                required : true,
+                rangelength:[0,50]
+            },
+        },
+        messages : {
+            store_name: {
+                required : '<i class="iconfont">&#xe64c;</i>店铺名称为必填',
+                rangelength : '<i class="iconfont">&#xe64c;</i>店铺名称长度在0-50'
+            },
+        }
+        
+    });
+    
     function ajaxFileUpload(url, id)
     {
         $(document).off('change', "#store_banner").on('change', function () {

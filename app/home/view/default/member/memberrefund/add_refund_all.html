@@ -43,7 +43,7 @@
                     <dl>
                         <dt><i class="required">*</i>{$Think.lang.refund_instructions}：</dt>
                         <dd>
-                            <textarea name="buyer_message" rows="3" class="textarea w400"></textarea>
+                            <textarea name="refundreturn_buyer_message" rows="3" class="textarea w400"></textarea>
                             <br />
                             <span class="error"></span> </dd>
                     </dl>
@@ -77,7 +77,7 @@
                 error.appendTo(element.nextAll('span.error'));
             },
             rules: {
-                buyer_message: {
+                refundreturn_buyer_message: {
                     required: true
                 },
                 refund_pic1: {
@@ -91,7 +91,7 @@
                 }
             },
             messages: {
-                buyer_message: {
+                refundreturn_buyer_message: {
                     required: '<i class="iconfont">&#xe64c;</i>{$Think.lang.please_fill_refund_instructions}'
                 },
                 refund_pic1: {

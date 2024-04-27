@@ -162,7 +162,7 @@ class  Connectsms extends BaseMall {
                 if (!$member['member_state']) {//1为启用 0 为禁用
                     ds_json_encode(10001,lang('login_index_account_stop'));
                 }
-                $member_model->createSession($member); //自动登录
+                $member_model->createSession($member,'login'); //自动登录
                 $reload = input('param.ref_url');
                 if (empty($reload)) {
                     $reload = url('Member/index');
@@ -208,7 +208,7 @@ class  Connectsms extends BaseMall {
                 ds_json_encode(10001, lang('login_index_account_stop'));
             }
             $member_model->editMember(array('member_id' => $member['member_id']), array('member_password' => md5($member_password)),$member['member_id']);
-            $member_model->createSession($member); //自动登录
+            $member_model->createSession($member,'login'); //自动登录
             ds_json_encode(10000,lang('password_changed_successfully'));
         }
     }

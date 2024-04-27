@@ -48,7 +48,7 @@
             <td colspan="20" class="sep-row"></td>
         </tr>
         <tr>
-            <th colspan="20"> <span class="ml10">{$Think.lang.refund_order_refundsn}{$Think.lang.ds_colon}</span><span>{$Think.lang.refund_buyer_add_time}{$Think.lang.ds_colon}{$val.add_time|date="Y-m-d H:i:s"}</span>
+            <th colspan="20"> <span class="ml10">{$Think.lang.refund_order_refundsn}{$Think.lang.ds_colon}</span><span>{$Think.lang.refund_buyer_add_time}{$Think.lang.ds_colon}{$val.refundreturn_add_time|date="Y-m-d H:i:s"}</span>
 
                 <!-- store_name -->
                 <span> <a href="{:url('Store/index',['store_id'=>$val.store_id])}" target="_blank" title="{$val.store_name}">{$val.store_name}</a></span>
@@ -84,8 +84,8 @@
             </td>
             {/if}
             <td>{$val.refund_amount}</td>
-            <td>{$state_array[$val['seller_state']]}</td>
-            <td>{if $val.seller_state==2}{$admin_array[$val['refund_state']]}{else/}{$Think.lang.none}{/if}</td>
+            <td>{$val.refundreturn_seller_state_desc}</td>
+            <td>{if $val.refundreturn_seller_state==2}{$val.refundreturn_admin_state_desc}{else/}{$Think.lang.none}{/if}</td>
             <td class="bdr"><a href="{:url('Memberrefund/view',['refund_id'=>$val.refund_id])}" class="dsm-btn">{$Think.lang.ds_view} </a></td>
         </tr>
         {/foreach}

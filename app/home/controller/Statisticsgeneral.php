@@ -145,7 +145,6 @@ class  Statisticsgeneral extends BaseSeller
         $where[]=array('order_isvalid','=',1);//计入统计的有效订单
         $where[] = array('order_add_time','between',array($stime,$etime));
         $where[] = array('store_id','<>',session('store_id'));
-        if (!check_platform_store()) {//如果不是平台店铺，则查询店铺经营类目的同行数据
             //查询店铺经营类目
             $store_bindclass = model('storebindclass')->getStorebindclassList(array('store_id'=>session('store_id')));
             $goodsclassid_arr = array();
@@ -173,7 +172,6 @@ class  Statisticsgeneral extends BaseSeller
                     $where[] = array(implode('|', $gc_parentidwhere_keyarr), 'in', $gc_parentidwhere_arr);
                 }
             }
-        }
         $field = ' sum(goods_num) as ordergoodsnum, goods_id, goods_name ';
         $othergoodstop30_arr = $stat_model->statByStatordergoods($where, $field, 0, 30,'ordergoodsnum desc', 'goods_id');
 

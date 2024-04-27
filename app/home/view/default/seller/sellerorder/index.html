@@ -157,7 +157,7 @@
                 <p><a class="dssc-btn-mini dssc-btn-green mt10" href="{:url('Sellerorder/show_distributor',['order_id'=>$order.order_id])}" /><i class="iconfont">&#xe731;</i>{$Think.lang.seller_order_deliver_order}</a></p>
                 {/if}
                 <!-- 锁定 -->
-                {if $order.if_lock}
+                {if $order.if_order_refund_lock}
                 <p>{$Think.lang.refund_return_goods}</p>
                 {/if}
             </td>

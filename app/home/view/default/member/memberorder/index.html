@@ -126,12 +126,12 @@
                     <td>{$goods_info.goods_price}</td>
                     <td>{$goods_info.goods_num}</td>
                     <td><!-- 退款 -->
-                        {if isset($goods_info['refund']) && $goods_info['refund'] == 1}
+                        {if isset($goods_info['if_allow_goods_refund']) && $goods_info['if_allow_goods_refund'] == 1}
                         <p><a href="{:url('Memberrefund/add_refund',['order_id'=>$order_info.order_id,'goods_id'=>$goods_info.rec_id])}">{$Think.lang.refund_return}</a></p>
                         {/if}
                         <!-- 退货退款中 -->
-                        {if isset($goods_info['extend_refund']) && !in_array($goods_info['extend_refund']['refund_state'],[3,4])}
-                        <p><a href="{if $goods_info['extend_refund']['return_type']==1}{:url('Memberrefund/view',['refund_id'=>$goods_info['extend_refund']['refund_id']])}{else}{:url('Memberreturn/view',['return_id'=>$goods_info['extend_refund']['refund_id']])}{/if}">{$Think.lang.refund_in_returns}</a></p>
+                        {if isset($goods_info['extend_order_goods_refund']) && !in_array($goods_info['extend_order_goods_refund']['refundreturn_admin_state'],[3,4])}
+                        <p><a href="{if $goods_info['extend_order_goods_refund']['return_type']==1}{:url('Memberrefund/view',['refund_id'=>$goods_info['extend_order_goods_refund']['refund_id']])}{else}{:url('Memberreturn/view',['return_id'=>$goods_info['extend_order_goods_refund']['refund_id']])}{/if}">{$Think.lang.refund_in_returns}</a></p>
                         {/if}
                         <!-- 投诉 -->
                         {if $order_info.if_complain}
@@ -164,7 +164,7 @@
 
                         <!-- 锁定-->
 
-                        {if $order_info.if_lock}
+                        {if $order_info.if_order_refund_lock}
                         <p>{$Think.lang.refund_returns}</p>
                         {/if}
 

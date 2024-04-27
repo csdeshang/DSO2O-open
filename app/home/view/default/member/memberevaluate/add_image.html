@@ -65,14 +65,10 @@
         </form>
     </div>
     <div class="dsm-flow-item">
-        {if $store_info.is_platform_store}
-
-
         <div class="dsm-evaluation-store">
             <div class="title">{$Think.lang.member_evaluation_storeinfotitle}</div>
             <div class="store-name"> {$store_info.store_name}</div>
             <div class="store-info">
-                {if !$store_info.is_platform_store}
                 <dl class="all-rate">
                     <dt>{$Think.lang.comprehensive_score}：</dt>
                     <dd>
@@ -92,7 +88,6 @@
                         {/foreach}
                     </ul>
                 </div>
-                {/if}
                 {if $store_info.store_qq || $store_info.store_ww}
                 <dl class="messenger">
                     <dt>{$Think.lang.contact_information}：</dt>
@@ -124,7 +119,6 @@
         </div>
 
 
-        {/if}
     </div>
 </div>
 

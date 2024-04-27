@@ -1,6 +1,6 @@
 {extend name="default/base/base_seller" /}
 {block name="seller_btn"}
-{if isset($isPlatformStore) || config('ds_config.promotion_voucher_price')==0}
+{if config('ds_config.promotion_voucher_price')==0}
 <a class="dssc-btn dssc-btn-green" href="{:url('Sellervoucher/templateadd')}"><i class="iconfont">&#xe6db;</i>{$Think.lang.voucher_templateadd}</a>
 {else /}
 {notempty name="current_quota"}
@@ -15,7 +15,7 @@
 
 {block name="seller_main"}
 
-{if isset($isPlatformStore) || config('ds_config.promotion_voucher_price')==0}
+{if config('ds_config.promotion_voucher_price')==0}
         <div class="alert alert-block mt10 mb10">
             <ul>
                 <li>{$Think.lang.voucher_template_list_tip1}</li>
@@ -54,11 +54,8 @@
                     <th>{$Think.lang.ds_status}</th>
                     <td class="w120"><select class="w80" name="select_state">
                         <option value="0" {if $Request.get.select_state == '0'}selected{/if}>{$Think.lang.ds_please_choose}</option>
-                        {notempty name="templatestate_arr"}
-                        {foreach name="templatestate_arr" item="v"}
-                        <option value="{$v.0}" {if $Request.get.select_state == $v.0}selected{/if}>{$v.1}</option>
-                        {/foreach}
-                        {/notempty}
+                        <option value="1" {if $Request.get.select_state == '1'}selected{/if}>有效</option>
+                        <option value="2" {if $Request.get.select_state == '2'}selected{/if}>无效</option>
                     </select></td><th class="w60">{$Think.lang.voucher_template_title}</th>
                     <td class="w160"><input type="text" class="text w150"  value="" id="txt_keyword" name="txt_keyword" /></td>
                     <td class="tc w70"><input type="submit" class="submit" value="{$Think.lang.ds_search}" /></td>
@@ -94,11 +91,10 @@
 					{$Think.lang.ds_no}
 					{/if}
 				</td>
-				<td>{if $val.vouchertemplate_state == $templatestate_arr.usable.0}{$templatestate_arr.usable.1}{/if}
-                    {if $val.vouchertemplate_state == $templatestate_arr.disabled.0}{$templatestate_arr.disabled.1}{/if}
+				<td>{if $val.vouchertemplate_state == 1}有效{/if}{if $val.vouchertemplate_state == 2}无效{/if}
                 </td>
                 <td class="dscs-table-handle">
-                    {if $val.vouchertemplate_state == $templatestate_arr.usable.0 && !$val.vouchertemplate_giveout}
+                    {if $val.vouchertemplate_state == 1 && !$val.vouchertemplate_giveout}
                     <span>
         		  <a class="btn-blue" href="{:url('Sellervoucher/templateedit',['tid'=>$val.vouchertemplate_id])}">
         		      <i class="iconfont">&#xe731;</i><p>{$Think.lang.ds_edit}</p>

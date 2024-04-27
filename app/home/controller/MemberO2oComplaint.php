@@ -81,6 +81,7 @@ class  MemberO2oComplaint extends BaseMember {
             if(!$content){
                 ds_json_encode(10001,lang('o2o_complaint_content_required'));
             }
+            
             $o2o_complaint_model->addO2oComplaint(array(
                 'order_id'=>$order_id,
                 'order_sn'=>$order_info['order_sn'],
@@ -93,6 +94,22 @@ class  MemberO2oComplaint extends BaseMember {
                 'o2o_complaint_content'=>$content,
                 'o2o_complaint_addtime'=>TIMESTAMP,
             ));
+            
+            
+            //用户新增投诉配送员,需扣除配送员费用
+            $o2o_complaint_fine = intval(config('ds_config.o2o_complaint_fine'));
+            if ($o2o_complaint_fine > 0) {
+                $o2o_distributor_moneylog_model = model('o2o_distributor_moneylog');
+                $distributor_money = array(
+                    'o2o_distributor_id' => $order_info['o2o_distributor_id'],
+                    'amount' => $o2o_complaint_fine,
+                    'order_sn' => $order_info['order_sn'],
+                );
+
+                $o2o_distributor_moneylog_model->changeO2oDistributorMoney('order_complaint', $distributor_money);
+            }
+
+
             ds_json_encode(10000,lang('ds_common_op_succ'));
         }else{
             return View::fetch($this->template_dir . 'form');
@@ -108,7 +125,7 @@ class  MemberO2oComplaint extends BaseMember {
         if ($order_id < 1) {//参数验证
             ds_json_encode(10001,lang('param_error'));
         }
-        if($o2o_complaint_model->delO2oComplaint(array('member_id'=>session('member_id'),'o2o_order_bill_id'=>0,'order_id'=>$order_id))){
+        if($o2o_complaint_model->delO2oComplaint(array('member_id'=>session('member_id'),'order_id'=>$order_id))){
             ds_json_encode(10000,lang('ds_common_op_succ'));
         }else{
             ds_json_encode(10001,lang('ds_common_op_fail'));

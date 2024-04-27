@@ -52,14 +52,14 @@
             rules: {
                 store_name: {
                     required: true,
-                    remote : "{:url('Ownshop/ckeck_store_name')}"
+                    remote : "{:url('Store/ckeck_store_name')}"
                 },
                 member_name: {
                     required: true,
                     minlength: 3,
                     maxlength: 15,
                     remote: {
-                        url: "{:url('Ownshop/check_member_name')}",
+                        url: "{:url('Store/check_member_name')}",
                         type: 'get',
                         data: {
                             member_name: function () {

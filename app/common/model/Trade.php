@@ -38,25 +38,6 @@ class  Trade extends BaseModel {
         return $max_data[$day_type];
     }
 
-    /**
-     * 订单状态
-     * @access public
-     * @author csdeshang
-     * @param type $type 类型
-     * @return type
-     */
-    public function getOrderState($type = 'all') {
-        $state_data = array(
-            'order_cancel' => ORDER_STATE_CANCEL, //0:已取消
-            'order_default' => ORDER_STATE_NEW, //10:未付款
-            'order_paid' => ORDER_STATE_PAY, //20:已付款
-            'order_shipped' => ORDER_STATE_SEND, //30:已发货
-            'order_completed' => ORDER_STATE_SUCCESS //40:已收货
-        );
-        if ($type == 'all')
-            return $state_data; //返回所有
-        return $state_data[$type];
-    }
 
     /**
      * 更新退款申请
@@ -69,7 +50,7 @@ class  Trade extends BaseModel {
     public function editRefundConfirm($member_id = 0, $store_id = 0) {
         $refund_confirm = $this->getMaxDay('refund_confirm'); //卖家不处理退款申请时按同意并弃货处理
         $day = TIMESTAMP - $refund_confirm * 60 * 60 * 24;
-        $condition = " seller_state=1 and add_time<" . $day; //状态:1为待审核,2为同意,3为不同意
+        $condition = " refundreturn_seller_state=1 and refundreturn_add_time<" . $day; //状态:1为待审核,2为同意,3为不同意
         $condition_sql = "";
         if ($member_id > 0) {
             $condition_sql = " buyer_id = '" . $member_id . "'  and ";
@@ -79,21 +60,20 @@ class  Trade extends BaseModel {
         }
         $condition_sql = $condition_sql . $condition;
         $refund_array = array();
-        $refund_array['refund_state'] = '2'; //状态:1为处理中,2为待管理员处理,3为已完成
-        $refund_array['seller_state'] = '2'; //卖家处理状态:1为待审核,2为同意,3为不同意
+        $refund_array['refundreturn_admin_state'] = '2'; //状态:1为处理中,2为待管理员处理,3为已完成
+        $refund_array['refundreturn_seller_state'] = '2'; //卖家处理状态:1为待审核,2为同意,3为不同意
         $refund_array['return_type'] = '1'; //退货类型:1为不用退货,2为需要退货
-        $refund_array['seller_time'] = TIMESTAMP;
-        $refund_array['seller_message'] = '超过' . $refund_confirm . '天未处理退款退货申请，按同意处理。';
-        $refund = Db::name('refundreturn')->field('refund_id,refund_sn,store_id,order_sn,refund_amount,order_lock,refund_type')->where($condition_sql)->select()->toArray();
+        $refund_array['refundreturn_seller_time'] = TIMESTAMP;
+        $refund_array['refundreturn_seller_message'] = '超过' . $refund_confirm . '天未处理退款退货申请，按同意处理。';
+        $refund = Db::name('refundreturn')->field('refund_id,refund_sn,store_id,order_sn,refund_amount,refund_type')->where($condition_sql)->select()->toArray();
         Db::name('refundreturn')->where($condition_sql)->update($refund_array);
 
         // 发送商家提醒
         foreach ((array) $refund as $val) {
             // 参数数组
             $message = array();
-            $message['type'] = $val['order_lock'] == 2 ? '售前' : '售后';
             $message['refund_sn'] = $val['refund_sn'];
-            $ten_message = array($message['type'],$message['refund_sn']);
+            $ten_message = array($message['refund_sn']);
             $weixin_param = array(
                     'url' => config('ds_config.h5_store_site_url').'/pages/seller/refund/RefundView?refund_id='.$val['refund_id'].'&refund_type='.$val['refund_type'],
                     'data'=>array(

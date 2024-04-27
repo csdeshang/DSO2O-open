@@ -46,13 +46,13 @@ class  O2oComplaint extends AdminControl {
 
     public function edit() {
         $o2o_complaint_model=model('o2o_complaint');
-        $order_id = intval(input('o2o_complaint_id'));
-        if ($order_id < 1) {//参数验证
+        $o2o_complaint_id = intval(input('o2o_complaint_id'));
+        if ($o2o_complaint_id < 1) {//参数验证
             $this->error(lang('param_error'));
         }
 
         //检查是不是正在进行投诉
-        if (!$o2o_complaint_model->getO2oComplaintInfo(array('o2o_complaint_id'=>$order_id,'store_id'=>0,'o2o_complaint_state'=>0))) {
+        if (!$o2o_complaint_model->getO2oComplaintInfo(array('o2o_complaint_id'=>$o2o_complaint_id,'store_id'=>0,'o2o_complaint_state'=>0))) {
             $this->error(lang('seller_o2o_complaint_not_exists')); //'您已经投诉了该订单请等待处理'
         }
 
@@ -64,7 +64,7 @@ class  O2oComplaint extends AdminControl {
             $o2o_complaint_model->editO2oComplaint(array(
                 'o2o_complaint_reply'=>$content,
                 'o2o_complaint_state'=>1,
-            ),array('o2o_complaint_id'=>$order_id,'store_id'=>0,'o2o_complaint_state'=>0));
+            ),array('o2o_complaint_id'=>$o2o_complaint_id,'store_id'=>0,'o2o_complaint_state'=>0));
             dsLayerOpenSuccess(lang('ds_common_op_succ'));
         }else{
             return View::fetch('form');

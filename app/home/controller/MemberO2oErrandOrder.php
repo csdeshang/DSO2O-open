@@ -32,6 +32,7 @@ class MemberO2oErrandOrder extends BaseMember {
          * 得到当前用户的跑腿订单列表
          */
         $o2o_errand_order_model = model('o2o_errand_order');
+        $logic_errand_order = model('errandorder','logic');
         $condition = array();
         $condition[] = array('member_id','=',$this->member_info['member_id']);
         $o2o_errand_order_state = input('param.o2o_errand_order_state');
@@ -54,7 +55,7 @@ class MemberO2oErrandOrder extends BaseMember {
         $o2o_errand_order_list = $o2o_errand_order_model->getO2oErrandOrderList($condition, '*', 20);
         foreach($o2o_errand_order_list as $key => $val){
             $o2o_errand_order_list[$key]['o2o_errand_order_state_text']=$o2o_errand_order_model->getO2oErrandOrderStateText($val['o2o_errand_order_state']);
-            $btn_list=$o2o_errand_order_model->getO2oErrandOrderBtn($val,'member');
+            $btn_list=$logic_errand_order->getO2oErrandOrderBtn($val,'member');
             $o2o_errand_order_list[$key]=array_merge($o2o_errand_order_list[$key],$btn_list);
         }
         
@@ -248,14 +249,15 @@ class MemberO2oErrandOrder extends BaseMember {
     }
 
     public function cancel(){
-        $o2o_errand_order_model = model('o2o_errand_order');
         
         $o2o_errand_order_id = input('param.o2o_errand_order_id');
         if (!$o2o_errand_order_id) {
             ds_json_encode(10001, lang('param_error'));
         }
+        
+        $logic_errand_order = model('errandorder','logic');
 
-        $result=$o2o_errand_order_model->cancelO2oErrandOrder(array('o2o_errand_order_id'=>$o2o_errand_order_id,'member_id'=>$this->member_info['member_id']),'member');
+        $result=$logic_errand_order->cancelO2oErrandOrder(array('o2o_errand_order_id'=>$o2o_errand_order_id,'member_id'=>$this->member_info['member_id']),'member');
         if(!$result['code']){
             ds_json_encode(10001, $result['msg']);
         }
@@ -277,16 +279,17 @@ class MemberO2oErrandOrder extends BaseMember {
         if(!$o2o_errand_order_info){
             ds_json_encode(10001, '订单不存在');
         }
+        
+        $logic_errand_order = model('errandorder','logic');
+        $result=$logic_errand_order->receiveO2oErrandOrder($o2o_errand_order_info,'member');
 
-        if (!$order_model->editO2oErrandOrder(array('o2o_errand_order_state' => ORDER_STATE_SUCCESS, 'o2o_errand_order_finish_time' => TIMESTAMP), $condition)) {
-            ds_json_encode(10001, lang('ds_common_op_fail'));
+        if(!$result['code']){
+            ds_json_encode(10001, $result['msg']);
+        }else{
+            ds_json_encode(10000, lang('ds_common_op_succ'));
         }
-
-        ds_json_encode(10000, lang('ds_common_op_succ'));
     }
     public function evaluate() {
-        $o2o_errand_order_model = model('o2o_errand_order');
-
         $o2o_errand_order_id = input('param.o2o_errand_order_id');
         if (!$o2o_errand_order_id) {
             ds_json_encode(10001, lang('param_error'));
@@ -306,7 +309,8 @@ class MemberO2oErrandOrder extends BaseMember {
         $comment = input('param.comment');
         $score = intval(input('param.score'));
         
-        $result=$o2o_errand_order_model->evaluateO2oErrandOrder($this->member_info['member_id'],$o2o_errand_order_id,$score,$comment);
+        $logic_errand_order = model('errandorder','logic');
+        $result=$logic_errand_order->evaluateO2oErrandOrder($this->member_info['member_id'],$o2o_errand_order_id,$score,$comment);
         if(!$result['code']){
             ds_json_encode(10001, $result['msg']);
         }

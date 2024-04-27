@@ -60,7 +60,9 @@
             <dt>详细地址{$Think.lang.ds_colon}</dt>
             <dd>
                 <input type="text" value="{$o2o_fuwu_organization_info.o2o_fuwu_organization_address}" name="organization_address" id="organization_address" class="text w400" {if $Think.config.ds_config.mapak_type eq '2'}onkeyup="local.search($(this).val());"{/if}>
+                <!--{if $Think.config.ds_config.mapak_type neq '0'}-->
                 <div id="allmap" style="width:530px;height: 350px;margin-top: 20px"></div>
+                <!--{/if}-->
             </dd>
         </dl>
         <div class="bottom">
@@ -78,7 +80,8 @@
         }
 </script>
 <script type="text/javascript" src="//webapi.amap.com/maps?v=2.0&key={$Think.config.ds_config.gaode_ak}"></script>
-<!--{else}-->
+<!--{/if}-->
+<!--{if $Think.config.ds_config.mapak_type eq '2'}-->
 <script type="text/javascript" src="{$Think.HTTP_TYPE}api.map.baidu.com/api?v=2.0&ak={$Think.config.ds_config.baidu_ak}"></script>
 <!--{/if}-->
 <script>
@@ -101,7 +104,7 @@ var local;
     $(function(){
 		var lng = '{$o2o_fuwu_organization_info.o2o_fuwu_organization_lng}';
         var lat = '{$o2o_fuwu_organization_info.o2o_fuwu_organization_lat}';
-		if ({$Think.config.ds_config.mapak_type} == '1'){
+		if ('{$Think.config.ds_config.mapak_type}' === '1'){
 			map = new AMap.Map("allmap", {
 				resizeEnable: true,
 				zoom:15
@@ -214,7 +217,8 @@ var local;
 					map.add(marker);
 				});
 			}		
-		}else{
+		}
+                if ('{$Think.config.ds_config.mapak_type}' === '2'){
 			map = new BMap.Map("allmap");
 			if(!lng && !lat){
 				var geolocation = new BMap.Geolocation();

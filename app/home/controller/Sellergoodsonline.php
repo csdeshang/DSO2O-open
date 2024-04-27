@@ -22,6 +22,9 @@ class  Sellergoodsonline extends BaseSeller {
         parent::initialize();
         Lang::load(base_path() . 'home/lang/' . config('lang.default_lang') . '/sellergoodsadd.lang.php');
         $this->template_dir = 'default/seller/sellergoodsadd/';
+        if (empty($this->store_info['store_latitude'])) {
+            $this->error(lang('store_goods_no_store_latitude'), url('Sellersetting/map'));
+        }
     }
 
     public function index() {
@@ -235,14 +238,10 @@ class  Sellergoodsonline extends BaseSeller {
         View::assign('store_class_goods', $goods_stcids_new);
 
         // 是否能使用编辑器
-        if (check_platform_store()) { // 平台店铺可以使用编辑器
-            $editor_multimedia = true;
-        } else {    // 三方店铺需要
             $editor_multimedia = false;
             if ($this->store_grade['storegrade_function'] == 'editor_multimedia') {
                 $editor_multimedia = true;
             }
-        }
         View::assign('editor_multimedia', $editor_multimedia);
 
         // 小时分钟显示
@@ -282,8 +281,6 @@ class  Sellergoodsonline extends BaseSeller {
             ds_json_encode(10001, lang('store_goods_index_again_choose_category1'));
         }
 
-        // 三方店铺验证是否绑定了该分类
-        if (!check_platform_store()) {
             //商品分类 提供批量显示所有分类插件
             $storebindclass_model = model('storebindclass');
             $goods_class = model('goodsclass')->getGoodsclassForCacheModel();
@@ -313,7 +310,6 @@ class  Sellergoodsonline extends BaseSeller {
                     }
                 }
             }
-        }
         // 分类信息
         $goods_class = model('goodsclass')->getGoodsclassLineForTag(intval(input('post.cate_id')));
         $goods_model = model('goods');
@@ -399,7 +395,6 @@ class  Sellergoodsonline extends BaseSeller {
         }
         $update_common['plateid_top'] = intval(input('post.plate_top')) > 0 ? intval(input('post.plate_top')) : '';
         $update_common['plateid_bottom'] = intval(input('post.plate_bottom')) > 0 ? intval(input('post.plate_bottom')) : '';
-        $update_common['is_platform_store'] = in_array(session('store_id'), model('store')->getOwnShopIds()) ? 1 : 0;
 
         // 开始事务
         Db::startTrans();
@@ -449,7 +444,6 @@ class  Sellergoodsonline extends BaseSeller {
                     $update['goods_if_required'] = $update_common['goods_if_required'];
                     $update['goods_stcids'] = $update_common['goods_stcids'];
 
-                    $update['is_platform_store'] = $update_common['is_platform_store'];
                     $goods_model->editGoodsById($update, $goods_id);
                 } else {
                     $insert = array();
@@ -483,7 +477,6 @@ class  Sellergoodsonline extends BaseSeller {
                     $insert['goods_commend'] = $update_common['goods_commend'];
                     $insert['goods_if_required'] = $update_common['goods_if_required'];
                     $insert['goods_stcids'] = $update_common['goods_stcids'];
-                    $insert['is_platform_store'] = $update_common['is_platform_store'];
                     $goods_id = $goods_model->addGoods($insert);
                 }
                 $goodsid_array[] = intval($goods_id);
@@ -523,7 +516,6 @@ class  Sellergoodsonline extends BaseSeller {
                 $update['goods_commend'] = $update_common['goods_commend'];
                 $update['goods_if_required'] = $update_common['goods_if_required'];
                 $update['goods_stcids'] = $update_common['goods_stcids'];
-                $update['is_platform_store'] = $update_common['is_platform_store'];
                 $goods_model->editGoodsById($update, $goods_id);
             } else {
                 $insert = array();
@@ -557,7 +549,6 @@ class  Sellergoodsonline extends BaseSeller {
                 $insert['goods_commend'] = $update_common['goods_commend'];
                 $insert['goods_if_required'] = $update_common['goods_if_required'];
                 $insert['goods_stcids'] = $update_common['goods_stcids'];
-                $insert['is_platform_store'] = $update_common['is_platform_store'];
                 $goods_id = $goods_model->addGoods($insert);
             }
             $goodsid_array[] = intval($goods_id);

@@ -128,12 +128,15 @@
                 </div>
             </div>
         </div>
+            <!--{if $Think.config.ds_config.mapak_type neq '0'}-->
         <div data-id="info_pxjl" class="detail-photo-wrap">
             <div class="module-title">
                 <h2 class="title">所在地址</h2>
             </div>
             <div id='allmap' class='map'></div>
         </div>
+            <!--{/if}-->
+            
         </div>
     </div>
 </div>
@@ -144,7 +147,8 @@
         }
 </script>
 <script type="text/javascript" src="//webapi.amap.com/maps?v=2.0&key={$Think.config.ds_config.gaode_ak}"></script>
-<!--{else}-->
+<!--{/if}-->
+<!--{if $Think.config.ds_config.mapak_type eq '2'}-->
 <script type="text/javascript" src="{$Think.HTTP_TYPE}api.map.baidu.com/api?v=2.0&ak={$Think.config.ds_config.baidu_ak}"></script>
 <!--{/if}-->
 <script>
@@ -190,7 +194,7 @@ $(function () {
 
 	var lng = '{$o2o_fuwu_organization_info.o2o_fuwu_organization_lng}';
 	var lat = '{$o2o_fuwu_organization_info.o2o_fuwu_organization_lat}';
-	if({$Think.config.ds_config.mapak_type} == '1'){
+	if('{$Think.config.ds_config.mapak_type}' === '1'){
 		var map = new AMap.Map("allmap", {
 			resizeEnable: true,
 			zoom:15
@@ -203,7 +207,8 @@ $(function () {
 		});
 		map.add(marker);
 		map.panTo([lng, lat]);
-	}else{
+	}
+        if('{$Think.config.ds_config.mapak_type}' === '2'){
 		var map = new BMap.Map("allmap");
 		
 		var point = new BMap.Point(lng, lat);

@@ -97,7 +97,6 @@ $lang['pre_sale_refund'] = '售前退款';
 $lang['after_sale_refund'] = '售后退款';
 $lang['return_before_sale'] = '售前退货';
 $lang['return_after_sale'] = '售后退货';
-$lang['bill_confirmed'] = '待确认账单';
 $lang['sales_statistics'] = '销售情况统计';
 $lang['statistics_store_order_quantity'] = '按周期统计商家店铺的订单量和订单金额';
 $lang['store_item'] = '项目';

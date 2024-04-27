@@ -40,11 +40,10 @@ class SellerO2o extends BaseSeller {
                 'store_o2o_receipt' => abs(intval(input('post.store_o2o_receipt'))),
                 'store_o2o_receipt_limit' => abs(intval(input('post.store_o2o_receipt_limit'))),
                 'store_o2o_complaint_fine' => abs(floatval(input('post.store_o2o_complaint_fine'))),
-                'store_o2o_distribute_type' => (((!$this->store_info['is_platform_store'] && $this->store_info['store_o2o_support']) || $this->store_info['is_platform_store']) && config('ds_config.o2o_open')) ? intval(input('post.store_o2o_distribute_type')) : 1,
+                'store_o2o_distribute_type' => config('ds_config.o2o_open') ? intval(input('post.store_o2o_distribute_type')) : 1,
                 'store_o2o_open_start' => $store_o2o_open_time[0],
                 'store_o2o_open_end' => $store_o2o_open_time[1],
                 'store_o2o_auto_receipt' => intval(input('post.store_o2o_auto_receipt')),
-                'store_o2o_auto_deliver' => intval(input('post.store_o2o_auto_deliver')),
                 'store_o2o_min_cost' => abs(intval(input('post.store_o2o_min_cost'))),
                 'store_o2o_reject_time' => abs(intval(input('post.store_o2o_reject_time'))),
             );

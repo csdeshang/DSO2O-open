@@ -54,9 +54,6 @@ class  Sellerinviter extends BaseSeller {
     public function goods_list() {
         $goods_model = model('goods');
 
-        if (check_platform_store()) {
-            View::assign('isPlatformStore', true);
-        }
 
         $condition = array();
         $condition[] = array('store_id','=',session('store_id'));

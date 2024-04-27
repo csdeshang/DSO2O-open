@@ -38,7 +38,7 @@ class  Member extends BaseMember {
         $order_list['order_noreceipt_count'] = $order_model->getOrderCountByID('buyer', session('member_id'), 'SendCount');
         $order_list['order_noeval_count'] = $order_model->getOrderCountByID('buyer', session('member_id'), 'EvalCount');
         $order_list['order_noship_count'] = $order_model->getOrderCountByID('buyer', session('member_id'), 'PayCount');
-        $order_list['order_refund_count'] = $refundreturn_model->getRefundreturnCount(array(array('buyer_id','=',session('member_id')),array('refund_state','in',[1,2])));
+        $order_list['order_refund_count'] = $refundreturn_model->getRefundreturnCount(array(array('buyer_id','=',session('member_id')),array('refundreturn_admin_state','in',[1,2])));
         
         View::assign('home_order_info', $order_list);
         

@@ -59,7 +59,7 @@ class  Search extends BaseMall {
         View::assign('checked_attr', $checked_attr);
 
         //处理排序
-        $order = 'is_platform_store desc,goods_id desc';
+        $order = 'goods_id desc';
         $key = input('param.key');
         $sequence = input('param.order');
         if (in_array($key, array('1', '2', '3'))) {
@@ -89,10 +89,6 @@ class  Search extends BaseMall {
                 $condition[] = array('areaid_1','=',$area_id);
             }
 
-            $type = intval(input('param.type'));
-            if ($type == 1) {
-                $condition[] = array('is_platform_store','=',1);
-            }
             $gift = intval(input('param.gift'));
             if ($gift == 1) {
                 $condition[] = array('is_have_gift','=',1);

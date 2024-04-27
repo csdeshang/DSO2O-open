@@ -62,9 +62,6 @@
                 <dt><i class="iconfont orange">&#xe764;</i>{$Think.lang.store_order_state}：</dt>
                 <dd>{$Think.lang.trading_closed}</dd>
             </dl>
-            <ul>
-                <li>{$order_info['close_info']['log_role']} {$Think.lang.store_show_order_at} {$order_info['close_info']['log_time']|date="Y-m-d H:i:s"} {$order_info['close_info']['log_msg']}</li>
-            </ul>
         </div>
         {/if}
         {if $order_info['order_state'] == ORDER_STATE_NEW}
@@ -213,27 +210,21 @@
                         <dl class="goods-name">
                             <dt><a target="_blank" href="{$goods.goods_url}">{$goods.goods_name}</a></dt>
                             <dd>
-                                <?php if (isset($refund_all)) {?>
-                                <?php if (is_array($refund_all) && !empty($refund_all)) {?>
-                                {$Think.lang.refund_number}：<a target="_blank" href="{:url('Sellerrefund/view',['refund_id'=>$refund_all.refund_id])}">{$refund_all.refund_sn}</a>
-                                <?php }else if($goods['extend_refund']['refund_type'] == 1) {?>
-                                {$Think.lang.refund_number}：<a target="_blank" href="{:url('Sellerrefund/view',['refund_id'=>$goods.extend_refund.refund_id])}">{$goods['extend_refund']['refund_sn']}</a></dd>
-                            <?php }else if($goods['extend_refund']['refund_type'] == 2) {?>
-                            {$Think.lang.return_number}：<a target="_blank" href="{:url('Sellerreturn/view',['refund_id'=>$goods.extend_refund.refund_id])}">{$goods['extend_refund']['refund_sn']}</a>
+                                <?php if (isset($goods['extend_order_goods_refund'])) {?>
+                                <?php if($goods['extend_order_goods_refund']['refund_type'] == 1) {?>
+                                 {$Think.lang.refund_number}：<a target="_blank" href="{:url('Sellerrefund/view',['refund_id'=>$goods.extend_order_goods_refund.refund_id])}">{$goods['extend_order_goods_refund']['refund_sn']}</a></dd>
+                            <?php }else if($goods['extend_order_goods_refund']['refund_type'] == 2) {?>
+                            {$Think.lang.return_number}：<a target="_blank" href="{:url('Sellerreturn/view',['return_id'=>$goods.extend_order_goods_refund.refund_id])}">{$goods['extend_order_goods_refund']['refund_sn']}</a>
+                            <?php } ?>
+                            <?php } ?>
                             </dd>
-                            <?php } ?>
-                            <?php } ?>
                         </dl>
                     </td>
                     <td>{$goods.goods_price}
                         <p class="green">
-                            <?php if (isset($refund_all)) {?>
-                            <?php if (is_array($refund_all) && !empty($refund_all) && $refund_all['admin_time'] > 0) {?>
-                            {$goods.goods_pay_price}<span>{$Think.lang.refund}</span>
-                            <?php } elseif (isset($goods['extend_refund']) && $goods['extend_refund']['admin_time'] > 0) { ?>
-                            {$goods['extend_refund']['refund_amount']}<span>{$Think.lang.refund}</span>
-                            <?php } ?>
-                            <?php } ?>
+                            {if isset($goods['extend_order_goods_refund']) && $goods['extend_order_goods_refund']['refundreturn_admin_time'] > 0}
+                            退款:{$goods.extend_order_goods_refund.refund_amount}
+                            {/if}
                         </p></td>
                     <td>{$goods.goods_num}</td>
                     <td>{$goods.goods_type_cn}</td>
@@ -246,7 +237,7 @@
                     <!-- S 合并TD -->
                     {if (($order_info['goods_count'] > 1 && $k ==0) || ($order_info['goods_count'] == 1))}
                     <td class="bdl bdr" rowspan="{$order_info.goods_count}">{$order_info.state_desc|raw}
-                        {if $order_info.if_lock}
+                        {if $order_info.if_order_refund_lock}
                         <p>{$Think.lang.refund_return_goods}</p>
                         {/if}
 
@@ -323,6 +314,14 @@
             </tfoot>
         </table>
     </div>
+    <div class="dssc-orderlog mt15" style="border: 1px solid #DDD;padding: 15px;color: #666;">
+        {foreach name="$order_info.extend_orderlog" item="orderlog" }
+        <dl style="line-height: 30px;">
+            {$orderlog.log_role} {$orderlog.log_user} {$orderlog.log_time|date="Y-m-d H:i:s"}&emsp;{$orderlog.log_msg}
+        </dl>
+        {/foreach}
+    </div>    
+    
 </div>
 <form id="pickup_form" method="post" action="{:url('Sellerorder/pickup_order')}">
     <input id="pickup_order_id" name="order_id" value="{$order_info.order_id}" type="hidden" />

@@ -1,6 +1,6 @@
 {extend name="default/base/base_seller" /}
 {block name="seller_btn"}
-{if isset($isPlatformStore) || config('ds_config.promotion_xianshi_price')==0}
+{if config('ds_config.promotion_xianshi_price')==0}
 <a class="dssc-btn dssc-btn-green" href="{:url('Sellerpromotionxianshi/xianshi_add')}"><i class="iconfont">&#xe6db;</i>{$Think.lang.xianshi_add}</a>
 {else /}
 {notempty name="current_xianshi_quota"}
@@ -14,7 +14,7 @@
 
 {/block}
 {block name="seller_main"}
-{if isset($isPlatformStore) || config('ds_config.promotion_xianshi_price')==0}
+{if config('ds_config.promotion_xianshi_price')==0}
 <div class="alert alert-block mt10">
     <ul>
         <li>{$Think.lang.information_discount_activities1}</li>

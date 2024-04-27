@@ -1,17 +1,9 @@
 <?php
 $lang['config_business_licence'] = '营业执照';
-$lang['o2o_distributor_bill_cycle'] = '配送员结算周期';
-$lang['o2o_distributor_bill_cycle_tips'] = '自动为配送员结算的周期设置区间为1-100数值';
-$lang['o2o_distributor_bill_cycle_error'] = '配送员结算周期设置错误';
-$lang['o2o_distributor_bill_cycle_required'] = '请填写配送员结算周期';
 
 $lang['if_o2o_open'] = '开启平台配送';
 $lang['o2o_open_notice'] = '开启后，订单店铺为支持平台配送的店铺并且收货地址在配送范围内则会出现平台配送方式';
 
-$lang['store_bill_cycle'] = '店铺结算周期';
-$lang['store_bill_cycle_tips'] = '自动为机构结算的周期，需大于等于7天（因为有7天可退款期）';
-$lang['store_bill_cycle_error'] = '店铺结算周期设置错误';
-$lang['store_bill_cycle_required'] = '请填写店铺结算周期';
 
 $lang['site_name'] = '网站名称';
 $lang['seller_center_logo'] = '商家中心LOGO';

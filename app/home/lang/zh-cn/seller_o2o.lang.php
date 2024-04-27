@@ -38,7 +38,6 @@ $lang['store_o2o_distribute_type_0']= '平台';
 $lang['store_o2o_distribute_type_1']= '店铺';
 $lang['store_o2o_open_time']= '营业时间';
 $lang['store_o2o_auto_receipt']= '自动接单';
-$lang['store_o2o_auto_deliver']= '自动派单';
 $lang['store_o2o_receipt']= '开启接单';
 $lang['store_o2o_min_cost']= '接单门槛';
 $lang['store_o2o_min_cost_help']= '元。用户下单时达到此购物金额，才能提交订单';

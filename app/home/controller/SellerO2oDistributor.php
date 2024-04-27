@@ -5,7 +5,6 @@ namespace app\home\controller;
 use think\facade\View;
 use think\facade\Lang;
 use think\Validate;
-use GatewayClient\Gateway;
 
 /**
  * ============================================================================
@@ -80,56 +79,26 @@ class SellerO2oDistributor extends BaseSeller {
         $o2o_distributor_model = model('o2o_distributor');
         $order_model = model('order');
         $condition = array();
-        $region_id=input('param.region_id');
         $keyword=input('param.keyword');
-        if($region_id){
-            $area_model=model('area');
-            $ids=$area_model->getChildrenIDs($region_id);
-            $ids[]=$region_id;
-            $condition[]=array('o2o_distributor_region_id','in',$ids);
-        }
         if($keyword){
             $condition[]=array('o2o_distributor_name|o2o_distributor_realname|o2o_distributor_phone|o2o_distributor_email','like','%'.$keyword.'%');
         }
+        $condition[] = array('o2o_distributor_lng','>',0);
+        $condition[] = array('o2o_distributor_lat','>',0);
         $condition = array_merge($condition, array(
             array('store_id' ,'=', session('store_id')),
             array('o2o_distributor_state','=','1')
         ));
         $order = 'o2o_distributor_addtime desc';
         $o2o_distributor_list = $o2o_distributor_model->getO2oDistributorList($condition, '*', 10, $order);
-        if(config('ds_config.instant_message_open')){
-            Gateway::$registerAddress = config('ds_config.instant_message_register_url');
-        }
         foreach ($o2o_distributor_list as $key => $val) {
             $o2o_distributor_list[$key]['o2o_distributor_avatar'] = get_o2o_distributor_file($val['o2o_distributor_avatar'],'avatar');
             $o2o_distributor_list[$key]['count_wait'] = $order_model->getOrderCount(array(array('o2o_order_deliver_time', '>', strtotime(date('Y-m-d 0:0:0'))), array('o2o_distributor_id', '=', $val['o2o_distributor_id']), array('order_state', 'in', [ORDER_STATE_DELIVER, ORDER_STATE_SEND])));
             $o2o_distributor_list[$key]['count_complete'] = $order_model->getOrderCount(array(array('o2o_order_deliver_time', '>', strtotime(date('Y-m-d 0:0:0'))), array('o2o_distributor_id', '=', $val['o2o_distributor_id']), array('order_state', 'in', [ORDER_STATE_SUCCESS])));
-            $state=0;
-            if(config('ds_config.instant_message_open')){
-                if(Gateway::isUidOnline('5:'.$val['o2o_distributor_id'])){
-                    $state=1;
-                }
-            }
-            $o2o_distributor_list[$key]['state'] = $state;
         }
         ds_json_encode(10000, '', $o2o_distributor_list);
     }
     
-    public function join(){
-        session('name');
-        $client_id = input('param.client_id');
-        if (config('ds_config.instant_message_open')) {
-            // 设置GatewayWorker服务的Register服务ip和端口，请根据实际情况改成实际值(ip不能是0.0.0.0)
-            try {
-                Gateway::$registerAddress = config('ds_config.instant_message_register_url');
-                // 加入某个群组（可调用多次加入多个群组）
-                Gateway::joinGroup($client_id, 'seller');
-            } catch (\Exception $e) {
-                ds_json_encode(10001, $e->getMessage());
-            }
-        }
-        ds_json_encode(10000, '');
-    }
     
     public function map(){
         View::assign('baidu_ak', config('ds_config.baidu_ak'));

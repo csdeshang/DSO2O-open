@@ -24,7 +24,6 @@ class  O2oFuwuToken extends BaseModel {
      * @access public
      * @author csdeshang 
      * @param array $o2o_fuwu 服务机构信息
-     * @param string $client_type 客户端
      * @return string
      */
     public function genO2oFuwuToken($o2o_fuwu) {

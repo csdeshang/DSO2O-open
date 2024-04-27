@@ -134,7 +134,7 @@ define('COMMON_IMAGES_EXT', '_240,_480,_1280');
 define('ORDER_STATE_CANCEL', 0);
 //已产生但未支付
 define('ORDER_STATE_NEW', 10);
-//待接单
+//待接单(已支付)
 define('ORDER_STATE_PAY', 20);
 //待派单
 define('ORDER_STATE_RECEIPT', 23);
@@ -167,13 +167,6 @@ define('O2O_FUWU_ORDER_STATE_SEND', 30);
 //已服务
 define('O2O_FUWU_ORDER_STATE_SUCCESS', 40);
 
-/*
- * 配送员结算状态
- */
-define('O2O_ORDER_BILL_STATE_CREATE', 0);//待配送员确认
-define('O2O_ORDER_BILL_STATE_CHECK', 1);//待店长确认
-define('O2O_ORDER_BILL_STATE_PAY', 2);//待付款
-define('O2O_ORDER_BILL_STATE_SUCCESS', 3);//已完成
 
 
 ?>

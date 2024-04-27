@@ -1,7 +1,6 @@
 <?php
 
 use think\facade\Db;
-use GatewayClient\Gateway;
 
 /* 引用全局定义 */
 require __DIR__ . '/common_global.php';
@@ -30,31 +29,36 @@ function model($name, $layer = 'model') {
 }
 
 /**
+ * 过滤特殊字符
+ * @param type $clean_text
+ * @return type
+ */
+function remove_special_words($clean_text) {
+    //不过滤变量
+    $filter = ['modify_pwd', 'modify_mobile', 'modify_email','modify_paypwd', 'unionpay', 'unionpay_h5',];
+    if(in_array($clean_text, $filter)){
+        return $clean_text;
+    }
+    
+    $farr = [
+            "/select|join|where|drop|like|modify|rename|insert|update|table|database|alter|truncate|union|into|load_file|outfile/is"
+        ];
+    $clean_text = preg_replace($farr, '', $clean_text);
+    return $clean_text;
+}
+
+/**
  * 去除特殊表情符号
  * @param type $string
  * @return type
  */
 function removeEmojis($clean_text) {
-    // Match Emoticons
-    $regexEmoticons = '/[\x{1F600}-\x{1F64F}]/u';
-    $clean_text = preg_replace($regexEmoticons, '', $clean_text);
-
-    // Match Miscellaneous Symbols and Pictographs
-    $regexSymbols = '/[\x{1F300}-\x{1F5FF}]/u';
-    $clean_text = preg_replace($regexSymbols, '', $clean_text);
-
-    // Match Transport And Map Symbols
-    $regexTransport = '/[\x{1F680}-\x{1F6FF}]/u';
-    $clean_text = preg_replace($regexTransport, '', $clean_text);
-
-    // Match Miscellaneous Symbols
-    $regexMisc = '/[\x{2600}-\x{26FF}]/u';
-    $clean_text = preg_replace($regexMisc, '', $clean_text);
-
-    // Match Dingbats
-    $regexDingbats = '/[\x{2700}-\x{27BF}]/u';
-    $clean_text = preg_replace($regexDingbats, '', $clean_text);
-
+    $clean_text = preg_replace_callback(//执行一个正则表达式搜索并且使用一个回调进行替换
+            '/./u',
+            function (array $match) {
+                return strlen($match[0]) >= 4 ? '' : $match[0];
+            },
+            $clean_text);
     return $clean_text;
 }
 
@@ -907,26 +911,6 @@ function dcache($key = null, $prefix = '') {
     return cache($name, NULL);
 }
 
-/*
- * 通知接单配送员
- */
-
-function o2o_send_order($order_list) {
-    if (config('ds_config.instant_message_open')==1) {
-        // 设置GatewayWorker服务的Register服务ip和端口，请根据实际情况改成实际值(ip不能是0.0.0.0)
-        try{
-            Gateway::$registerAddress = config('ds_config.instant_message_register_url');
-            foreach($order_list as $order_info){
-                Gateway::sendToUid('5:'.$order_info['o2o_distributor_id'], json_encode(array('type'=>'addOrder','order_info'=>$order_info)));
-            }
-        }catch(\Exception $e){
-            return ds_callback(false,$e->getMessage());
-        }
-    }else{
-        return ds_callback(false,'未设置GatewayWorker gateway地址');
-    }
-    
-}
 
 /**
  * 输出聊天信息
@@ -937,24 +921,7 @@ function get_chat() {
     return Chat::getChatHtml();
 }
 
-/**
- * 验证是否为平台店铺
- *
- * @return boolean
- */
-function check_platform_store() {
-    return session('is_platform_store');
-}
 
-/**
- * 验证是否为平台店铺 并且绑定了全部商品类目
- *
- * @return boolean
- */
-function check_platform_store_bindingall_goodsclass() {
-
-    return check_platform_store() && session('bind_all_gc');
-}
 
 /**
  * 生成20位编号(时间+微秒+随机数+会员ID%1000)，该值会传给第三方支付接口
@@ -1136,32 +1103,6 @@ function dsLayerOpenSuccess($msg = '', $url = '') {
     exit;
 }
 
-/**
- * 移除微信昵称中的emoji字符
- * @param type $nickname
- * @return type
- */
-function removeEmoji($nickname) {
-    $clean_text = "";
-    // Match Emoticons
-    $regexEmoticons = '/[\x{1F600}-\x{1F64F}]/u';
-    $clean_text = preg_replace($regexEmoticons, '', $nickname);
-    // Match Miscellaneous Symbols and Pictographs
-    $regexSymbols = '/[\x{1F300}-\x{1F5FF}]/u';
-    $clean_text = preg_replace($regexSymbols, '', $clean_text);
-    // Match Transport And Map Symbols
-    $regexTransport = '/[\x{1F680}-\x{1F6FF}]/u';
-    $clean_text = preg_replace($regexTransport, '', $clean_text);
-    // Match Miscellaneous Symbols
-    $regexMisc = '/[\x{2600}-\x{26FF}]/u';
-    $clean_text = preg_replace($regexMisc, '', $clean_text);
-    // Match Dingbats
-    $regexDingbats = '/[\x{2700}-\x{27BF}]/u';
-    $clean_text = preg_replace($regexDingbats, '', $clean_text);
-    //截取指定长度的昵称
-    $clean_text = ds_substing($clean_text, 0, 20);
-    return trim($clean_text);
-}
 
 /**
  * 截取指定长度的字符
@@ -1322,7 +1263,120 @@ function image_filter($img_url) {
     return ds_callback(true, '', $data);
 }
 
-function text_filter($text) {
-    preg_match_all('/[\x{4e00}-\x{9fa5}a-zA-Z0-9]/u',$text,$result);
-    return implode('',$result[0]);
+/**
+ * 获取文字首字母
+ * @param type $str
+ * @return string
+ */
+function get_first_charter($str) {
+    if (empty($str)) {
+        return 'Z';
+    }
+    $fchar = ord($str{0});
+    if ($fchar >= ord('A') && $fchar <= ord('z'))
+        return strtoupper($str{0});
+    $s1 = iconv('UTF-8', 'GBK', $str);
+    $s2 = iconv('GBK', 'UTF-8', $s1);
+    $s = $s2 == $str ? $s1 : $str;
+    $asc = ord($s{0}) * 256 + ord($s{1}) - 65536;
+    if ($asc >= -20319 && $asc <= -20284)
+        return 'A';
+    if ($asc >= -20283 && $asc <= -19776)
+        return 'B';
+    if ($asc >= -19775 && $asc <= -19219)
+        return 'C';
+    if ($asc >= -19218 && $asc <= -18711)
+        return 'D';
+    if ($asc >= -18710 && $asc <= -18527)
+        return 'E';
+    if ($asc >= -18526 && $asc <= -18240)
+        return 'F';
+    if ($asc >= -18239 && $asc <= -17923)
+        return 'G';
+    if ($asc >= -17922 && $asc <= -17418)
+        return 'H';
+    if ($asc >= -17417 && $asc <= -16475)
+        return 'J';
+    if ($asc >= -16474 && $asc <= -16213)
+        return 'K';
+    if ($asc >= -16212 && $asc <= -15641)
+        return 'L';
+    if ($asc >= -15640 && $asc <= -15166)
+        return 'M';
+    if ($asc >= -15165 && $asc <= -14923)
+        return 'N';
+    if ($asc >= -14922 && $asc <= -14915)
+        return 'O';
+    if ($asc >= -14914 && $asc <= -14631)
+        return 'P';
+    if ($asc >= -14630 && $asc <= -14150)
+        return 'Q';
+    if ($asc >= -14149 && $asc <= -14091)
+        return 'R';
+    if ($asc >= -14090 && $asc <= -13319)
+        return 'S';
+    if ($asc >= -13318 && $asc <= -12839)
+        return 'T';
+    if ($asc >= -12838 && $asc <= -12557)
+        return 'W';
+    if ($asc >= -12556 && $asc <= -11848)
+        return 'X';
+    if ($asc >= -11847 && $asc <= -11056)
+        return 'Y';
+    if ($asc >= -11055 && $asc <= -10247)
+        return 'Z';
+    return 'Z';
+}
+
+
+//根据USER_AGENT 获取系统名称
+function getOSFromUserAgent() {
+    $userAgent = $_SERVER['HTTP_USER_AGENT'];
+    $osPatterns = array(
+        '/windows nt 6.2/i' => 'Windows 8',
+        '/windows nt 6.1/i' => 'Windows 7',
+        '/windows nt 6.0/i' => 'Windows Vista',
+        '/windows nt 5.2/i' => 'Windows Server 2003/XP x64',
+        '/windows nt 5.1/i' => 'Windows XP',
+        '/windows xp/i' => 'Windows XP',
+        '/windows nt 5.0/i' => 'Windows 2000',
+        '/windows me/i' => 'Windows ME',
+        '/win98/i' => 'Windows 98',
+        '/win95/i' => 'Windows 95',
+        '/win16/i' => 'Windows 3.11',
+        '/macintosh|mac os x/i' => 'Mac OS X',
+        '/mac_powerpc/i' => 'Mac OS 9',
+        '/linux/i' => 'Linux',
+        '/unix/i' => 'Unix',
+        '/sunos/i' => 'SunOS',
+        '/bsd/i' => 'FreeBSD',
+        '/ibm/i' => 'IBM OS/2',
+        '/applewebkit/i' => 'Apple WebKit',
+        '/chrome/i' => 'Chrome',
+        '/safari/i' => 'Safari',
+        '/opera/i' => 'Opera',
+        '/opera mobi/i' => 'Opera Mobile',
+        '/opera mini/i' => 'Opera Mini',
+        '/konqueror/i' => 'Konqueror',
+        '/mozilla/i' => 'Mozilla Firefox',
+        '/seamonkey/i' => 'SeaMonkey',
+        '/firefox/i' => 'Mozilla Firefox',
+        '/msie/i' => 'Internet Explorer',
+        '/netscape/i' => 'Netscape',
+        '/maxthon/i' => 'Maxthon',
+        '/tencent traveler/i' => 'Tencent Traveler',
+        '/trident/i' => 'Trident',
+        '/realplayer/i' => 'RealPlayer',
+        '/flashget/i' => 'FlashGet',
+        '/java/i' => 'Java',
+        '/curl/i' => 'cURL',
+        '/wget/i' => 'Wget',
+        '/googlebot/i' => 'Googlebot',
+    );
+    foreach ($osPatterns as $pattern => $os) {
+        if (preg_match($pattern, $userAgent)) {
+            return $os;
+        }
+    }   
+    return '未知系统';
 }

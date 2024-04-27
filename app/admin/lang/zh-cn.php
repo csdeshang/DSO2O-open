@@ -17,8 +17,9 @@ $lang['o2o_third']='第三方配送';
 $lang['o2o_printer_setting']='打印机设置';
 $lang['o2o_setting']='配送设置';
 $lang['o2o_distributor_manage']='配送员管理';
-$lang['o2o_order_bill_manage']='配送员结算';
 $lang['o2o_distributor']='配送员';
+$lang['o2o_distributor_money']='配送员资金';
+
 //设置
 $lang['ds_dashboard'] = '控制台';
 $lang['ds_welcome'] = '欢迎界面';
@@ -68,19 +69,16 @@ $lang['ds_storegrade'] = '店铺等级';
 $lang['ds_storeclass'] = '店铺分类';
 $lang['ds_storehelp'] = '店铺帮助';
 $lang['ds_storejoin'] = '开店首页';
-$lang['ds_ownshop'] = '自营店铺';
 //交易
 $lang['ds_trade'] = '交易';
 $lang['ds_o2o_errand_order']='跑腿订单';
 $lang['ds_order'] = '实物订单';
 $lang['ds_refund'] = '退款管理';
 $lang['ds_return'] = '退货管理';
-$lang['ds_bill_manage'] = '订单结算';
 $lang['ds_consulting'] = '咨询管理';
 $lang['ds_inform'] = '举报管理';
 $lang['ds_evaluate'] = '评价管理';
 $lang['ds_complain'] = '投诉管理';
-$lang['ds_bill'] = '结算管理';
 //网站
 $lang['ds_website'] = '网站';
 $lang['ds_articleclass'] = '文章分类';

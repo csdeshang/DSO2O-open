@@ -207,35 +207,6 @@ class Stat extends BaseModel
         }
     }
 
-    /**
-     * 获取结算数据
-     * @access public
-     * @author csdeshang
-     * @param type $condition 条件
-     * @param type $type 类型
-     * @param type $have_page 判断分页
-     * @return type
-     */
-    public function getBillList($condition, $type, $have_page = true)
-    {
-        switch ($type) {
-            case 'os'://平台
-                return Db::name('orderstatis')->field('sum(os_order_totals) as oot,sum(os_order_returntotals) as oort,sum(os_commis_totals-os_commis_returntotals) as oct,sum(os_store_costtotals) as osct,sum(os_result_totals) as ort')->where($condition)->select()->toArray();
-                break;
-            case 'ob'://店铺
-                $pagesize = $have_page ? 15 : '';
-                $result = Db::name('orderbill')->alias('order_bill')->join('store store', 'order_bill.ob_store_id=store.store_id', 'left')->field('order_bill.*,store.member_name')->where($condition)->order('ob_no desc');
-                if($have_page){
-                  $result=$result->paginate(['list_rows'=>$pagesize,'query' => request()->param()],false);
-                  $this->page_info = $result;
-                  return $result->items();
-                }else{
-                  $result=$result->select()->toArray();
-                  return $result;
-                }
-                break;
-        }
-    }
 
     /**
      * 查询订单及订单商品的统计

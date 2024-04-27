@@ -88,7 +88,7 @@ class  Memberorder extends BaseMember {
             //显示收货
             $order['if_receive'] = $order_model->getOrderOperateState('receive', $order);
             //显示锁定中
-            $order['if_lock'] = $order_model->getOrderOperateState('lock', $order);
+            $order['if_order_refund_lock'] = $order_model->getOrderOperateState('order_refund_lock', $order);
             //显示物流跟踪
             $order['if_deliver'] = $order_model->getOrderOperateState('deliver', $order);
             //显示评价
@@ -178,15 +178,11 @@ class  Memberorder extends BaseMember {
         $refundreturn_model = model('refundreturn');
         $order_list = array();
         $order_list[$order_id] = $order_info;
-        $order_list = $refundreturn_model->getGoodsRefundList($order_list, 1); //订单商品的退款退货显示
+        $order_list = $refundreturn_model->getGoodsRefundList($order_list); //订单商品的退款退货显示
         $order_info = $order_list[$order_id];
-        $refund_all = isset($order_info['refund_list'][0]) ? $order_info['refund_list'][0] : '';
-        if (!empty($refund_all) && $refund_all['seller_state'] < 3) {//订单全部退款商家审核状态:1为待审核,2为同意,3为不同意
-            View::assign('refund_all', $refund_all);
-        }
 
         //显示锁定中
-        $order_info['if_lock'] = $order_model->getOrderOperateState('lock', $order_info);
+        $order_info['if_order_refund_lock'] = $order_model->getOrderOperateState('order_refund_lock', $order_info);
 
         //显示取消订单
         $order_info['if_cancel'] = $order_model->getOrderOperateState('buyer_cancel', $order_info);
@@ -217,10 +213,6 @@ class  Memberorder extends BaseMember {
             $order_info['order_confirm_day'] = $order_info['delay_time'] + config('ds_config.order_auto_receive_day') * 24 * 3600;
         }
 
-        //如果订单已取消，取得取消原因、时间，操作人
-        if ($order_info['order_state'] == ORDER_STATE_CANCEL) {
-            $order_info['close_info'] = $order_model->getOrderlogInfo(array('order_id' => $order_info['order_id']), 'log_id desc');
-        }
 
         foreach ($order_info['extend_order_goods'] as $value) {
             $value['image_240_url'] = goods_cthumb($value['goods_image'], 240, $value['store_id']);

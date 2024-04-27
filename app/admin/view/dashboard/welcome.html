@@ -327,28 +327,6 @@
                         </a>
                     </li>
                     <li class="none">
-                        <a href="{:url('Bill/show_statis',['bill_state'=>'2'])}">
-                            <div class="p_header bg-6C93CD">
-                                <i class="iconfont">&#xe69c;</i>
-                            </div>
-                            <div class="p_content">
-                                <div class="p_text">{$Think.lang.dashboard_wel_check_billno}</div>
-                                <div class="p_num" id="dashboard_wel_check_billno">0</div>
-                            </div>
-                        </a>
-                    </li>
-                    <li class="none">
-                        <a href="{:url('Bill/show_statis',['bill_state'=>'3'])}">
-                            <div class="p_header bg-6CCDA5">
-                                <i class="iconfont">&#xe74d;</i>
-                            </div>
-                            <div class="p_content">
-                                <div class="p_text">{$Think.lang.dashboard_wel_pay_billno}</div>
-                                <div class="p_num" id="dashboard_wel_pay_billno">0</div>
-                            </div>
-                        </a>
-                    </li>
-                    <li class="none">
                         <a href="{:url('Mallconsult/index')}">
                             <div class="p_header bg-86CE86">
                                 <i class="iconfont">&#xe750;</i>
@@ -442,7 +420,7 @@
     <script src="{$Think.PLUGINS_SITE_ROOT}/highcharts/highcharts.js"></script>
     <script type="text/javascript">
         var normal = [];
-        var work = ['week_add_member', 'week_add_product','store_joinin', 'store_bind_class_applay', 'store_reopen_applay', 'store_expired', 'store_expire', 'brand_apply', 'cashlist', 'points_order', 'complain_new_list', 'complain_handle_list', 'product_verify', 'inform_list', 'refund', 'return', 'cms_article_verify', 'cms_picture_verify', 'circle_verify', 'check_billno', 'pay_billno', 'mall_consult', 'delivery_point', 'offline'];
+        var work = ['week_add_member', 'week_add_product','store_joinin', 'store_bind_class_applay', 'store_reopen_applay', 'store_expired', 'store_expire', 'brand_apply', 'cashlist', 'points_order', 'complain_new_list', 'complain_handle_list', 'product_verify', 'inform_list', 'refund', 'return', 'cms_article_verify', 'cms_picture_verify', 'circle_verify', 'mall_consult', 'delivery_point', 'offline'];
         $(document).ready(function () {
             $.getJSON("{:url('Dashboard/statistics')}", function (data) {
                 $.each(data, function (k, v) {

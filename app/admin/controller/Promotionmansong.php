@@ -54,8 +54,6 @@ class  Promotionmansong extends AdminControl
 
 
         $this->setAdminCurItem('index');
-        // 输出自营店铺IDS
-        View::assign('flippedOwnShopIds', array_flip(model('store')->getOwnShopIds()));
         return View::fetch();
     }
 

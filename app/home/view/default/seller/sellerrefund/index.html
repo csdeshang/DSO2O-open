@@ -72,11 +72,11 @@
             {/if}
             <td>{$Think.lang.currency|raw}{$val.refund_amount}</td>
             <td>{$val.buyer_name}</td>
-            <td>{$val.add_time|date="Y-m-d H:i:s"}</td>
-            <td>{$state_array[$val['seller_state']]}</td>
-            <td>{if $val['seller_state']==2}{$admin_array[$val['refund_state']]}{else/}{$Think.lang.there_no}{/if}</td>
+            <td>{$val.refundreturn_add_time|date="Y-m-d H:i:s"}</td>
+            <td>{$val.refundreturn_seller_state_desc}</td>
+            <td>{if $val['refundreturn_seller_state']==2}{$val.refundreturn_admin_state_desc}{else/}{$Think.lang.there_no}{/if}</td>
             <td class="dscs-table-handle">
-                {if $val.seller_state == 1}
+                {if $val.refundreturn_seller_state == 1}
                 <span><a href="{:url('Sellerrefund/edit',['refund_id'=>$val.refund_id])}" class="btn-blue"><i class="iconfont">&#xe731;</i><p>{$Think.lang.deal_with}</p></a></span>
                 {else /}
                 <span><a href="{:url('Sellerrefund/view',['refund_id'=>$val.refund_id])}" class="btn-orange"><i class="iconfont">&#xe70b;</i><p>{$Think.lang.ds_view}</p></a></span>

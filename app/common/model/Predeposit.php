@@ -30,16 +30,23 @@ class  Predeposit extends BaseModel {
 		'bonus'=>'红包奖励',
     );
     public $lg_type_text=array(
-        'order_pay'=>'下单使用',
+        'order_pay'=>'下单支付',
+        'store_rechargew_pay'=>'店铺充值',
+        'store_withdraw'=>'店铺提现',
         'order_freeze'=>'下单冻结',
         'order_cancel'=>'取消订单解冻',
         'order_comb_pay'=>'下单扣除被冻结',
-        'recharge'=>'平台充值卡充值',
-        'cash_apply'=>'申请提现冻结预存款',
-        'cash_pay'=>'提现成功',
-        'cash_del'=>'取消提现申请',
-        'refund'=>'确认退款',
-        'vr_refund'=>'虚拟兑码退款',
+        'recharge'=>'充值',
+        'refund'=>'退款',
+        'vr_refund'=>'虚拟退款',
+        'cash_apply'=>'申请提现冻结',
+        'cash_pay'=>'提现',
+        'cash_del'=>'取消提现解冻',
+        'sys_add_money'=>'系统增加',
+        'sys_del_money'=>'系统减少',
+        'sys_freeze_money'=>'系统冻结',
+        'sys_unfreeze_money'=>'系统解冻',
+        'order_inviter'=>'订单佣金',
     );
 
 
@@ -573,18 +580,18 @@ class  Predeposit extends BaseModel {
             //end
 
             default:
-                throw new \think\Exception('参数错误', 10006);
+                throw new \think\Exception('预存款更新参数错误', 10006);
                 break;
         }
 
         $update = model('member')->editMember(array('member_id' => $data['member_id']), $data_pd,$data['member_id']);
 
         if (!$update) {
-            throw new \think\Exception('操作失败', 10006);
+            throw new \think\Exception('预存款更新异常', 10006);
         }
         $insert = Db::name('pdlog')->insertGetId($data_log);
         if (!$insert) {
-            throw new \think\Exception('操作失败', 10006);
+            throw new \think\Exception('新增预存款记录异常', 10006);
         }
 
         // 支付成功发送买家消息

@@ -11,7 +11,8 @@
         }
 </script>
 <script type="text/javascript" src="//webapi.amap.com/maps?v=2.0&key={$Think.config.ds_config.gaode_ak}"></script>
-<!--{else}-->
+<!--{/if}-->
+<!--{if $Think.config.ds_config.mapak_type eq '2'}-->
 <script type="text/javascript" src="{$Think.HTTP_TYPE}api.map.baidu.com/api?v=2.0&ak={$Think.config.ds_config.baidu_ak}"></script>
 <!--{/if}-->
 
@@ -61,7 +62,7 @@
     mySwiper.swipeNext()
 	}
   })
-  if ({$Think.config.ds_config.mapak_type} == '1'){
+  if ('{$Think.config.ds_config.mapak_type}' === '1'){
 		map = new AMap.Map("nearby_map", {
 			resizeEnable: true,
 			zoom:15
@@ -143,7 +144,8 @@
 			$("#pos_city").text(pos_city);
 			$("#pos_district").text(pos_district);
 		}
-	}else{
+	}
+        if ('{$Think.config.ds_config.mapak_type}' === '2'){
 		map = new BMap.Map('nearby_map');
 		map.enableScrollWheelZoom();
 		map.enableContinuousZoom();
@@ -247,7 +249,6 @@
                             '<div class="store_msg">' +
                             '<div class="store_name_wrap">' +
                             '<div class="store_name">' + store_list[k].store_name + '</div>' +
-                            (store_list[k].is_platform_store ? ('<p class="self">{$Think.lang.proprietary}</p>') : '') +
                             '</div>' +
                             '<div class="announcement">' +
                             '<div class="business_time">' +
@@ -265,7 +266,7 @@
                             '</div>' +
                             '</div>' +
                             '</a>';
-							if({$Think.config.ds_config.mapak_type} == '1'){
+							if('{$Think.config.ds_config.mapak_type}' === '1'){
 								if(store_list[k].store_longitude != '' || store_list[k].store_latitude != ''){
 									var infoWindow = new AMap.InfoWindow({});
 									var marker = new AMap.Marker({
@@ -281,7 +282,8 @@
 										infoWindow.open(map, e.target.getPosition());
 									}
 								}
-							}else{
+							}
+                                                        if('{$Think.config.ds_config.mapak_type}' === '2'){
 								var marker = new BMap.Marker(new BMap.Point(store_list[k].store_longitude,store_list[k].store_latitude));  // 创建标注
 								map.addOverlay(marker);
 								var content = '<h2 style="color:orangered;font-size:16px">'+store_list[k].store_name+'</h2><p style="font-size:14px">{$Think.lang.address}：' + store_list[k].store_address + '</p><p style="font-size:14px">{$Think.lang.the_phone}：' + store_list[k].store_phone + '</p>';
@@ -334,7 +336,6 @@
                             '<div class="store_msg">' +
                             '<div class="store_name_wrap">' +
                             '<div class="store_name">' + store_list[k].store_name + '</div>' +
-                            (store_list[k].is_platform_store ? ('<p class="self">{$Think.lang.proprietary}</p>') : '') +
                             '</div>' +
                             '<div class="announcement">' +
                             '<div class="business_time">' +
@@ -353,7 +354,7 @@
                             '<div class="qrcode_wrapper"><img src="{$Think.HOME_SITE_URL}/qrcode?url={:urlencode($Think.config.ds_config.h5_site_url)}%2fhome%2fstoredetail%3fid%3d'+store_list[k].store_id+'"><p>扫一扫，进入手机店铺</p></div>' +
                             '</div>' +
                             '</a>';
-							if({$Think.config.ds_config.mapak_type} == '1'){
+							if('{$Think.config.ds_config.mapak_type}' === '1'){
 								if(store_list[k].store_longitude != '' || store_list[k].store_latitude != ''){
 									var infoWindow = new AMap.InfoWindow({});
 									var marker = new AMap.Marker({
@@ -369,7 +370,8 @@
 										infoWindow.open(map, e.target.getPosition());
 									}
 								}
-							}else{
+							}
+                                                        if('{$Think.config.ds_config.mapak_type}' === '2'){
 								var marker = new BMap.Marker(new BMap.Point(store_list[k].store_longitude,store_list[k].store_latitude));  // 创建标注
 								var content = '<h2 style="color:orangered;font-size:16px">'+store_list[k].store_name+'</h2><p style="font-size:14px">{$Think.lang.address}：' + store_list[k].store_address + '</p><p style="font-size:14px">{$Think.lang.the_phone}：' + store_list[k].store_phone + '</p>';
 								map.addOverlay(marker);               // 将标注添加到地图中
@@ -387,7 +389,7 @@
         })
     }
     function change_map(name) {
-        if({$Think.config.ds_config.mapak_type} == '1' ){
+        if('{$Think.config.ds_config.mapak_type}' === '1' ){
 			if (name != '') {
 				var map = new AMap.Map("nearby_map", {
 					resizeEnable: true,
@@ -404,7 +406,8 @@
 				$('#pos_city').text(name);
 				setCookie('pos_city', name, 30);
 			}
-		}else{
+		}
+                if('{$Think.config.ds_config.mapak_type}' === '2' ){
 			if (name != '') {
 				map.centerAndZoom(name, 16);
 				map.setCurrentCity(name);

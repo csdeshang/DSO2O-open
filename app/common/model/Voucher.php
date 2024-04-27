@@ -33,7 +33,6 @@ class Voucher extends BaseModel
         'free' => array('sign' => 3, 'name' => '免费领取')
     );
     private $quotastate_arr;
-    private $templatestate_arr;
 
     /**
      * 构造函数
@@ -49,20 +48,8 @@ class Voucher extends BaseModel
             'cancel' => array(2, lang('voucher_quotastate_cancel')),
             'expire' => array(3, lang('voucher_quotastate_expire'))
         );
-        //代金券模板状态
-        $this->templatestate_arr = array('usable' => array(1, '有效'), 'disabled' => array(2, '失效'));
     }
 
-    /**
-     * 获取代金券模板状态
-     * @access public
-     * @author csdeshang
-     * @return type
-     */
-    public function getTemplateState()
-    {
-        return $this->templatestate_arr;
-    }
 
     /**
      * 领取的代金券状态
@@ -204,10 +191,13 @@ class Voucher extends BaseModel
         //查询可用代金券模板
         $where = array();
         $where[] = array('vouchertemplate_id','=',$vid);
-        $where[] = array('vouchertemplate_state','=',$this->templatestate_arr['usable'][0]);
+        $where[] = array('vouchertemplate_state','=',1);
         $where[] = array('vouchertemplate_enddate','>',TIMESTAMP);
         $template_info = $this->getVouchertemplateInfo($where);
-        if (empty($template_info) || $template_info['vouchertemplate_total'] <= $template_info['vouchertemplate_giveout']) {//代金券不存在或者已兑换完
+        if(empty($template_info)){
+            return array('state' => false, 'msg' => '优惠券不存在');
+        }
+        if ($template_info['vouchertemplate_total'] <= $template_info['vouchertemplate_giveout']) {//代金券不存在或者已兑换完
             return array('state' => false, 'msg' => '代金券已兑换完');
         }
         //验证是否为店铺自己
@@ -522,13 +512,7 @@ class Voucher extends BaseModel
                     }
                 }
                 //状态
-                if ($v['vouchertemplate_state']) {
-                    foreach ($this->templatestate_arr as $tstate_k => $tstate_v) {
-                        if ($v['vouchertemplate_state'] == $tstate_v[0]) {
-                            $v['vouchertemplate_state_text'] = $tstate_v[1];
-                        }
-                    }
-                }
+                $v['vouchertemplate_state_text'] = $v['vouchertemplate_state']==1 ? '有效':'无效';
                 
                 //会员级别
                 /*
@@ -586,7 +570,7 @@ class Voucher extends BaseModel
         //查询推荐的热门代金券列表
         $where = array();
         $where[] = array('vouchertemplate_recommend','=',1);
-        $where[] = array('vouchertemplate_state','=',$this->templatestate_arr['usable'][0]);
+        $where[] = array('vouchertemplate_state','=',1);
         //领取方式为积分兑换
         $where[] = array('vouchertemplate_gettype','=',$this->voucher_gettype_array['points']['sign']);
         $where[] = array('vouchertemplate_enddate','>',TIMESTAMP);
@@ -723,13 +707,7 @@ class Voucher extends BaseModel
                 }
             }
         }
-        if ($info['vouchertemplate_state']) {
-            foreach ($this->templatestate_arr as $k => $v) {
-                if ($info['vouchertemplate_state'] == $v[0]) {
-                    $info['vouchertemplate_state_text'] = $v[1];
-                }
-            }
-        }
+        $info['vouchertemplate_state_text'] = $info['vouchertemplate_state'] == 1 ? '有效':'无效';
         //查询店铺分类
         if ($info['vouchertemplate_sc_id']) {
             $store_class = rkcache('storeclass', true);

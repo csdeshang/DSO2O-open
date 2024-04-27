@@ -12,14 +12,8 @@
                 <div>
                     <h1 class="ng-binding">
                         <span class="shopguide-tip" title="{$store_info.store_name}">{$store_info.store_name}</span>
-                        {if !$store_info.is_platform_store}
                         {if $store_info.business_licence_number_electronic}
                         <a href="{$store_info.business_licence_number_electronic}" class="iconfont" target="_blank">&#xe668;</a>
-                        {/if}
-                        {else}
-                        {if $Think.config.ds_config.business_licence}
-                        <a href="{:ds_get_pic(ATTACH_COMMON,$Think.config.ds_config.business_licence)}" class="iconfont" target="_blank">&#xe668;</a>
-                        {/if}
                         {/if}
                     </h1>
                 </div>

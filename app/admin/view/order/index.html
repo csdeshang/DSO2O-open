@@ -93,7 +93,7 @@
             {foreach name="order_group_list" item="order_list" key="pay_sn"}
             {if condition="$order_list.pay_amount>0"}
             <tr>
-                <td colspan="7">{$Think.lang.order_total_price}{$Think.lang.ds_colon}{$Think.lang.currency}{$order_list.pay_amount}</td>
+                <td colspan="6">{$Think.lang.order_total_price}{$Think.lang.ds_colon}{$Think.lang.currency}{$order_list.pay_amount}</td>
                 <td><a href="javascript:dsLayerOpen('{:url('Order/change_state',['state_type'=>'receive_pay','pay_sn'=>$pay_sn])}','{$Think.lang.ds_order}-{$pay_sn}')" class="dsui-btn-edit"><i class="iconfont"></i>{$Think.lang.order_change_received}</a></td>
             </tr>
             {/if}

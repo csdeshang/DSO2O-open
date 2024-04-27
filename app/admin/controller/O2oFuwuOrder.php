@@ -121,14 +121,14 @@ class  O2oFuwuOrder extends AdminControl {
         } else {
             Db::startTrans();
             try {
-                $order_model->payO2oFuwuOrder($order_info['o2o_fuwu_order_sn'],$post['payment_code'],$post['trade_no'], 'admin',$post['payment_time']);
+                $result = $order_model->payO2oFuwuOrder($order_info['o2o_fuwu_order_sn'],$post['payment_code'],$post['trade_no'], 'admin',$post['payment_time']);
+                $this->log('将订单改为已收款状态,' . lang('order_number') . ':' . $order_info['o2o_fuwu_order_sn'], 1);
+                Db::commit();
+                return $result;
             } catch (\Exception $e) {
                 Db::rollback();
                 return ds_callback(false, $e->getMessage());
             }
-            Db::commit();
-            $this->log('将订单改为已收款状态,' . lang('order_number') . ':' . $order_info['o2o_fuwu_order_sn'], 1);
-            return $result;
         }
     }
 

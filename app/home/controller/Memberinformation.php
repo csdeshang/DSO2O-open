@@ -47,6 +47,12 @@ class  Memberinformation extends BaseMember
                 $member_array['member_birthday'] = strtotime(input('post.birthday'));
             }
             $member_array['member_privacy'] = serialize(input('post.privacy/a'));
+            
+            $member_validate = ds_validate('member');
+            if (!$member_validate->scene('edit')->check($member_array)){
+                ds_json_encode(10001, $member_validate->getError());
+            }
+            
             $update = $member_model->editMember(array('member_id' => session('member_id')), $member_array,session('member_id'));
 
             $message = $update ? lang('ds_common_save_succ') : lang('ds_common_save_fail');

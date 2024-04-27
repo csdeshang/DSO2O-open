@@ -164,7 +164,7 @@ class  Order extends AdminControl {
         $condition = array();
         $condition[]=array('pay_sn','=',$pay_sn);
         $condition[]=array('order_state','in',array_values(array(ORDER_STATE_NEW, ORDER_STATE_PAY)));
-        $order_list = $order_model->getOrderList($condition, 0, 'order_id,order_state,payment_code,order_amount,rcb_amount,pd_amount,order_sn', '', 0, array(), true);
+        $order_list = $order_model->getOrderList($condition);
         if (empty($order_list)) {
             return ds_callback(false, lang('no_right_operate'));
         }
@@ -230,18 +230,15 @@ class  Order extends AdminControl {
             $this->error(lang('miss_order_number'));
         }
         $order_model = model('order');
-        $order_info = $order_model->getOrderInfo(array('order_id' => $order_id), array('order_goods', 'order_common', 'store'));
+        $order_info = $order_model->getOrderInfo(array('order_id' => $order_id), array('order_goods', 'order_common', 'store','orderlog'));
 
-        //订单变更日志
-        $log_list = $order_model->getOrderlogList(array('order_id' => $order_info['order_id']));
-        View::assign('order_log', $log_list);
 
         //退款退货信息
         $refundreturn_model = model('refundreturn');
         $condition = array();
         $condition[]=array('order_id','=',$order_info['order_id']);
-        $condition[]=array('seller_state','=',2);
-        $condition[] = array('admin_time','>', 0);
+        $condition[]=array('refundreturn_seller_state','=',2);
+        $condition[] = array('refundreturn_admin_time','>', 0);
         $return_list = $refundreturn_model->getReturnList($condition);
         View::assign('return_list', $return_list);
 

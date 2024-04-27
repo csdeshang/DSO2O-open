@@ -7,7 +7,8 @@
         }
 </script>
 <script type="text/javascript" src="//webapi.amap.com/maps?v=2.0&key={$Think.config.ds_config.gaode_ak}"></script>
-<!--{else}-->
+<!--{/if}-->
+<!--{if $Think.config.ds_config.mapak_type eq '2'}-->
 <script type="text/javascript" src="{$Think.HTTP_TYPE}api.map.baidu.com/api?v=2.0&ak={$Think.config.ds_config.baidu_ak}"></script>
 <!--{/if}-->
 <script>
@@ -37,7 +38,7 @@
         $('#company_address').ds_region();
         var lng = '{$store_info.store_longitude}';
         var lat = '{$store_info.store_latitude}';
-        if({$Think.config.ds_config.mapak_type} == '1' ){
+        if('{$Think.config.ds_config.mapak_type}' === '1' ){
 			map = new AMap.Map("allmap", {
 				resizeEnable: true,
 				zoom:15
@@ -73,7 +74,7 @@
 								//搜索定位
 								AMap.plugin(['AMap.PlaceSearch','AMap.AutoComplete'], function(){
 									var auto = new AMap.AutoComplete({input:"store_address"});
-                                    console.log(auto)
+
 									var placeSearch = new AMap.PlaceSearch({
 										map: map
 									});  //构造地点查询类
@@ -164,7 +165,8 @@
 					map.add(marker);
 				});
 			}
-		}else{
+		}
+                if('{$Think.config.ds_config.mapak_type}' === '2' ){
 			if (!lng && !lat) {
 				map = new BMap.Map("allmap");
 				var geolocation = new BMap.Geolocation();
@@ -187,6 +189,7 @@
 					}
 				}, {enableHighAccuracy: true})
 			} else {
+                                map = new BMap.Map("allmap");
 				var point = new BMap.Point(lng, lat);
 				map.centerAndZoom(point, 16);
 				map.addControl(new BMap.NavigationControl());
@@ -246,13 +249,16 @@
         </dl>
         <dl>
             <dt>{$Think.lang.detailed_address}：</dt>
-            <dd><input name="company_address_detail" type="text" value="{$store_info.store_address}" class="w200" id="store_address" {if $Think.config.ds_config.mapak_type eq '2'}onkeyup="local.search($(this).val());"{/if}>
+            <dd><input name="company_address_detail" type="text" value="{$store_info.store_address}" class="w200" id="store_address">
                 <span></span>
+                <!--{if $Think.config.ds_config.mapak_type neq '0'}-->
                 <div>
                     <input name="longitude" id="longitude" value="{$store_info.store_longitude}" type="hidden" />
                     <input name="latitude" id="latitude" value="{$store_info.store_latitude}" type="hidden" />
-                    <div id="allmap" style="width:530px;height: 350px;margin-top: 20px"></div>
+                    <div id="allmap" style="width:1000px;height:500px;margin-top: 20px"></div>
                 </div>
+                <!--{/if}-->
+                
             </dd>
         </dl>
         <div class="bottom">

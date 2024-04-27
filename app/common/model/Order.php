@@ -68,6 +68,16 @@ class  Order extends BaseModel {
             $order_goods_list = $this->getOrdergoodsList(array('order_id' => $order_info['order_id']));
             $order_info['extend_order_goods'] = $order_goods_list;
         }
+        
+        //追加返回订单日志
+        if (in_array('orderlog', $extend)) {
+            //取商品列表
+            $orderlog_list = $this->getOrderlogList(array('order_id' => $order_info['order_id']));
+            foreach ($orderlog_list as $orderlog_key => $orderlog) {
+                $orderlog_list[$orderlog_key]['log_time_desc'] = date('Y-m-d H:i:s',$orderlog['log_time']);
+            }
+            $order_info['extend_orderlog'] = $orderlog_list;
+        }
 
         return $order_info;
     }
@@ -602,11 +612,8 @@ class  Order extends BaseModel {
 
             //申请退款
             case 'refund_cancel':
-                if (isset($order_info['refund'])) {
-                    $state = $order_info['refund'] == 1 && !intval($order_info['lock_state']);
-                    if ($order_info['ob_no']) {//已结算不可以退款
-                        $state = FALSE;
-                    }
+                if (isset($order_info['if_allow_order_refund'])) {
+                    $state = ($order_info['if_allow_order_refund'] == 1);
                 } else {
                     $state = FALSE;
                 }
@@ -654,42 +661,42 @@ class  Order extends BaseModel {
 
             //接单
             case 'receipt':
-                $state = !$order_info['lock_state'] && $order_info['order_state'] == ORDER_STATE_PAY;
+                $state = !$order_info['order_refund_lock_state'] && $order_info['order_state'] == ORDER_STATE_PAY;
                 break;
 
             //派单
             case 'deliver':
-                $state = !$order_info['o2o_third'] && !$order_info['lock_state'] && $order_info['order_state'] == ORDER_STATE_RECEIPT;
+                $state = !$order_info['o2o_third'] && !$order_info['order_refund_lock_state'] && $order_info['order_state'] == ORDER_STATE_RECEIPT;
                 break;
             //取货
             case 'pickup':
-                $state = !$order_info['lock_state'] && $order_info['order_state'] == ORDER_STATE_DELIVER;
+                $state = !$order_info['order_refund_lock_state'] && $order_info['order_state'] == ORDER_STATE_DELIVER;
                 break;
             //收货
             case 'receive':
-                $state = !$order_info['o2o_third'] && !$order_info['lock_state'] && $order_info['order_state'] == ORDER_STATE_SEND;
+                $state = !$order_info['o2o_third'] && !$order_info['order_refund_lock_state'] && $order_info['order_state'] == ORDER_STATE_SEND;
                 break;
 
             //评价
             case 'evaluation':
-                $state = !$order_info['refund_state'] && !$order_info['lock_state'] && !$order_info['evaluation_state'] && $order_info['order_state'] == ORDER_STATE_SUCCESS;
+                $state = !$order_info['refund_state'] && !$order_info['order_refund_lock_state'] && !$order_info['evaluation_state'] && $order_info['order_state'] == ORDER_STATE_SUCCESS;
                 break;
 
             //锁定
-            case 'lock':
-                $state = intval($order_info['lock_state']) ? true : false;
+            case 'order_refund_lock':
+                $state = intval($order_info['order_refund_lock_state']) ? true : false;
                 break;
 
 
             //放入回收站
             case 'delete':
-                $state = in_array($order_info['order_state'], array(ORDER_STATE_CANCEL, ORDER_STATE_SUCCESS)) && $order_info['delete_state'] == 0;
+                $state = !$order_info['order_refund_lock_state'] && in_array($order_info['order_state'], array(ORDER_STATE_CANCEL, ORDER_STATE_SUCCESS)) && $order_info['delete_state'] == 0;
                 break;
 
             //永久删除、从回收站还原
             case 'drop':
             case 'restore':
-                $state = in_array($order_info['order_state'], array(ORDER_STATE_CANCEL, ORDER_STATE_SUCCESS)) && $order_info['delete_state'] == 1;
+                $state = !$order_info['order_refund_lock_state'] && in_array($order_info['order_state'], array(ORDER_STATE_CANCEL, ORDER_STATE_SUCCESS)) && $order_info['delete_state'] == 1;
                 break;
         }
         return $state;
@@ -764,40 +771,6 @@ class  Order extends BaseModel {
     }
 
     /*
-     * 自动派单
-     * @param array $store_info  店铺信息
-     * @param array $order_info 订单信息
-     * @return array
-     */
-
-    public function autoOrderDeliver($store_info, $order_info) {
-        $update_order = array();
-        if ($store_info['store_o2o_auto_deliver'] == 1) {//如果开启了自动派单
-            if ($order_info['o2o_order_distributor_type'] == 1) {
-                //所有是可配送状态的开启了接单和自动接单且没超过接单上限的配送员,按照接单数量升序
-                $o2o_distributor_info = Db::name('o2o_distributor')->alias('o2o_distributor')->join('order order_alias', 'order_alias.o2o_distributor_id=o2o_distributor.o2o_distributor_id', 'LEFT')->where(array('o2o_distributor.store_id' => $store_info['store_id'], 'o2o_distributor.o2o_distributor_state' => 1, 'o2o_distributor.o2o_distributor_receipt' => 1, 'o2o_distributor.o2o_distributor_auto_receipt' => 1))->group('o2o_distributor.o2o_distributor_id')->having('CASE WHEN o2o_distributor.o2o_distributor_receipt_limit>0 THEN COUNT(order_alias.order_state IN (' . ORDER_STATE_DELIVER . ',' . ORDER_STATE_SEND . ') OR NULL) < o2o_distributor.o2o_distributor_receipt_limit ELSE 1=1 END')->orderRaw('COUNT(order_alias.order_state IN (' . ORDER_STATE_DELIVER . ',' . ORDER_STATE_SEND . ') OR NULL) ASC')->field('o2o_distributor.o2o_distributor_receipt_limit,o2o_distributor.o2o_distributor_id,o2o_distributor.o2o_distributor_name,o2o_distributor.o2o_distributor_realname,o2o_distributor.o2o_distributor_phone')->find();
-                if(!$o2o_distributor_info){
-                     $o2o_distributor_info=Db::name('o2o_distributor')->where(array('store_id' => $store_info['store_id'], 'o2o_distributor_state' => 1, 'o2o_distributor_receipt' => 1, 'o2o_distributor_auto_receipt' => 1))->field('o2o_distributor_receipt_limit,o2o_distributor_id,o2o_distributor_name,o2o_distributor_realname,o2o_distributor_phone')->find();
-                }
-            } else {//如果是平台配送员，则匹配配送地区在店铺所在地区的配送员
-                $o2o_distributor_info = Db::name('o2o_distributor')->alias('o2o_distributor')->join('order order_alias', 'order_alias.o2o_distributor_id=o2o_distributor.o2o_distributor_id', 'LEFT')->where(array('o2o_distributor.store_id' => 0, 'o2o_distributor.o2o_distributor_region_id' => $store_info['region_id'], 'o2o_distributor.o2o_distributor_state' => 1, 'o2o_distributor.o2o_distributor_receipt' => 1, 'o2o_distributor.o2o_distributor_auto_receipt' => 1))->group('o2o_distributor.o2o_distributor_id')->having('CASE WHEN o2o_distributor.o2o_distributor_receipt_limit>0 THEN COUNT(order_alias.order_state IN (' . ORDER_STATE_DELIVER . ',' . ORDER_STATE_SEND . ') OR NULL) < o2o_distributor.o2o_distributor_receipt_limit ELSE 1=1 END')->orderRaw('COUNT(order_alias.order_state IN (' . ORDER_STATE_DELIVER . ',' . ORDER_STATE_SEND . ') OR NULL) ASC')->field('o2o_distributor.o2o_distributor_receipt_limit,o2o_distributor.o2o_distributor_id,o2o_distributor.o2o_distributor_name,o2o_distributor.o2o_distributor_realname,o2o_distributor.o2o_distributor_phone')->find();
-                if(!$o2o_distributor_info){
-                     $o2o_distributor_info=Db::name('o2o_distributor')->where(array('store_id' => 0, 'o2o_distributor_region_id' => $store_info['region_id'], 'o2o_distributor_state' => 1, 'o2o_distributor_receipt' => 1, 'o2o_distributor_auto_receipt' => 1))->field('o2o_distributor_receipt_limit,o2o_distributor_id,o2o_distributor_name,o2o_distributor_realname,o2o_distributor_phone')->find();
-                }
-            }
-            if ($o2o_distributor_info) {
-                $update_order['o2o_distributor_id'] = $o2o_distributor_info['o2o_distributor_id'];
-                $update_order['o2o_distributor_name'] = $o2o_distributor_info['o2o_distributor_name'];
-                $update_order['o2o_distributor_realname'] = $o2o_distributor_info['o2o_distributor_realname'];
-                $update_order['o2o_distributor_phone'] = $o2o_distributor_info['o2o_distributor_phone'];
-                $update_order['order_state'] = ORDER_STATE_DELIVER;
-                $update_order['o2o_order_deliver_time'] = TIMESTAMP;
-            }
-        }
-        return $update_order;
-    }
-
-    /*
      * 推送订单格式化
      * @param array $store_info  店铺信息
      * @param array $order_info 订单信息
@@ -805,7 +778,6 @@ class  Order extends BaseModel {
      */
 
     public function formatO2oOrder($store_info, $order_info) {
-        $order_info['o2o_order_distance'] = round($order_info['o2o_order_distance'] / 1000, 1);
         //商品数
         $order_info['goods_num'] = Db::name('ordergoods')->where(array('order_id' => $order_info['order_id']))->sum('goods_num');
         //收货地址

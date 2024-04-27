@@ -67,7 +67,7 @@ class  Stataftersale extends AdminControl
                 $stat_arr['xAxis']['categories'][] = "$i";
                 $statlist[$i] = 0;
             }
-            $field .= ' ,HOUR(FROM_UNIXTIME(add_time)) as timeval ';
+            $field .= ' ,HOUR(FROM_UNIXTIME(refundreturn_add_time)) as timeval ';
         }
         if($this->search_arr['search_type'] == 'week'){
             //构造横轴数据
@@ -78,7 +78,7 @@ class  Stataftersale extends AdminControl
                 unset($tmp_weekarr);
                 $statlist[$i] = 0;
             }
-            $field .= ' ,WEEKDAY(FROM_UNIXTIME(add_time))+1 as timeval ';
+            $field .= ' ,WEEKDAY(FROM_UNIXTIME(refundreturn_add_time))+1 as timeval ';
         }
         if($this->search_arr['search_type'] == 'month'){
             //计算横轴的最大量（由于每个月的天数不同）
@@ -89,10 +89,10 @@ class  Stataftersale extends AdminControl
                 $stat_arr['xAxis']['categories'][] = $i;
                 $statlist[$i] = 0;
             }
-            $field .= ' ,day(FROM_UNIXTIME(add_time)) as timeval ';
+            $field .= ' ,day(FROM_UNIXTIME(refundreturn_add_time)) as timeval ';
         }
         $where = array();
-        $where[]=array('add_time','between',$searchtime_arr);
+        $where[]=array('refundreturn_add_time','between',$searchtime_arr);
         $statlist_tmp = $stat_model->statByRefundreturn($where, $field, 0, 0, 'timeval asc', 'timeval');
         if ($statlist_tmp){
             foreach((array)$statlist_tmp as $k=>$v){
@@ -116,14 +116,13 @@ class  Stataftersale extends AdminControl
      */
     public function refundlist(){
         $refundreturn_model = model('refundreturn');
-        $refundstate_arr = $this->getRefundStateArray();
         $where = array();
         $statlist= array();
         $searchtime_arr_tmp = explode('|',$this->search_arr['t']);
         foreach ((array)$searchtime_arr_tmp as $k=>$v){
             $searchtime_arr[] = intval($v);
         }
-        $where[]=array('add_time','between',$searchtime_arr);
+        $where[]=array('refundreturn_add_time','between',$searchtime_arr);
         if (isset($this->search_arr['exporttype']) && $this->search_arr['exporttype'] == 'excel'){
             $refundlist_tmp = $refundreturn_model->getRefundreturnList($where, 0);
         } else {
@@ -135,22 +134,22 @@ class  Stataftersale extends AdminControl
         $statheader[] = array('text'=>'店铺名','key'=>'store_name','class'=>'alignleft');
         $statheader[] = array('text'=>'商品名称','key'=>'goods_name','class'=>'alignleft');
         $statheader[] = array('text'=>'买家会员名','key'=>'buyer_name');
-        $statheader[] = array('text'=>'申请时间','key'=>'add_time');
+        $statheader[] = array('text'=>'申请时间','key'=>'refundreturn_add_time');
         $statheader[] = array('text'=>'退款金额','key'=>'refund_amount');
-        $statheader[] = array('text'=>'卖家审核','key'=>'seller_state');
-        $statheader[] = array('text'=>'平台确认','key'=>'refund_state');
+        $statheader[] = array('text'=>'卖家审核','key'=>'refundreturn_seller_state');
+        $statheader[] = array('text'=>'平台确认','key'=>'refundreturn_admin_state');
         foreach ((array)$refundlist_tmp as $k=>$v){
             $tmp = $v;
             foreach ((array)$statheader as $h_k=>$h_v){
                 $tmp[$h_v['key']] = $v[$h_v['key']];
-                if ($h_v['key'] == 'add_time'){
-                    $tmp[$h_v['key']] = @date('Y-m-d',$v['add_time']);
+                if ($h_v['key'] == 'refundreturn_add_time'){
+                    $tmp[$h_v['key']] = @date('Y-m-d',$v['refundreturn_add_time']);
                 }
-                if ($h_v['key'] == 'refund_state'){
-                    $tmp[$h_v['key']] = $v['seller_state']==2 ? $refundstate_arr['admin'][$v['refund_state']]:'无';
+                if ($h_v['key'] == 'refundreturn_admin_state'){
+                    $tmp[$h_v['key']] = $v['refundreturn_seller_state']==2 ? $v['refundreturn_admin_state_desc']:'无';
                 }
-                if ($h_v['key'] == 'seller_state'){
-                    $tmp[$h_v['key']] = $refundstate_arr['seller'][$v['seller_state']];
+                if ($h_v['key'] == 'refundreturn_seller_state'){
+                    $tmp[$h_v['key']] = $v['refundreturn_seller_state_desc'];
                 }
                 if ($h_v['key'] == 'goods_name'){
                     $tmp[$h_v['key']] = '<a href="'.(string)url('Goods/index', array('goods_id' => $v['goods_id'])).'" target="_blank">'.$v['goods_name'].'</a>';
@@ -259,30 +258,6 @@ class  Stataftersale extends AdminControl
         View::assign('show_page',$stat_model->page_info->render());
         $this->setAdminCurItem('evalstore');
         return View::fetch('aftersale_evalstore');
-    }
-    function getRefundStateArray($type = 'all') {
-        $state_array = array(
-            '1' => lang('refund_state_confirm'),
-            '2' => lang('refund_state_yes'),
-            '3' => lang('refund_state_no')
-        ); //卖家处理状态:1为待审核,2为同意,3为不同意
-        View::assign('state_array', $state_array);
-
-        $admin_array = array(
-            '1' => '处理中',
-            '2' => '待处理',
-            '3' => '已完成'
-        ); //确认状态:1为买家或卖家处理中,2为待平台管理员处理,3为退款退货已完成
-        View::assign('admin_array', $admin_array);
-
-        $state_data = array(
-            'seller' => $state_array,
-            'admin' => $admin_array
-        );
-        if ($type == 'all') {
-            return $state_data; //返回所有
-        }
-        return $state_data[$type];
     }
 
     protected function getAdminItemList()

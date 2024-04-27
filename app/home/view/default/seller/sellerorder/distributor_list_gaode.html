@@ -1,0 +1,324 @@
+<style>
+	.amap-container{left: 360px;}
+    .show_distributor{position:relative;font-size:14px}
+    .show_distributor .content-wrapper{z-index:2;width: 320px;position: absolute;left: 15px;top: 15px;}
+    .show_distributor .content-wrapper .order-info{box-shadow: 1px 2px 3px 1px #cbcbcb;background:#fff;width:100%;height:200px;margin-bottom:10px;position:relative}
+    .show_distributor .content-wrapper .distributor-list{box-shadow: 1px 2px 3px 1px #cbcbcb;background:#fff;width:100%;height:500px;overflow-y:auto;padding-bottom:60px}
+    .show_distributor .content-wrapper .order-info .order-title{color:#999}
+    .show_distributor .content-wrapper .order-info .order-header{padding:10px;background:#0a8cff;color:#fff;}
+    .show_distributor .content-wrapper .order-info .order-body{padding:10px;}
+    .show_distributor .content-wrapper .order-info .order-body .order-line{line-height:2}
+    .show_distributor .content-wrapper .order-info .btn-wrapper{position: absolute;bottom:10px;text-align: center;left:10px;right:10px;}
+    .show_distributor .content-wrapper .distributor-list .distributor-item{overflow:hidden;border-bottom:1px solid #eee;padding-bottom:10px}
+    .show_distributor .content-wrapper .distributor-list .distributor-item .left{float:left;width:50px;padding-left:10px;padding-top:10px;position:relative;}
+    .show_distributor .content-wrapper .distributor-list .distributor-item .left img{width:50px;height:50px;border-radius:50%;}
+    .show_distributor .content-wrapper .distributor-list .distributor-item .left i{position:absolute;width:8px;height:8px;display:block;border-radius:50%;right:4px;bottom:4px;background-color:#dcdcdc}
+    .show_distributor .content-wrapper .distributor-list .distributor-item .right{float:left;width:180px;padding:10px;margin-top:5px}
+    .show_distributor .content-wrapper .distributor-list .distributor-item .distributor-btn{float:right;width:28px;margin-right:10px;text-align:right;padding-top:10px;}
+    .show_distributor .content-wrapper .distributor-list .distributor-item .distributor-static{overflow:hidden;}
+    .show_distributor .content-wrapper .distributor-list .distributor-item .distributor-static .static{float:left;width:50%;}
+    .show_distributor .content-wrapper .distributor-list .distributor-item  .distributor-name{font-size:14px;color:#000}
+    .show_distributor .content-wrapper .distributor-list .distributor-item  .static{color:#999;font-size:12px;}
+    .show_distributor .content-wrapper .distributor-list .distributor-item  .order-count i{font-size:12px;margin:0 2px;font-style: normal;color: #F60;}
+    .show_distributor .content-wrapper .distributor-list .distributor-item  .btn1{color: #0579C6;line-height: 30px;}
+    .show_distributor .content-wrapper .distributor-list .distributor-item  .btn2{color: #F60;line-height: 30px;}
+    .show_distributor .content-wrapper .distributor-list .distributor-more{padding:20px 0;text-align:center;color:#999;position:absolute;bottom:0;left:0;width:100%;background:#fff}
+    .show_distributor .content-wrapper .distributor-list .distributor-item.select{background:#d9ebff}
+</style>
+<script type="text/javascript">
+        window._AMapSecurityConfig = {
+            securityJsCode:"{$Think.config.ds_config.gaode_jscode}",
+        }
+</script>
+<script type="text/javascript" src="//webapi.amap.com/maps?v=2.0&key={$Think.config.ds_config.gaode_ak}"></script>
+
+<div class="show_distributor">
+    <div id="allmap" style="width:1000px;height:800px"></div>
+    <div class="content-wrapper">
+        <!--{present name='order_info'}-->
+        <div class="order-info">
+            <div class="order-header">{$Think.lang.store_order_sn}{$Think.lang.ds_colon}{$order_info.order_sn}</div>
+            <div class="order-body">
+                <div class="order-line"><span class="order-title">{$Think.lang.store_show_order_receiver|raw}{$Think.lang.ds_colon}</span>{$order_info.reciver_name}</div>
+                <div class="order-line"><span class="order-title">{$Think.lang.store_show_order_receiver_address}{$Think.lang.ds_colon}</span>{$order_info.reciver_address}</div>
+                <div class="order-line"><span class="order-title">{$Think.lang.store_show_order_mobile}{$Think.lang.ds_colon}</span>{$order_info.reciver_phone}</div>
+                <div class="order-line"><span class="order-title">{$Think.lang.seller_order_o2o_order_distance}{$Think.lang.ds_colon}</span>{$order_info.order_distance}km</div>
+            </div>
+        </div>
+        <!--{else}-->
+        <div class="order-info">
+            <div class="order-body">
+                <div class="order-line"><span class="order-title">关键词{$Think.lang.ds_colon}</span><input id='keyword' type='text' placeholder='账号/姓名/手机/邮箱' /></div>
+                <div class='btn-wrapper'><input type="button" class="btn submit" value="搜索" onclick='search_distributor()'></div>
+            </div>
+        </div>
+        <!--{/present}-->
+        <div class="distributor-list">
+            <div></div>
+            <a class="distributor-more" href="javascript:get_distributor()">加载更多</a>
+        </div>
+    </div>
+    <!--{present name='order_info'}-->
+    <form action="{if $order_info.order_type=='real_order'}{:url('Sellerorder/deliver_order')}{else if $order_info.order_type=='o2o_errand_order'}{:url('admin/O2oErrandOrder/deliver_order')}{/if}" method="post" id="handle_form">
+        <input name="order_id" type="hidden" value="{$order_info.order_id}"/>
+        <input name="o2o_distributor_id" type="hidden" />
+    </form>
+    <!--{/present}-->
+</div>
+
+<script>
+    var page = 0;
+    var map
+    $(function () {
+        get_distributor()
+	initGaodeMap()	
+    })
+    function initGaodeMap(){
+                        map = new AMap.Map("allmap", {
+				resizeEnable: true,
+				zoom:15
+			});
+			//获取用户所在城市信息
+				AMap.plugin("AMap.CitySearch", function () {
+					var citySearch = new AMap.CitySearch();
+					citySearch.getLocalCity(function (status, result) {
+					  if (status === "complete" && result.info === "OK") {
+						// 查询成功，result即为当前所在城市信息
+						AMap.plugin("AMap.Geocoder", function () {
+						  var geocoder = new AMap.Geocoder({
+							// city 指定进行编码查询的城市，支持传入城市名、adcode 和 citycode
+							city: result.adcode,
+						  });
+						  geocoder.getLocation(result.city, function(status1, result1) {
+							  var location = result1.geocodes[0].location;
+								var lng = location.lng;
+								var lat = location.lat;
+								
+								//初始化定位
+								map.panTo([{$store_longitude|default=''}, {$store_latitude|default=''}]);
+								
+								//店铺位置标签
+								var storemarker = new AMap.Text({
+								        text:'起',
+								        anchor:'center', 
+								        draggable:true,
+								        cursor:'pointer',
+								        angle:10,
+								        style:{
+								            'padding': '.25rem .25rem',
+								            'margin-bottom': '1rem',
+								            'border-radius': '1rem',
+								            'background-color': 'white',
+								            'border-width': 0,
+								            'box-shadow': '0 2px 6px 0 rgba(114, 124, 245, .5)',
+								            'text-align': 'center',
+								            'font-size': '16px',
+								            'color': '#339933'
+								        },
+								        position: [{$store_longitude|default=''},{$store_latitude|default=''}]
+								    });
+								 storemarker.setMap(map);
+								//买家位置标签
+								//店铺位置标签
+								var usermarker = new AMap.Text({
+								        text:'终',
+								        anchor:'center', 
+								        draggable:true,
+								        cursor:'pointer',
+								        angle:10,
+								        style:{
+								            'padding': '.25rem .25rem',
+								            'margin-bottom': '1rem',
+								            'border-radius': '1rem',
+								            'background-color': 'white',
+								            'border-width': 0,
+								            'box-shadow': '0 2px 6px 0 rgba(114, 124, 245, .5)',
+								            'text-align': 'center',
+								            'font-size': '16px',
+								            'color': '#006699'
+								        },
+								        position: [{$order_info.order_lng|default=''},{$order_info.order_lat|default=''}]
+								    });
+								 usermarker.setMap(map);
+							});
+						});
+					  }
+					});
+				  });
+    }
+    
+    function addMarker(info, map) { // 给地图添加标记
+        var lng = info.lng
+        var lat = info.lat
+        var text = info.text
+        var color = info.color
+
+        var marker
+        
+        //添加自定义标注
+        var point = new BMap.Point(lng, lat)
+        marker = new BMap.Marker(point)
+        marker.initialize = function (map) {
+            var div = document.createElement('div')
+            div.style.position = 'absolute'
+            div.style.width = '45px'
+            div.style.height = '45px'
+            div.style.lineHeight = '45px'
+            div.style.fontSize = '40px'
+            div.style.textAlign = 'center'
+            div.style.color = color
+            div.className = 'iconfont'
+
+            div.innerHTML = '&#xe720;<b style="font-size:18px;position:absolute;top:0;left:0px;color:#000;line-height:1.8;width:100%">' + text + '</b>'
+            this.div = div
+            map.getPanes().markerPane.appendChild(div)
+            return div
+        }
+        marker.draw = function () {
+            var point = this.getPosition()
+            var position = map.pointToOverlayPixel(point)
+
+            this.div.style.left = position.x - 22.5 + 'px'
+            this.div.style.top = position.y - 45 + 'px'
+        }
+        map.addOverlay(marker)
+        return marker
+    }
+    
+    function get_distributor() {
+        page++
+        /*{present name='order_info'}*/
+        /*{if $order_info.order_type=='real_order'}*/
+        var url = HOMESITEURL + "/sellerorder/get_distributor_list?order_id={$order_info.order_id}&lng={$store_longitude}&lat={$store_latitude}&page=" + page
+        /*{else if $order_info.order_type=='o2o_errand_order'}*/
+        var url = ADMINSITEURL + "/o2o_errand_order/get_distributor_list?order_type=o2o_errand_order&order_id={$order_info.order_id}&lng={$store_longitude}&lat={$store_latitude}&page=" + page
+        /*{/if}*/
+        /*{else}*/
+        /*{if session('admin_id')}*/
+        var url = ADMINSITEURL + "/o2o_distributor/get_distributor_list?page=" + page + "&keyword=" + $('#keyword').val()
+        /*{else}*/
+        var url = HOMESITEURL + "/seller_o2o_distributor/get_distributor_list?page=" + page + "&keyword=" + $('#keyword').val()
+        /*{/if}*/
+        /*{/present}*/
+        $.getJSON(url, function (data) {
+            if (data.code == 10000) {
+                var distributor = data.result
+                if (distributor.length) {
+                    for (var i in distributor) {
+                        //添加配送员标注点
+                        addDistributMarker(distributor[i])
+                        
+                        var str = ''
+                        str += '<div class="distributor-item" data-id="' + distributor[i].o2o_distributor_id + '" data-receipt=' + distributor[i].o2o_distributor_state + '>'
+                        str += '<div class="left"><img src="' + distributor[i].o2o_distributor_avatar + '"><i class="receipt-state"></i></div>'
+                        str += '<div class="right">'
+                        str += '<div class="distributor-name">' + distributor[i].o2o_distributor_name + '(' + distributor[i].o2o_distributor_realname + ')</div>'
+                        str += '<div class="distributor-static">'
+                        str += '<div class="static">'
+
+                        str += '<div class="order-count">等待<i>' + distributor[i].count_wait + '</i>单</div>'
+                        str += '</div>'
+                        str += '<div class="static">'
+
+                        str += '<div class="order-count">完成<i>' + distributor[i].count_complete + '</i>单</div>'
+                        str += '</div>'
+                        str += '</div>'
+                        str += '</div>'
+                        str += '<div class="distributor-btn">'
+                        str += '<a class="btn1" href="javascript:markerPosition(' + distributor[i].o2o_distributor_lng + ',' + distributor[i].o2o_distributor_lat + ')">定位</a>'
+                        /*{present name='order_info'}*/
+                        str += '<a class="btn2" href="javascript:deliverOrder(' + distributor[i].o2o_distributor_id + ')">指派</a>'
+                        /*{/present}*/
+                        str += '</div>'
+                        str += '</div>'
+                        $('.distributor-list > div').append(str);
+                  
+                    }
+                } else {
+                    layer.msg('没有更多了');
+                }
+            } else {
+                layer.msg(data.message);
+            }
+        })
+    }
+    function deliverOrder(user_id) {
+        $('[name="o2o_distributor_id"]').val(user_id)
+        if ($('.distributor-item[data-id=' + user_id + ']').attr('data-receipt') == 0) {
+            layer.confirm("{$Think.lang.seller_order_distributor_receipt_confirm}", {
+                btn: ['确定', '取消'],
+                title: false,
+            }, function () {
+                submit_form()
+            });
+        } else {
+            layer.confirm("{$Think.lang.seller_order_distributor_deliver_confirm}", {
+                btn: ['确定', '取消'],
+                title: false,
+            }, function () {
+                submit_form()
+            });
+        }
+
+    }
+    /*{present name='order_info'}*/
+    function submit_form() {
+        var _form = $("#handle_form");
+        $.ajax({
+            type: "POST",
+            url: _form.attr('action'),
+            data: _form.serialize(),
+            dataType: "json",
+            success: function (res) {
+                if (res.code == 10000) {
+                    layer.msg(res.message, {time: 1000}, function () {
+                        /*{if $order_info.order_type=='real_order'}*/
+                        location.href = "{:url('Sellerorder/index')}";
+                        /*{else if $order_info.order_type=='o2o_errand_order'}*/
+                        parent.location.reload();
+                        /*{/if}*/
+                    });
+                } else {
+                    layer.msg(res.message)
+                }
+            }
+        });
+    }
+    /*{else}*/
+    function search_distributor(){
+        page=0
+        $('.distributor-list > div').html('')
+        initBaiduMap()
+        get_distributor()
+    }
+    /*{/present}*/
+    function markerPosition(o2o_distributor_lng,o2o_distributor_lat) {
+        //设置中心点
+        var point = new BMap.Point(o2o_distributor_lng,o2o_distributor_lat);
+        map.setCenter(point);
+    }
+    //添加配送员标注
+    function addDistributMarker(distributor) {
+        var point = new BMap.Point(distributor.o2o_distributor_lng,distributor.o2o_distributor_lat);
+        var marker = new BMap.Marker(point);
+        map.addOverlay(marker);
+        
+	var opts = {
+	  width : 100,     // 信息窗口宽度
+	  height: 50,     // 信息窗口高度
+	  title : distributor.o2o_distributor_realname , // 信息窗口标题
+	  enableMessage:true,//设置允许信息窗发送短息
+          message:""
+      }
+      console.log('11')
+      var infoWindow = new BMap.InfoWindow(distributor.count_wait+"单在送", opts);  // 创建信息窗口对象 
+      
+//      map.openInfoWindow(infoWindow,point); //开启信息窗口
+      
+      marker.addEventListener("click", function(){          
+          map.openInfoWindow(infoWindow,point); //开启信息窗口
+      });
+	 
+    }
+</script>
+

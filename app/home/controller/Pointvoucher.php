@@ -39,8 +39,6 @@ class  Pointvoucher extends BasePointShop
 
         $voucher_model = model('voucher');
 
-        //代金券模板状态
-        $templatestate_arr = $voucher_model->getTemplateState();
 
         //查询会员信息
         $member_info = model('member')->getMemberInfoByID(session('member_id'));
@@ -48,7 +46,7 @@ class  Pointvoucher extends BasePointShop
         //查询代金券列表
         $condition = array();
 		$condition[] = array('vouchertemplate_if_private','=',0);
-        $condition[] = array('vouchertemplate_state','=',$templatestate_arr['usable'][0]);
+        $condition[] = array('vouchertemplate_state','=',1);
         $condition[] = array('vouchertemplate_enddate','>',TIMESTAMP);
         if (intval(input('storeclass_id')) > 0){
             $condition[] = array('vouchertemplate_sc_id','=',intval(input('storeclass_id')));

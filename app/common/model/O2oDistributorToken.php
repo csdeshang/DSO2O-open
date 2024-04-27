@@ -24,7 +24,6 @@ class  O2oDistributorToken extends BaseModel {
      * @access public
      * @author csdeshang 
      * @param array $o2o_distributor 配送员信息
-     * @param string $client_type 客户端
      * @return string
      */
     public function genO2oDistributorToken($o2o_distributor) {

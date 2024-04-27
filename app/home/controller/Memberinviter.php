@@ -42,7 +42,7 @@ class  Memberinviter extends BaseMember {
         //是否有分销门槛
         if(config('ds_config.inviter_condition')){
             //检查消费金额
-            $temp=Db::name('order')->where('buyer_id='.session('member_id').' AND order_state='.ORDER_STATE_SUCCESS.' AND lock_state=0')->field('SUM(order_amount) AS order_amount,SUM(refund_amount) AS refund_amount')->find();
+            $temp=Db::name('order')->where('buyer_id='.session('member_id').' AND order_state='.ORDER_STATE_SUCCESS.' AND order_refund_lock_state=0')->field('SUM(order_amount) AS order_amount,SUM(refund_amount) AS refund_amount')->find();
             if(!$temp || ($temp['order_amount']-$temp['refund_amount'])<config('ds_config.inviter_condition_amount')){
                 $this->error(sprintf(lang('inviter_condition_amount'),!$temp?0:($temp['order_amount']-$temp['refund_amount']),config('ds_config.inviter_condition_amount')));
             }

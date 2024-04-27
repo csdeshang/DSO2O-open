@@ -95,7 +95,7 @@ class  Memberevaluate
             $evaluate_goods_info['geval_goodsprice'] = $value['goods_price'];
             $evaluate_goods_info['geval_goodsimage'] = $value['goods_image'];
             $evaluate_goods_info['geval_scores'] = $evaluate_score;
-            $evaluate_goods_info['geval_content'] = removeEmojis($evaluate_comment);
+            $evaluate_goods_info['geval_content'] = $evaluate_comment;
             $evaluate_goods_info['geval_isanonymous'] = input('post.anony') ? 1 : 0;
             $evaluate_goods_info['geval_addtime'] = TIMESTAMP;
             $evaluate_goods_info['geval_storeid'] = $store_info['store_id'];
@@ -124,7 +124,6 @@ class  Memberevaluate
             $store_deliverycredit = 5;
         }
         //添加店铺评价
-        if (!$store_info['is_platform_store']) {
             $evaluate_store_info = array();
             $evaluate_store_info['seval_orderid'] = $order_info['order_id'];
             $evaluate_store_info['seval_orderno'] = $order_info['order_sn'];
@@ -146,7 +145,6 @@ class  Memberevaluate
             $update_store['store_deliverycredit'] = $store_credit['store_deliverycredit']['credit'];
             $update_store['store_credit'] = intval($store_credit_average / 5 * 100);
             model('store')->editStore($update_store, array('store_id'=>$store_info['store_id']));
-        }
 
         
         //更新订单信息并记录订单日志

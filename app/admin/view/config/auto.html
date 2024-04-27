@@ -37,20 +37,6 @@
                 </td>
                 <td class="vatop tips">兑换码未使用，兑换码过期自动退款时间设置区间为1-100数值</td>
             </tr>
-            <tr class="noborder">
-                <td class="w150"><label for="store_bill_cycle">{$Think.lang.store_bill_cycle}:</label></td>
-                <td class="vatop rowform">
-                    <input id="store_bill_cycle" name="store_bill_cycle" value="{$list_config.store_bill_cycle|default=''}" type="text"> 天
-                </td>
-                <td class="vatop tips">{$Think.lang.store_bill_cycle_tips}</td>
-            </tr>
-            <tr class="noborder">
-                <td class="w150"><label for="o2o_distributor_bill_cycle">{$Think.lang.o2o_distributor_bill_cycle}:</label></td>
-                <td class="vatop rowform">
-                    <input id="o2o_distributor_bill_cycle" name="o2o_distributor_bill_cycle" value="{$list_config.o2o_distributor_bill_cycle|default=''}" type="text"> 天
-                </td>
-                <td class="vatop tips">{$Think.lang.o2o_distributor_bill_cycle_tips}</td>
-            </tr>
             </tbody>
             <tfoot>
             <tr class="tfoot">
@@ -85,16 +71,6 @@
                     number: true,
                     range : [1,100]
                 },
-                store_bill_cycle: {
-                    required: true,
-                    number: true,
-                    min : 7
-                },
-                o2o_distributor_bill_cycle: {
-                    required: true,
-                    number: true,
-                    range : [1,100]
-                },
                 
             },
             messages: {
@@ -110,16 +86,6 @@
                 },
                 code_invalid_refund: {
                     required: '{$Think.lang.code_invalid_refund_required}',
-                    number:'{$Think.lang.ds_sort_number}',
-                    range:"{$Think.lang.ds_range_1_100}",
-                },
-                store_bill_cycle: {
-                    required: '{$Think.lang.store_bill_cycle_required}',
-                    number:'{$Think.lang.ds_sort_number}',
-                    min:"{$Think.lang.ds_min_error}7",
-                },
-		o2o_distributor_bill_cycle: {
-                    required: '{$Think.lang.o2o_distributor_bill_cycle_required}',
                     number:'{$Think.lang.ds_sort_number}',
                     range:"{$Think.lang.ds_range_1_100}",
                 },

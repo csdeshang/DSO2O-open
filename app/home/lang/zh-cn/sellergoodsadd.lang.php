@@ -131,7 +131,7 @@ $lang['store_goods_step2_description_one'] = '最多可发布5张商品图片。
 $lang['store_goods_step2_description_two'] = '上传商品默认主图，如多规格值时将默认使用该图或分规格上传各规格主图；支持jpg、gif、png格式上传或从图片空间中选择，建议使用<font color="red">尺寸800x800像素以上、大小不超过1M的正方形图片</font>，上传后的图片将会自动保存在图片空间的默认分类中。';
 $lang['store_goods_step2_description_three'] = '图片可以通过两侧的箭头调整显示顺序。';
 $lang['store_goods_album_climit'] = '您上传图片数达到上限，请升级您的店铺或跟管理员联系';
-$lang['store_goods_no_store_latitude'] = '抱歉，添加商品前需要先设置您店铺的地图位置。';
+$lang['store_goods_no_store_latitude'] = '抱歉，您需要先设置您店铺的地图位置。';
 /**
  * 商品发布第一步
  */
@@ -260,7 +260,6 @@ $lang['store_goods_import_goodsdesc'] = '宝贝描述';
 $lang['store_goods_import_goodspic'] = '新图片';
 $lang['store_goods_import_goodsproperties'] = '销售属性组合';
 $lang['store_goods_import_upload_album'] = '导入相册选择';
-$lang['param_error'] = '参数错误';
 
 /**
  * ajax修改商品标题

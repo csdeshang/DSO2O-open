@@ -47,13 +47,11 @@ class  BaseStore extends BaseHome {
                 $this->store_info = $store_info;
             }
             $storejoinin_model=model('storejoinin');
-            if(!$store_info['is_platform_store']){
                 $storejoinin_info=$storejoinin_model->getOneStorejoinin(array('member_id'=>$store_info['member_id']));
                 //营业执照
                 if($storejoinin_info){
                     $this->store_info['business_licence_number_electronic']=$storejoinin_info['business_licence_number_electronic']?get_store_joinin_imageurl($storejoinin_info['business_licence_number_electronic']):'';
                 }  
-            }
 
             $this->outputStoreInfo($this->store_info);
             $this->getStorenavigation($store_id);

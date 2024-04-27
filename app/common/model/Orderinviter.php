@@ -37,7 +37,10 @@ class  Orderinviter extends BaseModel {
                     $data['amount'] = $val['orderinviter_money'];
                     $data['order_sn'] = $val['orderinviter_order_sn'];
                     $data['lg_desc'] = $val['orderinviter_remark'];
-                    $predeposit_model->changePd('order_inviter', $data);
+                    if($val['orderinviter_money'] > 0){
+                        //防止 orderinviter_money 佣金 金额小于0 ， 比如0.01的商品 佣金1% 所以忽略更新预存款， changePd 数据未做更新则会抛出异常
+                        $predeposit_model->changePd('order_inviter', $data);
+                    }
                     $goodscommon = Db::name('goodscommon')->where('goods_commonid=' . $val['orderinviter_goods_commonid'])->lock(true)->find();
 
                     if ($goodscommon) {
@@ -75,6 +78,47 @@ class  Orderinviter extends BaseModel {
                 }
             }
         }
+    }
+    
+    
+    // 当订单出现退款时候,需要修改推荐人的分销佣金[实物订单]
+    public function refundOrderinviterMoney($order_info,$refund_info) {
+        
+        $order_id = $order_info['order_id'];
+        $order_amount = $order_info['order_amount']; //订单金额
+        $refund_amount = $order_info['refund_amount'] + $refund_info['refund_amount']; //退款金额
+
+        $condition = array();
+        $condition[] = array('orderinviter_order_id', '=', $order_id);
+        $condition[] = array('orderinviter_valid', '=', 0);
+        $condition[] = array('orderinviter_order_type', '=', 0);
+        if ($refund_info['goods_id']) {
+            $condition[] = array('orderinviter_goods_id', '=', $refund_info['goods_id']);
+            $orderinviter_list = Db::name('orderinviter')->where($condition)->select()->toArray();
+            foreach ($orderinviter_list as $orderinviter_info) {
+                $orderinviter_goods_amount = round($orderinviter_info['orderinviter_goods_amount'] - $refund_info['refund_amount'], 2);
+                $orderinviter_money = round($orderinviter_info['orderinviter_ratio'] / 100 * $orderinviter_goods_amount, 2);
+                Db::name('orderinviter')->where(array(array('orderinviter_id', '=', $orderinviter_info['orderinviter_id'])))->update(['orderinviter_goods_amount' => $orderinviter_goods_amount, 'orderinviter_money' => $orderinviter_money]);
+            }
+        } else {
+            $orderinviter_list = Db::name('orderinviter')->where($condition)->select()->toArray();
+            foreach ($orderinviter_list as $orderinviter_info) {
+                $orderinviter_goods_amount = round(($order_amount - $refund_amount) * $orderinviter_info['orderinviter_goods_amount'] / $order_amount, 2);
+                $orderinviter_money = round($orderinviter_info['orderinviter_ratio'] / 100 * $orderinviter_goods_amount, 2);
+                Db::name('orderinviter')->where(array(array('orderinviter_id', '=', $orderinviter_info['orderinviter_id'])))->update(['orderinviter_goods_amount' => $orderinviter_goods_amount, 'orderinviter_money' => $orderinviter_money]);
+            }
+        }
+    }
+    
+    // 当订单取消时,修改分销佣金
+    public function cancelOrderinviterMoney($order_id, $orderinviter_order_type) {
+        // orderinviter_order_type   0 实物订单  1虚拟订单
+
+        $condition = array();
+        $condition[] = array('orderinviter_order_id', '=', $order_id);
+        $condition[] = array('orderinviter_valid', '=', 0);
+        $condition[] = array('orderinviter_order_type', '=', $orderinviter_order_type);
+        Db::name('orderinviter')->where($condition)->update(['orderinviter_valid' => 2]);
     }
 
 }

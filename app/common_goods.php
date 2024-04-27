@@ -288,7 +288,7 @@ function get_order_state($order_info)
         case ORDER_STATE_PAY:
             $order_state = lang('order_state_pay');
             break;
-				case ORDER_STATE_RECEIPT:
+	case ORDER_STATE_RECEIPT:
             $order_state = lang('order_state_receipt');
             break;
         case ORDER_STATE_DELIVER:
@@ -299,9 +299,29 @@ function get_order_state($order_info)
             break;
         case ORDER_STATE_SUCCESS:
             $order_state = lang('order_state_success');
+            if(isset($order_info['refund_state']) && $order_info['refund_state'] == 2 && $order_info['order_refund_lock_state'] ==0){
+                //全部退款
+                $order_state .= '(退款成功)';
+            }elseif(isset($order_info['refund_state']) && $order_info['refund_state'] == 1 && $order_info['order_refund_lock_state'] ==0){
+                //部分退款
+                $order_state .= '(有商品退款)';
+            }
             break;
     }
+    if($order_info['order_refund_lock_state']>0){
+        $order_state .= '(退款待处理)';
+    }
     return $order_state;
+}
+
+/**
+ * 取得退款文字输出形式,针对订单表字段
+ *
+ * @param array $refund_state
+ * @return string 描述输出
+ */
+function get_order_refund_state($refund_state) {
+    return str_replace(array('0', '1', '2'), array('', '部分退款', '全部退款'), $refund_state);
 }
 
 /**
@@ -326,15 +346,14 @@ function get_order_goodstype($goods_type)
     return str_replace(array('1', '3', '4', '5'), array('', '秒杀', '优惠套装', '赠品'), $goods_type);
 }
 
-/**
- * 取得结算文字输出形式
- *
- * @param array $bill_state
- * @return string 描述输出
- */
-function get_bill_state($bill_state)
-{
-    return str_replace(array('1', '2', '3', '4'), array('已出账', '商家已确认', '平台已审核', '结算完成'), $bill_state);
+//实物订单退款退货文字输出
+function get_refundreturn_seller_state($refundreturn_seller_state){
+    return str_replace(array('1', '2', '3'), array('待审核', '同意', '不同意'), $refundreturn_seller_state);
+}
+
+//实物订单退款退货文字输出
+function get_refundreturn_admin_state($refundreturn_admin_state){
+    return str_replace(array('1', '2', '3', '4'), array('商家处理中', '待平台处理', '已完成', '不同意'), $refundreturn_admin_state);
 }
 
 /**

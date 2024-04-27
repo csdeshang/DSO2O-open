@@ -83,9 +83,6 @@
                         <dt><i class="iconfont orange">&#xe764;</i>{$Think.lang.member_order_state}：</dt>
                         <dd>{$Think.lang.ransaction_closed}</dd>
                     </dl>
-                    <ul>
-                        <li>{$order_info['close_info']['log_role']} {$Think.lang.member_show_order_at} {$order_info.close_info.log_time|date="Y-m-d H:i:s"} {$order_info.close_info.log_msg}</li>
-                    </ul>
                 </div>
                 {/if}
                 {if $order_info['order_state'] == ORDER_STATE_NEW}
@@ -239,13 +236,11 @@
                             <dl class="goods-name">
                                 <dt><a target="_blank" href="{$goods.goods_url}">{$goods.goods_name}</a></dt>
                                 <dd>
-                                    <?php if (isset($refund_all)) {?>
-                                    <?php if (is_array($refund_all) && !empty($refund_all)) {?>
-                                    {$Think.lang.refund_number}：<a target="_blank" href="{:url('Memberrefund/view',['refund_id'=>$refund_all.refund_id])}">{$refund_all.refund_sn}</a>
-                                    <?php }else if($refund_all['refund_type'] == 1) {?>
-                                   {$Think.lang.refund_number}：<a target="_blank" href="{:url('Memberrefund/view',['refund_id'=>$refund_all.refund_id])}">{$goods['extend_refund']['refund_sn']}</a></dd>
-                                <?php }else if($refund_all['refund_type'] == 2) {?>
-                                {$Think.lang.returns_single_number}：<a target="_blank" href="{:url('Memberrefund/view',['refund_id'=>$refund_all.refund_id])}">{$goods['extend_refund']['refund_sn']}</a>
+                                    <?php if (isset($goods['extend_order_goods_refund'])) {?>
+                                    <?php if($goods['extend_order_goods_refund']['refund_type'] == 1) {?>
+                                   {$Think.lang.refund_number}：<a target="_blank" href="{:url('Memberrefund/view',['refund_id'=>$goods.extend_order_goods_refund.refund_id])}">{$goods['extend_order_goods_refund']['refund_sn']}</a></dd>
+                                <?php }else if($goods['extend_order_goods_refund']['refund_type'] == 2) {?>
+                                {$Think.lang.returns_single_number}：<a target="_blank" href="{:url('Memberreturn/view',['return_id'=>$goods.extend_order_goods_refund.refund_id])}">{$goods['extend_order_goods_refund']['refund_sn']}</a>
                                 <?php } ?>
                                 <?php } ?>
                                 </dd>
@@ -253,19 +248,16 @@
                         </td>
                         <td></td>
                         <td class="tl refund">{$goods.goods_price}
-                            <p class="green">
-                                <?php if (isset($refund_all)) {?>
-                                <?php if (is_array($refund_all) && !empty($refund_all) && $refund_all['admin_time'] > 0) {?>
-                                {$goods.goods_pay_price}<span>{$Think.lang.return}</span>
-                                <?php } elseif ($refund_all['admin_time'] > 0) { ?>
-                                {$refund_all.refund_amount}<span>{$Think.lang.return}</span>
-                                <?php } ?>
-                                <?php } ?>
+                            <p>实付:{$goods.goods_pay_price}</p>
+                            <p>
+                                {if isset($goods['extend_order_goods_refund']) && $goods['extend_order_goods_refund']['refundreturn_admin_time'] > 0}
+                                退款:{$goods.extend_order_goods_refund.refund_amount}
+                                {/if}
                             </p></td>
                         <td>{$goods.goods_num}</td>
                         <td>{$goods.goods_type_cn}</td>
                         <td><!-- 退款 -->
-                            {if isset($goods['refund']) && $goods['refund'] == 1 }
+                            {if isset($goods['if_allow_goods_refund']) && $goods['if_allow_goods_refund'] == 1 }
                             <p><a href="{:url('Memberrefund/add_refund',['order_id'=>$order_info.order_id,'goods_id'=>$goods.rec_id])}">{$Think.lang.refund_return}</a></p>
                             {/if}
 
@@ -278,7 +270,7 @@
                         <!-- S 合并TD -->
                         <?php if (($order_info['goods_count'] > 1 && $k ==0) || ($order_info['goods_count'] == 1)){ ?>
                         <td class="bdl bdr" rowspan="{$order_info.goods_count}">{$order_info.state_desc|raw}</td>
-                        <td rowspan="{$order_info.goods_count}">{if $order_info['if_lock']}<p>{$Think.lang.refund_returns}</p>{/if}
+                        <td rowspan="{$order_info.goods_count}">{if $order_info['if_order_refund_lock']}<p>{$Think.lang.refund_returns}</p>{/if}
                             <!-- 取消订单 -->
                             {if $order_info.if_cancel}
                             <p><a href="javascript:void(0)" style="color:#F30; text-decoration:underline;" ds_type="dialog" dialog_width="480" dialog_title="{$Think.lang.member_order_cancel_order}" dialog_id="buyer_order_cancel_order" uri="{:url('Memberorder/change_state',['state_type'=>'order_cancel','order_id'=>$order_info.order_id])}"  id="order_action_cancel">{$Think.lang.member_order_cancel_order}</a></p>

@@ -24,7 +24,9 @@ class  Member extends Validate
         'member_password'=>'require|length:6,20',
         'member_email'=>'email',
         'member_mobile'=>'mobile',
-        'member_nickname'=>'max:10',
+        'member_nickname'=>'max:20',
+        'member_qq'=>'length:5,12',
+        'member_ww'=>'length:5,20',
     ];
     protected $message  =   [
         'member_name.require'=>'用户名必填',
@@ -37,12 +39,14 @@ class  Member extends Validate
         'member_password.require'=>'密码为必填',
         'member_password.length'=>'密码长度必须为6-20之间',
         'member_email.email'=>'邮箱格式错误',
-        'member_mobile.length'=>'手机格式错误',
-        'member_nickname.max'=>'真实姓名长度超过10位',
+        'member_mobile.mobile'=>'手机格式错误',
+        'member_nickname.max'=>'会员昵称长度不能超过20位',
+        'member_qq.length'=>'QQ的长度应该在5至12位之间',
+        'member_ww.length'=>'旺旺的长度应该在5至20位之间',
     ];
     protected $scene = [
         'add' => ['member_name', 'member_password', 'member_email'],
-        'edit' => ['member_email', 'member_mobile', 'member_email'],
+        'edit' => ['member_email', 'member_mobile','member_nickname','member_qq','member_ww'],
         'edit_information' => ['member_nickname'],
         'login' => ['member_password'],
         'register' => ['member_name', 'member_password'],

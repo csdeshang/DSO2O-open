@@ -37,9 +37,6 @@ class O2o extends AdminControl {
             $this->setAdminCurItem('other');
             return View::fetch();
         } else {
-            $update_array['instant_message_gateway_url'] = input('param.instant_message_gateway_url');
-            $update_array['instant_message_register_url'] = input('param.instant_message_register_url');
-            $update_array['instant_message_open'] = input('param.instant_message_open');
             $update_array['o2o_auto_distribute'] = abs(input('post.o2o_auto_distribute'));
             $update_array['o2o_complaint_fine'] = abs(floatval(input('post.o2o_complaint_fine')));
             $result = $config_model->editConfig($update_array);

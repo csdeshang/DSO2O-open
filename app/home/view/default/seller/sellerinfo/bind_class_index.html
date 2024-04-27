@@ -1,22 +1,11 @@
 {extend name="default/base/base_seller" /}
 
 {block name="seller_btn"}
-{if !check_platform_store()}
   <a href="javascript:void(0)" class="dssc-btn dssc-btn-green" ds_type="dialog" dialog_title="{$Think.lang.apply_new_business_category}" dialog_id="my_goods_brand_apply" dialog_width="480" uri="{:url('Sellerinfo/bind_class_add')}">
       {$Think.lang.apply_new_business_category}
   </a>
-{/if}
 {/block}
 {block name="seller_main"}
-{if check_platform_store_bindingall_goodsclass()}
-<table class="dssc-default-table">
-    <tbody>
-        <tr>
-            <td colspan="20" class="norecord"><div class="warning-option"><span>{$Think.lang.store_bound_all_categories}</span></div></td>
-        </tr>
-    </tbody>
-</table>
-{else/}
 <table class="dssc-default-table">
     <thead>
         <tr>
@@ -51,5 +40,4 @@
         {/notempty}
     </tbody>
 </table>
-{/if}
 {/block}

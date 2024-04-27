@@ -29,7 +29,16 @@ class  Mbusertoken extends BaseModel {
      * @return array
      */
     public function getMbusertokenInfo($condition) {
-        return Db::name('mbusertoken')->where($condition)->find();
+        $mbusertoken = Db::name('mbusertoken')->where($condition)->find();
+        if(!empty($mbusertoken)){
+            $mbusertoken['member_logintime_desc'] = date('Y-m-d H:i:s',$mbusertoken['member_logintime']);
+            $mbusertoken['member_operationtime_desc'] = date('Y-m-d H:i:s',$mbusertoken['member_operationtime']);
+            //更新最近活跃时间
+            if(TIMESTAMP - $mbusertoken['member_operationtime'] > 60*60){
+                Db::name('mbusertoken')->where($condition)->update(array('member_operationtime' => TIMESTAMP));
+            }
+        }
+        return $mbusertoken;
     }
     
     /**
@@ -79,7 +88,15 @@ class  Mbusertoken extends BaseModel {
     public function delMbusertoken($condition) {
         return Db::name('mbusertoken')->where($condition)->delete();
     }
-
+    
+    public function getMbusertokenList($condition) {
+        $mbusertoken_list = Db::name('mbusertoken')->where($condition)->select()->toArray();
+        foreach ($mbusertoken_list as $key => $mbusertoken) {
+            $mbusertoken_list[$key]['member_logintime_desc'] = date('Y-m-d H:i:s',$mbusertoken['member_logintime']);
+            $mbusertoken_list[$key]['member_operationtime_desc'] = date('Y-m-d H:i:s',$mbusertoken['member_operationtime']);
+        }
+        return $mbusertoken_list;
+    }
 }
 
 ?>

@@ -461,11 +461,6 @@ class  AdminControl extends BaseController {
                         'text' => lang('ds_storejoin'),
                         'args' => 'index,Storejoin,store',
                     ),
-                    'Ownshop' => array(
-                        'ico'=>'&#xe6ec;',
-                        'text' => lang('ds_ownshop'),
-                        'args' => 'index,Ownshop,store',
-                    ),
                 ),
             ),
             'trade' => array(
@@ -483,11 +478,6 @@ class  AdminControl extends BaseController {
                         'ico'=>'&#xe6f3;',
                         'text' => lang('ds_refund'),
                         'args' => 'refund_manage,Refund,trade',
-                    ),
-                    'Bill' => array(
-                        'ico'=>'&#xe69c;',
-                        'text' => lang('ds_bill_manage'),
-                        'args' => 'show_statis,Bill,trade',
                     ),
                     'consulting' => array(
                         'ico'=>'&#xe71c;',
@@ -596,11 +586,6 @@ class  AdminControl extends BaseController {
                         'text' => lang('ds_statstore'),
                         'args' => 'newstore,Statstore,stat',
                     ),
-                    'stat_trade' => array(
-                         'ico'=>'&#xe745;',
-                        'text' => lang('ds_stattrade'),
-                        'args' => 'income,Stattrade,stat',
-                    ),
                     'stat_goods' => array(
                         'ico'=>'&#xe732;',
                         'text' => lang('ds_statgoods'),
@@ -671,6 +656,11 @@ class  AdminControl extends BaseController {
                 'text' => lang('ds_o2o'),
                 'show' => TRUE,
                 'children' => array(
+                    'o2o_distributor_money' => array(
+                        'ico'=>"&#xe73f;",
+                        'text' => lang('o2o_distributor_money'),
+                        'args' => 'index,O2oDistributorMoney,o2o',
+                    ),
                     'o2o_printer_setting' => array(
                         'ico'=>"&#xe7ca;",
                         'text' => lang('o2o_printer_setting'),
@@ -690,11 +680,6 @@ class  AdminControl extends BaseController {
                         'ico'=>"&#xe73f;",
                         'text' => lang('o2o_distributor_manage'),
                         'args' => 'index,O2oDistributor,o2o',
-                    ),
-                    'o2o_order_bill' => array(
-                        'ico'=>"&#xe623;",
-                        'text' => lang('o2o_order_bill_manage'),
-                        'args' => 'index,O2oOrderBill,o2o',
                     ),
                     'o2o_complaint' => array(
                         'ico'=>"&#xe623;",
@@ -796,7 +781,6 @@ class  AdminControl extends BaseController {
                     array('name' => lang('ds_storeclass'), 'action' => null, 'controller' => 'Storeclass'),
                     array('name' => lang('ds_Storehelp'), 'action' => null, 'controller' => 'Storehelp'),
                     array('name' => lang('ds_storejoin'), 'action' => null, 'controller' => 'Storejoin'),
-                    array('name' => lang('ds_ownshop'), 'action' => null, 'controller' => 'Ownshop'),
                 )),
             array('name' => lang('ds_member_name'), 'child' => array(
                     array('name' => lang('ds_member_manage'), 'action' => null, 'controller' => 'Member'),
@@ -813,7 +797,6 @@ class  AdminControl extends BaseController {
             array('name' => lang('ds_trade'), 'child' => array(
                     array('name' => lang('ds_order'), 'action' => null, 'controller' => 'Order'),
                     array('name' => lang('ds_refund'), 'action' => null, 'controller' => 'Refund'),
-                    array('name' => lang('ds_bill_manage'), 'action' => null, 'controller' => 'Bill'),
                     array('name' => lang('ds_consulting'), 'action' => null, 'controller' => 'Consulting'),
                     array('name' => lang('ds_inform'), 'action' => null, 'controller' => 'Inform'),
                     array('name' => lang('ds_evaluate'), 'action' => null, 'controller' => 'Evaluate'),
@@ -854,11 +837,11 @@ class  AdminControl extends BaseController {
                     array('name' => lang('wechat_push'), 'action' => 'SendList', 'controller' => 'Wechat'),
                 )),
             array('name' => lang('ds_o2o'), 'child' => array(
+                    array('name' => lang('o2o_distributor_money'), 'action' => null, 'controller' => 'O2oDistributorMoney'),
                     array('name' => lang('o2o_printer_setting'), 'action' => null, 'controller' => 'O2oPrinter'),
                     array('name' => lang('o2o_third'), 'action' => null, 'controller' => 'O2oThird'),
                     array('name' => lang('o2o_setting'), 'action' => null, 'controller' => 'O2o'),
                     array('name' => lang('o2o_distributor_manage'), 'action' => null, 'controller' => 'O2oDistributor'),
-                    array('name' => lang('o2o_order_bill_manage'), 'action' => null, 'controller' => 'O2oOrderBill'),
                     array('name' => lang('o2o_complaint'), 'action' => null, 'controller' => 'O2oComplaint'),
                 )),
             array('name' => lang('o2o_errand'), 'child' => array(

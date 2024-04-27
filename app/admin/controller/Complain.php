@@ -123,43 +123,12 @@ class  Complain extends AdminControl
         //获取投诉的商品列表
         $complain_goods_list = $this->get_complain_goods_list($complain_info['order_goods_id']);
         View::assign('complain_goods_list', $complain_goods_list);
-        if (intval($complain_info['complain_subject_id']) == 1) {//退款信息
-            $refundreturn_model = model('refundreturn');
-            $this->getRefundStateArray();//向模板页面输出退款退货状态
-            $list = $refundreturn_model->getComplainRefundList($order_info, $complain_info['order_goods_id']);
-            View::assign('refund_list', $list['refund']);//已退或处理中商品
-            View::assign('refund_goods', $list['goods']);//可退商品
-        }
         $this->setAdminCurItem('complain_progress');
         View::assign('order_info', $order_info);
         View::assign('complain_info', $complain_info);
         return View::fetch('complain_info');
     }
 
-    function getRefundStateArray($type = 'all') {
-        $state_array = array(
-            '1' => lang('refund_state_confirm'),
-            '2' => lang('refund_state_yes'),
-            '3' => lang('refund_state_no')
-        ); //卖家处理状态:1为待审核,2为同意,3为不同意
-        View::assign('state_array', $state_array);
-
-        $admin_array = array(
-            '1' => lang('ds_processing'),
-            '2' => lang('ds_processed'),
-            '3' => lang('order_state_success')
-        ); //确认状态:1为买家或卖家处理中,2为待平台管理员处理,3为退款退货已完成
-        View::assign('admin_array', $admin_array);
-
-        $state_data = array(
-            'seller' => $state_array,
-            'admin' => $admin_array
-        );
-        if ($type == 'all') {
-            return $state_data; //返回所有
-        }
-        return $state_data[$type];
-    }
     /*
      * 审核提交的投诉
      */
@@ -243,33 +212,6 @@ class  Complain extends AdminControl
             $where = array();
             $where[]=array('complain_id','=', $complain_id);
             if ($complain_model->editComplain($update_array, $where)) {
-                if (intval($complain_info['complain_subject_id']) == 1) {//退款信息
-                    $order = $this->get_order_info($complain_info['order_id']);
-                    $refundreturn_model = model('refundreturn');
-                    $list = $refundreturn_model->getComplainRefundList($order, $complain_info['order_goods_id']);
-                    $refund_goods = $list['goods'];//可退商品
-                    if (!empty($refund_goods) && is_array($refund_goods)) {
-                        $checked_goods = input('post.checked_goods/a');#获取数组
-                        foreach ($refund_goods as $key => $value) {
-                            $goods_id = $value['rec_id'];//订单商品表编号
-                            if (!empty($checked_goods) && array_key_exists($goods_id, $checked_goods)) {//验证提交的商品属于订单
-                                $refund_array = array();
-                                $refund_array['refund_type'] = '1';//类型:1为退款,2为退货
-                                $refund_array['seller_state'] = '2';//卖家处理状态:1为待审核,2为同意,3为不同意
-                                $refund_array['refund_state'] = '2';//状态:1为处理中,2为待管理员处理,3为已完成
-                                $refund_array['order_lock'] = '1';//锁定类型:1为不用锁定,2为需要锁定
-                                $refund_array['refund_amount'] = ds_price_format($value['goods_refund']);
-                                $refund_array['reason_id'] = '0';
-                                $refund_array['reason_info'] = lang('complaints_success');
-                                $refund_array['buyer_message'] = lang('complaints_success_confirm');
-                                $refund_array['seller_message'] = lang('complaints_success_confirm');
-                                $refund_array['add_time'] = TIMESTAMP;
-                                $refund_array['seller_time'] = TIMESTAMP;
-                                $refundreturn_model->addRefundreturn($refund_array, $order, $value);
-                            }
-                        }
-                    }
-                }
                 $this->log(lang('complain_close_success') . '[' . $complain_id . ']', 1);
                 $this->success(lang('complain_close_success'), $this->get_complain_state_link($current_state));
             } else {

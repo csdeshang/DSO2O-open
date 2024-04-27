@@ -17,7 +17,6 @@ $lang['have_no_legalpower'] = '没有权限';
 $lang['baseseller_o2o_complaint']='配送员投诉';
 $lang['baseseller_o2o_printer'] = '打印机管理';
 $lang['baseseller_o2o_distributor_magage'] = '配送员管理';
-$lang['baseseller_o2o_order_bill'] = '配送员结算';
 $lang['baseseller_o2o_distributor'] = '配送员';
 $lang['baseseller_dada_shop'] = '达达门店';
 $lang['baseseller_store_o2o'] = '店铺配送';
@@ -420,7 +419,7 @@ $lang['store_setting_exists_uri'] = '该二级域名已存在,请更换其它域
 $lang['store_setting_invalid_uri'] = '该二级域名为系统禁止域名,请更换其它域名';
 $lang['store_setting_lack_uri'] = '该二级域名不符合域名命名规范,请不要使用特殊字符';
 $lang['store_create_store_name_hint'] = '店铺名称请控制长度不超过20字';
-$lang['store_create_store_zy_hint'] = '关键字最多可输入50字，请用","进行分隔，例如”男装,女装,童装”';
+$lang['store_create_store_zy_hint'] = '关键字最多可输入255字，请用","进行分隔，例如”男装,女装,童装”';
 
 $lang['store_setting_change_label'] = '店铺logo';
 $lang['store_setting_label_tip'] = '此处理店铺页logo；<br/><span style="color:orange;">建议使用宽200像素-高60像素内的GIF或PNG透明图片。</span>';
@@ -451,7 +450,7 @@ $lang['store_setting_seo_keywords'] = 'SEO关键字';
 $lang['store_setting_store_zy'] = '主营商品';
 $lang['store_setting_seo_description'] = 'SEO店铺描述';
 $lang['store_setting_seo_keywords_help'] = '用于店铺搜索引擎的优化，关键字之间请用英文逗号分隔';
-$lang['store_setting_seo_description_help'] = '用于店铺搜索引擎的优化，建议120字以内';
+$lang['store_setting_seo_description_help'] = '用于店铺搜索引擎的优化，建议255字以内';
 $lang['store_settine_browse'] = '浏览...';
 $lang['store_setting_store_url'] = '当前店铺首页连接：';
 /**

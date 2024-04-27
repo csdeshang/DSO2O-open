@@ -301,7 +301,7 @@ class  BaseHome extends BaseController
         if (!$member_info['member_state']) {
             return false;
         }
-        $member_model->createSession($member_info);
+        $member_model->createSession($member_info,'login');
     }
 
 }

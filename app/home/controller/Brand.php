@@ -135,7 +135,7 @@ class  Brand extends BaseMall {
         View::assign('brand_r', $brand_r_list);
 
         // 得到排序方式
-        $order = 'is_platform_store desc,goods_id desc';
+        $order = 'goods_id desc';
         
         $key = input('param.key');
         
@@ -163,9 +163,6 @@ class  Brand extends BaseMall {
         $area_id = intval(input('param.area_id'));
         if ($area_id > 0) {
             $where[] = array('areaid_1','=',$area_id);
-        }
-        if (input('param.type') == 1) {
-            $where[] = array('is_platform_store','=',1);
         }
         if (input('param.gift') == 1) {
             $where[] = array('is_have_gift','=',1);

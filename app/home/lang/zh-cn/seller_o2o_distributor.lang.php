@@ -11,7 +11,6 @@ $lang['store_o2o_distance_help']= '米';
 $lang['store_o2o_fee']= '配送费用';
 $lang['store_o2o_fee_help']= '元';
 $lang['store_o2o_auto_receipt']= '自动接单';
-$lang['store_o2o_auto_deliver']= '自动派单';
 $lang['store_o2o_min_cost']= '接单门槛';
 $lang['store_o2o_min_cost_help']= '元。用户下单时达到此购物金额，才能提交订单';
 $lang['store_o2o_reject_time']= '拒接时限';

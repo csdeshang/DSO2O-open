@@ -25,60 +25,7 @@ class  Store extends BaseModel {
 
     public $page_info;
     
-    /**
-     * 自营店铺的ID
-     * @access protected
-     * @author csdeshang
-     * array(
-     *   '店铺ID(int)' => '是否绑定了全部商品类目(boolean)',
-     *   // ..
-     * )
-     */
-    protected $ownShopIds;
 
-    /**
-     * 删除缓存自营店铺的ID
-     * @access public
-     * @author csdeshang
-     */
-    public function dropCachedOwnShopIds() {
-        $this->ownShopIds = null;
-        dkcache('own_shop_ids');
-    }
-
-    /**
-     * 获取自营店铺的ID
-     * @access public
-     * @author csdeshang
-     * @param boolean $bind_all_gc = false 是否只获取绑定全部类目的自营店 默认否（即全部自营店）
-     * @return int
-     */
-    public function getOwnShopIds($bind_all_gc = false) {
-
-        $data = $this->ownShopIds;
-
-        // 属性为空则取缓存
-        if (!$data) {
-            $data = rkcache('own_shop_ids');
-
-            // 缓存为空则查库
-            if (!$data) {
-                $data = array();
-                $all_own_shops = Db::name('store')->field('store_id,bind_all_gc')->where(array('is_platform_store' => 1,))->select()->toArray();
-                foreach ((array) $all_own_shops as $v) {
-                    $data[$v['store_id']] = (int) (bool) $v['bind_all_gc'];
-                }
-
-                // 写入缓存
-                wkcache('own_shop_ids', $data);
-            }
-
-            // 写入属性
-            $this->ownShopIds = $data;
-        }
-
-        return array_keys($bind_all_gc ? array_filter($data) : $data);
-    }
 
     /**
      * 查询店铺列表
@@ -556,6 +503,9 @@ class  Store extends BaseModel {
         if (!$store_info['store_o2o_receipt']) {
             return ds_callback(false, '店铺[' . $store_info['store_name'] . ']暂停接单');
         }
+        
+        //根据店铺设置的营业时间判断是否可以下单
+        /*
         $start_time = strtotime(date('Y-m-d 0:0:0')) + $store_info['store_o2o_open_start'] * 60;
         $start_time_text = floor($store_info['store_o2o_open_start'] / 60) . ':' . str_pad(strval($store_info['store_o2o_open_start'] % 60), 2, '0', STR_PAD_LEFT);
         $end_time = strtotime(date('Y-m-d 0:0:0')) + $store_info['store_o2o_open_end'] * 60;
@@ -568,11 +518,15 @@ class  Store extends BaseModel {
         if ($end_time < TIMESTAMP) {
             return ds_callback(false, '店铺[' . $store_info['store_name'] . ']营业时间为' . $start_time_text . '到'.$end_time_text.'，请您明日再来');
         }
+         */
+        
+        
+        
         return ds_callback(true);
     }
     
     public function isO2oSupport($store_info){
-        if($store_info['store_o2o_distribute_type']==1 || ($store_info['store_o2o_distribute_type']==0 && config('ds_config.o2o_open') && ((!$store_info['is_platform_store'] && $store_info['store_o2o_support']==1) || $store_info['is_platform_store']))){
+        if($store_info['store_o2o_distribute_type']==1 || ($store_info['store_o2o_distribute_type']==0 && config('ds_config.o2o_open'))){
             return true;
         }else{
             return false;

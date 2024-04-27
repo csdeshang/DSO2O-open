@@ -29,13 +29,9 @@
                 <dt>{$Think.lang.ds_state}</dt>
                 <dd>
                     <select name="state">
-                        <option value="0"
-                         {eq name="Request.get.state" value="0"}selected{/eq}>{$Think.lang.ds_status}</option>
-                        {notempty name="templatestate_arr"}
-                        {foreach name="templatestate_arr" item="val"}
-                        <option value="{$val.0}" {eq name="val.0" value="$Request.get.state" }selected{/eq}>{$val.1}</option>
-                        {/foreach}
-                        {/notempty}
+                        <option value="0" {eq name="Request.get.state" value="0" }selected{/eq}>{$Think.lang.ds_status}</option>
+                        <option value="1" {eq name="Request.get.state" value="1" }selected{/eq}>有效</option>
+                        <option value="2" {eq name="Request.get.state" value="2" }selected{/eq}>无效</option>
                     </select>
                 </dd>
             </dl>
@@ -92,9 +88,6 @@
                 <td>&nbsp;</td>
                 <td class="align-left">
                     <a href="{:url('home/Store/index',['store_id'=>$val.vouchertemplate_store_id])}"><span>{$val.vouchertemplate_storename}</span></a>
-                    {present name="flippedOwnShopIds[$val.vouchertemplate_store_id]"}
-                    <span class="ownshop">[自营]</span>
-                    {/present}
                 </td>
                 <td class="align-left"><span>{$val.vouchertemplate_title}</span></td>
                 <td class="align-center"><span>{$val.vouchertemplate_price}</span></td>
@@ -112,9 +105,7 @@
 				</td>
                 <td class="align-center">
                     <span>
-                    {foreach name="templatestate_arr" item="v"}
-                    {eq name="val.vouchertemplate_state" value="$v.0"}{$v.1}{/eq}
-                    {/foreach}
+                        {if $val.vouchertemplate_state == 1}有效{/if}{if $val.vouchertemplate_state == 2}无效{/if}
                     </span>
                 </td>
                 <td class="align-center yes-onoff">

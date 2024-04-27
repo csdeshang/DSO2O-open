@@ -45,9 +45,7 @@
                 <td class="goods-time">{$val.o2o_complaint_addtime|date="Y-m-d H:i:s"}</td>
                 <td>{$Think.lang.member_o2o_complaint_state_text[$val.o2o_complaint_state]}</td>
                 <td>
-                    {if !$val.o2o_order_bill_id}
                     <a href="javascript:void(0)" dstype="btn_del_o2o_complaint" data-order-id="{$val.order_id}" />{$Think.lang.ds_del}</a>
-                    {/if}
                 </td>
             </tr>
             {/foreach}

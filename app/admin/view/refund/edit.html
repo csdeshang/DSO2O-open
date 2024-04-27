@@ -11,6 +11,7 @@
                     <tr class="noborder"> 
                         <td class="required w120">{$Think.lang.refund_order_refund}</td>
                         <td>{:ds_price_format($refund['refund_amount'])}</td>
+                        <td class="vatop tips"></td>
                     </tr>
                     <tr class="noborder"> 
                         <td class="required w120">商品名称</td>
@@ -24,7 +25,7 @@
                     </tr>
                     <tr class="noborder"> 
                         <td class="required w120">退款说明</td>
-                        <td class="vatop rowform">{$refund.buyer_message}</td>
+                        <td class="vatop rowform">{$refund.refundreturn_buyer_message}</td>
 			<td class="vatop tips"></td>
                     </tr>
                     <tr class="noborder"> 
@@ -44,7 +45,7 @@
                     </tr>
                     <tr class="noborder"> 
                         <td class="required w120">{$Think.lang.refund_seller_message}</td>
-                        <td class="vatop rowform">{$refund.seller_message}</td>
+                        <td class="vatop rowform">{$refund.refundreturn_seller_message}</td>
 			<td class="vatop tips"></td>
                     </tr>
                 <tr class="noborder">
@@ -53,19 +54,14 @@
                     <td class="vatop rowform onoff">
                         <label for="state1" class="cb-enable" title="{$Think.lang.ds_yes}"><span>{$Think.lang.ds_yes}</span></label>
                         <label for="state0" class="cb-disable" title="{$Think.lang.ds_no}"><span>{$Think.lang.ds_no}</span></label>
-                        <input id="state1" name="refund_state"  value="3" type="radio">
-                               <input id="state0" name="refund_state" value="4" type="radio">
+                        <input id="state1" name="refundreturn_admin_state"  value="3" type="radio">
+                               <input id="state0" name="refundreturn_admin_state" value="4" type="radio">
                     </td>
                     <td class="vatop tips"></td>
                 </tr>
-                <tr class="noborder" dstype="state1" style="display: none"> 
-                        <td class="required w120">{$Think.lang.trade_no}</td>
-                        <td class="vatop rowform"><input type="text" class="txt2" name="trade_no" id="trade_no" value="{$trade_no}"></td>
-			<td class="vatop tips">{$Think.lang.trade_no_tip}</td>
-                    </tr>
                     <tr class="noborder"> 
                         <td class="required w120">{$Think.lang.refund_message}</td>
-                        <td class="vatop rowform"><textarea id="admin_message" name="admin_message" class="tarea"></textarea></td>
+                        <td class="vatop rowform"><textarea id="refundreturn_admin_message" name="refundreturn_admin_message" class="tarea"></textarea></td>
 			<td class="vatop tips"></td>
                     </tr>
                 </tbody>
@@ -91,24 +87,17 @@
         $('#form1').submit()
     }
     $(function() {
-        $('input[name="refund_state"]').change(function(){
-            if($(this).val()==3){
-                $('*[dstype="state1"]').show()
-            }else{
-                $('*[dstype="state1"]').hide()
-            }
-        })
         $('#post_form').validate({
             errorPlacement: function(error, element) {
                 error.appendTo(element.parent().parent().prev().find('td:first'));
             },
             rules: {
-                admin_message: {
+                refundreturn_admin_message: {
                     required: true
                 }
             },
             messages: {
-                admin_message: {
+                refundreturn_admin_message: {
                     required   : '{$Think.lang.refund_message_null}'
                 }
             }

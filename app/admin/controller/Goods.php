@@ -103,7 +103,6 @@ class  Goods extends AdminControl {
 
         View::assign('verify', array('1' => '通过', '0' => '未通过', '10' => '等待审核'));
 
-        View::assign('ownShopIds', array_fill_keys(model('store')->getOwnShopIds(), true));
 
         $type = input('param.type');
         if(!in_array($type, array('lockup','waitverify','allgoods'))){

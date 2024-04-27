@@ -54,7 +54,6 @@ class  Seller extends BaseModel {
         session('seller_is_admin', intval($seller_info['is_admin']));
         session('store_id', intval($seller_info['store_id']));
         session('store_name', $store_info['store_name']);
-        session('is_platform_store', (bool) $store_info['is_platform_store']);
         session('bind_all_gc', (bool) $store_info['bind_all_gc']);
         session('seller_limits', isset($seller_group_info['sellergroup_limits']) ? explode(',', $seller_group_info['sellergroup_limits']) : '');
         if ($seller_info['is_admin']) {

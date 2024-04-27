@@ -125,8 +125,6 @@ class  Storebindclass extends BaseModel {
         if (empty($goods_list) || !is_array($goods_list))
             return array();
 
-        // 获取绑定所有类目的自营店
-        $own_shop_ids = model('store')->getOwnShopIds(true);
 
         //定义返回数组
         $store_gc_id_commis_rate = array();
@@ -137,12 +135,6 @@ class  Storebindclass extends BaseModel {
             if (!intval($goods['gc_id']))
                 continue;
             if (empty($store_gc_id_list) || empty($store_gc_id_list[$goods['store_id']]) || !in_array($goods['gc_id'], $store_gc_id_list[$goods['store_id']])) {
-                if (in_array($goods['store_id'], $own_shop_ids)) {
-                    //平台店铺佣金为0
-                    //$store_gc_id_commis_rate[$goods['store_id']][$goods['gc_id']] = 0;
-                } else {
-                    //$store_gc_id_list[$goods['store_id']][] = $goods['gc_id'];
-                }
                 $store_gc_id_list[$goods['store_id']][] = $goods['gc_id'];
             }
         }

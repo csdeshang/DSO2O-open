@@ -44,9 +44,9 @@
                     <input id="start_time" name="start_time" type="text" class="text w130"/><em
                         class="add-on"><i class="iconfont">&#xe8d6;</i></em><span></span>
                     <p class="hint">
-                        {notpresent name="isPlatformStore"}{if $current_xianshi_quota.xianshiquota_starttime > 1}
+                        {if $current_xianshi_quota.xianshiquota_starttime > 1}
                         {$Think.lang.xianshi_add_start_time_explain}{$current_xianshi_quota.xianshiquota_starttime|date="Y-m-d H:i:s"}
-                        {/if}{/notpresent}
+                        {/if}
                     </p>
                 </dd>
             </dl>
@@ -56,9 +56,7 @@
                     <input id="end_time" name="end_time" type="text" class="text w130"/><em class="add-on"><i
                             class="iconfont">&#xe8d6;</i></em><span></span>
                     <p class="hint">
-                        {notpresent name="isPlatformStore"}
                         {$Think.lang.xianshi_add_end_time_explain}{$current_xianshi_quota.xianshiquota_endtime|date="Y-m-d H:i:s"}
-                        {/notpresent}
                     </p>
                 </dd>
             </dl>
@@ -122,9 +120,7 @@
                     },
                     end_time: {
                     required: true,
-                    {if !$isPlatformStore}
                             lessThanDate : "{present name='current_xianshi_quota.xianshiquota_starttime'}{$current_xianshi_quota.xianshiquota_endtime|date='Y-m-d H:i'}{/present}",
-                    {/if}
                             greaterThanStartDate : true
                     },
                     lower_limit: {
@@ -147,10 +143,8 @@
                     end_time : {
                     required : '<i class="iconfont">&#xe64c;</i>' +
                             '<?php echo sprintf(lang('xianshi_add_end_time_explain'),@date('Y-m-d H:i',$current_xianshi_quota['xianshiquota_endtime']));?>',
-                            {if !$isPlatformStore}
                             lessThanDate : '<i class="iconfont">&#xe64c;</i>' +
                             '<?php echo sprintf(lang('xianshi_add_end_time_explain'),@date('Y-m-d H:i',$current_xianshi_quota['xianshiquota_endtime']));?>',
-                            {/if}
                             greaterThanStartDate : '<i class="iconfont">&#xe64c;</i>{$Think.lang.greater_than_start_time}'
                     },
                     lower_limit: {

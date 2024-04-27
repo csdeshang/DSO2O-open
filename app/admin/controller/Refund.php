@@ -22,30 +22,8 @@ class  Refund extends AdminControl
     {
         parent::initialize();
         Lang::load(base_path() . 'admin/lang/'.config('lang.default_lang').'/refund.lang.php');
-        //向模板页面输出退款退货状态
-        $this->getRefundStateArray();
     }
 
-    function getRefundStateArray($type = 'all')
-    {
-        $state_array = array(
-            '1' => lang('refund_state_confirm'), '2' => lang('refund_state_yes'), '3' => lang('refund_state_no')
-        ); //卖家处理状态:1为待审核,2为同意,3为不同意
-        View::assign('state_array', $state_array);
-
-        $admin_array = array(
-            '1' => '处理中', '2' => '待处理', '3' => '已完成', '4' => lang('refund_state_no')
-        ); //确认状态:1为买家或卖家处理中,2为待平台管理员处理,3为退款退货已完成
-        View::assign('admin_array', $admin_array);
-
-        $state_data = array(
-            'seller' => $state_array, 'admin' => $admin_array
-        );
-        if ($type == 'all') {
-            return $state_data; //返回所有
-        }
-        return $state_data[$type];
-    }
 
     /**
      * 待处理列表
@@ -54,7 +32,15 @@ class  Refund extends AdminControl
     {
         $refundreturn_model = model('refundreturn');
         $condition = array();
-        $condition[]=array('refund_state','=','2'); //状态:1为处理中,2为待管理员处理,3为已完成
+        
+        $admin_state = input('get.admin_state');
+        if(in_array($admin_state,array('1','2','3'))){
+            $condition[]=array('refundreturn_admin_state','=',$admin_state); //状态:1为处理中,2为待管理员处理,3为已完成
+            $this->setAdminCurItem('refund_manage');
+        }else{
+            $this->setAdminCurItem('refund_all');
+        }
+        
 
         $keyword_type = array('order_sn', 'refund_sn', 'store_name', 'buyer_name', 'goods_name');
         $key = input('get.key');
@@ -67,56 +53,21 @@ class  Refund extends AdminControl
         if (trim($add_time_from) != '') {
             $add_time_from = strtotime(trim($add_time_from));
             if ($add_time_from !== false) {
-                $condition[] = array('add_time','>=', $add_time_from);
+                $condition[] = array('refundreturn_add_time','>=', $add_time_from);
             }
         }
         if (trim($add_time_to) != '') {
             $add_time_to = strtotime(trim($add_time_to))+86399;
             if ($add_time_to !== false) {
-                $condition[] = array('add_time','<=', $add_time_to);
+                $condition[] = array('refundreturn_add_time','<=', $add_time_to);
             }
         }
         $refund_list = $refundreturn_model->getRefundList($condition, 10);
         View::assign('show_page', $refundreturn_model->page_info->render());
         View::assign('refund_list', $refund_list);
-        $this->setAdminCurItem('refund_manage');
         return View::fetch('refund_manage');
     }
 
-    /**
-     * 所有记录
-     */
-    public function refund_all()
-    {
-        $refundreturn_model = model('refundreturn');
-        $condition = array();
-
-        $keyword_type = array('order_sn', 'refund_sn', 'store_name', 'buyer_name', 'goods_name');
-        $key = input('get.key');
-        $type = input('get.type');
-        if (trim($key) != '' && in_array($type, $keyword_type)) {
-            $condition[] = array($type,'like', '%' . $key . '%');
-        }
-        $add_time_from = input('get.add_time_from');
-        $add_time_to = input('get.add_time_to');
-        if (trim($add_time_from) != '') {
-            $add_time_from = strtotime(trim($add_time_from));
-            if ($add_time_from !== false) {
-                $condition[] = array('add_time','>=', $add_time_from);
-            }
-        }
-        if (trim($add_time_to) != '') {
-            $add_time_to = strtotime(trim($add_time_to))+86399;
-            if ($add_time_to !== false) {
-                $condition[] = array('add_time','<=', $add_time_to);
-            }
-        }
-        $refund_list = $refundreturn_model->getRefundList($condition, 10);
-        View::assign('show_page', $refundreturn_model->page_info->render());
-        View::assign('refund_list', $refund_list);
-        $this->setAdminCurItem('refund_all');
-        return View::fetch('refund_all');
-    }
 
     /**
      * 退款处理页
@@ -127,54 +78,36 @@ class  Refund extends AdminControl
         $refundreturn_model = model('refundreturn');
         $condition = array();
         $condition[]=array('refund_id','=',intval(input('param.refund_id')));
-        $refund_list = $refundreturn_model->getRefundList($condition);
-        $refund = $refund_list[0];
-        //查询交易凭证
-        $order_model = model('order');
-        $order = $order_model->getOrderInfo(array('order_id' => $refund['order_id']));
+        //管理员待审核状态
+        $condition[] = array('refundreturn_admin_state','=','2');
+        
+        $refund = $refundreturn_model->getRefundreturnInfo($condition);
+        if(empty($refund)){
+            $this->error(lang('param_error'));
+        }
         if (request()->isPost()) {
-            if(!in_array(input('post.refund_state'),[3,4])){
+            $refundreturn_admin_state = input('post.refundreturn_admin_state');
+            if(!in_array($refundreturn_admin_state,[3,4])){
               $this->error(lang('refund_state_null'));
             }
             $check = request()->checkToken('__token__');
             if(false === $check) {
                 $this->error('invalid token');
             }
-            if ($refund['refund_state'] != '2') {//检查状态,防止页面刷新不及时造成数据错误
-                $this->error(lang('ds_common_save_fail'));
-            }
             $order_id = $refund['order_id'];
             $refund_array = array();
-            $refund_array['admin_time'] = TIMESTAMP;
-            $refund_array['refund_state'] = '4'; //状态:1为处理中,2为待管理员处理,3为已完成
-            $refund_array['admin_message'] = input('post.admin_message');
-            if (input('post.refund_state') == '3') {
-                $trade_no=input('param.trade_no');
-                if($trade_no && $trade_no!=$order['trade_no']){
-                    $order_model->editOrder(array('trade_no'=>$trade_no), array(
-                    'order_id' => $order['order_id']
-                    ));
-                    //添加订单日志
-                    $data = array();
-                    $data['order_id'] = $order['order_id'];
-                    $data['log_role'] = 'system';
-                    $data['log_user'] = $this->admin_info['admin_name'];
-                    $data['log_msg'] = '修改支付平台交易号 : ' . $trade_no;
-                    $data['log_orderstate'] = $order['order_state'];
-                    $order_model->addOrderlog($data);
-                }
-                $refund_array['refund_state'] = '3';
+            $refund_array['refundreturn_admin_time'] = TIMESTAMP;
+            $refund_array['refundreturn_admin_state'] = '4'; //状态:1为处理中,2为待管理员处理,3为已完成
+            $refund_array['refundreturn_admin_message'] = input('post.refundreturn_admin_message');
+            if ($refundreturn_admin_state == '3') {
+                $refund_array['refundreturn_admin_state'] = '3';
                 $res = $refundreturn_model->editOrderRefund($refund);
                 $state=$res['code'];
                 if(!$state){
                     $this->error($res['msg']);
                 }
             }else{
-                if($refund['order_lock'] == '2'){
-                    $state = $refundreturn_model->editOrderUnlock($order_id); //订单解锁
-                }else{
-                    $state = true;
-                }
+                $state = $refundreturn_model->editOrderUnlock($order_id); //订单解锁
             }
             if ($state) {
                 $refundreturn_model->editRefundreturn($condition, $refund_array);
@@ -216,7 +149,6 @@ class  Refund extends AdminControl
                 $this->error(lang('ds_common_save_fail'));
             }
         }
-        View::assign('trade_no', $order['trade_no']);
         View::assign('refund', $refund);
         $info['buyer'] = array();
         if (!empty($refund['pic_info'])) {
@@ -235,8 +167,10 @@ class  Refund extends AdminControl
         $refundreturn_model = model('refundreturn');
         $condition = array();
         $condition[]=array('refund_id','=',intval(input('param.refund_id')));
-        $refund_list = $refundreturn_model->getRefundList($condition);
-        $refund = $refund_list[0];
+        $refund = $refundreturn_model->getRefundreturnInfo($condition);
+        if(empty($refund)){
+            $this->error(lang('param_error'));
+        }
         View::assign('refund', $refund);
         $info['buyer'] = array();
         if (!empty($refund['pic_info'])) {
@@ -359,13 +293,13 @@ class  Refund extends AdminControl
         if (trim($add_time_from) != '') {
             $add_time_from = strtotime(trim($add_time_from));
             if ($add_time_from !== false) {
-                $condition[] = array('add_time','>=', $add_time_from);
+                $condition[] = array('refundreturn_add_time','>=', $add_time_from);
             }
         }
         if (trim($add_time_to) != '') {
             $add_time_to = strtotime(trim($add_time_to))+86399;
             if ($add_time_to !== false) {
-                $condition[] = array('add_time','<=', $add_time_to);
+                $condition[] = array('refundreturn_add_time','<=', $add_time_to);
             }
         }
         if (!is_numeric(input('param.page'))) {
@@ -419,7 +353,7 @@ class  Refund extends AdminControl
             $tmp[] = array('data' => $v['store_name']);
             $tmp[] = array('data' => $v['goods_name']);
             $tmp[] = array('data' => $v['buyer_name']);
-            $tmp[] = array('data' => date('Y-m-d H:i:s', $v['add_time']));
+            $tmp[] = array('data' => date('Y-m-d H:i:s', $v['refundreturn_add_time']));
             $tmp[] = array('format' => 'Number', 'data' => ds_price_format($v['refund_amount']));
             $excel_data[] = $tmp;
         }
@@ -436,9 +370,9 @@ class  Refund extends AdminControl
     {
         $menu_array = array(
             array(
-                'name' => 'refund_manage', 'text' => '待处理', 'url' => url('Refund/refund_manage')
+                'name' => 'refund_manage', 'text' => '待处理', 'url' => url('Refund/refund_manage',['admin_state'=>2])
             ), array(
-                'name' => 'refund_all', 'text' => '所有记录', 'url' => url('Refund/refund_all')
+                'name' => 'refund_all', 'text' => '所有记录', 'url' => url('Refund/refund_manage')
             ), array(
                 'name' => 'reason', 'text' => '退款退货原因', 'url' => url('Refund/reason')
             ),
