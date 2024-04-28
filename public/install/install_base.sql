@@ -531,7 +531,7 @@ CREATE TABLE IF NOT EXISTS `#__goods` (
   `goods_collect` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '商品收藏数量',
   `goods_spec` text NOT NULL COMMENT '商品规格序列化',
   `goods_storage` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '商品库存',
-  `goods_weight` decimal(5,3) unsigned NOT NULL DEFAULT '0.000' COMMENT '商品重量',
+  `goods_weight` decimal(6,3) unsigned NOT NULL DEFAULT '0.000' COMMENT '商品重量',
   `goods_image` varchar(100) DEFAULT '' COMMENT '商品主图',
   `goods_lock` tinyint(3) unsigned DEFAULT '0' COMMENT '商品锁定 0未锁，1已锁',
   `goods_state` tinyint(3) unsigned DEFAULT '0' COMMENT '商品状态 0:下架 1:正常，10:违规（禁售）',
@@ -861,7 +861,7 @@ CREATE TABLE IF NOT EXISTS `#__inviterclass` (
   `inviterclass_name` varchar(60) NOT NULL COMMENT '等级名',
   `inviterclass_amount` decimal(10,2) NOT NULL COMMENT '等级门槛',
   PRIMARY KEY (`inviterclass_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='推广等级表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='推广等级表';
 
 DROP TABLE IF EXISTS `#__invoice`;
 CREATE TABLE IF NOT EXISTS `#__invoice` (
@@ -1008,7 +1008,9 @@ CREATE TABLE IF NOT EXISTS `#__mbusertoken` (
   `member_name` varchar(50) NOT NULL COMMENT '用户名',
   `member_token` varchar(50) NOT NULL COMMENT '登录令牌',
   `member_logintime` int(10) unsigned NOT NULL COMMENT '登录时间',
-  `member_clienttype` varchar(10) NOT NULL COMMENT '客户端类型 android wap',
+  `member_operationtime` int(10) unsigned NOT NULL COMMENT '最近活跃时间',
+  `member_clienttype` varchar(10) NOT NULL COMMENT '客户端访问类型 APP H5 weixin 小程序',
+  `member_devicetype` varchar(20) NOT NULL DEFAULT '' COMMENT '客户端设备类型及系统',
   `member_openid` varchar(50) DEFAULT NULL COMMENT '微信支付jsapi的openid缓存',
   PRIMARY KEY (`member_token_id`),
   KEY `member_id` (`member_id`),
@@ -1171,7 +1173,6 @@ CREATE TABLE IF NOT EXISTS `#__o2o_complaint` (
   `o2o_complaint_addtime` int(10) unsigned NOT NULL COMMENT '投诉时间',
   `o2o_complaint_reply` varchar(255) NOT NULL DEFAULT '' COMMENT '店长回复',
   `o2o_complaint_state` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '投诉状态（0待处理1已处理）',
-  `o2o_order_bill_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '结算单号',
   `order_sn` varchar(20) NOT NULL COMMENT '订单编号',
   `o2o_complaint_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增ID',
   `o2o_complaint_order_type` tinyint(1) unsigned NOT NULL COMMENT '订单类型（0配送订单1跑腿订单）',
@@ -1189,7 +1190,7 @@ CREATE TABLE IF NOT EXISTS `#__o2o_distributor` (
   `o2o_distributor_name` varchar(60) NOT NULL COMMENT '配送员账号',
   `o2o_distributor_password` varchar(60) NOT NULL COMMENT '配送员密码',
   `o2o_distributor_realname` varchar(60) NOT NULL COMMENT '配送员姓名',
-  `store_id` int(10) unsigned NOT NULL COMMENT '所属店铺id',
+  `store_id` int(10) unsigned NOT NULL COMMENT '所属店铺id,处理店铺订单',
   `o2o_distributor_phone` varchar(60) NOT NULL DEFAULT '' COMMENT '手机号',
   `o2o_distributor_email` varchar(60) NOT NULL DEFAULT '' COMMENT '邮箱',
   `o2o_distributor_addtime` int(10) unsigned NOT NULL COMMENT '添加时间',
@@ -1201,15 +1202,12 @@ CREATE TABLE IF NOT EXISTS `#__o2o_distributor` (
   `o2o_distributor_total_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '总用时（分钟）',
   `o2o_distributor_total_count` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '总订单',
   `o2o_distributor_average_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '平均用时（分钟）',
-  `o2o_distributor_auto_receipt` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '自动接单（0否1是）',
-  `o2o_distributor_receipt_limit` smallint(3) unsigned NOT NULL DEFAULT '0' COMMENT '接单上限',
-  `o2o_distributor_new_order_ring_remind` tinyint(1) unsigned NOT NULL DEFAULT '1' COMMENT '新单铃声提醒（0否1是）',
-  `o2o_distributor_new_order_shock_remind` tinyint(1) unsigned NOT NULL DEFAULT '1' COMMENT '新单震动提醒（0否1是）',
-  `o2o_distributor_urge_order_ring_remind` tinyint(1) unsigned NOT NULL DEFAULT '1' COMMENT '催单铃声提醒（0否1是）',
-  `o2o_distributor_urge_order_shock_remind` tinyint(1) unsigned NOT NULL DEFAULT '1' COMMENT '催单震动提醒（0否1是）',
   `o2o_distributor_region_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '配送地区id',
   `o2o_distributor_region_name` varchar(60) NOT NULL DEFAULT '' COMMENT '配送地区名称',
-  `o2o_distributor_bill_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '结算时间',
+  `o2o_distributor_avaliable_money` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '配送员可用金额',
+  `o2o_distributor_freeze_money` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '配送员冻结金额',
+  `o2o_distributor_lng` varchar(20) DEFAULT '' COMMENT '经度',
+  `o2o_distributor_lat` varchar(20) DEFAULT '' COMMENT '纬度',
   `o2o_distributor_payment_account` varchar(500) NOT NULL DEFAULT '' COMMENT '结款账号',
   `o2o_distributor_identify_image` varchar(255) NOT NULL DEFAULT '' COMMENT '身份证图片',
   `o2o_distributor_errand_deposit` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '跑腿保证金',
@@ -1221,6 +1219,22 @@ CREATE TABLE IF NOT EXISTS `#__o2o_distributor` (
   KEY `o2o_distributor_phone` (`o2o_distributor_phone`),
   KEY `o2o_distributor_email` (`o2o_distributor_email`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='配送员表';
+
+DROP TABLE IF EXISTS `#__o2o_distributor_moneylog`;
+CREATE TABLE IF NOT EXISTS `#__o2o_distributor_moneylog` (
+  `o2o_distributor_moneylog_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '金额日志id',
+  `o2o_distributor_id` int(10) unsigned NOT NULL COMMENT '配送员ID',
+  `o2o_distributor_moneylog_avaliable_money` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '变动可用金额',
+  `o2o_distributor_moneylog_freeze_money` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '变动冻结金额',
+  `o2o_distributor_moneylog_type` varchar(20)  NOT NULL COMMENT '日志类型,order_waimai外卖订单,order_errand跑腿订单,order_complaint投诉,cash_apply申请提现冻结预存款,cash_pay提现成功,cash_del取消提现申请',
+  `o2o_distributor_moneylog_desc` varchar(255) NOT NULL COMMENT '日志详情',
+  `o2o_distributor_moneylog_add_time` int(10) unsigned NOT NULL COMMENT '添加时间',
+  `o2o_distributor_moneylog_payment_state` tinyint(1) unsigned NOT NULL DEFAULT '1' COMMENT '申请提现记录状态（0无效1有效2待审核3已同意4已拒绝）',
+  `o2o_distributor_moneylog_payment_code` varchar(20) DEFAULT '' COMMENT '支付方式',
+  `o2o_distributor_moneylog_trade_sn` varchar(50) DEFAULT '' COMMENT '第三方支付接口交易号',
+  PRIMARY KEY (`o2o_distributor_moneylog_id`),
+  KEY `o2o_distributor_id` (`o2o_distributor_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='配送员金额日志表';
 
 DROP TABLE IF EXISTS `#__o2o_distributor_notice`;
 CREATE TABLE IF NOT EXISTS `#__o2o_distributor_notice` (
@@ -1305,7 +1319,6 @@ CREATE TABLE IF NOT EXISTS `#__o2o_errand_order` (
   `o2o_errand_order_rcb_amount` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '充值卡支付金额',
   `o2o_errand_order_pd_amount` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '预存款支付金额',
   `o2o_errand_order_check_receive` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '需要当面收（0否1是）',
-  `o2o_order_bill_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '跑腿订单结算ID',
   `o2o_errand_order_deliver_region_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '送货点地区id',
   `o2o_errand_order_pickup_region_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '取货点地区id',
   `o2o_errand_order_if_evaluate` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '是否已评',
@@ -1562,37 +1575,6 @@ CREATE TABLE IF NOT EXISTS `#__o2o_fuwu_upload` (
   KEY `o2o_fuwu_upload_type_2` (`o2o_fuwu_upload_type`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='服务上传文件';
 
-DROP TABLE IF EXISTS `#__o2o_order_bill`;
-CREATE TABLE IF NOT EXISTS `#__o2o_order_bill` (
-  `o2o_order_bill_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '结算单号',
-  `store_id` int(10) unsigned NOT NULL COMMENT '店铺id',
-  `o2o_distributor_id` int(10) unsigned NOT NULL COMMENT '配送员id',
-  `o2o_distributor_name` varchar(60) NOT NULL COMMENT '配送员账号',
-  `o2o_distributor_payment_account` varchar(500) NOT NULL DEFAULT '' COMMENT '结款账号',
-  `o2o_order_bill_order_totals` int(10) unsigned NOT NULL COMMENT '订单总数',
-  `o2o_order_bill_fee_totals` decimal(10,2) unsigned NOT NULL COMMENT '配送费总额',
-  `o2o_order_bill_state` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '结算单状态（0待配送员确认1待店长确认2待付款3已完成）',
-  `o2o_order_bill_addtime` int(10) unsigned NOT NULL COMMENT '添加时间',
-  `o2o_order_bill_paytime` int(10) unsigned DEFAULT NULL COMMENT '付款时间',
-  `o2o_order_bill_remark` varchar(255) NOT NULL DEFAULT '' COMMENT '备注',
-  `o2o_order_bill_complaint_totals` int(10) unsigned NOT NULL COMMENT '投诉总数',
-  `o2o_order_bill_complaint_fine_totals` decimal(10,2) unsigned NOT NULL COMMENT '投诉罚款总额',
-  `o2o_order_bill_start_time` int(10) unsigned NOT NULL COMMENT '开始时间',
-  `o2o_order_bill_end_time` int(10) unsigned NOT NULL COMMENT '结束时间',
-  `o2o_order_bill_result_totals` decimal(10,2) NOT NULL COMMENT '应结金额',
-  `o2o_order_bill_income_totals` decimal(10,2) unsigned NOT NULL COMMENT '收入金额',
-  `o2o_order_bill_outlay_totals` decimal(10,2) unsigned NOT NULL COMMENT '支出金额',
-  `o2o_order_bill_payment_voucher` varchar(255) NOT NULL DEFAULT '' COMMENT '付款凭证',
-  `o2o_order_bill_errand_order_totals` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '跑腿订单总数',
-  `o2o_order_bill_errand_distance_totals` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '跑腿基础运费',
-  `o2o_order_bill_errand_weight_totals` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '重量附加费',
-  `o2o_order_bill_errand_time_totals` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '特殊时段费用',
-  `o2o_order_bill_errand_gratuity_totals` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '跑腿小费',
-  PRIMARY KEY (`o2o_order_bill_id`),
-  KEY `o2o_distributor_id` (`o2o_distributor_id`),
-  KEY `store_id` (`store_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='配送结算单表';
-
 DROP TABLE IF EXISTS `#__order`;
 CREATE TABLE IF NOT EXISTS `#__order` (
   `order_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '订单自增id',
@@ -1609,7 +1591,7 @@ CREATE TABLE IF NOT EXISTS `#__order` (
   `trade_no` varchar(35) DEFAULT NULL COMMENT '第三方平台交易号',
   `finnshed_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '订单完成时间',
   `goods_amount` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '商品总价格',
-  `goods_weight` decimal(5,3) unsigned NOT NULL DEFAULT '0.000' COMMENT '商品总重量',
+  `goods_weight` decimal(6,3) unsigned NOT NULL DEFAULT '0.000' COMMENT '商品总重量',
   `order_amount` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '订单总价格',
   `rcb_amount` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '充值卡支付金额',
   `pd_amount` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '预存款支付金额',
@@ -1617,7 +1599,7 @@ CREATE TABLE IF NOT EXISTS `#__order` (
   `evaluation_state` tinyint(4) DEFAULT '0' COMMENT '评价状态 0：未评价 1：已评价 2:已过期未评价',
   `order_state` tinyint(4) NOT NULL DEFAULT '10' COMMENT '订单状态：0:已取消 10:未付款 20:已付款 23:待分配 26:待取货 30:已发货 40:已收货',
   `refund_state` tinyint(1) unsigned DEFAULT '0' COMMENT '退款状态 0:无退款 1:部分退款 2:全部退款',
-  `lock_state` tinyint(1) unsigned DEFAULT '0' COMMENT '锁定状态:0:正常,大于0:锁定',
+  `order_refund_lock_state` tinyint(1) unsigned DEFAULT '0' COMMENT '锁定状态:0:正常,大于0:锁定',
   `delete_state` tinyint(4) NOT NULL DEFAULT '0' COMMENT '删除状态 0:未删除 1:放入回收站 2:彻底删除',
   `refund_amount` decimal(10,2) DEFAULT '0.00' COMMENT '退款金额',
   `delay_time` int(10) unsigned DEFAULT '0' COMMENT '延迟时间,默认为0',
@@ -1637,7 +1619,6 @@ CREATE TABLE IF NOT EXISTS `#__order` (
   `o2o_order_distance` float(10,1) unsigned NOT NULL DEFAULT '0.0' COMMENT '配送单距离',
   `o2o_order_pickup_code` char(6) NOT NULL DEFAULT '' COMMENT '取货码',
   `o2o_order_receive_code` char(6) NOT NULL DEFAULT '' COMMENT '收货码',
-  `o2o_order_bill_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '配送结算单号',
   `o2o_order_lng` varchar(60) NOT NULL DEFAULT '' COMMENT '经度',
   `o2o_order_lat` varchar(60) NOT NULL DEFAULT '' COMMENT '纬度',
   `o2o_order_deliver_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '配送单派单时间',
@@ -1647,36 +1628,11 @@ CREATE TABLE IF NOT EXISTS `#__order` (
   `o2o_order_transfer_distributor_name` varchar(60) NOT NULL DEFAULT '' COMMENT '转单配送员账号',
   `o2o_order_is_transfer` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否为转单，0:否 1:是',
   `o2o_order_receipt_priority` smallint(3) unsigned NOT NULL DEFAULT '0' COMMENT '自动接单优先级',
-  `o2o_order_deliver_priority` smallint(3) unsigned NOT NULL DEFAULT '0' COMMENT '自动派单优先级',
   `o2o_order_source` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '订单来源（0自己抢单1系统派单2店铺派单3转单）',
   PRIMARY KEY (`order_id`),
   KEY `store_id` (`store_id`),
   KEY `buyer_id` (`buyer_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='订单表';
-
-DROP TABLE IF EXISTS `#__orderbill`;
-CREATE TABLE IF NOT EXISTS `#__orderbill` (
-  `ob_no` int(11) NOT NULL AUTO_INCREMENT COMMENT '结算单编号(年月店铺ID)',
-  `ob_startdate` int(11) NOT NULL COMMENT '开始日期',
-  `ob_enddate` int(11) NOT NULL COMMENT '结束日期',
-  `ob_order_totals` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '结算订单金额',
-  `ob_shipping_totals` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '结算运费',
-  `ob_platform_shipping_totals` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '结算平台运费',
-  `ob_order_return_totals` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '结算退单金额',
-  `ob_commis_totals` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '结算佣金金额',
-  `ob_commis_return_totals` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '结算退还佣金',
-  `ob_store_cost_totals` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '店铺促销活动费用',
-  `ob_result_totals` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '应结金额',
-  `ob_createdate` int(11) DEFAULT '0' COMMENT '生成结算单日期',
-  `ob_state` enum('1','2','3','4') DEFAULT '1' COMMENT '结算状态 1，默认2，店家已确认3，平台已审核4，结算完成',
-  `ob_store_id` int(11) NOT NULL COMMENT '店铺ID',
-  `ob_store_name` varchar(50) DEFAULT NULL COMMENT '店铺名',
-  `ob_inviter_totals` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '分销的佣金',
-  `ob_seller_content` varchar(255) NOT NULL DEFAULT '' COMMENT '商家备注',
-  `ob_admin_content` varchar(255) NOT NULL DEFAULT '' COMMENT '管理员备注',
-  PRIMARY KEY (`ob_no`),
-  KEY `ob_store_id` (`ob_store_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='结算表';
 
 DROP TABLE IF EXISTS `#__ordercommon`;
 CREATE TABLE IF NOT EXISTS `#__ordercommon` (
@@ -1770,21 +1726,6 @@ CREATE TABLE IF NOT EXISTS `#__orderpay` (
   KEY `pay_sn` (`pay_sn`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='订单支付表';
 
-DROP TABLE IF EXISTS `#__orderstatis`;
-CREATE TABLE IF NOT EXISTS `#__orderstatis` (
-  `os_month` mediumint(9) unsigned NOT NULL DEFAULT '0' COMMENT '统计编号(年月)',
-  `os_order_totals` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '订单金额',
-  `os_shipping_totals` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '运费',
-  `os_platform_shipping_totals` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '结算平台运费',
-  `os_order_returntotals` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '退单金额',
-  `os_commis_totals` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '佣金金额',
-  `os_commis_returntotals` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '退还佣金',
-  `os_store_costtotals` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '店铺促销活动费用',
-  `os_result_totals` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '本期应结',
-  `os_createdate` int(11) DEFAULT NULL COMMENT '创建记录日期',
-  `os_inviter_totals` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '分销佣金',
-  PRIMARY KEY (`os_month`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='月销量统计表';
 
 DROP TABLE IF EXISTS `#__payment`;
 CREATE TABLE IF NOT EXISTS `#__payment` (
@@ -2110,22 +2051,21 @@ CREATE TABLE IF NOT EXISTS `#__refundreturn` (
   `goods_num` int(10) unsigned DEFAULT '1' COMMENT '商品数量',
   `refund_amount` decimal(10,2) DEFAULT '0.00' COMMENT '退款金额',
   `goods_image` varchar(100) DEFAULT NULL COMMENT '商品图片',
-  `order_goods_type` tinyint(1) unsigned DEFAULT '1' COMMENT '订单商品类型:1:默认3:限时折扣商品4:组合套装 5:赠品',
   `refund_type` tinyint(1) unsigned DEFAULT '1' COMMENT '申请类型:1:退款,2:退货',
-  `seller_state` tinyint(1) unsigned DEFAULT '1' COMMENT '卖家处理状态:1:待审核,2:同意,3:不同意',
-  `refund_state` tinyint(1) unsigned DEFAULT '1' COMMENT '申请状态:1:处理中,2:待管理员处理,3:已完成,4:已拒绝',
   `return_type` tinyint(1) unsigned DEFAULT '1' COMMENT '退货类型:1:不用退货,2:需要退货',
-  `order_lock` tinyint(1) unsigned DEFAULT '1' COMMENT '订单锁定类型:1:不用锁定,2:需要锁定',
-  `goods_state` tinyint(1) unsigned DEFAULT '1' COMMENT '物流状态:1:待发货,2:待收货,3:未收到,4:已收货',
-  `add_time` int(10) unsigned NOT NULL COMMENT '添加时间',
-  `seller_time` int(10) unsigned DEFAULT '0' COMMENT '卖家处理时间',
-  `admin_time` int(10) unsigned DEFAULT '0' COMMENT '管理员处理时间',
+  `refundreturn_goods_state` tinyint(1) unsigned DEFAULT '1' COMMENT '物流状态:1:待发货,2:待收货,3:未收到,4:已收货',
+  `refundreturn_seller_state` tinyint(1) unsigned DEFAULT '1' COMMENT '卖家处理状态:1:待审核,2:同意,3:不同意',
+  `refundreturn_seller_time` int(10) unsigned DEFAULT '0' COMMENT '卖家处理时间',
+  `refundreturn_seller_message` varchar(300) DEFAULT NULL COMMENT '卖家备注',
+  `refundreturn_admin_state` tinyint(1) unsigned DEFAULT '1' COMMENT '申请状态:1:处理中,2:待管理员处理,3:已完成,4:已拒绝',
+  `refundreturn_admin_time` int(10) unsigned DEFAULT '0' COMMENT '管理员处理时间',
+  `refundreturn_admin_message` varchar(300) DEFAULT NULL COMMENT '管理员备注',
+  `refundreturn_add_time` int(10) unsigned NOT NULL COMMENT '添加时间',
+  `refundreturn_buyer_message` varchar(300) DEFAULT NULL COMMENT '退款退货申请原因',
   `reason_id` int(10) unsigned DEFAULT '0' COMMENT '原因ID:0:其它',
   `reason_info` varchar(300) DEFAULT '' COMMENT '原因内容',
   `pic_info` varchar(300) DEFAULT '' COMMENT '退款退货图片',
-  `buyer_message` varchar(300) DEFAULT NULL COMMENT '退款退货申请原因',
-  `seller_message` varchar(300) DEFAULT NULL COMMENT '卖家备注',
-  `admin_message` varchar(300) DEFAULT NULL COMMENT '管理员备注',
+  `refundreturn_money_state` tinyint(1) unsigned DEFAULT '0' COMMENT '是否支付:0:未支付,1:已支付',
   `commis_rate` smallint(6) DEFAULT '0' COMMENT '佣金比例',
   PRIMARY KEY (`refund_id`),
   KEY `order_id` (`order_id`),
@@ -2434,19 +2374,16 @@ CREATE TABLE IF NOT EXISTS `#__store` (
   `store_longitude` varchar(20) DEFAULT '' COMMENT '经度',
   `store_latitude` varchar(20) DEFAULT '' COMMENT '纬度',
   `mb_title_img` varchar(150) DEFAULT NULL COMMENT '手机店铺背景图',
-  `store_bill_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '上一期结算时间',
   `store_avaliable_deposit` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '店铺已缴保证金',
   `store_freeze_deposit` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '店铺审核保证金',
   `store_payable_deposit` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '店铺应缴保证金',
   `store_avaliable_money` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '店铺可用金额',
   `store_freeze_money` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '店铺冻结金额',
   `store_o2o_open` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '开启配送（0关闭1开启）',
-  `store_o2o_support` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '平台支持配送（0否1是）',
   `store_o2o_distribute_type` tinyint(1) unsigned NOT NULL DEFAULT '1' COMMENT '配送方式（0平台1商家）',
   `store_o2o_open_start` smallint(5) unsigned NOT NULL DEFAULT '480' COMMENT '营业开始时间（分钟）',
   `store_o2o_open_end` smallint(5) unsigned NOT NULL DEFAULT '1080' COMMENT '营业结束时间（分钟）',
   `store_o2o_auto_receipt` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '自动接单（0否1是）',
-  `store_o2o_auto_deliver` int(10) unsigned NOT NULL DEFAULT '1' COMMENT '自动派单（0否1是）',
   `store_o2o_min_cost` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '最小接单金额',
   `store_o2o_reject_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '拒绝接单时间（分钟）',
   `store_o2o_total_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '总用时（秒）',
@@ -3051,14 +2988,11 @@ INSERT INTO `#__config` (`id`, `code`, `value`, `remark`) VALUES
 (710 ,  'inviter_view',  '0',  '推广员审核'),
 (711 ,  'inviter_condition',  '0',  '推广员条件'), 
 (712 ,  'inviter_condition_amount',  '0',  '成为推广员的消费门槛'),
-(713 ,  'store_bill_cycle',  '7',  '店铺结算周期（天）'),
 (714 ,  'store_withdraw_cycle',  '1',  '店铺提现周期（天）'), 
 (715 ,  'store_withdraw_min',  '100',  '店铺最小提现金额（元）'),
 (716 ,  'store_withdraw_max',  '10000',  '店铺最大提现金额（元）'),
 (717 ,  'o2o_open',  '1',  '开启配送'), 
 (719 ,  'o2o_auto_distribute',  '1',  '自动派单'), 
-(721 ,  'o2o_socket_url',  '',  'socket地址'),
-(722 ,  'o2o_distributor_bill_cycle',  '1',  '配送员结算周期（天）'),
 (723 ,  'o2o_complaint_fine',  '1',  '投诉罚款'),
 (724 ,  'auto_register',  '0',  '自动注册'),
 (725, 'o2o_errand_distance_price', 'a:4:{i:0;a:7:{s:14:"start_distance";i:0;s:12:"end_distance";i:3;s:8:"if_fixed";i:1;s:5:"price";i:14;s:17:"interval_distance";i:0;s:5:"title";s:9:"0~3公里";s:7:"content";s:5:"14元";}i:1;a:7:{s:14:"start_distance";i:3;s:12:"end_distance";i:10;s:8:"if_fixed";i:0;s:5:"price";i:2;s:17:"interval_distance";i:1;s:5:"title";s:10:"3~10公里";s:7:"content";s:20:"每1公里加价2元";}i:2;a:7:{s:14:"start_distance";i:10;s:12:"end_distance";i:20;s:8:"if_fixed";i:0;s:5:"price";i:7;s:17:"interval_distance";i:5;s:5:"title";s:11:"10~20公里";s:7:"content";s:20:"每3公里加价8元";}i:3;a:7:{s:14:"start_distance";i:20;s:12:"end_distance";i:98;s:8:"if_fixed";i:0;s:5:"price";i:8;s:17:"interval_distance";i:3;s:5:"title";s:11:"20~98公里";s:7:"content";s:20:"每3公里加价8元";}}', '跑腿基础运费'),
@@ -3097,7 +3031,7 @@ INSERT INTO `#__config` (`id`, `code`, `value`, `remark`) VALUES
 (801 ,  'instant_message_open',  '0',  '开启GatewayWorker'),
 (802 ,  'instant_message_gateway_url',  '',  'GatewayWorker gateway地址'),
 (803 ,  'instant_message_register_url',  '',  'GatewayWorker register地址'),
-(804 ,  'mapak_type',  '1',  '地图类型，1：高德地图，2：百度地图'),
+(804 ,  'mapak_type',  '0',  '地图类型，0：不使用地图，1：高德地图，2：百度地图'),
 (805 ,  'gaode_ak',  '',  '高德地图key'),
 (806 ,  'gaode_jscode',  '',  '高德地图安全密钥'),
 (807 ,  'baiduservice_ak',  '',  '百度地图服务端密钥');

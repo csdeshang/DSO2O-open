@@ -376,15 +376,11 @@ if($action == 'db') {
 
             // 创建店铺
             mysqli_query($link,"INSERT INTO {$db['prefix']}member (`member_id`,`member_name`,`member_password`,`member_nickname`,`member_email`,`member_addtime`,`member_logintime`,`member_old_logintime`) VALUES ('1', '{$member_name}','". md5($member_password) ."', '德尚网络_123456', '', '". time() ."', '". time() ."', '". time() ."')");
-            mysqli_query($link,"INSERT INTO {$db['prefix']}membercommon (`member_id`) VALUES ('1')");
             mysqli_query($link,"INSERT INTO {$db['prefix']}store (`store_id`,`store_name`,`grade_id`,`member_id`,`member_name`,`seller_name`,`store_state`,`store_addtime`) VALUES ('1','{$store_name}','1','1','{$member_name}','{$seller_name}','1', '". time() ."')");
             mysqli_query($link,"INSERT INTO {$db['prefix']}storejoinin (`member_id`,`member_name`,`seller_name`,`store_name`,`joinin_state`) VALUES ('1', '{$member_name}', '{$seller_name}', '{$store_name}', '40')");
             mysqli_query($link,"INSERT INTO {$db['prefix']}seller (`seller_id`,`seller_name`,`member_id`,`sellergroup_id`,`store_id`,`is_admin`) VALUES ('1', '{$seller_name}', '1', '0', '1', '1')");
             mysqli_query($link,"INSERT INTO {$db['prefix']}storebindclass (`bid`, `store_id`, `commis_rate`, `class_1`, `class_2`, `class_3`, `state`) VALUES ('1', '1', '0', '0', '0', '0', '1')");
 
-            mysqli_query($link,"update {$db['prefix']}goods set is_platform_store = 1 where store_id = 1");
-            mysqli_query($link,"update {$db['prefix']}goodscommon set is_platform_store = 1 where store_id = 1");
-            mysqli_query($link,"update {$db['prefix']}store set is_platform_store = 1 where store_id = 1");
             mysqli_query($link,"update {$db['prefix']}store set bind_all_gc = 1 where store_id = 1");
 
             if($_POST['initdata']){
