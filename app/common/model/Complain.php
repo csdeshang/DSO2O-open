@@ -2,9 +2,10 @@
 namespace app\common\model;
 use think\facade\Db;
 
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -14,7 +15,7 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Complain extends BaseModel {
+class Complain extends BaseModel {
 
     public $page_info;
 
@@ -126,9 +127,9 @@ class  Complain extends BaseModel {
      * @return type
      */
     public function getOneComplain($complain_id) {
-        $where = array();
-        $where[] = array('complain_id','=',intval($complain_id));
-        return Db::name('complain')->where($where)->find();
+        $condition = array();
+        $condition[] = array('complain_id','=',$complain_id);
+        return Db::name('complain')->where($condition)->find();
     }
 
 

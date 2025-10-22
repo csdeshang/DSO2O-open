@@ -107,6 +107,7 @@ class wxpay_native {
     
     /**
      * 原路退款
+     * https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_4
      */
     public function trade_refund($order_info,$refund_amount)
     {
@@ -142,13 +143,15 @@ class wxpay_native {
         
         if ($result['return_code'] == 'SUCCESS') {
             if ($result['result_code'] == 'SUCCESS') {
-                return ds_callback(TRUE);
+                $log_msg = '微信支付订单号：'.$result['transaction_id'].'，商户订单号:'.$result['out_trade_no'].'，商户退款单号:'.$result['out_refund_no'];
+                return ds_callback(TRUE,'',array('log_msg'=>$log_msg));
             } elseif ($result['err_code'] == 'NOTENOUGH') {//未结算资金不足时使用可用资金去退款
                 $input->SetRefund_account('REFUND_SOURCE_RECHARGE_FUNDS');
                 $result = $wxpay->refund($input);
                 if ($result['return_code'] == 'SUCCESS') {
                     if ($result['result_code'] == 'SUCCESS') {
-                        return ds_callback(TRUE);
+                        $log_msg = '微信支付订单号：'.$result['transaction_id'].'，商户订单号:'.$result['out_trade_no'].'，商户退款单号:'.$result['out_refund_no'];
+                        return ds_callback(TRUE,'',array('log_msg'=>$log_msg));
                     } else {
                         return ds_callback(FALSE, $result['err_code_des']);
                     }

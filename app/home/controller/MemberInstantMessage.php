@@ -41,11 +41,6 @@ class MemberInstantMessage extends BaseMember {
         $message = input('param.message');
         $message_type = input('param.message_type', 0);
 
-        $res=word_filter($message);
-        if(!$res['code']){
-            ds_json_encode(10001,$res['msg']);
-        }
-        $message=$res['data']['text'];
         $instant_message_data = array(
             'instant_message_from_id' => $this->member_info['member_id'],
             'instant_message_from_type' => 0,
@@ -58,10 +53,8 @@ class MemberInstantMessage extends BaseMember {
             'instant_message_add_time' => TIMESTAMP,
         );
 
-        $instant_message_validate = ds_validate('instant_message');
-        if (!$instant_message_validate->scene('instant_message_save')->check($instant_message_data)) {
-            ds_json_encode(10001, $instant_message_validate->getError());
-        }
+        $this->validate($instant_message_data, 'app\common\validate\InstantMessage.instant_message_save');
+        
         Db::startTrans();
         try {
             $instant_message_data = $instant_message_model->addInstantMessage($instant_message_data);
@@ -69,11 +62,12 @@ class MemberInstantMessage extends BaseMember {
             if (!$res['code']) {
                 throw new \think\Exception($res['msg'], 10006);
             }
+            Db::commit();
         } catch (\Exception $e) {
             Db::rollback();
             ds_json_encode(10001, $e->getMessage());
         }
-        Db::commit();
+
         ds_json_encode(10000, lang('message_send_success'), array('instant_message_data' => $instant_message_data));
     }
 
@@ -120,7 +114,7 @@ class MemberInstantMessage extends BaseMember {
             $condition[] = array('instant_message_to_type', '=', 0);
             $condition[] = array('instant_message_from_type', '=', 0);
             $condition[] = array('instant_message_state', '=', 2);
-            $msg_list = $instant_message_model->getInstantMessageList($condition,'','instant_message_id asc');
+            $msg_list = $instant_message_model->getInstantMessageList($condition, '', 'instant_message_id asc');
             foreach ($msg_list as $key => $val) {
                 $msg_list[$key] = $instant_message_model->formatInstantMessage($val);
             }
@@ -150,8 +144,8 @@ class MemberInstantMessage extends BaseMember {
         $member_model = model('member');
         $snsfriend_model = model('snsfriend');
         $instant_message_model = model('instant_message');
-        $snsfriend_list=$snsfriend_model->getSnsfriendList(array('friend_frommid' => $this->member_info['member_id']), '*', 100, 'simple');
-        
+        $snsfriend_list = $snsfriend_model->getSnsfriendList(array('friend_frommid' => $this->member_info['member_id']), '*', 100, 'simple');
+
         foreach ($instant_message_list as $val) {
             $_condition1 = $condition1;
             $_condition2 = $condition2;
@@ -169,11 +163,11 @@ class MemberInstantMessage extends BaseMember {
             $_condition2[] = array('instant_message_from_id', '=', $id);
             if (!isset($user_list[$type . '_' . $id])) {
                 $user_info = array(
-                        'u_id' => $id,
-                        'u_type' => $type,
-                        'u_name' => $name,
-                        'avatar' => get_member_avatar_for_id($id)
-                    );
+                    'u_id' => $id,
+                    'u_type' => $type,
+                    'u_name' => $name,
+                    'avatar' => get_member_avatar_for_id($id)
+                );
 
                 if (!empty($user_info)) {
                     $instant_message_info = Db::name('instant_message')->whereOr([$_condition1, $_condition2])->order('instant_message_add_time desc')->find();
@@ -184,8 +178,8 @@ class MemberInstantMessage extends BaseMember {
                             $snsfriend_info = false;
                         }
                         $user_info['recent'] = 1;
-                        $user_info['friend'] = ($snsfriend_info && $snsfriend_info['friend_followstate']==2) ? 1 : 0;
-                        $user_info['follow'] = ($snsfriend_info && $snsfriend_info['friend_followstate']==1) ? 1 : 0;
+                        $user_info['friend'] = ($snsfriend_info && $snsfriend_info['friend_followstate'] == 2) ? 1 : 0;
+                        $user_info['follow'] = ($snsfriend_info && $snsfriend_info['friend_followstate'] == 1) ? 1 : 0;
                         $user_info['message_type'] = $instant_message_info['instant_message_type'];
                         $message = $instant_message_info['instant_message'];
                         if ($instant_message_info['instant_message_type'] == 1) {
@@ -199,22 +193,22 @@ class MemberInstantMessage extends BaseMember {
                 }
             }
         }
-        foreach($snsfriend_list as $val){
-            $id=$val['friend_tomid'];
-            if(!isset($user_list['0_' . $id])){
+        foreach ($snsfriend_list as $val) {
+            $id = $val['friend_tomid'];
+            if (!isset($user_list['0_' . $id])) {
                 $user_list['0_' . $id] = array(
-                        'u_id' => $id,
-                        'u_type' => 0,
-                        'u_name' => $val['friend_tomname'],
-                        'avatar' => get_member_avatar_for_id($id),
-                        'recent' => 0,
-                        'friend' => ($val['friend_followstate']==2) ? 1 : 0,
-                        'follow' => ($val['friend_followstate']==1) ? 1 : 0,
-                        'message_type' => 0,
-                        'r_state' => 1,
-                        'message' => '',
-                        'time' => '',
-                    );
+                    'u_id' => $id,
+                    'u_type' => 0,
+                    'u_name' => $val['friend_tomname'],
+                    'avatar' => get_member_avatar_for_id($id),
+                    'recent' => 0,
+                    'friend' => ($val['friend_followstate'] == 2) ? 1 : 0,
+                    'follow' => ($val['friend_followstate'] == 1) ? 1 : 0,
+                    'message_type' => 0,
+                    'r_state' => 1,
+                    'message' => '',
+                    'time' => '',
+                );
             }
         }
         $user_list = array_values($user_list);
@@ -246,7 +240,7 @@ class MemberInstantMessage extends BaseMember {
         $condition = array();
         $condition[] = array('instant_message_add_time', '>=', $time_from[$key]);
         //最近联系人最多取100个
-        $result = Db::name('instant_message')->where(function ($query) use($condition1, $condition2) {
+        $result = Db::name('instant_message')->where(function ($query) use ($condition1, $condition2) {
                     $query->whereOr([$condition1, $condition2]);
                 })->where($condition)->order('instant_message_add_time desc')->paginate(['list_rows' => 10, 'query' => request()->param()], false);
         $instant_message_list = $result->items();
@@ -305,7 +299,6 @@ class MemberInstantMessage extends BaseMember {
         }
         ds_json_encode(10000, '', array('user_info' => $member));
     }
-
 }
 
 ?>

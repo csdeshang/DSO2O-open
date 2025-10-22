@@ -64,6 +64,7 @@ $lang['points_number_orderrate'] = '消费额与赠送积分比例';
 $lang['points_number_orderrate_tip'] = '例:设置为10，表明消费10单位货币赠送1积分，建议设置0-100之间';
 $lang['points_number_ordermax'] = '每订单最多赠送积分';
 $lang['points_number_ordermax_tip'] = '例:设置为100，表明每订单赠送积分最多为100积分';
-$lang['points_update_success'] = '更新成功';
-$lang['points_update_fail'] = '更新失败';
+$lang['pointslog']='积分调整';
+$lang['points_setting']='积分规则';
+
 return $lang;

@@ -1,9 +1,12 @@
 <?php
+
 namespace app\common\validate;
+
 use think\Validate;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -13,24 +16,22 @@ use think\Validate;
  * ============================================================================
  * 验证器
  */
-class  Memberbank extends Validate
-{
-    protected $rule = [
-        'memberbank_type'=>'require',
-        'memberbank_truename'=>'require',
-        'memberbank_no'=>'require',
+class Memberbank extends Validate {
 
+    protected $rule = [
+        'memberbank_type' => 'require',
+        'memberbank_truename' => 'require|length:2,5',
+        'memberbank_no' => 'require|length:5,30',
     ];
     protected $message = [
-        'memberbank_type.require'=>'账户类型不能为空',
-        'memberbank_truename.require'=>'开户名不能为空',
-        'memberbank_no.require'=>'账号不能为空',
-
+        'memberbank_type.require' => '账户类型不能为空',
+        'memberbank_truename.require' => '开户名不能为空',
+        'memberbank_truename.length' => '开户名长度应为2至5之间',
+        'memberbank_no.require' => '账号不能为空',
+        'memberbank_no.length' => '账号长度不正确',
     ];
     protected $scene = [
         'add' => ['memberbank_type', 'memberbank_truename', 'memberbank_no'],
         'edit' => ['memberbank_type', 'memberbank_truename', 'memberbank_no'],
     ];
-
-
 }

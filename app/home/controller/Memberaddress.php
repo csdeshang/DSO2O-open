@@ -70,14 +70,21 @@ class  Memberaddress extends BaseMember {
             return View::fetch($this->template_dir . 'form');
         } else {
             $address_is_default = input('post.is_default') == 1 ? 1 : 0;
+            
+            //验证器在model中,需要判断必填
+            $address_realname = input('post.true_name');
+            if (empty($address_realname)) {
+                ds_json_encode(10001, lang('param_error'));
+            }
+            
             $data = array(
                 'address_o2o_errand_type' => $o2o_errand_type,
                 'member_id' => session('member_id'),
-                'address_realname' => input('post.true_name'),
+                'address_realname' => $address_realname,
                 'area_id' => input('post.area_id'),
                 'city_id' => input('post.city_id'),
                 'address_detail' => input('post.address'),
-				'house_number' =>input('post.house_number'),
+		'house_number' =>input('post.house_number'),
                 'address_longitude' => input('post.longitude'),
                 'address_latitude' => input('post.latitude'),
                 'address_tel_phone' => input('post.tel_phone'),
@@ -85,18 +92,7 @@ class  Memberaddress extends BaseMember {
                 'address_is_default' => $address_is_default,
                 'area_info' => input('post.area_info'),
             );
-            $memberaddress_validate = ds_validate('memberaddress');
-            if (!$memberaddress_validate->scene('add')->check($data)) {
-                ds_json_encode(10001,$memberaddress_validate->getError());
-            }
             
-            //当默认地址为1时,把当前用户的地址设置为非默认地址
-            if($address_is_default == 1){
-                $condition = array();
-                $condition[] = array('member_id','=',session('member_id'));
-                $condition[] = array('address_o2o_errand_type','=',$o2o_errand_type);
-                model('address')->editAddress(array('address_is_default'=>0), $condition);
-            }
 
             $address_model=model('address');
             $result = $address_model->addAddress($data);
@@ -132,13 +128,21 @@ class  Memberaddress extends BaseMember {
             return View::fetch($this->template_dir . 'form');
         } else {
             $address_is_default = input('post.is_default') == 1 ? 1 : 0;
+            
+            //验证器在model中,需要判断必填
+            $address_realname = input('post.true_name');
+            if (empty($address_realname)) {
+                ds_json_encode(10001, lang('param_error'));
+            }
+            
             $data = array(
                 'address_o2o_errand_type' => $o2o_errand_type,
-                'address_realname' => input('post.true_name'),
+                'member_id' => session('member_id'),
+                'address_realname' => $address_realname,
                 'area_id' => input('post.area_id'),
                 'city_id' => input('post.city_id'),
                 'address_detail' => input('post.address'),
-				'house_number' =>input('post.house_number'),
+		'house_number' =>input('post.house_number'),
                 'address_longitude' => input('post.longitude'),
                 'address_latitude' => input('post.latitude'),
                 'address_tel_phone' => input('post.tel_phone'),
@@ -146,18 +150,6 @@ class  Memberaddress extends BaseMember {
                 'address_is_default' => $address_is_default,
                 'area_info' => input('post.area_info'),
             );
-            $memberaddress_validate = ds_validate('memberaddress');
-            if (!$memberaddress_validate->scene('edit')->check($data)) {
-                ds_json_encode(10001,$memberaddress_validate->getError());
-            }
-            
-            //当默认地址为1时,把当前用户的地址设置为非默认地址
-            if($address_is_default == 1){
-                $condition = array();
-                $condition[] = array('member_id','=',session('member_id'));
-                $condition[] = array('address_o2o_errand_type','=',$o2o_errand_type);
-                model('address')->editAddress(array('address_is_default'=>0), $condition);
-            }
             
             $condition=array();
             $condition[]=array('member_id' ,'=', session('member_id'));

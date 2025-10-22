@@ -2,11 +2,11 @@
 
 namespace app\common\validate;
 
-
 use think\Validate;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -16,17 +16,18 @@ use think\Validate;
  * ============================================================================
  * 验证器
  */
-class  Message extends Validate
-{
+class Message extends Validate {
+
     protected $rule = [
-        'to_member_name'=>'require',
-        'msg_content'=>'require',
+        'to_member_name' => 'require',
+        'msg_content' => 'require|length:0,255',
     ];
     protected $message = [
-        'to_member_name.require'=>'收件人不能为空',
-        'msg_content.require'=>'内容不能为空',
+        'to_member_name.require' => '收件人不能为空',
+        'msg_content.require' => '内容不能为空',
+        'msg_content.length' => '内容长度不能大于50',
     ];
     protected $scene = [
-        'savemsg' => ['to_member_name','msg_content'],
+        'savemsg' => ['to_member_name', 'msg_content'],
     ];
 }

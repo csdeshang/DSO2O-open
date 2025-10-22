@@ -7,7 +7,7 @@ use think\facade\Lang;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能 平台红包
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -81,10 +81,10 @@ class Bonus extends AdminControl {
             if ($bonus_pricetype == 1) {
                 //固定金额
                 if ($bonus_fixedprice == 0 || $bonus_fixedprice > $bonus_totalprice) {
-                    $this->error('固定金额或红包总面额错误');
+                    $this->error(lang('bonus_fixedprice_error'));
                 }
                 if (($bonus_totalprice*100) % ($bonus_fixedprice*100) != 0) {
-                    $this->error('总金额必须是固定金额的整数倍');
+                    $this->error(lang('bonus_fixedprice_error'));
                 }
                 //生成红包领取记录-固定金额
                 for ($i = 0; $i < $bonus_totalprice / $bonus_fixedprice; $i++) {
@@ -186,6 +186,7 @@ class Bonus extends AdminControl {
             ds_json_encode(10000, lang('param_error'));
         }
         $bonus_model = model('bonus');
+        $condition = array();
         $condition[] = array('bonus_id','=',$bonus_id);
         $data['bonus_state'] = 3;
         $bonus_model->editBonus($condition, $data);
@@ -233,12 +234,12 @@ class Bonus extends AdminControl {
             array(
                 'name' => 'index',
                 'text' => lang('ds_manage'),
-                'url' => url('Bonus/index')
+                'url' => (string)url('Bonus/index')
             ),
             array(
                 'name' => 'add',
                 'text' => lang('ds_add'),
-                'url' => "javascript:dsLayerOpen('" . url('Bonus/add') . "','".lang('ds_add')."')"
+                'url' => "javascript:dsLayerOpen('" . (string)url('Bonus/add') . "','".lang('ds_add')."')"
             ),
         );
         return $menu_array;

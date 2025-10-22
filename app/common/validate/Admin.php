@@ -2,11 +2,11 @@
 
 namespace app\common\validate;
 
-
 use think\Validate;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -16,25 +16,25 @@ use think\Validate;
  * ============================================================================
  * 验证器
  */
-class  Admin extends Validate
-{
-    protected  $rule = [
-        'admin_name'=>'require|length:3,12',
-        'admin_password'=>'require|min:6',
-        'admin_gid'=>'require',
-        'captcha'=>'require|min:3',
+class Admin extends Validate {
+
+    protected $rule = [
+        'admin_name' => 'require|length:3,12',
+        'admin_password' => 'require|min:6',
+        'admin_gid' => 'require',
+        'captcha' => 'require|min:3',
     ];
-    protected  $message = [
-        'admin_name.require'=>'登录名必填',
-        'admin_name.length'=>'登录名长度在3到12位',
-        'admin_password.require'=>'密码为必填',
-        'admin_password.min'=>'密码长度至少为6位',
-        'admin_gid.require'=>'权限组为必填',
-        'captcha.require'=>'验证码为必填',
-        'captcha.min'=>'验证码长度至少为3位',
+    protected $message = [
+        'admin_name.require' => '登录名必填',
+        'admin_name.length' => '登录名长度在3到12位',
+        'admin_password.require' => '密码为必填',
+        'admin_password.min' => '密码长度至少为6位',
+        'admin_gid.require' => '权限组为必填',
+        'captcha.require' => '验证码为必填',
+        'captcha.min' => '验证码长度至少为3位',
     ];
     protected $scene = [
-        'admin_add' => ['admin_name', 'admin_password', 'admin_gid'],
-        'index' => ['admin_name', 'admin_password', 'captcha'],//login index
+        'add' => ['admin_name', 'admin_password', 'admin_gid'],
+        'index' => ['admin_name', 'admin_password', 'captcha'], //login index
     ];
 }

@@ -158,6 +158,13 @@ $lang['successful_email_setting']='邮箱设置成功';
 $lang['system_error']='系统发生错误，如有疑问请与管理员联系';
 $lang['verify_that_length_incorrect']='手机号或手机验证码长度不正确';
 
+$lang['send_fail']='发送失败';
+$lang['send_success']='发送成功';
+$lang['mobile_not_exist']='手机号不存在';
+$lang['password_error']='用户名密码错误';
+$lang['login_fail']='登录失败';
+$lang['member_state_0']='该用户禁止登录';
+
 $lang['find_the_password_help']	= '如果账号还没有绑定手机号，请联系平台管理员找回密码';
 $lang['frequent_operation']='操作太频繁，请24小时候再尝试';
 return $lang;

@@ -122,7 +122,7 @@ $lang['information_discount_activities1'] = '1、点击添加活动按钮可以�
 $lang['information_discount_activities2'] = '2、点击删除按钮可以删除秒杀活动';
 $lang['overdue_set_meal'] = '套餐过期时间';
 $lang['please_buy_set_meal'] = '当前没有可用套餐，请先购买套餐';
-$lang['deduction_settlement_payment_days'] = '相关费用会在店铺的账期结算中扣除';
+$lang['deduction_settlement_payment_days'] = '相关费用会在店铺的资金中扣除';
 $lang['buy_lower_limit'] = '购买下限';
 
 //xianshi_add

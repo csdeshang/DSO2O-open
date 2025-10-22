@@ -52,10 +52,7 @@ class  Memberconnect extends BaseMember {
                 'new_password' => input('post.new_password'),
                 'confirm_password' => input('post.confirm_password')
             );
-            $memberconnect_validate = ds_validate('memberconnect');
-            if (!$memberconnect_validate->scene('qqunbind')->check($data)) {
-                $this->error($memberconnect_validate->getError());
-            }
+            $this->validate($data, 'app\common\validate\Memberconnect.qqunbind');
 
             $update_arr['member_password'] = md5(trim(input('post.new_password')));
         }
@@ -100,10 +97,7 @@ class  Memberconnect extends BaseMember {
                 'new_password' => input('post.new_password'),
                 'confirm_password' => input('post.confirm_password')
             );
-            $memberconnect_validate = ds_validate('memberconnect');
-            if (!$memberconnect_validate->scene('sinaunbind')->check($data)) {
-                $this->error($memberconnect_validate->getError());
-            }
+            $this->validate($data, 'app\common\validate\Memberconnect.sinaunbind');
 
             $update_arr['member_password'] = md5(trim(input('post.new_password')));
         }
@@ -123,10 +117,6 @@ class  Memberconnect extends BaseMember {
      * 微信绑定
      */
     public function weixinbind() {
-        //获得用户信息
-        if (trim($this->member_info['member_wxinfo'])) {
-            $this->member_info['weixin_infoarr'] = unserialize($this->member_info['member_wxinfo']);
-        }
         View::assign('member_info', $this->member_info);
         //信息输出
         $this->setMemberCurMenu('member_connect');
@@ -150,16 +140,16 @@ class  Memberconnect extends BaseMember {
                 'confirm_password'=>input('post.confirm_password')
             ];
 
-            $memberconnect_validate = ds_validate('memberconnect');
-            if (!$memberconnect_validate->scene('weixinunbind')->check($data)) {
-                $this->error($memberconnect_validate->getError());
-            }
+            $this->validate($data, 'app\common\validate\Memberconnect.weixinunbind');
 
             $update_arr['member_password'] = md5(trim(input('post.new_password')));
         }
         $update_arr['member_wxunionid'] = '';
-        $update_arr['member_wxopenid'] = '';
-        $update_arr['member_wxinfo'] = '';
+        $update_arr['member_pc_wxopenid'] = '';
+        $update_arr['member_h5_wxopenid'] = '';
+        $update_arr['member_mini_wxopenid'] = '';
+        $update_arr['member_app_wxopenid'] = '';
+        $update_arr['member_wxnickname'] = '';
         $edit_state = $member_model->editMember(array('member_id' => session('member_id')), $update_arr,session('member_id'));
         if (!$edit_state) {
             $this->error(lang('ds_common_save_fail'));

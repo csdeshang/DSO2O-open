@@ -458,6 +458,13 @@ tfoot label { +display: inline-block; +float:left; +line-height:38px; /* IE */}
 .ds-default-table ul li{color: #333;width: 50.1%;float: left;padding: 4px 0;}
 .ds-default-table tr.no_data td{ font-size:14px; line-height: 120px; color: #09C; text-align:center; font-weight: bold;}
 
+/*订单显示表格*/
+.order-list tbody tr td.sep-row { height:0px;padding:0;border:0;}
+.order-list tbody tr:hover td.sep-row { background-color: #FFF;border:0;}
+.order-list tbody tr td { border-bottom: 1px solid #E7E7E7;vertical-align: top;}
+.order-list tbody tr td.bdl { border-left: 1px solid #E7E7E7;}
+.order-list tbody tr td.bdr { border-right: 1px solid #E7E7E7;}
+
 .ckbox {width:700px; }
 .ckbox li { float: left; margin: 5px 10px 5px 0; white-space: nowrap; width: 130px; height: 20px; }
 .partition, .partition2{ line-height:21px; font-weight:700; color:#09C; }

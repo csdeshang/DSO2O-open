@@ -45,21 +45,16 @@ class Memberfeedback extends BaseMember {
     public function add(){
         if (request()->isPost()) {
             $feedback_model = model('feedback');
-            $param = array();
-            $param['fb_content'] = input('param.fb_content');
-            $param['fb_type'] = 2;
-            $param['fb_time'] = TIMESTAMP;
-            $param['member_id'] = session('member_id');
-            $param['member_name'] = session('member_name');
+            $data = array();
+            $data['fb_content'] = input('param.fb_content');
+            $data['fb_type'] = 2;
+            $data['fb_time'] = TIMESTAMP;
+            $data['member_id'] = session('member_id');
+            $data['member_name'] = session('member_name');
             
-            $res=word_filter($param['fb_content']);
-            if(!$res['code']){
-                ds_json_encode(10001,$res['msg']);
-            }
-            $param['fb_content']=$res['data']['text'];
-
-
-            $result = $feedback_model->addFeedback($param);
+            $this->validate($data, 'app\common\validate\Feedback.add');
+            
+            $result = $feedback_model->addFeedback($data);
 
             if ($result) {
                 ds_json_encode(10000, lang('ds_common_op_succ'));

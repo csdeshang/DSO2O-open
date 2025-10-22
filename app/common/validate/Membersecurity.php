@@ -3,9 +3,10 @@
 namespace app\common\validate;
 
 use think\Validate;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,28 +16,25 @@ use think\Validate;
  * ============================================================================
  * 验证器
  */
-class  Membersecurity extends Validate
-{
+class Membersecurity extends Validate {
+
     protected $rule = [
-        'email'=>'email',
-        'password'=>'require',
-        'confirm_password'=>'require',
-        'mobile'=>'require',
-        'vcode'=>'require',
+        'password' => 'require',
+        'confirm_password' => 'require',
+        'member_mobile' => 'require|mobile',
+        'verify_code' => 'require|length:6,6',
     ];
     protected $message = [
-        'email.email'=>'请正确填写邮箱',
-        'password.require'=>'请正确输入密码',
-        'confirm_password.require'=>'请正确输入确认密码',
-        'mobile.require'=>'请正确填写手机号',
-        'vcode.require'=>'请正确填写手机验证码',
+        'password.require' => '请正确输入密码',
+        'confirm_password.require' => '请正确输入确认密码',
+        'member_mobile.require' => '请填写手机号',
+        'member_mobile.mobile' => '请正确填写手机号',
+        'verify_code.require' => '请正确填写手机验证码',
+        'verify_code.length' => '验证码的长度为6位',
     ];
     protected $scene = [
-        'send_bind_email' => ['email'],
         'modify_pwd' => ['password', 'confirm_password'],
         'modify_paypwd' => ['password', 'confirm_password'],
-        'modify_mobile' => ['mobile', 'vcode'],
-        'send_modify_mobile' => ['mobile'],
+        'modify_mobile' => ['member_mobile', 'verify_code'],
     ];
-
 }

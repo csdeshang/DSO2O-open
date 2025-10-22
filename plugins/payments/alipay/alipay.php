@@ -152,6 +152,7 @@ class alipay {
 
     /**
      * 原路退款
+     * https://opendocs.alipay.com/open/f60979b3_alipay.trade.refund?pathHash=e4c921a7&ref=api&scene=common
      */
     public function trade_refund($order_info, $refund_amount) {
         require_once dirname(__FILE__) . '/aop/AopCertClient.php';
@@ -184,9 +185,10 @@ class alipay {
         $responseNode = str_replace(".", "_", $request->getApiMethodName()) . "_response";
         $resultCode = $result->$responseNode->code;
         if (!empty($resultCode) && $resultCode == 10000) {
-            return ds_callback(TRUE, $result->$responseNode->msg);
+            $log_msg = '支付宝支付订单号：'.$result->$responseNode->trade_no.'，商户订单号:'.$result->$responseNode->out_trade_no.'，退款请求号:'.$order_info['out_request_no'];
+            return ds_callback(TRUE, $result->$responseNode->msg,array('log_msg'=>$log_msg));
         } else {
-            return ds_callback(FALSE, $result->$responseNode->sub_msg);
+            return ds_callback(FALSE, $result->$responseNode->sub_msg.$result->$responseNode->sub_code);
         }
     }
 

@@ -4,6 +4,7 @@ namespace app\common\logic;
 
 use think\facade\Db;
 use app\common\model\Storemoneylog;
+
 /**
  * ============================================================================
  * DSO2O多用户商城
@@ -45,7 +46,6 @@ class Order {
             if ($if_update_account) {
                 $predeposit_model = model('predeposit');
 
-
                 //注意：当用户全额使用预存款进行支付,并不会冻结, 当用户使用部分预存款进行支付,支付的预存款则会冻结.也就是支付成功之后不会有冻结资金,当未支付成功,使用的预付款变为冻结资金。
 
                 if ($order_info['order_state'] == ORDER_STATE_NEW) {
@@ -71,9 +71,9 @@ class Order {
                     }
                 }
 
-                if ($order_info['order_state'] == ORDER_STATE_PAY && $order_info['payment_code'] != 'offline') {//offline为货到付款的订单，取消时不需要返回预存款
-                    $refundreturn_model=model('refundreturn');
-                    $refundreturn_model->refundAmount($order_info, $order_info['order_amount']);
+                if ($order_info['order_state'] == ORDER_STATE_PAY) {
+                    $refundreturn_model = model('refundreturn');
+                    $refundreturn_model->refundAmount($order_info, $order_info['order_amount'], 'order');
                 }
             }
 
@@ -85,7 +85,7 @@ class Order {
             }
             //分销佣金取消
             $orderinviter_model = model('orderinviter');
-            $orderinviter_model->cancelOrderinviterMoney($order_id,0);
+            $orderinviter_model->cancelOrderinviterMoney($order_id, 0);
 
             //添加订单日志
             $data = array();
@@ -96,8 +96,7 @@ class Order {
             if ($msg) {
                 $data['log_msg'] .= ' ( ' . $msg . ' )';
             }
-            $data['log_orderstate'] = ORDER_STATE_CANCEL;
-            $order_model->addOrderlog($data);
+            model('orderlog')->addOrderlog($data);
         }
     }
 
@@ -158,9 +157,8 @@ class Order {
             if ($msg) {
                 $data['log_msg'] .= ' ( ' . $msg . ' )';
             }
-            $data['log_orderstate'] = ORDER_STATE_SUCCESS;
-            $order_model->addOrderlog($data);
-            
+            model('orderlog')->addOrderlog($data);
+
             //确认收货对金额进行操作
             $this->balanceOrderStateReceive($order_info);
 
@@ -191,54 +189,51 @@ class Order {
             }
             Db::commit();
             return ds_callback(true, '操作成功');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Db::rollback();
             return ds_callback(false, $e->getMessage());
         }
     }
-    
+
     //获取订单结算的数据,支付给店铺,平台,佣金,退款等
-    public function getBalanceOrderInfo($order_info){
+    public function getBalanceOrderInfo($order_info) {
         //订单金额
         $result['order_amount'] = $order_info['order_amount'];
         $result['shipping_fee'] = $order_info['shipping_fee'];
-        
+
         //退款金额(用户退款金额)
         $result['refund_amount'] = $order_info['refund_amount'];
-        
+
         //平台的佣金
-        $ordergoods = Db::name('ordergoods')->where('order_id', '=',$order_info['order_id'])->field('SUM(ROUND(goods_pay_price*commis_rate/100,2)) AS commis_totals')->find();
+        $ordergoods = Db::name('ordergoods')->where('order_id', '=', $order_info['order_id'])->field('SUM(ROUND(goods_pay_price*commis_rate/100,2)) AS commis_totals')->find();
         $result['commis_totals'] = $ordergoods['commis_totals'];
-        
-        
+
         //获取用户推荐佣金
-        $orderinviter = Db::name('orderinviter')->where('orderinviter_order_id', '=',$order_info['order_id'])->where('orderinviter_order_type', 0)->field('SUM(orderinviter_money) AS inviter_totals')->find();
+        $orderinviter = Db::name('orderinviter')->where('orderinviter_order_id', '=', $order_info['order_id'])->where('orderinviter_order_type', 0)->field('SUM(orderinviter_money) AS inviter_totals')->find();
         $result['inviter_totals'] = $orderinviter['inviter_totals'];
-        
+
         return $result;
-        
     }
-    
+
     //用户确认收货,进行结算
     public function balanceOrderStateReceive($order_info) {
         $result = $this->getBalanceOrderInfo($order_info);
 
         //店铺去除费用后应该获得的资金
         $store_avaliable_money = $result['order_amount'] - $result['commis_totals'] - $result['inviter_totals'] - $result['shipping_fee'];
-        
-        
-        $storemoneylog_desc = '外卖订单'.$order_info['order_sn'].'，确认收货。(订单金额：'.$result['order_amount'].')';
-        if($result['shipping_fee'] > 0){
-            $storemoneylog_desc .= '-(配送费用：'.$result['shipping_fee'].')';
+
+        $storemoneylog_desc = '外卖订单' . $order_info['order_sn'] . '，确认收货。(订单金额：' . $result['order_amount'] . ')';
+        if ($result['shipping_fee'] > 0) {
+            $storemoneylog_desc .= '-(配送费用：' . $result['shipping_fee'] . ')';
         }
-        if($result['commis_totals'] > 0){
-            $storemoneylog_desc .= '-(平台佣金：'.$result['commis_totals'].')';
+        if ($result['commis_totals'] > 0) {
+            $storemoneylog_desc .= '-(平台佣金：' . $result['commis_totals'] . ')';
         }
-        if($result['inviter_totals'] > 0){
-            $storemoneylog_desc .= '-(分销佣金：'.$result['inviter_totals'].')';
+        if ($result['inviter_totals'] > 0) {
+            $storemoneylog_desc .= '-(分销佣金：' . $result['inviter_totals'] . ')';
         }
-        
-        
+
+
         $storemoneylog_model = model('storemoneylog');
         //付款给店铺
         $data = array(
@@ -246,28 +241,26 @@ class Order {
             'storemoneylog_type' => Storemoneylog::TYPE_ORDER_SUCCESS,
             'storemoneylog_state' => Storemoneylog::STATE_VALID,
             'storemoneylog_add_time' => TIMESTAMP,
-            'store_avaliable_money' => $store_avaliable_money,
+            'storemoneylog_avaliable_money' => $store_avaliable_money,
             'storemoneylog_desc' => $storemoneylog_desc,
         );
         $storemoneylog_model->changeStoremoney($data);
-        
+
         //付款给推荐人
         $orderinviter_model = model('orderinviter');
         //实物订单
         $orderinviter_model->giveMoney($order_info['order_id'], 0);
-        
+
         //付款给配送员,如果店铺的订单已分配给配送员   
         //付款给配送员,如果店铺的订单有配送费
-        if ($order_info['o2o_distributor_id'] > 0 && $order_info['shipping_fee']>0) {
+        if ($order_info['o2o_distributor_id'] > 0 && $order_info['shipping_fee'] > 0) {
             $o2o_distributor_moneylog_model = model('o2o_distributor_moneylog');
             $distributor_money = array(
                 'o2o_distributor_id' => $order_info['o2o_distributor_id'],
                 'amount' => $result['shipping_fee'],
                 'order_sn' => $order_info['order_sn'],
             );
-            
-            
-            
+
             $o2o_distributor_moneylog_model->changeO2oDistributorMoney('order_waimai', $distributor_money);
         }
 
@@ -279,25 +272,22 @@ class Order {
         $data['order_id'] = $order_info['order_id'];
         $data['log_role'] = 'system';
         $data['log_user'] = '';
-        $data['log_msg'] = '店铺收款'.$store_avaliable_money.'元。'.$storemoneylog_desc;
-        $data['log_orderstate'] = ORDER_STATE_SUCCESS;
-        $order_model->addOrderlog($data);
-        
+        $data['log_msg'] = '店铺收款' . $store_avaliable_money . '元。' . $storemoneylog_desc;
+        model('orderlog')->addOrderlog($data);
     }
-    
+
     //确认退款,对店铺的扣款
-    public function balanceOrderStateRefundreturn($order_info,$refund){
-        
+    public function balanceOrderStateRefundreturn($order_info, $refund) {
+
         //判断订单状态,店铺是否发货,未发货则店铺不需要进行扣款
-        
         //用户申请的退款金额
         $refund_amount = $refund['refund_amount'];
-        
+
         //扣除店铺的资金  平台的佣金、推荐的分成、配送员的配送费 不做扣除
         $store_avaliable_money = $refund_amount;
-        
-        $storemoneylog_desc = '外卖订单'.$order_info['order_sn'].'退款。(申请退款金额：'.$refund['refund_amount'].')';
-        
+
+        $storemoneylog_desc = '外卖订单' . $order_info['order_sn'] . '退款。(申请退款金额：' . $refund['refund_amount'] . ')';
+
         $storemoneylog_model = model('storemoneylog');
         //付款给店铺
         $data = array(
@@ -305,25 +295,23 @@ class Order {
             'storemoneylog_type' => Storemoneylog::TYPE_ORDER_REFUND,
             'storemoneylog_state' => Storemoneylog::STATE_VALID,
             'storemoneylog_add_time' => TIMESTAMP,
-            'store_avaliable_money' => -$store_avaliable_money,
+            'storemoneylog_avaliable_money' => -$store_avaliable_money,
             'storemoneylog_desc' => $storemoneylog_desc,
         );
         $storemoneylog_model->changeStoremoney($data);
-        
+
         //产生退款,修改推荐人分销佣金[实物订单]
         $orderinviter_model = model('orderinviter');
         $orderinviter_model->refundOrderinviterMoney($order_info, $refund);
-        
+
         //记录订单日志
         $order_model = model('order');
         $data = array();
         $data['order_id'] = $order_info['order_id'];
         $data['log_role'] = 'system';
         $data['log_user'] = '';
-        $data['log_msg'] = '店铺扣除'.$store_avaliable_money.'元。'.$storemoneylog_desc;
-        $data['log_orderstate'] = ORDER_STATE_SUCCESS;
-        $order_model->addOrderlog($data);
-        
+        $data['log_msg'] = '店铺扣除' . $store_avaliable_money . '元。' . $storemoneylog_desc;
+        model('orderlog')->addOrderlog($data);
     }
 
     /**
@@ -356,11 +344,9 @@ class Order {
             $data['log_role'] = $role;
             $data['log_user'] = $user;
             $data['log_msg'] = '修改了运费' . '( ' . $price . ' )';
-            ;
-            $data['log_orderstate'] = $order_info['payment_code'] == 'offline' ? ORDER_STATE_PAY : ORDER_STATE_NEW;
-            $order_model->addOrderlog($data);
+            model('orderlog')->addOrderlog($data);
             return ds_callback(true, '操作成功');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return ds_callback(false, $e->getMessage());
         }
     }
@@ -382,6 +368,9 @@ class Order {
 
             $data = array();
             $data['goods_amount'] = abs(floatval($price));
+            if($data['goods_amount'] <=0){
+                throw new \think\Exception('商品金额不能小于等于0元', 10006);
+            }
             $data['order_amount'] = Db::raw('shipping_fee+' . $data['goods_amount']);
             if (($order_info['rcb_amount'] + $order_info['pd_amount']) > ($order_info['shipping_fee'] + $data['goods_amount'])) {
                 throw new \think\Exception('订单金额必须大于用户已支付金额', 10006);
@@ -393,48 +382,49 @@ class Order {
             //修改商品费用
             if ($data['goods_amount'] > 0) {
                 $ordergoods_list = $order_model->getOrdergoodsList(array('order_id' => $order_id));
-                $diff_amount = $data['goods_amount'] - $order_info['goods_amount'];
+                //剩余金额,用于最后一个商品或单个商品的金额
+                $surplus_amount = $data['goods_amount'];
+                //修改后的价格 与 商品最初的差额 比例
+                $diff_amount_ratio = $data['goods_amount']/$order_info['goods_amount'];
                 $i = 0;
                 foreach ($ordergoods_list as $ordergoods) {
                     if ($i != (count($ordergoods_list) - 1)) {
-
                         if ($order_info['goods_amount'] > 0) {
-                            $temp = $ordergoods['goods_pay_price'] / $order_info['goods_amount'] * $diff_amount;
-                            $price = round($ordergoods['goods_pay_price'] + $temp, 2);
+                            //多个商品 平分到每个商品的实际支付价格
+                            $goods_pay_price = round($ordergoods['goods_pay_price']*$diff_amount_ratio, 2);
                         } else {
-                            $price = round(1 / count($ordergoods_list) * $diff_amount, 2);
-                            $temp = $price;
+                            //商品金额为0,按照订单商品表平分金额
+                            $goods_pay_price = round(1 / count($ordergoods_list) * $data['goods_amount'], 2);
                         }
-
-                        $diff_amount -= $temp;
+                        $surplus_amount -= $goods_pay_price;
                     } else {
-
-                        $price = $ordergoods['goods_pay_price'] + $diff_amount;
+                        //最后一个商品或单个商品补齐差额(多个商品避免金额最小值,差一分的情况)
+                        $goods_pay_price = $surplus_amount;
                     }
 
-                    $order_model->editOrdergoods(array('goods_pay_price' => $price), array('rec_id' => $ordergoods['rec_id']));
+                    $order_model->editOrdergoods(array('goods_pay_price' => $goods_pay_price), array('rec_id' => $ordergoods['rec_id']));
                     //修改分销佣金
-                    $condition=array();
-                    $condition[]=array('orderinviter_order_id','=',$order_id);
-                    $condition[]=array('orderinviter_goods_id','=',$ordergoods['goods_id']);
-                    $condition[]=array('orderinviter_valid','=',0);
-                    $condition[]=array('orderinviter_order_type','=',0);
-                    $orderinviter_list=Db::name('orderinviter')->where($condition)->select()->toArray();
-                    foreach($orderinviter_list as $orderinviter_info){
-                        $orderinviter_goods_amount=$price;
-                        $orderinviter_money=round($orderinviter_info['orderinviter_ratio']/100*$orderinviter_goods_amount,2);
-                        Db::name('orderinviter')->where(array(array('orderinviter_id','=',$orderinviter_info['orderinviter_id'])))->update(['orderinviter_goods_amount' => $orderinviter_goods_amount,'orderinviter_money'=>$orderinviter_money]);
+                    $condition = array();
+                    $condition[] = array('orderinviter_order_id', '=', $order_id);
+                    $condition[] = array('orderinviter_goods_id', '=', $ordergoods['goods_id']);
+                    $condition[] = array('orderinviter_valid', '=', 0);
+                    $condition[] = array('orderinviter_order_type', '=', 0);
+                    $orderinviter_list = Db::name('orderinviter')->where($condition)->select()->toArray();
+                    foreach ($orderinviter_list as $orderinviter_info) {
+                        $orderinviter_goods_amount = $goods_pay_price;
+                        $orderinviter_money = round($orderinviter_info['orderinviter_ratio'] / 100 * $orderinviter_goods_amount, 2);
+                        Db::name('orderinviter')->where(array(array('orderinviter_id', '=', $orderinviter_info['orderinviter_id'])))->update(['orderinviter_goods_amount' => $orderinviter_goods_amount, 'orderinviter_money' => $orderinviter_money]);
                     }
                     $i++;
                 }
             } else {
                 $order_model->editOrdergoods(array('goods_pay_price' => 0), array('order_id' => $order_id));
                 //修改分销佣金
-                $condition=array();
-                $condition[]=array('orderinviter_order_id','=',$order_id);
-                $condition[]=array('orderinviter_valid','=',0);
-                $condition[]=array('orderinviter_order_type','=',0);
-                Db::name('orderinviter')->where($condition)->update(['orderinviter_goods_amount' => 0,'orderinviter_money'=>0]);
+                $condition = array();
+                $condition[] = array('orderinviter_order_id', '=', $order_id);
+                $condition[] = array('orderinviter_valid', '=', 0);
+                $condition[] = array('orderinviter_order_type', '=', 0);
+                Db::name('orderinviter')->where($condition)->update(['orderinviter_goods_amount' => 0, 'orderinviter_money' => 0]);
             }
 
             //记录订单日志
@@ -443,14 +433,13 @@ class Order {
             $data['log_role'] = $role;
             $data['log_user'] = $user;
             $data['log_msg'] = '修改了商品费用' . '( ' . $price . ' )';
-            ;
-            $data['log_orderstate'] = $order_info['payment_code'] == 'offline' ? ORDER_STATE_PAY : ORDER_STATE_NEW;
-            $order_model->addOrderlog($data);
+            model('orderlog')->addOrderlog($data);
+            Db::commit();
         } catch (\Exception $e) {
             Db::rollback();
             return ds_callback(false, $e->getMessage());
         }
-        Db::commit();
+        
         return ds_callback(true, '操作成功');
     }
 
@@ -485,7 +474,6 @@ class Order {
      */
     public function changeOrderReceivePay($order_list, $role, $user = '', $post = array()) {
         $order_model = model('order');
-
 
         $data = array();
         $data['api_paystate'] = 1;
@@ -527,8 +515,8 @@ class Order {
         $update_order = array();
         $update_order['order_state'] = ORDER_STATE_PAY;
         $update_order['payment_time'] = isset($post['payment_time']) ? strtotime($post['payment_time']) : TIMESTAMP;
-        $update_order['payment_code'] = isset($post['payment_code'])?$post['payment_code']:'';
-        $update_order['trade_no'] = isset($post['trade_no'])?$post['trade_no']:'';
+        $update_order['payment_code'] = isset($post['payment_code']) ? $post['payment_code'] : '';
+        $update_order['trade_no'] = isset($post['trade_no']) ? $post['trade_no'] : '';
         $update = $order_model->editOrder($update_order, array(
             'pay_sn' => $order_info['pay_sn'], 'order_state' => ORDER_STATE_NEW
         ));
@@ -555,7 +543,7 @@ class Order {
                 $order_info['order_sn'],
             );
             $param['param'] = array_merge($param['ali_param'], array(
-                'order_url' => HOME_SITE_URL .'/Memberorder/show_order?order_id='.$order_info['order_id']
+                'order_url' => HOME_SITE_URL . '/Memberorder/show_order?order_id=' . $order_info['order_id']
             ));
             //微信模板消息
             $param['weixin_param'] = array(
@@ -579,7 +567,7 @@ class Order {
                     )
                 ),
             );
-            model('cron')->addCron(array('cron_exetime'=>TIMESTAMP,'cron_type'=>'sendMemberMsg','cron_value'=>serialize($param)));
+            model('cron')->addCron(array('cron_exetime' => TIMESTAMP, 'cron_type' => 'sendMemberMsg', 'cron_value' => serialize($param)));
 
             // 支付成功发送店铺消息
             $param = array();
@@ -614,17 +602,15 @@ class Order {
                     )
                 ),
             );
-            model('cron')->addCron(array('cron_exetime'=>TIMESTAMP,'cron_type'=>'sendStoremsg','cron_value'=>serialize($param)));
+            model('cron')->addCron(array('cron_exetime' => TIMESTAMP, 'cron_type' => 'sendStoremsg', 'cron_value' => serialize($param)));
 
             //添加订单日志
             $data = array();
             $data['order_id'] = $order_id;
             $data['log_role'] = $role;
             $data['log_user'] = $user;
-            $data['log_msg'] = '收到了货款 '.(isset($post['trade_no'])?('( 支付平台交易号 : ' . $post['trade_no'] . ' )'):'');
-            $data['log_orderstate'] = ORDER_STATE_PAY;
-            $order_model->addOrderlog($data);
+            $data['log_msg'] = '收到了货款 ' . (isset($post['trade_no']) ? ('( 支付平台交易号 : ' . $post['trade_no'] . ' )') : '');
+            model('orderlog')->addOrderlog($data);
         }
     }
-
 }

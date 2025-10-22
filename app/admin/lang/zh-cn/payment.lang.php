@@ -69,5 +69,9 @@ $lang['payment_index_enable_ing'] = '开启中';
 $lang['payment_index_disable_ing'] = '关闭中';
 $lang['payment_index_enable'] = '启用';
 $lang['payment_index_disable'] = '禁用';
+
+$lang['please_open_wechat_payment'] = '请先开启并配置微信扫码支付';
+$lang['please_open_alipay_payment'] = '请先开启并配置支付宝PC支付';
+
 return $lang;
 ?>

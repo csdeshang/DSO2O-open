@@ -7,7 +7,7 @@ use think\facade\Lang;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能 
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -43,7 +43,7 @@ class Storejoin extends AdminControl {
 
         if (request()->isPost()) {
             $store_joinin_open = input('post.store_joinin_open');
-            if(!in_array($store_joinin_open,array(0,1,2,3))){
+            if (!in_array($store_joinin_open, array(0, 1, 2, 3))) {
                 $this->error(lang('param_error'));
             }
             $info['show_txt'] = input('post.show_txt');

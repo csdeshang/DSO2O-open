@@ -11,7 +11,7 @@ use think\facade\Lang;
 use GatewayClient\Gateway;
 /**
  * ============================================================================
- * DSKMS多用户商城
+ * 通用功能
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -27,10 +27,7 @@ class InstantMessage extends AdminControl {
         parent::initialize();
         Lang::load(base_path() . 'admin/lang/' . config('lang.default_lang') . '/instant_message.lang.php');
     }
-
-    /**
-     * 商品管理
-     */
+    
     public function index() {
         $instant_message_model = model('instant_message');
         $f_name = trim(input('param.f_name'));
@@ -73,9 +70,6 @@ class InstantMessage extends AdminControl {
         return View::fetch();
     }
 
-    /**
-     * 删除商品
-     */
     public function del() {
         $instant_message_id = input('param.instant_message_id');
         $instant_message_id_array = ds_delete_param($instant_message_id);
@@ -89,9 +83,6 @@ class InstantMessage extends AdminControl {
         ds_json_encode('10000', lang('ds_common_op_succ'));
     }
 
-    /*
-     * 直播设置
-     */
     public function setting() {
         $config_model = model('config');
         if (!request()->isPost()) {

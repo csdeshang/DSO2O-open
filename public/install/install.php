@@ -360,6 +360,9 @@ if($action == 'db') {
             //更新安装时间
             $setup_date = date("Y-m-d H:i:s",time());
             mysqli_query($link,"update {$db['prefix']}config set value = '{$setup_date}' where code = 'setup_date'");
+            //更新系统唯一标识 32位
+            $site_uniqid = md5(bin2hex(random_bytes(64)));
+            mysqli_query($link,"update {$db['prefix']}config set value = '{$site_uniqid}' where code = 'site_uniqid'");
 
             //添加用户管理员
             $password = md5($user['password']);
@@ -379,7 +382,7 @@ if($action == 'db') {
             mysqli_query($link,"INSERT INTO {$db['prefix']}store (`store_id`,`store_name`,`grade_id`,`member_id`,`member_name`,`seller_name`,`store_state`,`store_addtime`) VALUES ('1','{$store_name}','1','1','{$member_name}','{$seller_name}','1', '". time() ."')");
             mysqli_query($link,"INSERT INTO {$db['prefix']}storejoinin (`member_id`,`member_name`,`seller_name`,`store_name`,`joinin_state`) VALUES ('1', '{$member_name}', '{$seller_name}', '{$store_name}', '40')");
             mysqli_query($link,"INSERT INTO {$db['prefix']}seller (`seller_id`,`seller_name`,`member_id`,`sellergroup_id`,`store_id`,`is_admin`) VALUES ('1', '{$seller_name}', '1', '0', '1', '1')");
-            mysqli_query($link,"INSERT INTO {$db['prefix']}storebindclass (`bid`, `store_id`, `commis_rate`, `class_1`, `class_2`, `class_3`, `state`) VALUES ('1', '1', '0', '0', '0', '0', '1')");
+            mysqli_query($link,"INSERT INTO {$db['prefix']}storebindclass (`storebindclass_id`, `store_id`, `commis_rate`, `class_1`, `class_2`, `class_3`, `state`) VALUES ('1', '1', '0', '0', '0', '0', '1')");
 
             mysqli_query($link,"update {$db['prefix']}store set bind_all_gc = 1 where store_id = 1");
 
@@ -420,7 +423,7 @@ function tpl_install_license() {
 		<div class="panel panel-default">
 			<div class="panel-heading">阅读许可协议</div>
 			<div class="panel-body" style="overflow-y:scroll;max-height:400px;line-height:20px;">
-				<h3>版权所有 (c)2017，DSO2O开源商城团队保留所有权利。 </h3>
+				<h3>版权所有 (c)2028，DSO2O开源商城团队保留所有权利。 </h3>
 				<p>
 					感谢您选择DSO2O开源商城（以下简称DSO2O，DSO2O基于 PHP + MySQL的技术开发，全部源码开放。 <br />
 					为了使你正确并合法的使用本软件，请你在使用前务必阅读清楚下面的协议条款：

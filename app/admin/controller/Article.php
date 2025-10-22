@@ -3,9 +3,10 @@
 namespace app\admin\controller;
 use think\facade\View;
 use think\facade\Lang;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能 文章管理
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,7 +16,7 @@ use think\facade\Lang;
  * ============================================================================
  * 控制器
  */
-class  Article extends AdminControl {
+class Article extends AdminControl {
 
     public function initialize() {
         parent::initialize();
@@ -103,11 +104,11 @@ class  Article extends AdminControl {
                 'article_content' => '',
             ];
             $articleclass_model = model('articleclass');
-            $cate_list=$articleclass_model->getTreeClassList(2);
+            $cate_list = $articleclass_model->getTreeClassList(2);
             View::assign('ac_list', $cate_list);
             View::assign('article', $article);
             //游离图片
-            $article_pic_list=model('upload')->getUploadList(array('upload_type'=>'1','item_id'=>0));
+            $article_pic_list = model('upload')->getUploadList(array('upload_type' => '1', 'item_id' => 0));
             View::assign('file_upload', $article_pic_list);
             $this->setAdminCurItem('add');
             return View::fetch('form');
@@ -121,11 +122,8 @@ class  Article extends AdminControl {
                 'article_time' => TIMESTAMP,
             );
             $data['article_show'] = intval(input('post.article_show'));
-
-            $article_validate = ds_validate('article');
-            if (!$article_validate->scene('add')->check($data)) {
-                $this->error($article_validate->getError());
-            }
+            
+            $this->validate($data, 'app\common\validate\Article.add');
 
             $article_id = model('article')->addArticle($data);
             if ($article_id) {
@@ -188,10 +186,8 @@ class  Article extends AdminControl {
                 'article_time' => TIMESTAMP,
             );
             $data['article_show'] = intval(input('post.article_show'));
-            $article_validate = ds_validate('article');
-            if (!$article_validate->scene('edit')->check($data)) {
-                $this->error($article_validate->getError());
-            }
+            
+            $this->validate($data, 'app\common\validate\Article.edit');
 
             //上传文章封面
             if (!empty($_FILES['_pic']['name'])) {
@@ -200,7 +196,7 @@ class  Article extends AdminControl {
                     $file_name=$res['data']['file_name'];
                     //删除原图
                     if($article['article_pic']){
-                        @unlink(BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . ATTACH_ARTICLE . DIRECTORY_SEPARATOR . $article['article_pic']);
+                        ds_del_pic(ATTACH_ARTICLE,$article['article_pic']);
                     }
                     $data['article_pic'] = $file_name;
                 }else{
@@ -230,11 +226,11 @@ class  Article extends AdminControl {
         }
         //删除图片
         if($article['article_pic']){
-            @unlink(BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . ATTACH_ARTICLE . DIRECTORY_SEPARATOR . $article['article_pic']);
+            ds_del_pic(ATTACH_ARTICLE,$article['article_pic']);
         }
         $article_pic_list=model('upload')->getUploadList(array('upload_type'=>'1','item_id'=>$article_id));
         foreach($article_pic_list as $article_pic){
-            @unlink(BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . ATTACH_ARTICLE . DIRECTORY_SEPARATOR . $article_pic['file_name']);
+            ds_del_pic(ATTACH_ARTICLE,$article_pic['file_name']);
         }
         $result = model('article')->delArticle($article_id);
         if ($result) {
@@ -255,14 +251,14 @@ class  Article extends AdminControl {
                 if($res['code']){
                     $file_name=$res['data']['file_name'];
                 }else{
-                    echo $e->getMessage();
+                    echo $res['msg'];
                     exit;
                 }
         } else {
             echo 'error';
             exit;
         }
-        
+
         /**
          * 模型实例化
          */
@@ -305,7 +301,7 @@ class  Article extends AdminControl {
                      * 删除图片
                      */
                     $file_array = $upload_model->getOneUpload(intval(input('param.file_id')));
-                    @unlink(BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . ATTACH_ARTICLE . DIRECTORY_SEPARATOR . $file_array['file_name']);
+                    ds_del_pic(ATTACH_ARTICLE,$file_array['file_name']);
                     /**
                      * 删除信息
                      */
@@ -329,7 +325,7 @@ class  Article extends AdminControl {
             array(
                 'name' => 'index',
                 'text' => lang('ds_manage'),
-                'url' => url('Article/index')
+                'url' => (string)url('Article/index')
             ),
         );
 
@@ -337,7 +333,7 @@ class  Article extends AdminControl {
             $menu_array[] = array(
                 'name' => 'add',
                 'text' => lang('ds_new'),
-                'url' => url('Article/add')
+                'url' => (string)url('Article/add')
             );
         }
         if (request()->action() == 'edit') {

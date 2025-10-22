@@ -6,6 +6,7 @@
  */
 
 namespace app\common\model;
+
 use think\facade\Db;
 
 /**
@@ -20,9 +21,8 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Storebindclass extends BaseModel {
+class Storebindclass extends BaseModel {
 
-    
     /**
      * 读取列表
      * @access public
@@ -34,11 +34,11 @@ class  Storebindclass extends BaseModel {
      * @return array
      */
     public function getStorebindclassList($condition, $pagesize = '', $order = '', $field = '*') {
-        if($pagesize){
-            $result = Db::name('storebindclass')->field($field)->where($condition)->order($order)->paginate(['list_rows'=>$pagesize,'query' => request()->param()],false);
+        if ($pagesize) {
+            $result = Db::name('storebindclass')->field($field)->where($condition)->order($order)->paginate(['list_rows' => $pagesize, 'query' => request()->param()], false);
             $this->page_info = $result;
             return $result->items();
-        }else{
+        } else {
             $result = Db::name('storebindclass')->field($field)->where($condition)->order($order)->select()->toArray();
             return $result;
         }
@@ -89,7 +89,6 @@ class  Storebindclass extends BaseModel {
     public function editStorebindclass($update, $condition) {
         return Db::name('storebindclass')->where($condition)->update($update);
     }
-
 
     /**
      * 删除
@@ -144,15 +143,15 @@ class  Storebindclass extends BaseModel {
 
         $condition = array();
         foreach ($store_gc_id_list as $store_id => $gc_id_list) {
-            $condition[]=array('store_id','=',$store_id);
-            $condition[]=array('class_1|class_2|class_3','in', $gc_id_list);
+            $condition[] = array('store_id', '=', $store_id);
+            $condition[] = array('class_1|class_2|class_3', 'in', $gc_id_list);
             $bind_list = $this->getStorebindclassList($condition);
             if (!$bind_list) {
                 $condition = array();
-                $condition[] = array('store_id','=',$store_id);
-                $condition[] = array('class_1','=',0);
-                $condition[] = array('class_2','=',0);
-                $condition[] = array('class_3','=',0);
+                $condition[] = array('store_id', '=', $store_id);
+                $condition[] = array('class_1', '=', 0);
+                $condition[] = array('class_2', '=', 0);
+                $condition[] = array('class_3', '=', 0);
                 $bind_list = $this->getStorebindclassList($condition);
             }
             if (!empty($bind_list) && is_array($bind_list)) {
@@ -171,5 +170,4 @@ class  Storebindclass extends BaseModel {
         }
         return $store_gc_id_commis_rate;
     }
-
 }

@@ -1,10 +1,11 @@
 <?php
 namespace app\admin\controller;
-use think\facade\Lang;
 use think\facade\View;
+use think\facade\Lang;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -14,7 +15,7 @@ use think\facade\View;
  * ============================================================================
  * 控制器
  */
-class  Promotionmansong extends AdminControl
+class Promotionmansong extends AdminControl
 {
     public function initialize()
     {
@@ -45,7 +46,7 @@ class  Promotionmansong extends AdminControl
             $param[] = array('store_name','like', '%' . input('param.store_name') . '%');
         }
         if (!empty(input('param.state'))) {
-            $param[] = array('mansong_state','=',input('param.state'));
+            $param[]=array('mansong_state','=',input('param.state'));
         }
         $mansong_list = $mansong_model->getMansongList($param, 10);
         View::assign('mansong_list', $mansong_list);
@@ -189,21 +190,21 @@ class  Promotionmansong extends AdminControl
             array(
                 'name' => 'index', 
                 'text' => lang('mansong_list'), 
-                'url' => url('Promotionmansong/index')
+                'url' => (string)url('Promotionmansong/index')
             ), array(
                 'name' => 'mansong_quota',
                 'text' => lang('mansong_quota'),
-                'url' => url('Promotionmansong/mansong_quota')
+                'url' => (string)url('Promotionmansong/mansong_quota')
             ), array(
                 'name' => 'mansong_setting',
                 'text' => lang('mansong_setting'),
-                'url' => "javascript:dsLayerOpen('".url('Promotionmansong/mansong_setting')."','".lang('mansong_setting')."')"
+                'url' => "javascript:dsLayerOpen('".(string)url('Promotionmansong/mansong_setting')."','".lang('mansong_setting')."')"
             ),
         );
         if (request()->action() == 'mansong_detail') {
             $menu_array[] = array(
                 'name' => 'mansong_detail', 'text' => lang('mansong_detail'),
-                'url' => url('Promotionmansong/mansong_detail')
+                'url' => (string)url('Promotionmansong/mansong_detail')
             );
         }
         return $menu_array;

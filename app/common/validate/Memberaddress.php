@@ -1,8 +1,12 @@
 <?php
+
 namespace app\common\validate;
-use think\Validate;/**
+
+use think\Validate;
+
+/**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -12,40 +16,28 @@ use think\Validate;/**
  * ============================================================================
  * 验证器
  */
-class  Memberaddress extends Validate
-{
-    protected $rule = [
-        'city_id'=>'gt:0',
-        'area_id'=>'gt:0',
-        'address_realname'=>'require',
-        'area_info'=>'require',
-        'address_detail'=>'require',
-        'address_mob_phone'=>'checkMemberAddressMobPhone:1'//
+class Memberaddress extends Validate {
 
+    protected $rule = [
+        'address_realname' => 'length:0,50',
+        'city_id' => 'gt:0',
+        'area_id' => 'gt:0',
+        'area_info' => 'length:0,255',
+        'address_detail' => 'length:0,255',
+        'address_mob_phone' => 'mobile',
+        'address_tel_phone' => 'length:0,255',
     ];
     protected $message = [
-        'city_id.gt'=>'请选择地区',
-        'area_id.gt'=>'地区至少两级',
-        'address_realname.require'=>'姓名不能为空',
-        'area_info.require'=>'地区不能为空',
-        'address_detail.require'=>'地址不能为空',
-        'address_mob_phone.checkMemberAddressMobPhone'=>'联系方式不能为空'//
-
+        'address_realname.length' => '姓名长度不能大于50',
+        'city_id.gt' => '请选择地区',
+        'area_id.gt' => '地区至少两级',
+        'area_info.length' => '地区长度不能大于255',
+        'address_detail.length' => '地址长度不能大于255',
+        'address_mob_phone.mobile' => '手机号格式不正确',
+        'address_tel_phone.mobile' => '座机号长度不能大于15',
     ];
     protected $scene = [
-        'add' => ['address_realname', 'city_id', 'area_id'],
-        'edit' => ['address_realname', 'city_id', 'area_id'],
-        'address_valid' => ['address_realname', 'area_info', 'address_detail', 'address_mob_phone'],//mobile
+        'model_add' => ['address_realname', 'city_id', 'area_id', 'area_info', 'address_detail', 'address_mob_phone', 'address_tel_phone'],
+        'model_edit' => ['address_realname', 'city_id', 'area_id', 'area_info', 'address_detail', 'address_mob_phone', 'address_tel_phone'],
     ];
-
-    protected function checkMemberAddressMobPhone($value)
-    {
-        if (empty(input('post.mob_phone'))&&empty(input('post.tel_phone'))){
-            if (empty($value)) {
-                return '联系方式不能为空';
-            }
-        }
-        return true;
-    }
-
 }

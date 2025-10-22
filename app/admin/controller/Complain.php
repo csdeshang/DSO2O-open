@@ -2,11 +2,11 @@
 
 namespace app\admin\controller;
 use think\facade\View;
-
 use think\facade\Lang;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能 投诉管理
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -16,7 +16,7 @@ use think\facade\Lang;
  * ============================================================================
  * 控制器
  */
-class  Complain extends AdminControl
+class Complain extends AdminControl
 {
     //定义投诉状态常量
     const STATE_NEW = 10;
@@ -143,9 +143,9 @@ class  Complain extends AdminControl
             $update_array['complain_handle_datetime'] = TIMESTAMP;
             $update_array['complain_handle_member_id'] = $this->get_admin_id();
             $update_array['complain_active'] = self::STATE_ACTIVE;
-            $where = array();
-            $where[]=array('complain_id','=', $complain_id);
-            if ($complain_model->editComplain($update_array, $where)) {
+            $condition = array();
+            $condition[] = array('complain_id','=',$complain_id);
+            if ($complain_model->editComplain($update_array, $condition)) {
                 $this->log(lang('complain_verify_success') . '[' . $complain_id . ']', 1);
 
                 // 发送商家消息
@@ -175,9 +175,9 @@ class  Complain extends AdminControl
                 );
                 model('cron')->addCron(array('cron_exetime'=>TIMESTAMP,'cron_type'=>'sendStoremsg','cron_value'=>serialize($param)));
 
-                $this->success(lang('complain_verify_success'), url('Complain/complain_new_list'));
+                $this->success(lang('complain_verify_success'), (string)url('Complain/complain_new_list'));
             } else {
-                $this->error(lang('complain_verify_fail'), url('Complain/complain_new_list'));
+                $this->error(lang('complain_verify_fail'), (string)url('Complain/complain_new_list'));
             }
         } else {
             $this->error(lang('param_error'), '');
@@ -192,13 +192,6 @@ class  Complain extends AdminControl
         //获取输入的数据
         $complain_id = intval(input('post.complain_id'));
         $final_handle_message = trim(input('post.final_handle_message'));
-        $data=[
-            'final_handle_message'=>$final_handle_message
-        ];
-        $complain_validate = ds_validate('complain');
-        if (!$complain_validate->scene('complain_close')->check($data)) {
-            $this->error($complain_validate->getError());
-        }
 
         $complain_info = $this->get_complain_info($complain_id);
         $current_state = intval($complain_info['complain_state']);
@@ -209,9 +202,12 @@ class  Complain extends AdminControl
             $update_array['final_handle_message'] = $final_handle_message;
             $update_array['final_handle_datetime'] = TIMESTAMP;
             $update_array['final_handle_member_id'] = $this->get_admin_id();
-            $where = array();
-            $where[]=array('complain_id','=', $complain_id);
-            if ($complain_model->editComplain($update_array, $where)) {
+            
+            $this->validate($update_array, 'app\common\validate\Complain.complain_close');
+            
+            $condition = array();
+            $condition[] = array('complain_id','=',$complain_id);
+            if ($complain_model->editComplain($update_array, $condition)) {
                 $this->log(lang('complain_close_success') . '[' . $complain_id . ']', 1);
                 $this->success(lang('complain_close_success'), $this->get_complain_state_link($current_state));
             } else {
@@ -253,23 +249,15 @@ class  Complain extends AdminControl
             //获取提交的内容
             $input['complainsubject_content'] = trim(input('post.complain_subject_content'));
             $input['complainsubject_desc'] = trim(input('post.complain_subject_desc'));
-            //验证提交的内容
-            $data = [
-                'complain_subject_content' => $input['complainsubject_content'],
-                'complain_subject_desc' => $input['complainsubject_desc'],
-            ];
 
-            $complain_validate = ds_validate('complain');
-            if (!$complain_validate->scene('complain_subject_add')->check($data)) {
-                $this->error($complain_validate->getError());
-            } else {
+            $this->validate($input, 'app\common\validate\Complainsubject.add');
+            
                 //验证成功保存
                 $input['complainsubject_state'] = 1;
                 $complainsubject_model = model('complainsubject');
                 $complainsubject_model->addComplainsubject($input);
                 $this->log(lang('complain_subject_add_success') . '[' . input('complain_subject_content') . ']', 1);
                 $this->success(lang('complain_subject_add_success'), 'complain/complain_subject_list');
-            }
         }
     }
 
@@ -380,9 +368,9 @@ class  Complain extends AdminControl
             $update_array = array();
             $update_array['talk_state'] = 2;
             $update_array['talk_admin'] = $this->get_admin_id();
-            $where = array();
-            $where[]=array('talk_id','=', $talk_id);
-            if ($complaintalk_model->editComplaintalk($update_array, $where)) {
+            $condition = array();
+            $condition[] = array('talk_id','=',$talk_id);
+            if ($complaintalk_model->editComplaintalk($update_array, $condition)) {
                 echo json_encode('success');
             } else {
                 echo json_encode('error2');
@@ -551,42 +539,42 @@ class  Complain extends AdminControl
             array(
                 'name' => 'complain_new_list',
                 'text' => lang('complain_new_list'),
-                'url' => url('complain/complain_new_list')
+                'url' => (string)url('complain/complain_new_list')
             ),
             array(
                 'name' => 'complain_appeal_list',
                 'text' => lang('complain_appeal_list'),
-                'url' => url('Complain/complain_appeal_list')
+                'url' => (string)url('Complain/complain_appeal_list')
             ),
             array(
                 'name' => 'complain_talk_list',
                 'text' => lang('complain_talk_list'),
-                'url' => url('Complain/complain_talk_list')
+                'url' => (string)url('Complain/complain_talk_list')
             ),
             array(
                 'name' => 'complain_handle_list',
                 'text' => lang('complain_handle_list'),
-                'url' => url('Complain/complain_handle_list')
+                'url' => (string)url('Complain/complain_handle_list')
             ),
             array(
                 'name' => 'complain_finish_list',
                 'text' => lang('complain_finish_list'),
-                'url' => url('Complain/complain_finish_list')
+                'url' => (string)url('Complain/complain_finish_list')
             ),
             array(
                 'name' => 'complain_subject_list',
                 'text' => lang('complain_subject_list'),
-                'url' => url('Complain/complain_subject_list')
+                'url' => (string)url('Complain/complain_subject_list')
             ),
             array(
                 'name' => 'complain_subject_add',
                 'text' => lang('complain_subject_add'),
-                'url' => url('Complain/complain_subject_add')
+                'url' => (string)url('Complain/complain_subject_add')
             ),
             array(
                 'name' => 'complain_setting',
                 'text' => lang('complain_setting'),
-                'url' => url('Complain/complain_setting')
+                'url' => (string)url('Complain/complain_setting')
             )
         );
 

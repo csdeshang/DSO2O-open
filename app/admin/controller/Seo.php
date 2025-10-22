@@ -6,7 +6,7 @@ use think\facade\Lang;
 use think\facade\Db;
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -16,7 +16,7 @@ use think\facade\Db;
  * ============================================================================
  * 控制器
  */
-class  Seo extends AdminControl {
+class Seo extends AdminControl {
 
     public function initialize() {
         parent::initialize();

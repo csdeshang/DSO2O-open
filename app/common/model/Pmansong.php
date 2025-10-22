@@ -1,15 +1,17 @@
 <?php
+
 /**
  * 满即送模型
  *
  */
 
 namespace app\common\model;
+
 use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -19,8 +21,8 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Pmansong extends BaseModel
-{
+class Pmansong extends BaseModel {
+
     const MANSONG_STATE_NORMAL = 1;
     const MANSONG_STATE_CLOSE = 2;
     const MANSONG_STATE_CANCEL = 3;
@@ -43,14 +45,12 @@ class  Pmansong extends BaseModel
      * @return array 满即送列表
      *
      */
-    public function getMansongList($condition, $pagesize = null, $order = '', $field = '*', $limit = 0)
-    {
+    public function getMansongList($condition, $pagesize = null, $order = '', $field = '*', $limit = 0) {
         if ($pagesize) {
-            $res = Db::name('pmansong')->field($field)->where($condition)->order($order)->paginate(['list_rows'=>$pagesize,'query' => request()->param()],false);
-            $this->page_info=$res;
-            $mansong_list =$res->items();
-        }
-        else {
+            $res = Db::name('pmansong')->field($field)->where($condition)->order($order)->paginate(['list_rows' => $pagesize, 'query' => request()->param()], false);
+            $this->page_info = $res;
+            $mansong_list = $res->items();
+        } else {
             $mansong_list = Db::name('pmansong')->field($field)->where($condition)->limit($limit)->order($order)->select()->toArray();
         }
         if (!empty($mansong_list)) {
@@ -68,16 +68,15 @@ class  Pmansong extends BaseModel
      * @param int $store_id 店铺ID
      * @return type
      */
-    public function getMansongNewStartTime($store_id)
-    {
+    public function getMansongNewStartTime($store_id) {
         if (empty($store_id)) {
             return null;
         }
         $condition = array();
-        $condition[] = array('store_id','=',$store_id);
-        $condition[] = array('mansong_state','=',self::MANSONG_STATE_NORMAL);
+        $condition[] = array('store_id', '=', $store_id);
+        $condition[] = array('mansong_state', '=', self::MANSONG_STATE_NORMAL);
         $mansong_list = $this->getMansongList($condition, null, 'mansong_endtime desc');
-        if(!empty($mansong_list)) {
+        if (!empty($mansong_list)) {
             return $mansong_list[0]['mansong_endtime'];
         }
     }
@@ -89,8 +88,7 @@ class  Pmansong extends BaseModel
      * @param array $condition 查询条件
      * @return array 秒杀信息
      */
-    public function getMansongInfo($condition)
-    {
+    public function getMansongInfo($condition) {
         $mansong_info = Db::name('pmansong')->where($condition)->find();
         $mansong_info = $this->getMansongExtendInfo($mansong_info);
         return $mansong_info;
@@ -105,19 +103,17 @@ class  Pmansong extends BaseModel
      * @return array 满即送活动信息
      *
      */
-    public function getMansongInfoByID($mansong_id, $store_id = 0)
-    {
+    public function getMansongInfoByID($mansong_id, $store_id = 0) {
         if (intval($mansong_id) <= 0) {
             return null;
         }
 
         $condition = array();
-        $condition[] = array('mansong_id','=',$mansong_id);
+        $condition[] = array('mansong_id', '=', $mansong_id);
         $mansong_info = $this->getMansongInfo($condition);
         if ($store_id > 0 && $mansong_info['store_id'] != $store_id) {
             return null;
-        }
-        else {
+        } else {
             return $mansong_info;
         }
     }
@@ -129,28 +125,26 @@ class  Pmansong extends BaseModel
      * @param array $store_id 店铺编号
      * @return array 满即送活动
      */
-    public function getMansongInfoByStoreID($store_id)
-    {
+    public function getMansongInfoByStoreID($store_id) {
         if (intval($store_id) <= 0) {
             return array();
         }
         $info = $this->_rGoodsMansongCache($store_id);
         if (empty($info)) {
             $condition = array();
-            $condition[]=array('mansong_state','=',self::MANSONG_STATE_NORMAL);
-            $condition[]=array('store_id','=',$store_id);
-            $condition[]=array('mansong_endtime','>', TIMESTAMP);
+            $condition[] = array('mansong_state', '=', self::MANSONG_STATE_NORMAL);
+            $condition[] = array('store_id', '=', $store_id);
+            $condition[] = array('mansong_endtime', '>', TIMESTAMP);
             $mansong_list = $this->getMansongList($condition, null, 'mansong_starttime asc', '*', 1);
 
-            $mansong_info = isset($mansong_list[0])?$mansong_list[0]:"";
+            $mansong_info = isset($mansong_list[0]) ? $mansong_list[0] : "";
 
             if (!empty($mansong_info)) {
                 $mansongrule_model = model('pmansongrule');
                 $mansong_info['rules'] = $mansongrule_model->getMansongruleListByID($mansong_info['mansong_id']);
                 if (empty($mansong_info['rules'])) {
                     $mansong_info = array(); // 如果不存在规则直接返回不记录缓存。
-                }
-                else {
+                } else {
                     // 规则数组序列化保存
                     $mansong_info['rules'] = serialize($mansong_info['rules']);
                 }
@@ -176,8 +170,7 @@ class  Pmansong extends BaseModel
      * @param array $order_price 订单金额
      * @return array 满即送规则
      */
-    public function getMansongruleByStoreID($store_id, $order_price)
-    {
+    public function getMansongruleByStoreID($store_id, $order_price) {
         $mansong_info = $this->getMansongInfoByStoreID($store_id);
 
         if (empty($mansong_info)) {
@@ -205,8 +198,7 @@ class  Pmansong extends BaseModel
      * @author csdeshang
      * @return type
      */
-    public function getMansongStateArray()
-    {
+    public function getMansongStateArray() {
         return $this->mansong_state_array;
     }
 
@@ -217,19 +209,16 @@ class  Pmansong extends BaseModel
      * @param array $mansong_info 满即送信息
      * @return array
      */
-    public function getMansongExtendInfo($mansong_info)
-    {
+    public function getMansongExtendInfo($mansong_info) {
         if ($mansong_info['mansong_endtime'] > TIMESTAMP) {
             $mansong_info['mansong_state_text'] = $this->mansong_state_array[$mansong_info['mansong_state']];
-        }
-        else {
+        } else {
             $mansong_info['mansong_state_text'] = '已结束';
         }
 
         if ($mansong_info['mansong_state'] == self::MANSONG_STATE_NORMAL && $mansong_info['mansong_endtime'] > TIMESTAMP) {
             $mansong_info['editable'] = true;
-        }
-        else {
+        } else {
             $mansong_info['editable'] = false;
         }
 
@@ -243,8 +232,7 @@ class  Pmansong extends BaseModel
      * @param array $data 参数内容
      * @return bool
      */
-    public function addMansong($data)
-    {
+    public function addMansong($data) {
         $data['mansong_state'] = self::MANSONG_STATE_NORMAL;
         $result = Db::name('pmansong')->insertGetId($data);
         if ($result) {
@@ -261,8 +249,7 @@ class  Pmansong extends BaseModel
      * @param array $condition 条件
      * @return bool
      */
-    public function editMansong($update, $condition)
-    {
+    public function editMansong($update, $condition) {
         $mansong_list = $this->getMansongList($condition);
         if (empty($mansong_list)) {
             return true;
@@ -283,8 +270,7 @@ class  Pmansong extends BaseModel
      * @param array $condition 条件
      * @return bool
      */
-    public function delMansong($condition)
-    {
+    public function delMansong($condition) {
         $mansong_list = $this->getMansongList($condition);
         $mansong_id_string = '';
         if (!empty($mansong_list)) {
@@ -308,8 +294,7 @@ class  Pmansong extends BaseModel
      * @param array $condition 条件
      * @return bool
      */
-    public function cancelMansong($condition)
-    {
+    public function cancelMansong($condition) {
         $update = array();
         $update['mansong_state'] = self::MANSONG_STATE_CANCEL;
         return $this->editMansong($update, $condition);
@@ -321,14 +306,13 @@ class  Pmansong extends BaseModel
      * @author csdeshang
      * @return  type
      */
-    public function editExpireMansong()
-    {
-        $updata = array();
-        $update=array('mansong_state'=>self::MANSONG_STATE_CLOSE);
+    public function editExpireMansong() {
+        $update = array();
+        $update['mansong_state'] = self::MANSONG_STATE_CLOSE;
 
         $condition = array();
-        $condition[]=array('mansong_endtime','<', TIMESTAMP);
-        $condition[]=array('mansong_state','=',self::MANSONG_STATE_NORMAL);
+        $condition[] = array('mansong_endtime', '<', TIMESTAMP);
+        $condition[] = array('mansong_state', '=', self::MANSONG_STATE_NORMAL);
         $this->editMansong($update, $condition);
     }
 
@@ -339,8 +323,7 @@ class  Pmansong extends BaseModel
      * @param int $store_id 店铺id
      * @return array
      */
-    private function _rGoodsMansongCache($store_id)
-    {
+    private function _rGoodsMansongCache($store_id) {
         return rcache($store_id, 'goods_mansong');
     }
 
@@ -352,8 +335,7 @@ class  Pmansong extends BaseModel
      * @param array $mansong_info  满即送信息
      * @return boolean
      */
-    private function _wGoodsMansongCache($store_id, $mansong_info)
-    {
+    private function _wGoodsMansongCache($store_id, $mansong_info) {
         return wcache($store_id, $mansong_info, 'goods_mansong');
     }
 
@@ -364,8 +346,7 @@ class  Pmansong extends BaseModel
      * @param int $store_id 店铺ID 
      * @return boolean
      */
-    private function _dGoodsMansongCache($store_id)
-    {
+    private function _dGoodsMansongCache($store_id) {
         return dcache($store_id, 'goods_mansong');
     }
 }

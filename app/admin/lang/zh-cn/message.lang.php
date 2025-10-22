@@ -113,7 +113,6 @@ $lang['smscf_ten_secret'] = '主账号AccessKey的Secret';
 $lang['smscf_sign'] = '短信签名';
 $lang['smscf_sign_tips'] = '请将短信签名同步设置到短信服务商后台';
 $lang['ali_template_param'] = '短信模板变量';
-$lang['ali_template_param_tips'] = 'JSON格式';
 
 $lang['ali_template_name'] = '模板名称';
 $lang['ali_template_code'] = '模板code';

@@ -5,7 +5,7 @@ namespace app\common\model;
 use think\facade\Db;
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,7 +15,7 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Goodsclassstaple extends BaseModel {
+class Goodsclassstaple extends BaseModel {
 
     /**
      * 常用分类列表
@@ -108,11 +108,11 @@ class  Goodsclassstaple extends BaseModel {
      * 删除常用分类
      * @access public
      * @author csdeshang
-     * @param array $condtion 条件
+     * @param array $condition 条件
      * @return boolean
      */
-    public function delGoodsclassstaple($condtion) {
-        $result = Db::name('goodsclassstaple')->where($condtion)->delete();
+    public function delGoodsclassstaple($condition) {
+        $result = Db::name('goodsclassstaple')->where($condition)->delete();
         return $result;
     }
 

@@ -3,9 +3,10 @@
 namespace app\common\validate;
 
 use think\Validate;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,24 +16,20 @@ use think\Validate;
  * ============================================================================
  * 验证器
  */
-class  Article extends Validate
-{
+class Article extends Validate {
+
     protected $rule = [
-        'article_sort'=>'number',
-        'article_title'=>'require',
-        'ac_name'=>'require',
-        'ac_sort'=>'number'
+        'article_sort' => 'number|between:0,255',
+        'article_title' => 'require|length:0,50',
     ];
     protected $message = [
-        'article_sort.number'=>'排序只能为数字',
-        'article_title.require'=>'标题名称不能为空',
-        'ac_name.require'=>'分类名称不能为空',
-        'ac_sort.number'=>'分类排序仅能为数字'
+        'article_sort.number' => '排序只能为数字',
+        'article_sort.between' => '排序必须为0-255间数字',
+        'article_title.require' => '标题名称不能为空',
+        'article_title.length' => '标题名称长度不能大于50',
     ];
     protected $scene = [
         'add' => ['article_sort', 'article_title'],
         'edit' => ['article_sort', 'article_title'],
-        'article_class_add' => ['ac_name', 'ac_sort'],
-        'article_class_edit' => ['ac_name', 'ac_sort'],
     ];
 }

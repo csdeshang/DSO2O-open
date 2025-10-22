@@ -22,7 +22,6 @@
                 <tr>
                     <th class="w120">{$Think.lang.cost_consumption_amount}</th>
                     <th class="tl">{$Think.lang.cost_consumption_content}</th>
-                    <th class="w80">{$Think.lang.cost_status}</th>
                     <th class="w130">{$Think.lang.cost_time}</th>
                 </tr>
             </thead>
@@ -32,7 +31,6 @@
                 <tr class="bd-line">
                     <td>{$value.storecost_price}</td>
                     <td class="tl">{$value.storecost_remark}</td>
-                    <td>{if $value.storecost_state}{$Think.lang.cost_settled}{else/}{$Think.lang.cost_not_settled}{/if}</td>
                     <td>{$value.storecost_time|date="Y-m-d H:s"}</td>
                 </tr>
                 {/foreach}

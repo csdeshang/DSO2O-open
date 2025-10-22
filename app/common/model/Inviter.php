@@ -1,11 +1,11 @@
 <?php
 
 namespace app\common\model;
-use think\facade\Db;
 
+use think\facade\Db;
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,7 +15,7 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Inviter extends BaseModel {
+class Inviter extends BaseModel {
 
     public $page_info;
 
@@ -138,14 +138,21 @@ class  Inviter extends BaseModel {
         }
         $qrcode = imagecreatefromstring(file_get_contents($qrcode_path));
         //背景图片
-        $inviter_back = imagecreatefromstring(file_get_contents(ds_get_pic(ATTACH_COMMON,config('ds_config.inviter_back'))));
+        $inviter_back = imagecreatefromstring(file_get_contents(BASE_UPLOAD_PATH.'/' . ATTACH_COMMON . '/' .config('ds_config.inviter_back')));
 
 
         $QR_width = imagesx($qrcode);
         $QR_height = imagesy($qrcode);
         imagecopyresampled($inviter_back, $qrcode, 100, 170, 0, 0, 160, 160, $QR_width, $QR_height);
         
-        $portrait = imagecreatefromstring(file_get_contents(get_member_avatar_for_id($member_info['member_id'])));
+        //file_get_contents  SSL
+        $stream_opts = [
+            "ssl" => [
+                "verify_peer"=>false,
+                "verify_peer_name"=>false,
+            ]
+        ];
+        $portrait = imagecreatefromstring(file_get_contents(get_member_avatar_for_id($member_info['member_id']) ,  false, stream_context_create($stream_opts)));
 
         $QR_width2 = imagesx($portrait);
         $QR_height2 = imagesy($portrait);
@@ -161,5 +168,8 @@ class  Inviter extends BaseModel {
 
         imagepng($inviter_back, $refer_qrcode_logo);
     }
+    
+    
+    
 
 }

@@ -3,9 +3,10 @@
 namespace app\common\validate;
 
 use think\Validate;
+
 /**
  * ============================================================================
- * DSKMS多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,17 +16,17 @@ use think\Validate;
  * ============================================================================
  * 验证器
  */
-class  InstantMessage extends Validate
-{
+class InstantMessage extends Validate {
+
     protected $rule = [
-        'instant_message_from_id'=>'require',
-        'instant_message_from_type'=>'require',
-        'instant_message_to_id'=>'require',
-        'instant_message_to_type'=>'require',
-        'instant_message_type'=>'require',
-        'instant_message'=>'require',
+        'instant_message_from_id' => 'require',
+        'instant_message_from_type' => 'require',
+        'instant_message_to_id' => 'require',
+        'instant_message_to_type' => 'require',
+        'instant_message_type' => 'require',
+        'instant_message' => 'require',
     ];
-    protected $message  =   [
+    protected $message = [
         'instant_message_from_id.require' => '发送ID不能为空',
         'instant_message_from_type.require' => '发送类型不能为空',
         'instant_message_to_id.require' => '接收ID不能为空',

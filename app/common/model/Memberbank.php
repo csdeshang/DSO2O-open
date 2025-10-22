@@ -1,12 +1,12 @@
 <?php
 
 namespace app\common\model;
-use think\facade\Db;
 
+use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -17,7 +17,6 @@ use think\facade\Db;
  * 数据层模型
  */
 class Memberbank extends BaseModel {
-
 
     /**
      * 取得单条提现账户
@@ -69,13 +68,11 @@ class Memberbank extends BaseModel {
      * @param int $id 提现账户ID
      * @return array 数组类型的返回结果
      */
-    public function getOneMemberbank($id) {
-        if (intval($id) > 0) {
-            $result = Db::name('memberbank')->where('memberbank_id',intval($id))->find();
-            return $result;
-        } else {
-            return false;
-        }
+    public function getOneMemberbank($memberbank_id) {
+        $condition = array();
+        $condition[] = array('memberbank_id', '=', $memberbank_id);
+        $result = Db::name('memberbank')->where($condition)->find();
+        return $result;
     }
 
     /**
@@ -85,10 +82,9 @@ class Memberbank extends BaseModel {
      * @param array $condition 更新条件
      * @return bool 布尔类型的返回结果
      */
-    public function editMemberbank($update, $condition) {
-        return Db::name('memberbank')->where($condition)->update($update);
+    public function editMemberbank($data, $condition) {
+        return Db::name('memberbank')->where($condition)->update($data);
     }
-
 
     /**
      * 删除提现账户
@@ -99,7 +95,6 @@ class Memberbank extends BaseModel {
     public function delMemberbank($condition) {
         return Db::name('memberbank')->where($condition)->delete();
     }
-
 }
 
 ?>

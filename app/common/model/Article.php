@@ -2,9 +2,10 @@
 namespace app\common\model;
 use think\facade\Db;
 
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -14,7 +15,7 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Article extends BaseModel
+class Article extends BaseModel
 {
     public $page_info;
     /**
@@ -84,7 +85,7 @@ class  Article extends BaseModel
      * @return bool 布尔类型的返回结果
      */
     public function editArticle($data,$article_id){
-        $result = Db::name('article')->where("article_id=".$article_id)->update($data);
+        $result = Db::name('article')->where(array('article_id'=>$article_id))->update($data);
         return $result;
     }
 
@@ -95,7 +96,7 @@ class  Article extends BaseModel
      * @param int $id 记录ID
      * @return bool 布尔类型的返回结果
      */
-    public function delArticle($id){
-        return Db::name('article')->where("article_id=".$id)->delete();
+    public function delArticle($article_id){
+        return Db::name('article')->where(array('article_id'=>$article_id))->delete();
     }
 }

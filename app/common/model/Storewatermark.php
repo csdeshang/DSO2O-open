@@ -1,11 +1,12 @@
 <?php
 
 namespace app\common\model;
+
 use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,9 +16,8 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Storewatermark extends BaseModel {
+class Storewatermark extends BaseModel {
 
-   
     /**
      * 根据店铺id获取水印
      * @access public
@@ -30,12 +30,12 @@ class  Storewatermark extends BaseModel {
 
         $cache_info = rcache($store_id, $prefix);
         if (empty($cache_info)) {
-            $wm_arr = Db::name('storewatermark')->where('store_id',$store_id)->find();
+            $wm_arr = Db::name('storewatermark')->where('store_id', $store_id)->find();
             $cache = array();
             $cache['wm_arr'] = serialize($wm_arr);
             wcache($store_id, $cache, $prefix, 60 * 24);
-        }else{
-            $wm_arr=unserialize($cache_info['wm_arr']);
+        } else {
+            $wm_arr = unserialize($cache_info['wm_arr']);
         }
         return $wm_arr;
     }
@@ -58,13 +58,13 @@ class  Storewatermark extends BaseModel {
      * @param array $data 更新数据
      * @return bool 布尔类型的返回结果
      */
-    public function editStorewatermark($wm_id,$data) {
-        $storewatermark_info=Db::name('storewatermark')->where('swm_id',$wm_id)->find();
-        if($storewatermark_info){
+    public function editStorewatermark($wm_id, $data) {
+        $storewatermark_info = Db::name('storewatermark')->where('swm_id', $wm_id)->find();
+        if ($storewatermark_info) {
             //清空缓存
             dcache($storewatermark_info['store_id'], 'storewatermark_info');
         }
-        return Db::name('storewatermark')->where('swm_id',$wm_id)->update($data);
+        return Db::name('storewatermark')->where('swm_id', $wm_id)->update($data);
     }
 
     /**
@@ -77,5 +77,4 @@ class  Storewatermark extends BaseModel {
     public function delStorewatermark($condition) {
         return Db::name('storewatermark')->where($condition)->delete();
     }
-
 }

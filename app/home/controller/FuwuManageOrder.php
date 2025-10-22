@@ -50,9 +50,10 @@ class FuwuManageOrder extends BaseFuwu {
             $condition[] = array('o2o_fuwu_order_sn','=',$order_sn);
         }
         $o2o_fuwu_order_list = $o2o_fuwu_order_model->getO2oFuwuOrderList($condition, '*', 20);
+        $fuwuorder_logic = model('fuwuorder','logic');
         foreach($o2o_fuwu_order_list as $key => $val){
             $o2o_fuwu_order_list[$key]['o2o_fuwu_order_state_text']=$o2o_fuwu_order_model->getO2oFuwuOrderStateText($val['o2o_fuwu_order_state']);
-            $btn_list=$o2o_fuwu_order_model->getO2oFuwuOrderBtn($val,'fuwu');
+            $btn_list=$fuwuorder_logic->getO2oFuwuOrderBtn($val,'fuwu');
             $o2o_fuwu_order_list[$key]=array_merge($o2o_fuwu_order_list[$key],$btn_list);
         }
         View::assign('order_list', $o2o_fuwu_order_list);
@@ -88,7 +89,6 @@ class FuwuManageOrder extends BaseFuwu {
         return View::fetch($this->template_dir . 'view');
     }
     public function cancel() {
-        $o2o_fuwu_order_model = model('o2o_fuwu_order');
         
         $o2o_fuwu_order_id = input('param.o2o_fuwu_order_id');
         $reason = input('param.reason');
@@ -98,21 +98,20 @@ class FuwuManageOrder extends BaseFuwu {
         if(!$reason){
             ds_json_encode(10001, '请填写理由');
         }
-        $result=$o2o_fuwu_order_model->cancelO2oFuwuOrder(array('o2o_fuwu_order_id'=>$o2o_fuwu_order_id,'o2o_fuwu_organization_id'=>$this->o2o_fuwu_organization_info['o2o_fuwu_organization_id']),'fuwu',$this->o2o_fuwu_organization_info['o2o_fuwu_account_name'],$reason);
+        $result=model('fuwuorder','logic')->cancelO2oFuwuOrder(array('o2o_fuwu_order_id'=>$o2o_fuwu_order_id,'o2o_fuwu_organization_id'=>$this->o2o_fuwu_organization_info['o2o_fuwu_organization_id']),'fuwu',$this->o2o_fuwu_organization_info['o2o_fuwu_account_name'],$reason);
         if(!$result['code']){
             ds_json_encode(10001, $result['msg']);
         }
         ds_json_encode(10000, lang('ds_common_op_succ'));
     }
     public function arrange() {
-        $o2o_fuwu_order_model = model('o2o_fuwu_order');
         
         $o2o_fuwu_order_id = input('param.o2o_fuwu_order_id');
         if (!$o2o_fuwu_order_id) {
             ds_json_encode(10001, lang('param_error'));
         }
 
-        $result=$o2o_fuwu_order_model->arrangeO2oFuwuOrder(array('o2o_fuwu_order_id'=>$o2o_fuwu_order_id,'o2o_fuwu_organization_id'=>$this->o2o_fuwu_organization_info['o2o_fuwu_organization_id']),'fuwu',$this->o2o_fuwu_organization_info['o2o_fuwu_account_name']);
+        $result=model('fuwuorder','logic')->arrangeO2oFuwuOrder(array('o2o_fuwu_order_id'=>$o2o_fuwu_order_id,'o2o_fuwu_organization_id'=>$this->o2o_fuwu_organization_info['o2o_fuwu_organization_id']),'fuwu',$this->o2o_fuwu_organization_info['o2o_fuwu_account_name']);
         if(!$result['code']){
             ds_json_encode(10001, $result['msg']);
         }

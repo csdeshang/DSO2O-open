@@ -87,6 +87,31 @@ class  O2oFuwuAccount extends BaseModel {
     public function delO2oFuwuAccount($condition) {
         return Db::name('o2o_fuwu_account')->where($condition)->delete();
     }
+    
+    //获取服务帐户Token
+    public function getO2oFuwuAccountToken($o2o_fuwu_account_id, $o2o_fuwu_account_name){
+        
+        //生成新的token
+        $platformtoken_data = array();
+        $token = md5($o2o_fuwu_account_name . strval(TIMESTAMP) . strval(rand(0, 999999)));
+        $platformtoken_data['platform_userid'] = $o2o_fuwu_account_id;
+        $platformtoken_data['platform_username'] = $o2o_fuwu_account_name;
+        $platformtoken_data['platform_token'] = $token;
+        $platformtoken_data['platform_type'] = 'fuwu';
+        $platformtoken_data['platform_logintime'] = TIMESTAMP;
+        $platformtoken_data['platform_operationtime'] = TIMESTAMP;
+        $platformtoken_data['platform_clienttype'] = get_clienttype();
+        $platformtoken_data['platform_devicetype'] = getOSFromUserAgent();
+
+        $result = model('platformtoken')->addPlatformtoken($platformtoken_data);
+        if ($result) {
+            return $token;
+        } else {
+            return null;
+        }
+        
+    }
+    
 
 }
 

@@ -1,11 +1,12 @@
 <?php
 
 namespace app\common\model;
+
 use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,9 +16,10 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Storereopen extends BaseModel {
+class Storereopen extends BaseModel {
+
     public $page_info;
- 
+
     /**
      * 取得列表
      * @access public
@@ -28,14 +30,13 @@ class  Storereopen extends BaseModel {
      * @return array
      */
     public function getStorereopenList($condition = array(), $pagesize = '', $order = 'storereopen_id desc') {
-        if($pagesize){
-            $result =  Db::name('storereopen')->where($condition)->order($order)->paginate(['list_rows'=>$pagesize,'query' => request()->param()],false);
+        if ($pagesize) {
+            $result = Db::name('storereopen')->where($condition)->order($order)->paginate(['list_rows' => $pagesize, 'query' => request()->param()], false);
             $this->page_info = $result;
             return $result->items();
-        }else{
+        } else {
             return Db::name('storereopen')->where($condition)->order($order)->select()->toArray();
         }
-        
     }
 
     /**
@@ -60,13 +61,14 @@ class  Storereopen extends BaseModel {
         return Db::name('storereopen')->where($condition)->find();
     }
 
-    /**更新记录
+    /*     * 更新记录
      * @access public
      * @author csdeshang
      * @param type $data 更新数据
      * @param type $condition 条件
      * @return type
      */
+
     public function editStorereopen($data, $condition) {
         return Db::name('storereopen')->where($condition)->update($data);
     }
@@ -92,7 +94,6 @@ class  Storereopen extends BaseModel {
     public function delStorereopen($condition) {
         return Db::name('storereopen')->where($condition)->delete();
     }
-
 }
 
 ?>

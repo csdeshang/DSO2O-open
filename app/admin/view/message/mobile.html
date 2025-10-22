@@ -134,16 +134,16 @@
             <tr class="noborder smscf_type_ali" {if $list_config.smscf_type!='ali'}style="display:none"{/if}>
                 <td class="required w120">{$Think.lang.ali_template_content}</td>
                 <td class="vatop rowform">
-                    <textarea name="ali_template_content" id="ali_template_content" class="w200"></textarea>
+                    <textarea name="ali_template_content" id="ali_template_content" class="w300" style="height:50px"></textarea>
                 </td>
-                <td class="vatop tips"></td>
+                <td class="vatop tips">例：尊敬的${customer}，欢迎您使用阿里云通信服务！<br/>具体以阿里云账户关联的短信模板为准</td>
             </tr>
             <tr class="noborder smscf_type_ali" {if $list_config.smscf_type!='ali'}style="display:none"{/if}>
                 <td class="required w120">{$Think.lang.ali_template_param}</td>
                 <td class="vatop rowform">
-                    <textarea name="ali_template_param" id="ali_template_param" class="w200"></textarea>
+                    <textarea name="ali_template_param" id="ali_template_param" class="w300" style="height:50px"></textarea>
                 </td>
-                <td class="vatop tips">{$Think.lang.ali_template_param_tips}</td>
+                <td class="vatop tips">例：{"customer":"123"} <br/>JSON格式，以手机注册为例只有一个customer变量 </td>
             </tr>
             <tr class="noborder smscf_type_ten" {if $list_config.smscf_type!='ten'}style="display:none"{/if}>
             <td class="required w120">{$Think.lang.ten_template_code}</td>
@@ -154,21 +154,21 @@
             <tr class="noborder smscf_type_ten" {if $list_config.smscf_type!='ten'}style="display:none"{/if}>
             <td class="required w120">{$Think.lang.ten_template_content}</td>
             <td class="vatop rowform">
-                <textarea name="ten_template_content" id="ten_template_content" class="w200"></textarea>
+                <textarea name="ten_template_content" id="ten_template_content" class="w300" style="height:50px"></textarea>
             </td>
             <td class="vatop tips"></td>
             </tr>
             <tr class="noborder smscf_type_ten" {if $list_config.smscf_type!='ten'}style="display:none"{/if}>
             <td class="required w120">{$Think.lang.ten_template_param}</td>
             <td class="vatop rowform">
-                <textarea name="ten_template_param" id="ten_template_param" class="w200"></textarea>
+                <textarea name="ten_template_param" id="ten_template_param" class="w300" style="height:50px"></textarea>
             </td>
             <td class="vatop tips">{$Think.lang.ten_template_param_tips}</td>
             </tr>
             <tr class="noborder smscf_type_wj" {if $list_config.smscf_type!='wj'}style="display:none"{/if}>
                 <td class="required w120">{$Think.lang.test_mobile_content}</td>
                 <td class="vatop rowform">
-                    <textarea name="mobile_test_content" id="mobile_test_content" class="w200"></textarea>
+                    <textarea name="mobile_test_content" id="mobile_test_content" class="w300" style="height:50px"></textarea>
                 </td>
             </tr>
             </tbody>

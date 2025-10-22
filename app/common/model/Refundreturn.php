@@ -77,7 +77,7 @@ class Refundreturn extends BaseModel {
                 )
             ),
         );
-        model('cron')->addCron(array('cron_exetime'=>TIMESTAMP,'cron_type'=>'sendStoremsg','cron_value'=>serialize($message)));
+        model('cron')->addCron(array('cron_exetime' => TIMESTAMP, 'cron_type' => 'sendStoremsg', 'cron_value' => serialize($message)));
         return $refund_id;
     }
 
@@ -153,12 +153,14 @@ class Refundreturn extends BaseModel {
      * @param type $refund 退款
      * @return boolean
      */
-    public function refundAmount($order, $refund_amount) {
+    public function refundAmount($order, $refund_amount, $refund_type = 'order') {
         $order_model = model('order');
         //生成out_request_no 支付宝部分退款必传唯一的标识一次退款请求号
-        $order['out_request_no'] = $order['order_sn'];
+        if (!isset($order['out_request_no']) && !empty($order['out_request_no'])) {
+            $order['out_request_no'] = $order['order_sn'];
+        }
 
-        if(!isset($order['total_order_amount'])){
+        if (!isset($order['total_order_amount'])) {
             //订单总金额，单次支付包含多个店铺订单的总金额（针对于微信退款原路返回需要传订单总金额）
             $order['total_order_amount'] = 0;
             $order_array = $order_model->getOrderList(array('trade_no' => $order['trade_no']));
@@ -167,6 +169,13 @@ class Refundreturn extends BaseModel {
             }
         }
 
+
+        //原路退回金额
+        $trade_refund_amount = 0;
+        //充值卡退回金额
+        $rcb_refund_amount = 0;
+        //预存款退回金额
+        $pd_refund_amount = 0;
 
         $order_amount = $order['order_amount']; //订单金额
         $rcb_amount = $order['rcb_amount']; //充值卡支付金额
@@ -196,10 +205,10 @@ class Refundreturn extends BaseModel {
             }
             $main_payment_info = $payment_info = $result['data'];
 
-            if($payment_code == 'alipay' && !isset($payment_info['payment_config']['alipay_trade_refund_state'])){
+            if ($payment_code == 'alipay' && !isset($payment_info['payment_config']['alipay_trade_refund_state'])) {
                 throw new \think\Exception($payment_code . '请配置支付宝支付', 10006);
             }
-            if($payment_code == 'wxpay_native' && !isset($payment_info['payment_config']['wx_trade_refund_state'])){
+            if ($payment_code == 'wxpay_native' && !isset($payment_info['payment_config']['wx_trade_refund_state'])) {
                 throw new \think\Exception($payment_code . '请配置微信支付', 10006);
             }
             //支付宝/微信 未开启原路返回
@@ -214,12 +223,13 @@ class Refundreturn extends BaseModel {
                 if ($refund_amount > $predeposit_amount) {
                     $trade_refund_amount = $predeposit_amount;
                 }
-                $payment_info['payment_config']=array_merge($main_payment_info['payment_config'],$payment_info['payment_config']);
+                $payment_info['payment_config'] = array_merge($main_payment_info['payment_config'], $payment_info['payment_config']);
                 $payment_api = new $payment_code($payment_info);
                 $result = $payment_api->trade_refund($order, $trade_refund_amount);
                 if (!$result['code']) {
                     throw new \think\Exception($result['msg'], 10006);
                 }
+                $trade_refund_msg = isset($result['data']['log_msg']) ? $result['data']['log_msg'] : '';
                 $not_trade_refund = FALSE;
             }
         }
@@ -231,10 +241,12 @@ class Refundreturn extends BaseModel {
             $log_array['member_id'] = $order['buyer_id'];
             $log_array['member_name'] = $order['buyer_name'];
             $log_array['order_sn'] = $order['order_sn'];
-            $log_array['amount'] = $refund_amount;
+            //充值卡退会金额
+            $rcb_refund_amount = $refund_amount;
             if ($predeposit_amount > 0) {
-                $log_array['amount'] = $refund_amount - $predeposit_amount;
+                $rcb_refund_amount = $refund_amount - $predeposit_amount;
             }
+            $log_array['amount'] = $rcb_refund_amount;
             $state = $predeposit_model->changeRcb('refund', $log_array); //增加买家可用充值卡金额
             if (!$state) {
                 throw new \think\Exception('充值卡退回失败', 10006);
@@ -248,14 +260,72 @@ class Refundreturn extends BaseModel {
             $log_array['member_id'] = $order['buyer_id'];
             $log_array['member_name'] = $order['buyer_name'];
             $log_array['order_sn'] = $order['order_sn'];
-            $log_array['amount'] = $refund_amount; //退预存款金额
+            //预存款退回金额
+            $pd_refund_amount = $refund_amount;
             if ($refund_amount > $predeposit_amount) {
-                $log_array['amount'] = $predeposit_amount;
+                $pd_refund_amount = $predeposit_amount;
             }
+            $log_array['amount'] = $pd_refund_amount; //退预存款金额
             $state = $predeposit_model->changePd('refund', $log_array); //增加买家可用预存款金额
             if (!$state) {
                 throw new \think\Exception('预存款退回失败', 10006);
             }
+        }
+
+        //实物订单记录退款日志
+        if ($refund_type == 'order') {
+            $data = array();
+            $data['order_id'] = $order['order_id'];
+            $data['log_role'] = 'system';
+            $data['log_user'] = '';
+            $log_msg = '用户退款';
+            if ($trade_refund_amount > 0) {
+                $log_msg .= '，原路退回：' . $trade_refund_amount . '元，' . $trade_refund_msg;
+            }
+            if ($rcb_refund_amount > 0) {
+                $log_msg .= '，充值卡退回：' . $rcb_refund_amount . '元';
+            }
+            if ($pd_refund_amount > 0) {
+                $log_msg .= '，预存款退回：' . $pd_refund_amount . '元';
+            }
+            $data['log_msg'] = $log_msg;
+            model('orderlog')->addOrderlog($data);
+        } elseif ($refund_type == 'errand_order') {
+            $data = array();
+            //o2o_errand_order_id 传过来统一为 order_id
+            $data['order_id'] = $order['order_id'];
+            $data['log_role'] = 'system';
+            $data['log_user'] = '';
+            $log_msg = '用户退款';
+            if ($trade_refund_amount > 0) {
+                $log_msg .= '，原路退回：' . $trade_refund_amount . '元，' . $trade_refund_msg;
+            }
+            if ($rcb_refund_amount > 0) {
+                $log_msg .= '，充值卡退回：' . $rcb_refund_amount . '元';
+            }
+            if ($pd_refund_amount > 0) {
+                $log_msg .= '，预存款退回：' . $pd_refund_amount . '元';
+            }
+            $data['log_msg'] = $log_msg;
+            model('orderlog')->addErrandOrderlog($data);
+        } elseif ($refund_type == 'fuwu_order') {
+            $data = array();
+            //o2o_fuwu_order_id 传过来统一为 order_id
+            $data['order_id'] = $order['order_id'];
+            $data['log_role'] = 'system';
+            $data['log_user'] = '';
+            $log_msg = '用户退款';
+            if ($trade_refund_amount > 0) {
+                $log_msg .= '，原路退回：' . $trade_refund_amount . '元，' . $trade_refund_msg;
+            }
+            if ($rcb_refund_amount > 0) {
+                $log_msg .= '，充值卡退回：' . $rcb_refund_amount . '元';
+            }
+            if ($pd_refund_amount > 0) {
+                $log_msg .= '，预存款退回：' . $pd_refund_amount . '元';
+            }
+            $data['log_msg'] = $log_msg;
+            model('orderlog')->addFuwuOrderlog($data);
         }
     }
 
@@ -280,44 +350,47 @@ class Refundreturn extends BaseModel {
             //同意退款之后,订单状态自动设置为已完成 ,  成交的金额减去退款的金额, 交易成功后,买家次月产生的其他退款，由再下月进行结算
             if ($order['order_state'] != ORDER_STATE_SUCCESS) {
                 $result = $logic_order->changeOrderStateReceive($order, 'system', '系统', '用户申请退款,商品自动收货');
+                if ($result['code'] !== true) {
+                    return $result;
+                }
             }
 
 
+            Db::startTrans();
             try {
-                Db::startTrans();
+
 
                 //对店铺资金进行扣款
                 $logic_order = model('order', 'logic');
-                $logic_order->balanceOrderStateRefundreturn($order,$refund);
-                
+                $logic_order->balanceOrderStateRefundreturn($order, $refund);
 
-                $this->refundAmount($order, $refund['refund_amount']);
+                //支付宝多商品退款 交易号下唯一 out_request_no
+                $order['out_request_no'] = $order['order_sn'] . $refund['refund_id'];
+                $this->refundAmount($order, $refund['refund_amount'], 'order');
                 $goods_list = $order_model->getOrdergoodsList(array('order_id' => $order_id));
 
+                $order_array = array();
+                $order_amount = $order['order_amount']; //订单金额
+                $refund_amount = $order['refund_amount'] + $refund['refund_amount']; //退款金额
+                $order_array['refund_state'] = ($order_amount - $refund_amount) > 0 ? 1 : 2;
+                $order_array['refund_amount'] = ds_price_format($refund_amount);
+                $order_array['delay_time'] = TIMESTAMP;
+                $state = $order_model->editOrder($order_array, array('order_id' => $order_id)); //更新订单退款
+                if (!$state) {
+                    throw new \think\Exception('订单修改失败', 10006);
+                }
 
-
-                    $order_array = array();
-                    $order_amount = $order['order_amount']; //订单金额
-                    $refund_amount = $order['refund_amount'] + $refund['refund_amount']; //退款金额
-                    $order_array['refund_state'] = ($order_amount - $refund_amount) > 0 ? 1 : 2;
-                    $order_array['refund_amount'] = ds_price_format($refund_amount);
-                    $order_array['delay_time'] = TIMESTAMP;
-                    $state = $order_model->editOrder($order_array, array('order_id' => $order_id)); //更新订单退款
-                    if (!$state) {
-                        throw new \think\Exception('订单修改失败', 10006);
-                    }
-                    
-                    $state = $this->editOrderUnlock($order_id); //订单解锁
-                    if (!$state) {
-                        throw new \think\Exception('订单解锁失败', 10006);
-                    }
+                $state = $this->editOrderUnlock($order_id); //订单解锁
+                if (!$state) {
+                    throw new \think\Exception('订单解锁失败', 10006);
+                }
 
                 //全额退款或单个商品退款  修改退款的资金处理
-                $state = $this->editRefundreturn(array('refund_id'=>$refund_id),array('refundreturn_money_state'=>1));
+                $state = $this->editRefundreturn(array('refund_id' => $refund_id), array('refundreturn_money_state' => 1));
                 if (!$state) {
                     throw new \think\Exception('refundreturn_money_state状态修改失败', 10006);
                 }
-                    
+
                 Db::commit();
                 return ds_callback(true);
             } catch (\Exception $e) {
@@ -416,7 +489,7 @@ class Refundreturn extends BaseModel {
         } else {
             $result = Db::name('refundreturn')->field($field)->where($condition)->order($order)->limit($limit)->select()->toArray();
         }
-        
+
         foreach ($result as $key => $refundreturn) {
             $result[$key]['refundreturn_seller_state_desc'] = get_refundreturn_seller_state($refundreturn['refundreturn_seller_state']);
             $result[$key]['refundreturn_admin_state_desc'] = get_refundreturn_admin_state($refundreturn['refundreturn_admin_state']);
@@ -475,7 +548,7 @@ class Refundreturn extends BaseModel {
      */
     public function getRefundreturnInfo($condition = array(), $fields = '*') {
         $result = Db::name('refundreturn')->where($condition)->field($fields)->find();
-        if(!empty($result)){
+        if (!empty($result)) {
             $result['refundreturn_seller_state_desc'] = get_refundreturn_seller_state($result['refundreturn_seller_state']);
             $result['refundreturn_admin_state_desc'] = get_refundreturn_admin_state($result['refundreturn_admin_state']);
         }
@@ -516,20 +589,18 @@ class Refundreturn extends BaseModel {
                     //全额退款信息
                     $order_list[$order_id]['extend_order_refund'] = $refund_goods[$order_id][0];
                 }
-                if ($order_state == ORDER_STATE_PAY && $payment_code != 'offline') {
+                if ($order_state == ORDER_STATE_PAY) {
                     //已付款未发货的非货到付款订单可以申请取消
-                    
                     // getOrderOperateState 判断是否可以进行订单全额退款
                     if (empty($refund_goods[$order_id])) {
                         $order_list[$order_id]['if_allow_order_refund'] = '1';
-                    }else{
+                    } else {
                         $order_list[$order_id]['if_allow_order_refund'] = '0';
                     }
-                    
                 } elseif ($order_state > ORDER_STATE_PAY && !empty($goods_list) && is_array($goods_list)) {
                     //只有已发货的商品,才能对单个商品进行退款退货
                     //根据订单状态判断是否可以退款退货
-                    $if_allow_goods_refund = $this->getOrderAllowRefundState($value); 
+                    $if_allow_goods_refund = $this->getOrderAllowRefundState($value);
                     foreach ($goods_list as $k => $v) {
                         $goods_id = $v['rec_id']; //订单商品表编号
                         if ($v['goods_pay_price'] > 0) {//实际支付额大于0的可以退款
@@ -537,14 +608,14 @@ class Refundreturn extends BaseModel {
                         }
                         if (!empty($refund_goods[$order_id][$goods_id])) {
                             //已经存在处理中或同意的商品不能再进行退款
-                            $v['if_allow_goods_refund'] = '0'; 
+                            $v['if_allow_goods_refund'] = '0';
                             //单个商品退款信息
                             $v['extend_order_goods_refund'] = $refund_goods[$order_id][$goods_id];
                         } elseif (!empty($refund_goods[$order_id][0])) {
                             //如果有订单全额退款,则订单下的商品都不能申请退款
                             $v['if_allow_goods_refund'] = '0';
                         }
-                        
+
                         $goods_list[$k] = $v;
                     }
                 }
@@ -554,7 +625,6 @@ class Refundreturn extends BaseModel {
 
         return $order_list;
     }
-
 
     /**
      * 详细页右侧订单信息
@@ -571,8 +641,6 @@ class Refundreturn extends BaseModel {
         $order_id = $order_info['order_id'];
         $order_common = $order_info['extend_order_common'];
         $order_info['order_common'] = $order_common;
-
-
 
         $condition = array();
         $condition[] = array('order_id', '=', $order_id);
@@ -600,12 +668,7 @@ class Refundreturn extends BaseModel {
             case ORDER_STATE_RECEIPT:
             case ORDER_STATE_DELIVER:
             case ORDER_STATE_SEND:
-                $payment_code = $order['payment_code']; //支付方式
-                if ($payment_code != 'offline') {//货到付款订单在没确认收货前不能退款退货
-                    $refund = '1';
-                } else {
-                    $refund = '0';
-                }
+                $refund = '1';
                 break;
             case ORDER_STATE_SUCCESS:
                 $order_refund = $trade_model->getMaxDay('order_refund'); //15:收货完成后可以申请退款退货
@@ -676,7 +739,6 @@ class Refundreturn extends BaseModel {
         $field = 'store_id,store_name,member_id,member_name,store_qq,store_ww,store_phone';
         return model('store')->getStoreMemberIDList($store_ids, $field);
     }
-
 }
 
 ?>

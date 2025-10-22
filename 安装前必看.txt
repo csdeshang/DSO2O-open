@@ -8,11 +8,9 @@ DSCMS （企业站）
 官网
 http:www.csdeshang.com/
 
-http://www.csdeshang.com/home/help/article/id/510.html
-
 
 安装部署方式
-http://www.csdeshang.com/home/help/article/id/176.html
+http://www.csdeshang.com/Home/help/article/id/1227.html
 如遇安装问题到官网（http:www.csdeshang.com）联系技术咨询
 
 

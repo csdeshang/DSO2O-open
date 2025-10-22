@@ -4,10 +4,9 @@ namespace app\common\model;
 
 use think\facade\Db;
 
-
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -17,9 +16,10 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class Message extends BaseModel
-{
+class Message extends BaseModel {
+
     public $page_info;
+
     /**
      * 站内信列表
      * @access public
@@ -28,17 +28,16 @@ class Message extends BaseModel
      * @param  int $pagesize 分页页数
      * @return array
      */
-    public function getMessageList($condition, $pagesize = '')
-    {
+    public function getMessageList($condition, $pagesize = '') {
         //得到条件语句
-        $where = $this->getCondition($condition,false);
+        $where = $this->getCondition($condition, false);
         $order = 'message_id DESC';
-        if($pagesize){
-            $message_list= Db::name('message')->where($where)->order($order)->paginate(['list_rows'=>$pagesize,'query' => request()->param()],false);
-            $this->page_info=$message_list;
-            $message=$message_list->items();
-        }else{
-            $message= Db::name('message')->where($where)->order($order)->select()->toArray();
+        if ($pagesize) {
+            $message_list = Db::name('message')->where($where)->order($order)->paginate(['list_rows' => $pagesize, 'query' => request()->param()], false);
+            $this->page_info = $message_list;
+            $message = $message_list->items();
+        } else {
+            $message = Db::name('message')->where($where)->order($order)->select()->toArray();
         }
         return $message;
     }
@@ -51,18 +50,17 @@ class Message extends BaseModel
      * @param  int $pagesize 分页页数
      * @return array
      */
-    public function getStoreMessageList($condition, $pagesize = '')
-    {
+    public function getStoreMessageList($condition, $pagesize = '') {
         //得到条件语句
         $where = $this->getCondition($condition);
         $field = 'message.*,store.store_name,store.store_id';
         $order = 'message.message_id DESC';
-        if($pagesize){
-            $message_list=Db::name('message')->join('store','message.from_member_id = store.member_id','LEFT')->field($field)->where($where)->order($order)->paginate(['list_rows'=>$pagesize,'query' => request()->param()],false);
-            $this->page_info=$message_list;
-            $message=$message_list->items();
-        }else{
-            $message=Db::name('message')->join('store','message.from_member_id = store.member_id','LEFT')->field($field)->where($where)->order($order)->select()->toArray();
+        if ($pagesize) {
+            $message_list = Db::name('message')->join('store', 'message.from_member_id = store.member_id', 'LEFT')->field($field)->where($where)->order($order)->paginate(['list_rows' => $pagesize, 'query' => request()->param()], false);
+            $this->page_info = $message_list;
+            $message = $message_list->items();
+        } else {
+            $message = Db::name('message')->join('store', 'message.from_member_id = store.member_id', 'LEFT')->field($field)->where($where)->order($order)->select()->toArray();
         }
         return $message;
     }
@@ -74,9 +72,8 @@ class Message extends BaseModel
      * @param array $condition 条件
      * @return int
      */
-    public function getMessageCount($condition)
-    {
-        $where = $this->getCondition($condition,false);
+    public function getMessageCount($condition) {
+        $where = $this->getCondition($condition, false);
         return Db::name('message')->where($where)->count('message_id');
     }
 
@@ -87,8 +84,7 @@ class Message extends BaseModel
      * @param type $member_id 会员id
      * @return int
      */
-    public function getNewMessageCount($member_id)
-    {
+    public function getNewMessageCount($member_id) {
         $special_condition = array();
         $special_condition['to_member_id'] = "$member_id";
         $special_condition['no_message_state'] = '2';
@@ -106,14 +102,13 @@ class Message extends BaseModel
      * @param  array $condition 条件数组
      * @param  int $pagesize 分页页数
      */
-    public function getOneMessage($condition)
-    {
+    public function getOneMessage($condition) {
         //得到条件语句
         $where = $this->getCondition($condition);
-        $message_list=Db::name('message')->alias('message')->where($where)->select()->toArray();
-        if(!empty($message_list)){
+        $message_list = Db::name('message')->alias('message')->where($where)->select()->toArray();
+        if (!empty($message_list)) {
             return $message_list[0];
-        }else{
+        } else {
             return null;
         }
     }
@@ -125,8 +120,7 @@ class Message extends BaseModel
      * @param type $data 参数内容
      * @return boolean
      */
-    public function addMessage($data)
-    {
+    public function addMessage($data) {
         if ($data['member_id'] == '') {
             return false;
         }
@@ -154,8 +148,7 @@ class Message extends BaseModel
      * @param type $condition 条件
      * @return boolean
      */
-    public function editCommonMessage($data, $condition)
-    {
+    public function editCommonMessage($data, $condition) {
         if (empty($data)) {
             return false;
         }
@@ -172,12 +165,11 @@ class Message extends BaseModel
      * @param type $drop_type 删除类型
      * @return boolean
      */
-    public function delCommonMessage($condition, $drop_type)
-    {
+    public function delCommonMessage($condition, $drop_type) {
         //得到条件语句
         $where = $this->getCondition($condition);
         //查询站内信列表
-        $field= 'message_id,from_member_id,to_member_id,message_state,message_open';
+        $field = 'message_id,from_member_id,to_member_id,message_state,message_open';
         $message_list = Db::name('message')->alias('message')->where($where)->field($field)->select()->toArray();
         unset($where);
         if (empty($message_list)) {
@@ -189,20 +181,16 @@ class Message extends BaseModel
             if ($drop_type == 'msg_private') {
                 if ($v['message_state'] == 2) {
                     $delmessage_id[] = $v['message_id'];
-                }
-                elseif ($v['message_state'] == 0) {
+                } elseif ($v['message_state'] == 0) {
                     $updatemessage_id[] = $v['message_id'];
                 }
-            }
-            elseif ($drop_type == 'msg_list') {
+            } elseif ($drop_type == 'msg_list') {
                 if ($v['message_state'] == 1) {
                     $delmessage_id[] = $v['message_id'];
-                }
-                elseif ($v['message_state'] == 0) {
+                } elseif ($v['message_state'] == 0) {
                     $updatemessage_id[] = $v['message_id'];
                 }
-            }
-            elseif ($drop_type == 'sns_msg') {
+            } elseif ($drop_type == 'sns_msg') {
                 $delmessage_id[] = $v['message_id'];
             }
         }
@@ -217,8 +205,7 @@ class Message extends BaseModel
             $where = $this->getCondition(array('message_id_in' => $updatemessage_id_str));
             if ($drop_type == 'msg_private') {
                 Db::name('message')->where($where)->update(array('message_state' => 1));
-            }
-            elseif ($drop_type == 'msg_list') {
+            } elseif ($drop_type == 'msg_list') {
                 Db::name('message')->where($where)->update(array('message_state' => 2));
             }
         }
@@ -233,12 +220,11 @@ class Message extends BaseModel
      * @param type $to_member_id 会员ID
      * @return boolean
      */
-    public function delBatchMessage($condition, $to_member_id)
-    {
+    public function delBatchMessage($condition, $to_member_id) {
         //得到条件语句
         $where = $this->getCondition($condition);
         //查询站内信列表
-        $message_list=Db::name('message')->alias('message')->where($where)->select()->toArray();
+        $message_list = Db::name('message')->alias('message')->where($where)->select()->toArray();
         unset($where);
         if (empty($message_list)) {
             return true;
@@ -255,23 +241,21 @@ class Message extends BaseModel
                         unset($tmp_delid_arr[$delid_k]);
                     }
                 }
-                $tmp_delid_arr = array_unique($tmp_delid_arr);//去除相同
-                sort($tmp_delid_arr);//排序
+                $tmp_delid_arr = array_unique($tmp_delid_arr); //去除相同
+                sort($tmp_delid_arr); //排序
                 $tmp_delid_str = "," . implode(',', $tmp_delid_arr) . ",";
-            }
-            else {
+            } else {
                 $tmp_delid_str = ",{$to_member_id},";
             }
             if ($tmp_delid_str == $v['to_member_id']) {//所有用户已经全部阅读过了可以删除
-                Db::name('message')->where('message_id',$v['message_id'])->delete();
-            }
-            else {
-                Db::name('message')->where('message_id',$v['message_id'])->update(array('del_member_id' => $tmp_delid_str));
+                Db::name('message')->where('message_id', $v['message_id'])->delete();
+            } else {
+                Db::name('message')->where('message_id', $v['message_id'])->update(array('del_member_id' => $tmp_delid_str));
             }
         }
         return true;
     }
-    
+
     /**
      * 获取条件
      * @access public
@@ -280,11 +264,10 @@ class Message extends BaseModel
      * @param bool $join 连接
      * @return type
      */
-    private function getCondition($condition_array,$join=true)
-    {
+    private function getCondition($condition_array, $join = true) {
         $condition_sql = '1=1';
         //站内信编号
-        if($join) {
+        if ($join) {
             if (isset($condition_array['message_id']) && $condition_array['message_id'] != '') {
                 $condition_sql .= " and message.message_id = '{$condition_array['message_id']}'";
             }
@@ -335,12 +318,11 @@ class Message extends BaseModel
             if (isset($condition_array['message_id_in'])) {
                 if ($condition_array['message_id_in'] == '') {
                     $condition_sql .= " and message_id in('')";
-                }
-                else {
+                } else {
                     $condition_sql .= " and message_id in({$condition_array['message_id_in']})";
                 }
             }
-        }else{
+        } else {
             if (isset($condition_array['message_id']) && $condition_array['message_id'] != '') {
                 $condition_sql .= " and message_id = '{$condition_array['message_id']}'";
             }
@@ -391,14 +373,11 @@ class Message extends BaseModel
             if (isset($condition_array['message_id_in'])) {
                 if ($condition_array['message_id_in'] == '') {
                     $condition_sql .= " and message_id in('')";
-                }
-                else {
+                } else {
                     $condition_sql .= " and message_id in({$condition_array['message_id_in']})";
                 }
             }
         }
         return $condition_sql;
     }
-
-
 }

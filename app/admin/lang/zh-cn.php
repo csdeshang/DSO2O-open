@@ -39,7 +39,6 @@ $lang['ds_db'] = '数据备份';
 $lang['ds_adminlog'] = '操作日志';
 $lang['ds_brand_manage'] = '品牌管理';
 //会员
-$lang['ds_member_name'] = '会员';
 $lang['ds_member_manage'] = '会员管理';
 $lang['ds_membergrade'] = '会员级别';
 $lang['ds_exppoints'] = '经验值管理';
@@ -333,6 +332,29 @@ $lang['ds_download'] = '下载';
 $lang['ds_apply'] = '立即申请';
 $lang['ds_documents'] = '相关文档';
 $lang['ds_song_typeface'] = '宋体';
+$lang['ds_captcha'] = '验证码';
+$lang['ds_login'] = '登录';
+
+//常用字段
+$lang['ds_member_name'] = '会员';
+$lang['ds_member_password'] = '密码';
+$lang['ds_store_name'] = '店铺名称';
+$lang['ds_store_id'] = '店铺ID';
+$lang['ds_seller_name'] = '卖家账号';
+$lang['ds_buyer_name'] = '买家账号';
+$lang['ds_order_sn'] = '订单编号';
+$lang['ds_pay_sn'] = '支付编号';
+$lang['ds_order_amount'] = '订单总金额';
+$lang['ds_pay_amount'] = '订单支付金额';
+$lang['ds_payment_time'] = '付款时间';
+$lang['ds_payment_code'] = '付款方式';
+$lang['ds_begin_time'] = '开始时间';
+$lang['ds_start_time'] = '开始时间';
+$lang['ds_end_time'] = '结束时间';
+$lang['ds_goods_name'] = '商品名称';
+$lang['ds_goods_price'] = '商品价格';
+$lang['ds_trade_no'] = '第三方平台交易号';
+$lang['ds_refund_sn'] = '退款编号';
 
 //操作提示
 $lang['ds_common_op_succ'] = '操作成功';
@@ -380,5 +402,16 @@ $lang['ds_store_deposit_log_insert_fail'] = '店铺保证金记录新增失败';
 
 
 $lang['order_goods_more_than_one'] = '等%d种商品';
+
+//退款
+$lang['refund_state'] = '退款状态';
+$lang['refund_state_yes'] = '同意退款';
+$lang['refund_state_no'] = '不同意退款';
+$lang['refund_state_confirm'] = '待审核';
+
+$lang['refund_state_0'] = '无退款';
+$lang['refund_state_1'] = '部分退款';
+$lang['refund_state_2'] = '全部退款';
+
 return $lang;
 ?>

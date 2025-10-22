@@ -1,11 +1,12 @@
 <?php
 
 namespace app\common\model;
+
 use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,7 +16,7 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Navigation extends BaseModel {
+class Navigation extends BaseModel {
 
     public $page_info;
 
@@ -30,7 +31,7 @@ class  Navigation extends BaseModel {
      */
     public function getNavigationList($condition, $pagesize = '', $order = 'nav_sort desc') {
         if ($pagesize) {
-            $nav_list = Db::name('navigation')->where($condition)->order($order)->paginate(['list_rows'=>$pagesize,'query' => request()->param()],false);
+            $nav_list = Db::name('navigation')->where($condition)->order($order)->paginate(['list_rows' => $pagesize, 'query' => request()->param()], false);
             $this->page_info = $nav_list;
             return $nav_list->items();
         } else {
@@ -49,6 +50,7 @@ class  Navigation extends BaseModel {
         $add_navigation = Db::name('navigation')->insert($data);
         return $add_navigation;
     }
+
     /**
      * 编辑导航
      * @access public
@@ -60,7 +62,7 @@ class  Navigation extends BaseModel {
     public function eidtNavigation($data, $condition) {
         return Db::name('navigation')->where($condition)->update($data);
     }
-    
+
     /**
      * 获取单个导航
      * @access public
@@ -71,15 +73,15 @@ class  Navigation extends BaseModel {
     public function getOneNavigation($condition) {
         return Db::name('navigation')->where($condition)->find();
     }
+
     /**
      * 删除导航
      * @access public
      * @author csdeshang
-     * @param type $conditions 条件
+     * @param type $condition 条件
      * @return bool
      */
-    public function delNavigation($conditions) {
-        return Db::name('navigation')->where($conditions)->delete();
+    public function delNavigation($condition) {
+        return Db::name('navigation')->where($condition)->delete();
     }
-
 }

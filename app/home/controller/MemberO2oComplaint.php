@@ -5,8 +5,11 @@
  */
 
 namespace app\home\controller;
+
 use think\facade\View;
 use think\facade\Lang;
+use think\facade\Db;
+
 /**
  * ============================================================================
  * DSO2O多用户商城
@@ -19,12 +22,11 @@ use think\facade\Lang;
  * ============================================================================
  * 控制器
  */
-class  MemberO2oComplaint extends BaseMember {
-
+class MemberO2oComplaint extends BaseMember {
 
     public function initialize() {
-        parent::initialize(); 
-        Lang::load(base_path() . 'home/lang/'.config('lang.default_lang').'/member_o2o_complaint.lang.php');
+        parent::initialize();
+        Lang::load(base_path() . 'home/lang/' . config('lang.default_lang') . '/member_o2o_complaint.lang.php');
     }
 
     /*
@@ -37,13 +39,13 @@ class  MemberO2oComplaint extends BaseMember {
          */
         $o2o_complaint_model = model('o2o_complaint');
         $condition = array();
-        $condition[] = array('member_id','=',session('member_id'));
-        $select_complain_state=input('param.select_complain_state');
-        if($select_complain_state!==null && $select_complain_state!==''){
-            $condition[] = array('o2o_complaint_state','=',intval($select_complain_state));
+        $condition[] = array('member_id', '=', session('member_id'));
+        $select_complain_state = input('param.select_complain_state');
+        if ($select_complain_state !== null && $select_complain_state !== '') {
+            $condition[] = array('o2o_complaint_state', '=', intval($select_complain_state));
         }
 
-        $complain_list = $o2o_complaint_model->getO2oComplaintList($condition,'*',10);
+        $complain_list = $o2o_complaint_model->getO2oComplaintList($condition, '*', 10);
         /* 设置买家当前菜单 */
         $this->setMemberCurMenu('member_o2o_complaint');
         /* 设置买家当前栏目 */
@@ -59,76 +61,87 @@ class  MemberO2oComplaint extends BaseMember {
      */
 
     public function add() {
-        $o2o_complaint_model=model('o2o_complaint');
+        $o2o_complaint_model = model('o2o_complaint');
         $order_id = intval(input('order_id'));
         if ($order_id < 1) {//参数验证
-            ds_json_encode(10001,lang('param_error'));
+            ds_json_encode(10001, lang('param_error'));
         }
 
         //检查订单是否可以投诉
         $order_model = model('order');
-        $order_info = $order_model->getOrderInfo(array(array('order_id','=',$order_id),array('buyer_id','=',session('member_id')),array('finnshed_time','>',0),array('order_state','=',ORDER_STATE_SUCCESS)));
+        $condition = array();
+        $condition[] = array('order_id', '=', $order_id);
+        $condition[] = array('buyer_id', '=', session('member_id'));
+        $condition[] = array('finnshed_time', '>', 0);
+        $condition[] = array('order_state', '=', ORDER_STATE_SUCCESS);
+        $condition[] = array('o2o_distributor_id', '<>', 0);
+        $order_info = $order_model->getOrderInfo($condition);
         if (!$order_info) {
-            ds_json_encode(10001,lang('member_o2o_complaint_error'));
+            ds_json_encode(10001, lang('member_o2o_complaint_error'));
         }
         //检查是不是正在进行投诉
-        if ($o2o_complaint_model->getO2oComplaintInfo(array('order_id'=>$order_id))) {
-            ds_json_encode(10001,lang('member_o2o_complaint_repeat')); //'您已经投诉了该订单请等待处理'
+        if ($o2o_complaint_model->getO2oComplaintInfo(array('order_id' => $order_id))) {
+            ds_json_encode(10001, lang('member_o2o_complaint_repeat')); //'您已经投诉了该订单请等待处理'
         }
 
-        if(request()->isPost()){
-            $content=input('post.content');
-            if(!$content){
-                ds_json_encode(10001,lang('o2o_complaint_content_required'));
+        if (request()->isPost()) {
+            $content = input('post.content');
+            if (!$content) {
+                ds_json_encode(10001, lang('o2o_complaint_content_required'));
             }
-            
-            $o2o_complaint_model->addO2oComplaint(array(
-                'order_id'=>$order_id,
-                'order_sn'=>$order_info['order_sn'],
-                'member_id'=>session('member_id'),
-                'member_name'=>session('member_name'),
-                'o2o_distributor_id'=>$order_info['o2o_distributor_id'],
-                'o2o_distributor_name'=>$order_info['o2o_distributor_name'],
-                'store_id'=>$order_info['store_id'],
-                'store_name'=>$order_info['store_name'],
-                'o2o_complaint_content'=>$content,
-                'o2o_complaint_addtime'=>TIMESTAMP,
-            ));
-            
-            
-            //用户新增投诉配送员,需扣除配送员费用
-            $o2o_complaint_fine = intval(config('ds_config.o2o_complaint_fine'));
-            if ($o2o_complaint_fine > 0) {
-                $o2o_distributor_moneylog_model = model('o2o_distributor_moneylog');
-                $distributor_money = array(
-                    'o2o_distributor_id' => $order_info['o2o_distributor_id'],
-                    'amount' => $o2o_complaint_fine,
+
+            Db::startTrans();
+            try {
+                $o2o_complaint_model->addO2oComplaint(array(
+                    'order_id' => $order_id,
                     'order_sn' => $order_info['order_sn'],
-                );
+                    'member_id' => session('member_id'),
+                    'member_name' => session('member_name'),
+                    'o2o_distributor_id' => $order_info['o2o_distributor_id'],
+                    'o2o_distributor_name' => $order_info['o2o_distributor_name'],
+                    'store_id' => $order_info['store_id'],
+                    'store_name' => $order_info['store_name'],
+                    'o2o_complaint_content' => $content,
+                    'o2o_complaint_addtime' => TIMESTAMP,
+                ));
 
-                $o2o_distributor_moneylog_model->changeO2oDistributorMoney('order_complaint', $distributor_money);
+                //用户新增投诉配送员,需扣除配送员费用
+                $o2o_complaint_fine = intval(config('ds_config.o2o_complaint_fine'));
+                if ($o2o_complaint_fine > 0) {
+                    $o2o_distributor_moneylog_model = model('o2o_distributor_moneylog');
+                    $distributor_money = array(
+                        'o2o_distributor_id' => $order_info['o2o_distributor_id'],
+                        'amount' => $o2o_complaint_fine,
+                        'order_sn' => $order_info['order_sn'],
+                    );
+
+                    $o2o_distributor_moneylog_model->changeO2oDistributorMoney('order_complaint', $distributor_money);
+                }
+                Db::commit();
+                ds_json_encode(10000, lang('ds_common_op_succ'));
+            } catch (\Exception $e) {
+                Db::rollback();
+                ds_json_encode(10001, $e->getMessage());
             }
-
-
-            ds_json_encode(10000,lang('ds_common_op_succ'));
-        }else{
+        } else {
             return View::fetch($this->template_dir . 'form');
         }
-        
     }
+
     /*
      * 删除投诉
      */
-    public function del(){
-        $o2o_complaint_model=model('o2o_complaint');
+
+    public function del() {
+        $o2o_complaint_model = model('o2o_complaint');
         $order_id = intval(input('order_id'));
         if ($order_id < 1) {//参数验证
-            ds_json_encode(10001,lang('param_error'));
+            ds_json_encode(10001, lang('param_error'));
         }
-        if($o2o_complaint_model->delO2oComplaint(array('member_id'=>session('member_id'),'order_id'=>$order_id))){
-            ds_json_encode(10000,lang('ds_common_op_succ'));
-        }else{
-            ds_json_encode(10001,lang('ds_common_op_fail'));
+        if ($o2o_complaint_model->delO2oComplaint(array('member_id' => session('member_id'), 'order_id' => $order_id))) {
+            ds_json_encode(10000, lang('ds_common_op_succ'));
+        } else {
+            ds_json_encode(10001, lang('ds_common_op_fail'));
         }
     }
 
@@ -149,7 +162,6 @@ class  MemberO2oComplaint extends BaseMember {
         );
         return $menu_array;
     }
-
 }
 
 ?>

@@ -4,7 +4,7 @@ use think\facade\View;
 use think\facade\Lang;
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能 用户等级
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -14,12 +14,12 @@ use think\facade\Lang;
  * ============================================================================
  * 控制器
  */
-class  Membergrade extends AdminControl
+class Membergrade extends AdminControl
 {
     public function initialize()
     {
         parent::initialize();
-        Lang::load(base_path() . 'admin/lang/'.config('lang.default_lang').'/Membergrade.lang.php');
+        Lang::load(base_path() . 'admin/lang/'.config('lang.default_lang').'/membergrade.lang.php');
     }
     public function index() {
         if (request()->isPost()) {
@@ -38,7 +38,7 @@ class  Membergrade extends AdminControl
                     $mg_arr[$i]['level_name'] = $level_name;
                     //所需经验值
                     if($max_exppoints>=$exppoints){
-                        $this->error($level_name.'经验值应大于'.$max_exppoints);
+                        $this->error($level_name.lang('exppoints_greater_than').$max_exppoints);
                     }else{
                         $mg_arr[$i]['exppoints'] = $exppoints;
                     }
@@ -47,7 +47,7 @@ class  Membergrade extends AdminControl
                 }
                 $update_arr['member_grade'] = serialize($mg_arr);
             } else {
-                $this->error('必须设置会员等级');
+                $this->error(lang('ds_common_op_fail'));
             }
             $result = true;
             if ($update_arr) {
@@ -81,8 +81,8 @@ class  Membergrade extends AdminControl
         $menu_array = array(
             array(
                 'name' => 'index',
-                'text' => '管理',
-                'url' => url('Membergrade/index')
+                'text' => lang('ds_manage'),
+                'url' => (string)url('Membergrade/index')
             )
         );
         return $menu_array;

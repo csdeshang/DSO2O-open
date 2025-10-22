@@ -100,7 +100,7 @@ class  BaseSeller extends BaseMall {
             $param['storecost_seller_id'] = session('seller_id');
             $param['storecost_price'] = $storecost_price;
             $param['storecost_remark'] = $storecost_remark;
-            $param['storecost_state'] = 0;
+            $param['storecost_state'] = 1;
             $param['storecost_time'] = TIMESTAMP;
             $storecost_model->addStorecost($param);
             $storemoneylog_model = model('storemoneylog');
@@ -110,13 +110,15 @@ class  BaseSeller extends BaseMall {
                 'storemoneylog_type' => $storemoneylog_model::TYPE_ORDER_SUCCESS,
                 'storemoneylog_state' => $storemoneylog_model::STATE_VALID,
                 'storemoneylog_add_time' => TIMESTAMP,
-                'store_avaliable_money' => -$storecost_price,
+                'storemoneylog_avaliable_money' => -$storecost_price,
                 'storemoneylog_desc' => $storecost_remark,
             );
             $storemoneylog_model->changeStoremoney($data);
             Db::commit();
-        } catch (Exception $ex) {
+        } catch (\Exception $e) {
             Db::rollback();
+            ds_json_encode(10001, $e->getMessage());
+            
         }
 
 

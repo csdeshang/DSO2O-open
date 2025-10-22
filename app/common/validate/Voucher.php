@@ -2,11 +2,11 @@
 
 namespace app\common\validate;
 
-
 use think\Validate;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -16,49 +16,25 @@ use think\Validate;
  * ============================================================================
  * 验证器
  */
-class  Voucher extends Validate
-{
+class Voucher extends Validate {
+
     protected $rule = [
-        'promotion_voucher_price'=>'require|number',
-        'promotion_voucher_storetimes_limit'=>'require|number',
-        'promotion_voucher_buyertimes_limit'=>'require|number|elt:100',
-        'voucher_price'=>'require',
-        'voucher_price_describe'=>'require',
-        'voucher_points'=>'require',
-        
-        'vouchertemplate_title'=>'require|length:1,50',
-        'vouchertemplate_total'=>'require|number',
-        'vouchertemplate_price'=>'require|number',
-        'vouchertemplate_limit'=>'require',
-        'vouchertemplate_desc'=>'require|length:1,255'
+        'voucherprice' => 'require|number|length:0,11',
+        'voucherprice_describe' => 'require|length:0,255',
+        'voucherprice_defaultpoints' => 'require|number|length:0,11',
     ];
     protected $message = [
-        'promotion_voucher_price.require'=>'购买单价应为大于0的整数',
-        'promotion_voucher_price.number'=>'购买单价应为大于0的整数',
-        'promotion_voucher_storetimes_limit.require'=>'每月活动数量应为大于0的整数',
-        'promotion_voucher_storetimes_limit.number'=>'每月活动数量应为大于0的整数',
-        'promotion_voucher_buyertimes_limit.require'=>'最大领取数量应为大于0小于100的整数',
-        'promotion_voucher_buyertimes_limit.number'=>'最大领取数量应为大于0小于100的整数',
-        'promotion_voucher_buyertimes_limit.elt'=>'最大领取数量应为大于0小于100的整数',
-        'voucher_price.require'=>'代金券面额应为大于0的整数',
-        'voucher_price_describe.require'=>'描述不能为空',
-        'voucher_points.require'=>'默认兑换积分数应为大于0的整数',
-        
-        'vouchertemplate_title.require'=>'模版名称不能为空且不能大于50个字符',
-        'vouchertemplate_title.length'=>'模版名称不能为空且不能大于50个字符',
-        'vouchertemplate_total.require'=>'可发放数量不能为空且必须为整数',
-        'vouchertemplate_total.number'=>'可发放数量不能为空且必须为整数',
-        'vouchertemplate_price.require'=>'模版面额不能为空且必须为整数，且面额不能大于限额',
-        'vouchertemplate_price.number'=>'模版面额不能为空且必须为整数，且面额不能大于限额',
-        'vouchertemplate_limit.require'=>'模版使用消费限额不能为空且必须是数字',
-        'vouchertemplate_desc.require'=>'模版描述不能为空且不能大于255个字符',
-        'vouchertemplate_desc.length'=>'模版描述不能为空且不能大于255个字符'
+        'voucherprice.require' => '代金券面额应为大于0的整数',
+        'voucherprice.number' => '代金券面额应为大于0的整数',
+        'voucherprice.length' => '代金券面额长度应该小于11位',
+        'voucherprice_describe.require' => '描述不能为空',
+        'voucherprice_describe.length' => '描述长度应该小于255',
+        'voucherprice_defaultpoints.require' => '默认兑换积分数应为大于0的整数',
+        'voucherprice_defaultpoints.number' => '默认兑换积分数应为大于0的整数',
+        'voucherprice_defaultpoints.length' => '默认兑换积分数长度应该小于11位',
     ];
     protected $scene = [
-        'setting' => ['promotion_voucher_price', 'promotion_voucher_storetimes_limit', 'promotion_voucher_buyertimes_limit'],
-        'priceadd' => ['voucher_price', 'voucher_price_describe', 'voucher_points'],
-        'priceedit' => ['voucher_price', 'voucher_price_describe', 'voucher_points'],
-        'templateadd' => ['vouchertemplate_title', 'vouchertemplate_total', 'vouchertemplate_price', 'vouchertemplate_limit', 'vouchertemplate_desc'],
-        'templateedit' => ['vouchertemplate_title', 'vouchertemplate_total', 'vouchertemplate_price', 'vouchertemplate_limit', 'vouchertemplate_desc'],
+        'priceadd' => ['voucherprice', 'voucherprice_describe', 'voucherprice_defaultpoints'],
+        'priceedit' => ['voucherprice', 'voucherprice_describe', 'voucherprice_defaultpoints'],
     ];
 }

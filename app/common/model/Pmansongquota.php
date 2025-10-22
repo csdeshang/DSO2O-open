@@ -7,11 +7,11 @@
 
 namespace app\common\model;
 
-
 use think\facade\Db;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -21,8 +21,8 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class Pmansongquota extends BaseModel
-{
+class Pmansongquota extends BaseModel {
+
     public $page_info;
 
     /**
@@ -36,13 +36,12 @@ class Pmansongquota extends BaseModel
      * @return array 满即送套餐列表
      *
      */
-    public function getMansongquotaList($condition, $pagesize = null, $order = '', $field = '*')
-    {
-        if($pagesize){
-        $res = Db::name('pmansongquota')->field($field)->where($condition)->order($order)->paginate(['list_rows'=>$pagesize,'query' => request()->param()],false);
-        $this->page_info = $res;
-        $result = $res->items();
-        }else{
+    public function getMansongquotaList($condition, $pagesize = null, $order = '', $field = '*') {
+        if ($pagesize) {
+            $res = Db::name('pmansongquota')->field($field)->where($condition)->order($order)->paginate(['list_rows' => $pagesize, 'query' => request()->param()], false);
+            $this->page_info = $res;
+            $result = $res->items();
+        } else {
             $result = Db::name('pmansongquota')->field($field)->where($condition)->order($order)->select()->toArray();
         }
         return $result;
@@ -55,8 +54,7 @@ class Pmansongquota extends BaseModel
      * @param type $condition 条件
      * @return type
      */
-    public function getMansongquotaInfo($condition)
-    {
+    public function getMansongquotaInfo($condition) {
         $result = Db::name('pmansongquota')->where($condition)->find();
         return $result;
     }
@@ -68,8 +66,7 @@ class Pmansongquota extends BaseModel
      * @param int $store_id 店铺id
      * @return array
      */
-    public function getMansongquotaCurrent($store_id)
-    {
+    public function getMansongquotaCurrent($store_id) {
         $condition = array();
         $condition[] = array('store_id', '=', $store_id);
         $condition[] = array('mansongquota_endtime', '>', TIMESTAMP);
@@ -83,8 +80,7 @@ class Pmansongquota extends BaseModel
      * @param array $data 数据
      * @return bool
      */
-    public function addMansongquota($data)
-    {
+    public function addMansongquota($data) {
         return Db::name('pmansongquota')->insertGetId($data);
     }
 
@@ -96,8 +92,7 @@ class Pmansongquota extends BaseModel
      * @param array $condition 条件
      * @return bool
      */
-    public function editMansongquota($update, $condition)
-    {
+    public function editMansongquota($update, $condition) {
         return Db::name('pmansongquota')->where($condition)->update($update);
     }
 
@@ -108,9 +103,7 @@ class Pmansongquota extends BaseModel
      * @param array $condition 条件
      * @return bool
      */
-    public function delMansongquota($condition)
-    {
+    public function delMansongquota($condition) {
         return Db::name('pmansongquota')->where($condition)->delete();
     }
-
 }

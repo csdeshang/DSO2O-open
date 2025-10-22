@@ -1,11 +1,12 @@
 <?php
 
 namespace app\common\model;
+
 use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * DSMall多用户商城
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,8 +16,8 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Rechargecard extends BaseModel
-{
+class Rechargecard extends BaseModel {
+
     public $page_info;
 
     /**
@@ -31,7 +32,7 @@ class  Rechargecard extends BaseModel
     public function getRechargecardList($condition, $pagesize = 20, $limit = 0) {
         $order = 'rc_id desc';
         if ($pagesize) {
-            $res = Db::name('rechargecard')->where($condition)->order($order)->paginate(['list_rows'=>$pagesize,'query' => request()->param()],false);
+            $res = Db::name('rechargecard')->where($condition)->order($order)->paginate(['list_rows' => $pagesize, 'query' => request()->param()], false);
             $this->page_info = $res;
             return $res->items();
         } else {
@@ -46,11 +47,10 @@ class  Rechargecard extends BaseModel
      * @param type $sn 卡号
      * @return type
      */
-    public function getRechargecardBySN($sn)
-    {
+    public function getRechargecardBySN($sn) {
         return Db::name('rechargecard')->where(array(
-                                'rc_sn' => (string) $sn,
-                            ))->find();
+                    'rc_sn' => (string) $sn,
+                ))->find();
     }
 
     /**
@@ -62,8 +62,7 @@ class  Rechargecard extends BaseModel
      * @param type $memberName 会员名称
      * @return type
      */
-    public function setRechargecardUsedById($id, $memberId, $memberName)
-    {
+    public function setRechargecardUsedById($id, $memberId, $memberName) {
         return Db::name('rechargecard')->where(array('rc_id' => (string) $id,))->update(array('rc_tsused' => TIMESTAMP, 'rc_state' => 1, 'member_id' => $memberId, 'member_name' => $memberName,));
     }
 
@@ -74,8 +73,7 @@ class  Rechargecard extends BaseModel
      * @param type $id 表自增id
      * @return type
      */
-    public function delRechargecard($condition)
-    {
+    public function delRechargecard($condition) {
         return Db::name('rechargecard')->where($condition)->delete();
     }
 
@@ -86,19 +84,20 @@ class  Rechargecard extends BaseModel
      * @param array $sns 卡号数组
      * @return type
      */
-    public function getOccupiedRechargecardSNsBySNs(array $sns)
-    {
-        $array = Db::name('rechargecard')->field('rc_sn')->where(array(array('rc_sn','in', $sns),))->select()->toArray();
+    public function getOccupiedRechargecardSNsBySNs(array $sns) {
+        
+        $condition = array();
+        $condition[] = array('rc_sn', 'in', $sns);
+        $array = Db::name('rechargecard')->field('rc_sn')->where($condition)->select()->toArray();
 
         $data = array();
-
         foreach ((array) $array as $v) {
             $data[] = $v['rc_sn'];
         }
 
         return $data;
     }
-    
+
     /**
      * 获取充值卡数量
      * @access public
@@ -109,16 +108,15 @@ class  Rechargecard extends BaseModel
     public function getRechargecardCount($condition) {
         return Db::name('rechargecard')->where($condition)->count();
     }
-    
+
     /**
-     * 插入充值卡
+     * 保存充值卡
      * @access public
-     * @author csdeshang
-     * @param type $id 表自增id
-     * @return type
+     * @author csdeshang 
+     * @param array $data 参数内容
+     * @return boolean
      */
-    public function addRechargecardAll($data)
-    {
+    public function addRechargecardAll($data) {
         return Db::name('rechargecard')->insertAll($data);
     }
 }

@@ -6,7 +6,7 @@ use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -40,11 +40,11 @@ class Bonus extends BaseModel {
     /**
      * 取单个吸粉红包的内容
      * @author csdeshang
-     * @param array $conditions 检索条件
+     * @param array $condition 检索条件
      * @return array 数组类型的返回结果
      */
-    public function getOneBonus($conditions) {
-        return Db::name('bonus')->where($conditions)->find();
+    public function getOneBonus($condition) {
+        return Db::name('bonus')->where($condition)->find();
     }
 
     /**
@@ -76,11 +76,11 @@ class Bonus extends BaseModel {
     /**
      * 删除
      * @author csdeshang
-     * @param array $conditions 检索条件
+     * @param array $condition 检索条件
      * @return array $rs_row 返回数组形式的查询结果
      */
-    public function delBonus($conditions) {
-        return Db::name('bonus')->where($conditions)->delete();
+    public function delBonus($condition) {
+        return Db::name('bonus')->where($condition)->delete();
     }
     // 获取红包类型
     public function bonus_type_list()
@@ -107,7 +107,7 @@ class Bonus extends BaseModel {
      * @param array $pagesize 分页信息
      * @return array 数组类型的返回结果
      */
-    public function getBonusreceiveList($condition,$pagesize ,$limit = 0) {
+    public function getBonusreceiveList($condition,$pagesize ,$limit=0) {
         if($pagesize){
             $result = Db::name('bonusreceive')->where($condition)->paginate(['list_rows'=>$pagesize,'query' => request()->param()],false);
             $this->page_info=$result;
@@ -120,11 +120,11 @@ class Bonus extends BaseModel {
     /**
      * 取吸粉红包的领取详情
      * @author csdeshang
-     * @param array $conditions 检索条件
+     * @param array $condition 检索条件
      * @return array 数组类型的返回结果
      */
-    public function getOneBonusreceive($conditions) {
-        return Db::name('bonusreceive')->where($conditions)->find();
+    public function getOneBonusreceive($condition) {
+        return Db::name('bonusreceive')->where($condition)->find();
     }
     /**
      * 更新信息
@@ -134,10 +134,9 @@ class Bonus extends BaseModel {
      * @return bool 布尔类型的返回结果
      */
     public function editBonusreceive($bonusreceive_id,$data) {
-        if (empty($data)) {
-            return false;
-        }
-        return Db::name('bonusreceive')->where('bonusreceive_id',$bonusreceive_id)->update($data);
+        $condition = array();
+        $condition[] = array('bonusreceive_id','=',$bonusreceive_id);
+        return Db::name('bonusreceive')->where($condition)->update($data);
     }
     
     /**

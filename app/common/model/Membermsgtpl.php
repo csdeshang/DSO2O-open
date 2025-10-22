@@ -1,11 +1,12 @@
 <?php
 
 namespace app\common\model;
+
 use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,9 +16,8 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Membermsgtpl extends BaseModel {
-    
-  
+class Membermsgtpl extends BaseModel {
+
     /**
      * 用户消息模板列表
      * @access public
@@ -30,7 +30,7 @@ class  Membermsgtpl extends BaseModel {
     public function getMembermsgtplList($condition, $field = '*', $order = 'membermt_code asc') {
         return Db::name('membermsgtpl')->field($field)->where($condition)->order($order)->select()->toArray();
     }
-    
+
     /**
      * 用户消息模板详细信息
      * @access public
@@ -41,7 +41,7 @@ class  Membermsgtpl extends BaseModel {
     public function getMembermsgtplInfo($condition, $field = '*') {
         return Db::name('membermsgtpl')->field($field)->where($condition)->find();
     }
-    
+
     /**
      * 编辑用户消息模板
      * @access public
@@ -53,7 +53,6 @@ class  Membermsgtpl extends BaseModel {
     public function editMembermsgtpl($condition, $update) {
         return Db::name('membermsgtpl')->where($condition)->update($update);
     }
-    
-    
 }
+
 ?>

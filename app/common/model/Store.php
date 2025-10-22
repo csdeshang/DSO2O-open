@@ -6,6 +6,7 @@
  */
 
 namespace app\common\model;
+
 use app\common\model\Storedepositlog;
 use think\facade\Db;
 
@@ -21,11 +22,9 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Store extends BaseModel {
+class Store extends BaseModel {
 
     public $page_info;
-    
-
 
     /**
      * 查询店铺列表
@@ -40,7 +39,7 @@ class  Store extends BaseModel {
      */
     public function getStoreList($condition, $pagesize = null, $order = '', $field = '*', $limit = 0) {
         if ($pagesize) {
-            $result = Db::name('store')->field($field)->where($condition)->order($order)->paginate(['list_rows'=>$pagesize,'query' => request()->param()],false);
+            $result = Db::name('store')->field($field)->where($condition)->order($order)->paginate(['list_rows' => $pagesize, 'query' => request()->param()], false);
             $this->page_info = $result;
             return $result->items();
         } else {
@@ -60,7 +59,7 @@ class  Store extends BaseModel {
      * @return array
      */
     public function getStoreOnlineList($condition, $pagesize = null, $order = '', $field = '*') {
-        $condition[]=array('store_state','=',1);
+        $condition[] = array('store_state', '=', 1);
         return $this->getStoreList($condition, $pagesize, $order, $field);
     }
 
@@ -84,7 +83,7 @@ class  Store extends BaseModel {
      * @return type
      */
     public function getStoreMemberIDList($storeid_array, $field = 'store_id,member_id,store_name') {
-        $store_list = Db::name('store')->where(array(array('store_id','in', $storeid_array)))->field($field)->select()->toArray();
+        $store_list = Db::name('store')->where(array(array('store_id', 'in', $storeid_array)))->field($field)->select()->toArray();
         $store_list = ds_change_arraykey($store_list, 'store_id');
         return $store_list;
     }
@@ -106,7 +105,7 @@ class  Store extends BaseModel {
 
             //商品数
             $goods_model = model('goods');
-            $store_info['goods_count'] = $goods_model->getGoodsCommonOnlineCount(array(array('store_id' ,'=', $store_info['store_id'])));
+            $store_info['goods_count'] = $goods_model->getGoodsCommonOnlineCount(array(array('store_id', '=', $store_info['store_id'])));
 
             //店铺评价
             $evaluatestore_model = model('evaluatestore');
@@ -139,7 +138,7 @@ class  Store extends BaseModel {
 
         return $store_info;
     }
-    
+
     /**
      * 获取店铺信息根据店铺id
      * @access public
@@ -155,7 +154,7 @@ class  Store extends BaseModel {
             return $store_info;
         }
     }
-    
+
     /**
      * 获取店铺ID字符串
      * @access public
@@ -164,7 +163,7 @@ class  Store extends BaseModel {
      * @return string
      */
     public function getStoreIDString($condition) {
-        $condition[]=array('store_state','=',1);
+        $condition[] = array('store_state', '=', 1);
         $store_list = $this->getStoreList($condition);
         $store_id_string = '';
         foreach ($store_list as $value) {
@@ -181,6 +180,8 @@ class  Store extends BaseModel {
      * @return type
      */
     public function addStore($data) {
+        $this->validate($data, 'app\common\validate\Store.model_add');
+        
         return Db::name('store')->insertGetId($data);
     }
 
@@ -188,18 +189,20 @@ class  Store extends BaseModel {
      * 编辑店铺
      * @access public
      * @author csdeshang
-     * @param type $update 更新数据
+     * @param type $data 更新数据
      * @param type $condition 条件
      * @return type
      */
-    public function editStore($update, $condition) {
+    public function editStore($data, $condition) {
+        $this->validate($data, 'app\common\validate\Store.model_edit');
+        
         //清空缓存
         $store_list = $this->getStoreList($condition);
         foreach ($store_list as $value) {
             dcache($value['store_id'], 'store_info');
         }
 
-        return Db::name('store')->where($condition)->update($update);
+        return Db::name('store')->where($condition)->update($data);
     }
 
     /**
@@ -212,9 +215,9 @@ class  Store extends BaseModel {
     public function delStore($condition) {
         $store_info = $this->getStoreInfo($condition);
         //删除店铺相关图片
-        @unlink(BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . ATTACH_STORE . DIRECTORY_SEPARATOR . $store_info['store_logo']);
-        @unlink(BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . ATTACH_STORE . DIRECTORY_SEPARATOR . $store_info['store_banner']);
-        if (isset($store_info['store_slide'])&&$store_info['store_slide'] != '') {
+        ds_del_pic(ATTACH_STORE . '/' . $store_info['store_id'], $store_info['store_logo']);
+        ds_del_pic(ATTACH_STORE . '/' . $store_info['store_id'], $store_info['store_banner']);
+        if (isset($store_info['store_slide']) && $store_info['store_slide'] != '') {
             foreach (explode(',', $store_info['store_slide']) as $val) {
                 @unlink(BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . ATTACH_SLIDE . DIRECTORY_SEPARATOR . $val);
             }
@@ -238,14 +241,12 @@ class  Store extends BaseModel {
         model('sellergroup')->delSellergroup($condition);
         model('album')->delAlbum($condition['store_id']);
         model('storeextend')->delStoreextend($condition);
-        model('storegoodsclass')->delStoregoodsclass($condition,$condition['store_id']);
+        model('storegoodsclass')->delStoregoodsclass($condition, $condition['store_id']);
         model('storemsg')->delStoremsg($condition);
-        model('storenavigation')->delStorenavigation(array('storenav_store_id'=>$condition['store_id']));
+        model('storenavigation')->delStorenavigation(array('storenav_store_id' => $condition['store_id']));
         model('storeplate')->delStoreplate($condition);
-        model('storereopen')->delStorereopen(array('storereopen_store_id'=>$condition['store_id']));
+        model('storereopen')->delStorereopen(array('storereopen_store_id' => $condition['store_id']));
         model('storewatermark')->delStorewatermark($condition);
-
-        
     }
 
     /**
@@ -261,7 +262,7 @@ class  Store extends BaseModel {
         $hot_sales_list = rcache($store_id, $prefix);
         if (empty($hot_sales_list)) {
             $goods_model = model('goods');
-            $hot_sales_list = $goods_model->getGoodsOnlineList(array(array('store_id' ,'=', $store_id)), '*', 0, 'goods_salenum desc', $limit);
+            $hot_sales_list = $goods_model->getGoodsOnlineList(array(array('store_id', '=', $store_id)), '*', 0, 'goods_salenum desc', $limit);
             $cache = array();
             $cache['hot_sales'] = serialize($hot_sales_list);
             wcache($store_id, $cache, $prefix, 60 * 24);
@@ -284,7 +285,7 @@ class  Store extends BaseModel {
         $hot_collect_list = rcache($store_id, $prefix);
         if (empty($hot_collect_list)) {
             $goods_model = model('goods');
-            $hot_collect_list = $goods_model->getGoodsOnlineList(array(array('store_id' ,'=', $store_id)), '*', 0, 'goods_collect desc', $limit);
+            $hot_collect_list = $goods_model->getGoodsOnlineList(array(array('store_id', '=', $store_id)), '*', 0, 'goods_collect desc', $limit);
             $cache = array();
             $cache['collect_sales'] = serialize($hot_collect_list);
             wcache($store_id, $cache, $prefix, 60 * 24);
@@ -364,9 +365,9 @@ class  Store extends BaseModel {
                 $store_id_string = implode(',', array_keys($list_new));
                 //指定天数直接查询数据库
                 $condition = array();
-                $condition[]=array('goods_show','=','1');
-                $condition[]=array('store_id','in', $store_id_string);
-                $condition[] = array('goods_addtime','>', strtotime("-{$day} day"));
+                $condition[] = array('goods_show', '=', '1');
+                $condition[] = array('store_id', 'in', $store_id_string);
+                $condition[] = array('goods_addtime', '>', strtotime("-{$day} day"));
                 $goods_count_array = Db::name('goods')->field('store_id,count(*) as goods_count')->where($condition)->group('store_id')->select()->toArray();
                 if (!empty($goods_count_array)) {
                     foreach ($goods_count_array as $value) {
@@ -410,8 +411,8 @@ class  Store extends BaseModel {
             //从数据库读取店铺商品数赋值并缓存
             $no_cache_store = rtrim($no_cache_store, ',');
             $condition = array();
-            $condition[]=array('goods_state','=','1');
-            $condition[]=array('store_id','in', $no_cache_store);
+            $condition[] = array('goods_state', '=', '1');
+            $condition[] = array('store_id', 'in', $no_cache_store);
             $goods_count_array = Db::name('goods')->field('store_id,count(*) as goods_count')->where($condition)->group('store_id')->select()->toArray();
             if (!empty($goods_count_array)) {
                 foreach ($goods_count_array as $value) {
@@ -431,7 +432,7 @@ class  Store extends BaseModel {
      * @return type
      */
     private function getGoodsCountJq($store_array) {
-        $order_count_array = Db::name('order')->field('store_id,count(*) as order_count')->where(array(array('store_id','in', implode(',', array_keys($store_array))),array('order_state','<>',"0"), array('add_time','>', TIMESTAMP - 3600 * 24 * 90)))->group('store_id')->select()->toArray();
+        $order_count_array = Db::name('order')->field('store_id,count(*) as order_count')->where(array(array('store_id', 'in', implode(',', array_keys($store_array))), array('order_state', '<>', "0"), array('add_time', '>', TIMESTAMP - 3600 * 24 * 90)))->group('store_id')->select()->toArray();
         foreach ((array) $order_count_array as $value) {
             $store_array[$value['store_id']]['num_sales_jq'] = $value['order_count'];
         }
@@ -452,41 +453,26 @@ class  Store extends BaseModel {
         }
         return $store_array;
     }
-    /**
-     * 编辑
-     * @param type $condition
-     * @param type $data
-     * @return type
-     */
-    public function editGoodscommon($condition,$data){
-        return Db::name('goodscommon')->where($condition)->update($data);
-    }
-    /**
-     * 编辑商品
-     * @param type $condition
-     * @param type $data
-     * @return type
-     */
-    public function editGoods($condition,$data){
-        return Db::name('goods')->where($condition)->update($data);
-    }
+
     /**
      * 插入店铺扩展表
      * @param type $condition
      * @return type
      */
-    public function addStoreextend($condition){
+    public function addStoreextend($condition) {
         return Db::name('storeextend')->insert($condition);
     }
+
     /**
      * 获取单个店铺
      * @param type $condition
      * @param type $field
      * @return type
      */
-    public function getOneStore($condition,$field){
+    public function getOneStore($condition, $field) {
         return Db::name('store')->field($field)->where($condition)->find();
     }
+
     /**
      * 判断店铺配送状态
      * @param array $store_info
@@ -503,41 +489,52 @@ class  Store extends BaseModel {
         if (!$store_info['store_o2o_receipt']) {
             return ds_callback(false, '店铺[' . $store_info['store_name'] . ']暂停接单');
         }
-        
+
         //根据店铺设置的营业时间判断是否可以下单
         /*
-        $start_time = strtotime(date('Y-m-d 0:0:0')) + $store_info['store_o2o_open_start'] * 60;
-        $start_time_text = floor($store_info['store_o2o_open_start'] / 60) . ':' . str_pad(strval($store_info['store_o2o_open_start'] % 60), 2, '0', STR_PAD_LEFT);
-        $end_time = strtotime(date('Y-m-d 0:0:0')) + $store_info['store_o2o_open_end'] * 60;
-        $end_hour = floor($store_info['store_o2o_open_end'] / 60);
-        $end_time_text = (($end_hour < 24) ? $end_hour : ('次日' . ($end_hour % 24))) . ':' . str_pad(strval($store_info['store_o2o_open_end'] % 60), 2, '0', STR_PAD_LEFT);
-        //是否在营业时间内
-        if ($start_time > TIMESTAMP) {
-            return ds_callback(false, '店铺[' . $store_info['store_name'] . ']营业时间为' . $start_time_text . '到'.$end_time_text.'，请您耐心等待');
-        }
-        if ($end_time < TIMESTAMP) {
-            return ds_callback(false, '店铺[' . $store_info['store_name'] . ']营业时间为' . $start_time_text . '到'.$end_time_text.'，请您明日再来');
-        }
+          $start_time = strtotime(date('Y-m-d 0:0:0')) + $store_info['store_o2o_open_start'] * 60;
+          $start_time_text = floor($store_info['store_o2o_open_start'] / 60) . ':' . str_pad(strval($store_info['store_o2o_open_start'] % 60), 2, '0', STR_PAD_LEFT);
+          $end_time = strtotime(date('Y-m-d 0:0:0')) + $store_info['store_o2o_open_end'] * 60;
+          $end_hour = floor($store_info['store_o2o_open_end'] / 60);
+          $end_time_text = (($end_hour < 24) ? $end_hour : ('次日' . ($end_hour % 24))) . ':' . str_pad(strval($store_info['store_o2o_open_end'] % 60), 2, '0', STR_PAD_LEFT);
+          //是否在营业时间内
+          if ($start_time > TIMESTAMP) {
+          return ds_callback(false, '店铺[' . $store_info['store_name'] . ']营业时间为' . $start_time_text . '到'.$end_time_text.'，请您耐心等待');
+          }
+          if ($end_time < TIMESTAMP) {
+          return ds_callback(false, '店铺[' . $store_info['store_name'] . ']营业时间为' . $start_time_text . '到'.$end_time_text.'，请您明日再来');
+          }
          */
-        
-        
-        
+
+
+
         return ds_callback(true);
     }
-    
-    public function isO2oSupport($store_info){
-        if($store_info['store_o2o_distribute_type']==1 || ($store_info['store_o2o_distribute_type']==0 && config('ds_config.o2o_open'))){
+
+    public function isO2oSupport($store_info) {
+        if ($store_info['store_o2o_distribute_type'] == 1 || ($store_info['store_o2o_distribute_type'] == 0 && config('ds_config.o2o_open'))) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
     
     /**
+     * 当店铺修改了店铺名称，同时修改该店铺其他位置的店铺名称
+     * @param type $store_id
+     * @param type $store_name
+     */
+    public function updateAllStorename($store_id, $store_name) {
+        $goods_model = model('goods');
+        $goods_model->editGoodsCommon(array('store_name' => $store_name), array('store_id' => $store_id));
+        $goods_model->editGoods(array('store_name' => $store_name), array('store_id' => $store_id));
+    }
+
+    /**
      *  店铺流量统计入库
      */
-    public function flowstat_record($store_id,$goods_id,$controller_param,$action_param,$store_info) {
-        if(!empty($store_info)){
+    public function flowstat_record($store_id, $goods_id, $controller_param, $action_param, $store_info) {
+        if (!empty($store_info)) {
             if ($store_id <= 0 || $store_info['store_id'] == $store_id) {
                 return false;
             }
@@ -587,131 +584,128 @@ class  Store extends BaseModel {
             Db::name($flow_tablename)->insertAll($insert_arr);
         }
     }
-	
-	/**
-	 * 店铺开店成功
-	 * @param type $condition
-	 * @param type $field
-	 * @return type
-	 */
-	public function setStoreOpen($joinin_detail,$param){
-		$storejoinin_model = model('storejoinin');
-		$seller_model = model('seller');
-		//验证卖家用户名是否已经存在
-		if ($seller_model->isSellerExist(array('seller_name' => $joinin_detail['seller_name']))) {
-			throw new \think\Exception('卖家用户名已存在', 10006);
-		}
-			$predeposit_model = model('predeposit');
-			//下单，支付被冻结的充值卡
-			$rcb_amount = floatval($joinin_detail['rcb_amount']);
-			if ($rcb_amount > 0) {
-				$data_pd = array();
-				$data_pd['member_id'] = $joinin_detail['member_id'];
-				$data_pd['member_name'] = $joinin_detail['member_name'];
-				$data_pd['amount'] = $rcb_amount;
-				$data_pd['order_sn'] = $joinin_detail['pay_sn'];
-				$predeposit_model->changeRcb('storejoinin_comb_pay', $data_pd);
-			}
 
-			//下单，支付被冻结的预存款
-			$pd_amount = floatval($joinin_detail['pd_amount']);
-			if ($pd_amount > 0) {
-				$data_pd = array();
-				$data_pd['member_id'] = $joinin_detail['member_id'];
-				$data_pd['member_name'] = $joinin_detail['member_name'];
-				$data_pd['amount'] = $pd_amount;
-				$data_pd['order_sn'] = $joinin_detail['pay_sn'];
-				$predeposit_model->changePd('storejoinin_comb_pay', $data_pd);
-			}
-			//开店
-			$shop_array = array();
-			$shop_array['member_id'] = $joinin_detail['member_id'];
-			$shop_array['member_name'] = $joinin_detail['member_name'];
-			$shop_array['seller_name'] = $joinin_detail['seller_name'];
-			$shop_array['grade_id'] = $joinin_detail['storegrade_id'];
-			$shop_array['store_name'] = $joinin_detail['store_name'];
-			$shop_array['storeclass_id'] = $joinin_detail['storeclass_id'];
-			$shop_array['store_company_name'] = $joinin_detail['company_name'];
-			$shop_array['region_id'] = $joinin_detail['company_province_id'];
-			$shop_array['store_longitude'] = $joinin_detail['store_longitude'];
-			$shop_array['store_latitude'] = $joinin_detail['store_latitude'];
-			$shop_array['area_info'] = $joinin_detail['company_address'];
+    /**
+     * 店铺开店成功
+     * @param type $condition
+     * @param type $field
+     * @return type
+     */
+    public function setStoreOpen($joinin_detail, $param) {
+        $storejoinin_model = model('storejoinin');
+        $seller_model = model('seller');
+        //验证卖家用户名是否已经存在
+        if ($seller_model->isSellerExist(array('seller_name' => $joinin_detail['seller_name']))) {
+            throw new \think\Exception('卖家用户名已存在', 10006);
+        }
+        $predeposit_model = model('predeposit');
+        //下单，支付被冻结的充值卡
+        $rcb_amount = floatval($joinin_detail['rcb_amount']);
+        if ($rcb_amount > 0) {
+            $data_pd = array();
+            $data_pd['member_id'] = $joinin_detail['member_id'];
+            $data_pd['member_name'] = $joinin_detail['member_name'];
+            $data_pd['amount'] = $rcb_amount;
+            $data_pd['order_sn'] = $joinin_detail['pay_sn'];
+            $predeposit_model->changeRcb('storejoinin_comb_pay', $data_pd);
+        }
 
-			$shop_array['store_address'] = $joinin_detail['company_address_detail'];
-			$shop_array['store_zip'] = '';
-			$shop_array['store_mainbusiness'] = '';
-			$shop_array['store_state'] = 1;
-			$shop_array['store_addtime'] = TIMESTAMP;
-			$shop_array['store_endtime'] = strtotime(date('Y-m-d 23:59:59', strtotime('+1 day')) . " +" . intval($joinin_detail['joinin_year']) . " year");
-			//$shop_array['store_avaliable_deposit']=$joinin_detail['storeclass_bail'];
-			$store_id = $this->addStore($shop_array);
+        //下单，支付被冻结的预存款
+        $pd_amount = floatval($joinin_detail['pd_amount']);
+        if ($pd_amount > 0) {
+            $data_pd = array();
+            $data_pd['member_id'] = $joinin_detail['member_id'];
+            $data_pd['member_name'] = $joinin_detail['member_name'];
+            $data_pd['amount'] = $pd_amount;
+            $data_pd['order_sn'] = $joinin_detail['pay_sn'];
+            $predeposit_model->changePd('storejoinin_comb_pay', $data_pd);
+        }
+        //开店
+        $shop_array = array();
+        $shop_array['member_id'] = $joinin_detail['member_id'];
+        $shop_array['member_name'] = $joinin_detail['member_name'];
+        $shop_array['seller_name'] = $joinin_detail['seller_name'];
+        $shop_array['grade_id'] = $joinin_detail['storegrade_id'];
+        $shop_array['store_name'] = $joinin_detail['store_name'];
+        $shop_array['storeclass_id'] = $joinin_detail['storeclass_id'];
+        $shop_array['store_company_name'] = $joinin_detail['company_name'];
+        $shop_array['region_id'] = $joinin_detail['company_province_id'];
+        $shop_array['store_longitude'] = $joinin_detail['store_longitude'];
+        $shop_array['store_latitude'] = $joinin_detail['store_latitude'];
+        $shop_array['area_info'] = $joinin_detail['company_address'];
 
-			if ($store_id) {
-				//记录保证金
-				if ($joinin_detail['storeclass_bail'] > 0) {
-					$storedepositlog_model = model('storedepositlog');
-			 
-						$storedepositlog_model->changeStoredeposit(array(
-							'store_id' => $store_id,
-							'storedepositlog_type' => Storedepositlog::TYPE_PAY,
-							'storedepositlog_state' => Storedepositlog::STATE_VALID,
-							'storedepositlog_add_time' => TIMESTAMP,
-							'store_avaliable_deposit' => $joinin_detail['storeclass_bail'],
-							'storedepositlog_desc' => '店铺入驻保证金',
-						));
+        $shop_array['store_address'] = $joinin_detail['company_address_detail'];
+        $shop_array['store_zip'] = '';
+        $shop_array['store_mainbusiness'] = '';
+        $shop_array['store_state'] = 1;
+        $shop_array['store_addtime'] = TIMESTAMP;
+        $shop_array['store_endtime'] = strtotime(date('Y-m-d 23:59:59', strtotime('+1 day')) . " +" . intval($joinin_detail['joinin_year']) . " year");
+        $store_id = $this->addStore($shop_array);
 
-				}
-				//写入卖家账号
-				$seller_array = array();
-				$seller_array['seller_name'] = $joinin_detail['seller_name'];
-				$seller_array['member_id'] = $joinin_detail['member_id'];
-				$seller_array['sellergroup_id'] = 0;
-				$seller_array['store_id'] = $store_id;
-				$seller_array['is_admin'] = 1;
-				$state = $seller_model->addSeller($seller_array);
-				//改变店铺状态
-				$storejoinin_model->editStorejoinin($param, array('member_id' => $joinin_detail['member_id']));
-			}else{
-				throw new \think\Exception('店铺新增失败', 10006);
-			}
+        if ($store_id) {
+            //记录保证金
+            if ($joinin_detail['storeclass_bail'] > 0) {
+                $storedepositlog_model = model('storedepositlog');
 
-			if ($state) {
-				// 添加相册默认
-				$album_model = model('album');
-				$album_arr = array();
-				$album_arr['aclass_name'] = '默认相册';
-				$album_arr['store_id'] = $store_id;
-				$album_arr['aclass_des'] = '';
-				$album_arr['aclass_sort'] = '255';
-				$album_arr['aclass_cover'] = '';
-				$album_arr['aclass_uploadtime'] = TIMESTAMP;
-				$album_arr['aclass_isdefault'] = '1';
-				$album_model->addAlbumclass($album_arr);
+                $storedepositlog_model->changeStoredeposit(array(
+                    'store_id' => $store_id,
+                    'storedepositlog_type' => Storedepositlog::TYPE_PAY,
+                    'storedepositlog_state' => Storedepositlog::STATE_VALID,
+                    'storedepositlog_add_time' => TIMESTAMP,
+                    'storedepositlog_avaliable_deposit' => $joinin_detail['storeclass_bail'],
+                    'storedepositlog_desc' => '店铺入驻保证金',
+                ));
+            }
+            //写入卖家账号
+            $seller_array = array();
+            $seller_array['seller_name'] = $joinin_detail['seller_name'];
+            $seller_array['member_id'] = $joinin_detail['member_id'];
+            $seller_array['sellergroup_id'] = 0;
+            $seller_array['store_id'] = $store_id;
+            $seller_array['is_admin'] = 1;
+            $state = $seller_model->addSeller($seller_array);
+            //改变店铺状态
+            $storejoinin_model->editStorejoinin($param, array('member_id' => $joinin_detail['member_id']));
+        } else {
+            throw new \think\Exception('店铺新增失败', 10006);
+        }
 
-				//插入店铺扩展表
-				$this->addStoreextend(array('store_id' => $store_id));
+        if ($state) {
+            // 添加相册默认
+            $album_model = model('album');
+            $album_arr = array();
+            $album_arr['aclass_name'] = '默认相册';
+            $album_arr['store_id'] = $store_id;
+            $album_arr['aclass_des'] = '';
+            $album_arr['aclass_sort'] = '255';
+            $album_arr['aclass_cover'] = '';
+            $album_arr['aclass_uploadtime'] = TIMESTAMP;
+            $album_arr['aclass_isdefault'] = '1';
+            $album_model->addAlbumclass($album_arr);
 
-				//插入店铺绑定分类表
-				$store_bind_class_array = array();
-				$store_bind_class = unserialize($joinin_detail['store_class_ids']);
-				$store_bind_commis_rates = explode(',', $joinin_detail['store_class_commis_rates']);
-				for ($i = 0, $length = count($store_bind_class); $i < $length; $i++) {
-					@list($class1, $class2, $class3) = explode(',', $store_bind_class[$i]);
-					$store_bind_class_array[] = array(
-						'store_id' => $store_id,
-						'commis_rate' => $store_bind_commis_rates[$i],
-						'class_1' => intval($class1),
-						'class_2' => intval($class2),
-						'class_3' => intval($class3),
-						'storebindclass_state' => 1
-					);
-				}
-				$storebindclass_model = model('storebindclass');
-				$storebindclass_model->addStorebindclassAll($store_bind_class_array);
-			} else {
-				throw new \think\Exception('店铺新增失败', 10006);
-			}
-			return true;
-	}
+            //插入店铺扩展表
+            $this->addStoreextend(array('store_id' => $store_id));
 
+            //插入店铺绑定分类表
+            $store_bind_class_array = array();
+            $store_bind_class = unserialize($joinin_detail['store_class_ids']);
+            $store_bind_commis_rates = explode(',', $joinin_detail['store_class_commis_rates']);
+            for ($i = 0, $length = count($store_bind_class); $i < $length; $i++) {
+                @list($class1, $class2, $class3) = explode(',', $store_bind_class[$i]);
+                $store_bind_class_array[] = array(
+                    'store_id' => $store_id,
+                    'commis_rate' => $store_bind_commis_rates[$i],
+                    'class_1' => intval($class1),
+                    'class_2' => intval($class2),
+                    'class_3' => intval($class3),
+                    'storebindclass_state' => 1
+                );
+            }
+            $storebindclass_model = model('storebindclass');
+            $storebindclass_model->addStorebindclassAll($store_bind_class_array);
+        } else {
+            throw new \think\Exception('店铺新增失败', 10006);
+        }
+        return true;
+    }
 }

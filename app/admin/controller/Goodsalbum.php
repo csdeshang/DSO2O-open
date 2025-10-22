@@ -1,15 +1,12 @@
 <?php
 
-/*
- * 空间管理
- */
-
 namespace app\admin\controller;
 use think\facade\View;
 use think\facade\Lang;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能 空间管理
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -19,7 +16,7 @@ use think\facade\Lang;
  * ============================================================================
  * 控制器
  */
-class  Goodsalbum extends AdminControl {
+class Goodsalbum extends AdminControl {
 
     public function initialize() {
         parent::initialize();
@@ -53,6 +50,7 @@ class  Goodsalbum extends AdminControl {
             foreach ($albumclass_list as $v) {
                 $class[] = $v['aclass_id'];
             }
+            $where=array();
             $where[]=array('aclass_id','in',$class);
         } else {
             $where = '1=1';
@@ -150,13 +148,13 @@ class  Goodsalbum extends AdminControl {
         $menu_array = array(
             array(
                 'name' => 'index',
-                'text' => '相册列表',
-                'url' => url('Goodsalbum/index')
+                'text' => lang('g_album_list'),
+                'url' => (string)url('Goodsalbum/index')
             ),
             array(
                 'name' => 'pic_list',
-                'text' => '图片列表',
-                'url' => url('Goodsalbum/pic_list')
+                'text' => lang('g_album_pic_list'),
+                'url' => (string)url('Goodsalbum/pic_list')
             ),
         );
         return $menu_array;

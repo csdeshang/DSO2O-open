@@ -72,18 +72,17 @@ class  Sellerbrand extends BaseSeller {
 
         $brand_model = model('brand');
         if (request()->isPost()) {
-            /**
-             * 验证
-             */
-            $data = [
-                'brand_name' => input('param.brand_name'),
-                'brand_initial' => input('param.brand_initial'),
-            ];
-            $sellerbrand_validate = ds_validate('sellerbrand');
-            if (!$sellerbrand_validate->scene('brand_save')->check($data)) {
-                ds_json_encode(10001,$sellerbrand_validate->getError());
-            }
-
+            
+            $insert_array = array();
+            $insert_array['brand_name'] = trim(input('param.brand_name'));
+            $insert_array['brand_initial'] = strtoupper(input('param.brand_initial'));
+            $insert_array['gc_id'] = input('param.class_id');
+            $insert_array['brand_class'] = input('param.brand_class');
+            $insert_array['brand_apply'] = 0;
+            $insert_array['store_id'] = session('store_id');
+            
+            $this->validate($insert_array, 'app\common\validate\Brand.brand_add');
+            
             /**
              * 上传图片
              */
@@ -97,14 +96,8 @@ class  Sellerbrand extends BaseSeller {
                     $this->error($res['msg']);
                 }
             }
-            $insert_array = array();
-            $insert_array['brand_name'] = trim(input('param.brand_name'));
-            $insert_array['brand_initial'] = strtoupper(input('param.brand_initial'));
-            $insert_array['gc_id'] = input('param.class_id');
-            $insert_array['brand_class'] = input('param.brand_class');
             $insert_array['brand_pic'] = $brand_pic;
-            $insert_array['brand_apply'] = 0;
-            $insert_array['store_id'] = session('store_id');
+
 
             $result = $brand_model->addBrand($insert_array);
             if ($result) {
@@ -127,17 +120,15 @@ class  Sellerbrand extends BaseSeller {
         }
         
         if (request()->isPost()) {
-            /**
-             * 验证
-             */
-            $data = [
-                'brand_name' => input('post.brand_name'),
-                'brand_initial' => input('post.brand_initial'),
-            ];
-            $sellerbrand_validate = ds_validate('sellerbrand');
-            if (!$sellerbrand_validate->scene('brand_edit')->check($data)) {
-                $this->error($sellerbrand_validate->getError());
-            } else {
+            
+                $update_array = array();
+                $update_array['brand_initial'] = strtoupper(input('post.brand_initial'));
+                $update_array['brand_name'] = trim(input('post.brand_name'));
+                $update_array['gc_id'] = input('post.class_id');
+                $update_array['brand_class'] = input('post.brand_class');
+                
+                $this->validate($update_array, 'app\common\validate\Brand.brand_edit');
+                
                 /**
                  * 上传图片
                  */
@@ -149,30 +140,23 @@ class  Sellerbrand extends BaseSeller {
                         //删除图片
                         $brand_info = $brand_model->getBrandInfo(array('brand_id' => $brand_id));
                         if (!empty($brand_info['brand_pic'])) {
-                            @unlink(BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . ATTACH_BRAND . DIRECTORY_SEPARATOR . $brand_info['brand_pic']);
+                            ds_del_pic(ATTACH_BRAND,$brand_info['brand_pic']);
                         }
                     } else {
                         $this->error($res['msg']);
                     }
                 }
-                $condition = array();
-                $condition[] = array('brand_id','=',$brand_id);
-                $update_array = array();
-                $update_array['brand_initial'] = strtoupper(input('post.brand_initial'));
-                $update_array['brand_name'] = trim(input('post.brand_name'));
-                $update_array['gc_id'] = input('post.class_id');
-                $update_array['brand_class'] = input('post.brand_class');
                 if (!empty($brand_pic)) {
                     $update_array['brand_pic'] = $brand_pic;
                 }
-                
+                $condition = array();
+                $condition[] = array('brand_id','=',$brand_id);
                 $result = $brand_model->editBrand($condition, $update_array);
                 if ($result) {
                     $this->success(lang('ds_common_save_succ'), url('Sellerbrand/index'));
                 } else {
                     $this->error(lang('ds_common_save_fail'));
                 }
-            }
         } else {
             $this->error(lang('ds_common_save_fail'));
         }

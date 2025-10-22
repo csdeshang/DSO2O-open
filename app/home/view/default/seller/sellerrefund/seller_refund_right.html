@@ -35,7 +35,7 @@
       <dd><a target="_blank" href="{:url('Sellerorder/show_order',['order_id'=>$order.order_id])} ">{$order.order_sn}</a> <a href="javascript:void(0);" class="a">{$Think.lang.ds_more}<i class="iconfont">&#xe689;</i>
         <div class="more"> <span class="arrow"></span>
           <ul>
-             {if $order['payment_code'] != 'offline' && !in_array($order['order_state'],array(ORDER_STATE_CANCEL,ORDER_STATE_NEW))}
+             {if !in_array($order['order_state'],array(ORDER_STATE_CANCEL,ORDER_STATE_NEW))}
             <li>{$Think.lang.payment_order_number}{$Think.lang.ds_colon}<span>{$order.pay_sn}</span></li>
             {/if}
             <li>{$Think.lang.store_order_pay_method}{$Think.lang.ds_colon}<span>{$order.payment_name}</span></li>

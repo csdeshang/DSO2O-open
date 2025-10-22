@@ -1,18 +1,33 @@
+## 相关产品
+
+### DSPlatform系统
+DSPlatform系统是一个集成的解决方案，基于Thinkphp8 + Vue3 + Element Plus + Uniapp 开发，系统支持多种商业模式，包括传统商城购物、外卖配送、上门服务、上门家政、短视频带货等，满足不同行业的业务需求。无论是电商平台、本地生活服务、家政服务还是内容电商，都能快速构建完整的业务体系。
+- [DSPlatform帮助手册](http://help.dsplatform.csdeshang.com/) http://help.dsplatform.csdeshang.com/
+- [DSPlatform系统](https://gitee.com/csdeshang/DSPlatform_open) https://gitee.com/csdeshang/DSPlatform_open
+
+### DSMall商城系统
+DSMall商城系统是基于ThinkPhp6.0和Uniapp开发的一套完善的B2B2C（多店铺商城）电商系统。它能够快速积累客户和会员数据，进行智能转化，提升销售和会员维护效率。主要功能包括拼团、砍价、秒杀、优惠券、积分、分销、刮刮卡等，适合企业进行二次开发。
+
+### DSO2O外卖系统
+DSO2O外卖系统专为餐饮行业设计，基于ThinkPhp6.0和Uniapp开发，支持线上点餐和线下配送。系统提供用户友好的界面，方便顾客快速下单，同时支持商家管理订单和配送。该系统还集成了实时数据分析功能，帮助商家优化运营策略。
+
+---
+
+
 
 ## DSO2O介绍
 DSO2O商城系统是基于ThinkPhp6.0+Uniapp开发的一套完善的外卖/家政服务系统，DSO2O系统是一款专业的O2O本地商圈线上线下源码系统，包含同城跑腿、外卖送餐、上门服务、等最贴近社区居民的功能特性。
 DSO2O包含移动端、微信端，是一款全平台的本地生活/智慧城市创业利器！
 
 
-## 导航栏目
- [帮助手册](http://www.csdeshang.com/home/help/index/id/120.html)
- | [功能清单](http://www.csdeshang.com/home/dso2o/feature.html)
- | [官网地址](http://www.csdeshang.com)
- | [TP6开发手册](https://www.kancloud.cn/manual/thinkphp6_0/1037479)
- | [Vue.js手册](https://cn.vuejs.org/)
+## DSO2O导航栏目
+- [帮助手册](http://doc.csdeshang.com) http://doc.csdeshang.com
+- [功能清单](http://www.csdeshang.com/home/dso2o/feature.html) http://www.csdeshang.com/home/dso2o/feature.html
+- [官网地址](http://www.csdeshang.com) http://www.csdeshang.com
+
 
 ## QQ交流群
-DSO2O开源商城官方群:549770277  <a target="_blank" href="//shang.qq.com/wpa/qunwpa?idkey=727cfd470568a3b4905b391cb373a2dfd2318c87ff0104eec8a70cb711483362"><img border="0" src="//pub.idqqimg.com/wpa/images/group.png" alt="DSShop单店铺商城官方群" title="DSShop单店铺商城官方群"></a>
+DSO2O开源商城官方群:549770277 
 
 
 ## DSO2O演示Demo
@@ -21,7 +36,7 @@ DSO2O开源商城官方群:549770277  <a target="_blank" href="//shang.qq.com/wp
 | 后台PC端 | https://uniapp.api.dso2o.csdeshang.com/admin/ |  dso2o  |  123456  |
 | 用户PC端 | https://uniapp.api.dso2o.csdeshang.com/ |  buyer  |  123456  |
 | 商家PC端 | https://uniapp.api.dso2o.csdeshang.com/home/sellerlogin/login.html |  seller  |  123456  |
-| 服务机构管理 | https://dso2o.csdeshang.com/home/fuwu_manage_login/login.html	 |  test1  | 123456 |
+| 服务机构管理 | https://uniapp.api.dso2o.csdeshang.com/home/fuwu_manage_login/login.html	 |  test1  | 123456 |
 | 用户手机端 | https://uniapp.dso2o.csdeshang.com  |  buyer  |  123456  |
 | 商家手机端 | https://uniapp.store.dso2o.csdeshang.com  |  seller  |  123456  |
 | 配送员手机端 | https://uniapp.distributor.dso2o.csdeshang.com	 |  测试配送员  | 123456 |
@@ -79,6 +94,74 @@ DSO2O开源商城官方群:549770277  <a target="_blank" href="//shang.qq.com/wp
 
 ## APIDOC 生成API
 apidoc -i application/api/controller -o public/apidoc/
+
+
+## 更新日志
+
+#### V5.1.6
+1. 新增 店铺设备管理
+2. 优化 验证器
+
+
+#### V5.1.5
+1. 优化 实物订单,退款信息加入订单日志
+2. 优化 获取用户名
+3. 优化 微信一键登录
+4. 优化 跑腿订单日志
+5. 优化 资金日志新增资金总额
+6. 优化 微信登录
+7. 优化 阿里云OSS上传
+
+#### V5.1.3
+1. 优化 实物订单,退款信息加入订单日志
+2. 优化 获取用户名
+3. 优化 微信一键登录
+4. 优化 跑腿订单日志
+5. 优化 资金日志新增资金总额
+6. 优化 微信登录
+7. 优化 阿里云OSS上传
+8. 新增 店铺设备管理
+
+
+#### V5.1.2
+1. 优化 配送员列表
+2. 优化 服务商家
+
+#### V5.1.1
+1. 新增 用户访问设备
+2. 优化 退款
+
+#### V5.1.0
+免费版更新
+1. 优化 多店铺合并支付退款
+2. 优化 订单退款
+3. 去除 自营店铺
+4. 修改 店铺结算模式
+
+
+授权版更新
+1. 新增 展示店铺日志记录
+2. 新增 用户访问设备
+3. 新增 用户资金统计
+4. 优化 商品规格展示
+5. 优化 配送员接单功能
+6. 优化 店铺接单功能
+
+#### V4.1.2
+免费版更新
+1. 新增 发票验证
+2. 优化 地图显示
+3. 优化 商品规格展示
+
+
+#### V4.1.1
+免费版更新
+1. 框架升级 Thinkphp升级为7.1.4
+2. 优化 服务内容
+3. 优化 评论过滤特殊字符
+4. 优化 提现流程
+5. 优化 后台订单列表
+6. 新增 店铺查看优惠券使用
 
 ## 更新日志
 #### V4.1.0

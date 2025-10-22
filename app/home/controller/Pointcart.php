@@ -80,7 +80,7 @@ class  Pointcart extends BasePointShop
         $insert_arr['pgoods_name']		= $prod_info['pgoods_name'];
         $insert_arr['pgoods_points']	= $prod_info['pgoods_points'];
         $insert_arr['pgoods_choosenum']	= $prod_info['quantity'];
-        $insert_arr['pgoods_image']		= $prod_info['pgoods_image_old'];
+        $insert_arr['pgoods_image']		= $prod_info['pgoods_image'];
         $cart_state = $pointcart_model->addPointcart($insert_arr);
         echo json_encode(array('done'=>true));
         die;

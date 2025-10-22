@@ -1,11 +1,12 @@
 <?php
 
 namespace app\common\model;
+
 use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,8 +16,8 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Mallconsulttype extends BaseModel
-{
+class Mallconsulttype extends BaseModel {
+
     /**
      * 咨询类型列表
      * @access public
@@ -27,12 +28,11 @@ class  Mallconsulttype extends BaseModel
      * @param string $order 排序
      * @return array 
      */
-    public function getMallconsulttypeList($condition, $field = '*', $key = '', $order = 'mallconsulttype_sort asc,mallconsulttype_id asc')
-    {
-        $res= Db::name('mallconsulttype')->where($condition)->field($field)->order($order)->select()->toArray();
-        if(!empty($key)) {
+    public function getMallconsulttypeList($condition, $field = '*', $key = '', $order = 'mallconsulttype_sort asc,mallconsulttype_id asc') {
+        $res = Db::name('mallconsulttype')->where($condition)->field($field)->order($order)->select()->toArray();
+        if (!empty($key)) {
             return ds_change_arraykey($res, $key);
-        }else{
+        } else {
             return $res;
         }
     }
@@ -45,8 +45,7 @@ class  Mallconsulttype extends BaseModel
      * @param string $field 字段
      * @return type 
      */
-    public function getMallconsulttypeInfo($condition, $field = '*')
-    {
+    public function getMallconsulttypeInfo($condition, $field = '*') {
         return Db::name('mallconsulttype')->where($condition)->field($field)->find();
     }
 
@@ -57,8 +56,7 @@ class  Mallconsulttype extends BaseModel
      * @param array $data 参数内容
      * @return bool
      */
-    public function addMallconsulttype($data)
-    {
+    public function addMallconsulttype($data) {
         return Db::name('mallconsulttype')->insertGetId($data);
     }
 
@@ -70,8 +68,7 @@ class  Mallconsulttype extends BaseModel
      * @param array $update 数据
      * @return boolean
      */
-    public function editMallconsulttype($condition, $update)
-    {
+    public function editMallconsulttype($condition, $update) {
         return Db::name('mallconsulttype')->where($condition)->update($update);
     }
 
@@ -82,8 +79,7 @@ class  Mallconsulttype extends BaseModel
      * @param array $condition 条件
      * @return boolean
      */
-    public function delMallconsulttype($condition)
-    {
+    public function delMallconsulttype($condition) {
         return Db::name('mallconsulttype')->where($condition)->delete();
     }
 }

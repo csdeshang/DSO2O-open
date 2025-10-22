@@ -34,7 +34,6 @@ class  O2oDistributor extends Validate {
         'o2o_distributor_urge_order_ring_remind' => 'require|in:0,1',
         'o2o_distributor_urge_order_shock_remind' => 'require|in:0,1',
     ];
-    protected $regex = ['mobile' => '^1[0-9]{10}$'];
     protected $message = [
         'o2o_distributor_state.require' => '请选择状态',
         'o2o_distributor_state.in' => '状态错误',
@@ -61,7 +60,6 @@ class  O2oDistributor extends Validate {
         'o2o_distributor_update_payment_account' => ['o2o_distributor_payment_account'],
         'o2o_distributor_update_phone' => ['o2o_distributor_phone'],
         'o2o_distributor_update_email' => ['o2o_distributor_email'],
-        'o2o_distributor_update_password' => ['o2o_distributor_password'],
     ];
 
 }

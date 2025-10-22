@@ -43,10 +43,8 @@ class FuwuManageAccount extends BaseFuwu {
             $validate_data = array(
                 'o2o_fuwu_account_phone' => $mobile,
             );
-            $o2o_fuwu_account_validate = ds_validate('o2o_fuwu_account');
-            if (!$o2o_fuwu_account_validate->scene('o2o_fuwu_account_edit_phone')->check($validate_data)) {
-                ds_json_encode(10001, $o2o_fuwu_account_validate->getError());
-            }
+            $this->validate($validate_data, 'app\common\validate\O2oFuwuAccount.o2o_fuwu_account_edit_phone');
+            
             $o2o_fuwu_account_model = model('o2o_fuwu_account');
             $result = $o2o_fuwu_account_model->editO2oFuwuAccount($validate_data, array('o2o_fuwu_account_id' => $this->o2o_fuwu_account_info['o2o_fuwu_account_id']));
             if ($result) {
@@ -81,21 +79,13 @@ class FuwuManageAccount extends BaseFuwu {
                 ds_json_encode(10001, lang('o2o_fuwu_account_password_not_equal'));
             }
 
-            $validate_data = array(
-                'verify_code' => $verify_code,
-            );
-            $verify_code_validate = ds_validate('verify_code');
-            if (!$verify_code_validate->scene('verify_code_search')->check($validate_data)) {
-                ds_json_encode(10001, $verify_code_validate->getError());
-            }
+            $this->validate(array('verify_code'=>$verify_code), 'app\common\validate\Singlefield.verify_code');
 
             $validate_data = array(
                 'o2o_fuwu_account_password' => $password1,
             );
-            $o2o_fuwu_account_validate = ds_validate('o2o_fuwu_account');
-            if (!$o2o_fuwu_account_validate->scene('o2o_fuwu_account_edit_password')->check($validate_data)) {
-                ds_json_encode(10001, $o2o_fuwu_account_validate->getError());
-            }
+            $this->validate($validate_data, 'app\common\validate\O2oFuwuAccount.o2o_fuwu_account_edit_password');
+            
             $verify_code_model = model('verify_code');
             if (!$verify_code_model->getVerifyCodeInfo(array(array('verify_code_type' ,'=', 3), array('verify_code_user_type' ,'=', 4), array('verify_code_user_id' ,'=', $this->o2o_fuwu_account_info['o2o_fuwu_account_id']), array('verify_code' ,'=', $verify_code), array('verify_code_add_time','>', TIMESTAMP - VERIFY_CODE_INVALIDE_MINUTE * 60)))) {
                 ds_json_encode(10001, lang('o2o_fuwu_account_verify_code_error'));
@@ -166,7 +156,7 @@ class FuwuManageAccount extends BaseFuwu {
                 if (!$flag) {
                     throw new \think\Exception('新增验证码记录失败', 10006);
                 }
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 ds_json_encode(10001, $e->getMessage());
             }
         } else {

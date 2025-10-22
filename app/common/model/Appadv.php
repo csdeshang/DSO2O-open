@@ -3,9 +3,10 @@
 namespace app\common\model;
 use think\facade\Db;
 
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,7 +16,7 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Appadv extends BaseModel
+class Appadv extends BaseModel
 {
     /**
      * 获取APP广告位列表
@@ -102,9 +103,10 @@ class  Appadv extends BaseModel
      * @return bool 布尔类型的返回结果
      */
     public function delAppadvposition($ap_id) {
-        $apId = (int) $ap_id;
-        dkcache("appadv/{$apId}");
-        return Db::name('appadvposition')->where('ap_id', $apId)->delete();
+        dkcache("appadv/{$ap_id}");
+        $condition = array();
+        $condition[] = array('ap_id','=',$ap_id);
+        return Db::name('appadvposition')->where($condition)->delete();
     }
     /**
      * 获取一个广告位
@@ -123,13 +125,16 @@ class  Appadv extends BaseModel
      * @return bool
      */
     public function editAppadv($adv_id,$data) {
-        $adv_array = Db::name('appadv')->where('adv_id', $adv_id)->find();
+        $condition = array();
+        $condition[] = array('adv_id','=',$adv_id);
+        
+        $adv_array = Db::name('appadv')->where($condition)->find();
         if ($adv_array) {
             // drop cache
             $apId = (int) $adv_array['ap_id'];
             dkcache("appadv/{$apId}");
         }
-        return Db::name('appadv')->where('adv_id', $adv_id)->update($data);
+        return Db::name('appadv')->where($condition)->update($data);
     }
 
     /**
@@ -139,14 +144,16 @@ class  Appadv extends BaseModel
      * @return bool 布尔类型的返回结果
      */
     public function delAppadv($adv_id) {
+        $condition = array();
         $condition[] = array('adv_id','=',$adv_id);
+        
         $adv = Db::name('appadv')->where($condition)->find();
         if ($adv) {
             // drop cache
             $apId = (int) $adv['ap_id'];
             dkcache("appadv/{$apId}");
         }
-        @unlink(BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . ATTACH_APPADV. DIRECTORY_SEPARATOR .$adv['adv_code']);
+        ds_del_pic(ATTACH_APPADV, $adv['adv_code']);
         return Db::name('appadv')->where($condition)->delete();
     }
 }

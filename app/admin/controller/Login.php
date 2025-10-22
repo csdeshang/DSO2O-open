@@ -4,9 +4,10 @@ namespace app\admin\controller;
 use think\facade\View;
 use think\facade\Lang;
 use think\captcha\facade\Captcha;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能 登录
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -16,7 +17,7 @@ use think\captcha\facade\Captcha;
  * ============================================================================
  * 控制器
  */
-class  Login extends AdminControl {
+class Login extends AdminControl {
 
     public function initialize() {
         parent::initialize();
@@ -25,7 +26,7 @@ class  Login extends AdminControl {
 
     public function index() {
         if (session('admin_id')) {
-            $this->success('已经登录', 'Index/index');
+            $this->success(lang('already_logged'), 'Index/index');
         }
         if (request()->isPost()) {
             $admin_name = input('post.admin_name');
@@ -38,16 +39,13 @@ class  Login extends AdminControl {
                 'captcha' => $captcha,
             );
 
-            $login_validate = ds_validate('admin');
-            if (!$login_validate->scene('index')->check($data)) {
-                ds_json_encode(10001,$login_validate->getError());
-            }
+            //验证器
+            $this->validate($data, 'app\common\validate\Admin.index');
 
             if (!captcha_check(input('post.captcha'))) {
                 //验证失败
-                ds_json_encode(10001,'验证码错误');
+                ds_json_encode(10001,lang('wrong_checkcode'));
             }
-
             $condition = array();
             $condition[] = array('admin_name','=',$admin_name);
             $condition[] = array('admin_password','=',md5($admin_password));
@@ -67,9 +65,9 @@ class  Login extends AdminControl {
                 session('admin_name', $admin_info['admin_name']);
                 session('admin_gid', $admin_info['admin_gid']);
                 session('admin_is_super', $admin_info['admin_is_super']);
-                ds_json_encode(10000,'登录成功', '','',false);
+                ds_json_encode(10000,lang('login_succ'), '','',false);
             } else {
-                ds_json_encode(10001,'帐号密码错误');
+                ds_json_encode(10001,lang('login_error'));
             }
         } else {
             return View::fetch();
@@ -79,7 +77,7 @@ class  Login extends AdminControl {
     public function logout() {
         //设置 session
         session(null);
-        ds_json_encode(10000,'退出成功', '','',false);
+        ds_json_encode(10000,lang('logout_succ'), '','',false);
     }
     
     /**

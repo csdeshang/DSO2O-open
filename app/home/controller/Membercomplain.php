@@ -172,11 +172,6 @@ class  Membercomplain extends BaseMember {
         }
         list($input['complain_subject_id'], $input['complain_subject_content']) = explode(',', trim(input('post.input_complain_subject')));
         $input_complain_content=trim(input('post.input_complain_content'));
-        $res=word_filter($input_complain_content);
-        if(!$res['code']){
-            $this->error($res['msg']);
-        }
-        $input_complain_content=$res['data']['text'];
         
         $input['complain_content'] = $input_complain_content;
         $input['accuser_id'] = $order_info['buyer_id'];
@@ -242,10 +237,7 @@ class  Membercomplain extends BaseMember {
                 $pics[] = $complain_info['complain_pic3'];
             if (!empty($pics)) {//删除图片
                 foreach ($pics as $pic) {
-                    $pic = BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . ATTACH_PATH . DIRECTORY_SEPARATOR . 'complain' . DIRECTORY_SEPARATOR . $pic;
-                    if (file_exists($pic)) {
-                        @unlink($pic);
-                    }
+                    ds_del_pic(ATTACH_COMPLAIN,$pic);
                 }
             }
             $complain_model = model('complain');

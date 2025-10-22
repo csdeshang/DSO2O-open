@@ -84,10 +84,7 @@ class  Sellerplate extends BaseSeller {
             $insert['storeplate_content'] = input('post.p_content');
             $insert['store_id'] = session('store_id');
 
-            $sellerplate_validate = ds_validate('sellerplate');
-            if (!$sellerplate_validate->scene('plate_add')->check($insert)) {
-                ds_json_encode(10001,lang('error') . $sellerplate_validate->getError());
-            }
+            $this->validate($insert, 'app\common\validate\Storeplate.add');
 
             $result = model('storeplate')->addStoreplate($insert);
             if ($result) {
@@ -125,12 +122,7 @@ class  Sellerplate extends BaseSeller {
             $update['storeplate_position'] = input('post.p_position');
             $update['storeplate_content'] = input('post.p_content');
 
-            //验证数据  BEGIN
-            $sellerplate_validate = ds_validate('sellerplate');
-            if (!$sellerplate_validate->scene('plate_edit')->check($update)) {
-                ds_json_encode(10001,lang('error') . $sellerplate_validate->getError());
-            }
-            //验证数据  END
+            $this->validate($update, 'app\common\validate\Storeplate.edit');
             
             $condition = array();
             $condition[] = array('storeplate_id','=',$storeplate_id);

@@ -31,9 +31,7 @@
             <dd> <a href="{:url('Memberorder/show_order',['order_id'=>$return_info.order_id])}"  target="_blank"> {$return_info.order_sn} </a> <a href="javascript:void(0);" class="a">{$Think.lang.more}<i class="iconfont">&#xe689;</i>
                 <div class="more"> <span class="arrow"></span>
                     <ul>
-                        {if $return_info.payment_code != 'offline'}
                         <li>{$Think.lang.payment_order_number}{$Think.lang.ds_colon}<span>{$return_info.pay_sn}</span></li>
-                        {/if}
                         <li>{$Think.lang.payment_method}：<span>{$return_info.payment_name}</span> </li>
                         <li>{$Think.lang.member_order_time}{$Think.lang.ds_colon}<span>{$return_info.refundreturn_add_time|date="Y-m-d H:i:s"}</span></li>
                         {gt name="return_info.payment_time" value="0"}

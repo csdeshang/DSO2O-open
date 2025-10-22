@@ -96,6 +96,18 @@ class  O2oDistributorMoneylog extends BaseModel {
      */
     public function changeO2oDistributorMoney($change_type, $data = array()) {
         
+        if(empty($data['o2o_distributor_id']) || intval($data['o2o_distributor_id']) <= 0){
+            throw new \think\Exception('changeO2oDistributorMoney 方法未传 o2o_distributor_id 系统严重错误');
+        }
+        //获取配送员信息
+        $o2o_distributor_info = Db::name('O2oDistributor')->field('o2o_distributor_id,o2o_distributor_avaliable_money,o2o_distributor_freeze_money')->where(array('o2o_distributor_id' => $data['o2o_distributor_id']))->lock(true)->find();
+        if (empty($o2o_distributor_info)) {
+            throw new \think\Exception('changePd 方法未传 o2o_distributor_id 用户不存在');
+        }
+        if ($data['amount'] <= 0) {
+            throw new \think\Exception('changeO2oDistributorMoney 方法 amount金额错误');
+        }
+        
         $data_log = array();
         $data_pd = array();
         
@@ -135,6 +147,10 @@ class  O2oDistributorMoneylog extends BaseModel {
                 //待审核状态,用于判断管理员的状态,在其他地方无用
                 $data_log['o2o_distributor_moneylog_payment_state'] = '2';
                 
+                //判断是否有充足金额
+                if($data['amount'] > $o2o_distributor_info['o2o_distributor_avaliable_money']){
+                    throw new \think\Exception('申请提现金额不足');
+                }
                 $data_pd['o2o_distributor_avaliable_money'] = Db::raw('o2o_distributor_avaliable_money-'.$data['amount']);
                 $data_pd['o2o_distributor_freeze_money'] = Db::raw('o2o_distributor_freeze_money+'.$data['amount']);
                 break;
@@ -142,6 +158,10 @@ class  O2oDistributorMoneylog extends BaseModel {
                 $data_log['o2o_distributor_moneylog_freeze_money'] = -$data['amount'];
                 $data_log['o2o_distributor_moneylog_desc'] = '提现成功,'.$log_desc;
                 
+                //判断是否有充足金额
+                if($data['amount'] > $o2o_distributor_info['o2o_distributor_freeze_money']){
+                    throw new \think\Exception('系统错误,配送员冻结金额不足');
+                }
                 $data_pd['o2o_distributor_freeze_money'] = Db::raw('o2o_distributor_freeze_money-'.$data['amount']);
                 break;
             case 'cash_del':
@@ -150,6 +170,10 @@ class  O2oDistributorMoneylog extends BaseModel {
                 $data_log['o2o_distributor_moneylog_desc'] = '取消提现申请，解冻预存款。'.$log_desc;
                 
                 $data_pd['o2o_distributor_avaliable_money'] = Db::raw('o2o_distributor_avaliable_money+'.$data['amount']);
+                //判断是否有充足金额
+                if($data['amount'] > $o2o_distributor_info['o2o_distributor_freeze_money']){
+                    throw new \think\Exception('系统错误,配送员冻结金额不足');
+                }
                 $data_pd['o2o_distributor_freeze_money'] = Db::raw('o2o_distributor_freeze_money-'.$data['amount']);
                 break;
 

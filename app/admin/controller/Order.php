@@ -33,6 +33,10 @@ class  Order extends AdminControl {
         if ($order_sn) {
             $condition[]=array('order_sn','=',$order_sn);
         }
+        $pay_sn = input('param.pay_sn');
+        if ($pay_sn) {
+            $condition[] = array('pay_sn','=',$pay_sn);
+        }
         $store_name = input('param.store_name');
         if ($store_name) {
             $condition[]=array('store_name','=',$store_name);
@@ -135,14 +139,16 @@ class  Order extends AdminControl {
         if (!$if_allow) {
             return ds_callback(false, '无权操作');
         }
+        
+        Db::startTrans();
         try{
-            Db::startTrans();
             $logic_order->changeOrderStateCancel($order_info, 'system', $this->admin_info['admin_name']);
+            Db::commit();
         } catch (\Exception $e) {
             Db::rollback();
             return ds_callback(false, $e->getMessage());
         }
-        Db::commit();
+        
         $this->log(lang('order_log_cancel') . ',' . lang('order_number') . ':' . $order_info['order_sn'], 1);
         return ds_callback(true, lang('ds_common_op_succ'));
     }
@@ -180,12 +186,10 @@ class  Order extends AdminControl {
             }
             $payed_amount = floatval($order_info['rcb_amount']) + floatval($order_info['pd_amount']);
             //计算相关支付金额
-            if ($order_info['payment_code'] != 'offline') {
                 if ($order_info['order_state'] == ORDER_STATE_NEW) {
                     $pay_amount_online += ds_price_format(floatval($order_info['order_amount']) - $payed_amount);
                 }
                 $pay_amount += floatval($order_info['order_amount']);
-            }
             $order_sn_list[]=$order_info['order_sn'];
         }
 
@@ -196,9 +200,9 @@ class  Order extends AdminControl {
             View::assign('pay_amount', ds_price_format($pay_amount));
             //显示支付接口列表
             $payment_list = model('payment')->getPaymentOpenList();
-            //去掉预存款和货到付款
+            //去掉预存款
             foreach ($payment_list as $key => $value) {
-                if ($value['payment_code'] == 'predeposit' || $value['payment_code'] == 'offline') {
+                if ($value['payment_code'] == 'predeposit') {
                     unset($payment_list[$key]);
                 }
             }
@@ -207,14 +211,16 @@ class  Order extends AdminControl {
             exit;
         } else {
             $order_list = $order_model->getOrderList(array('pay_sn' => $pay_sn, 'order_state' => ORDER_STATE_NEW));
-            try{
-                Db::startTrans();
+            
+            Db::startTrans();
+            try {
                 $logic_order->changeOrderReceivePay($order_list, 'system', $this->admin_info['admin_name'], $post);
+                Db::commit();
             } catch (\Exception $e) {
                 Db::rollback();
                 return ds_callback(false, $e->getMessage());
             }
-            Db::commit();    
+
             $this->log('将订单改为已收款状态,' . lang('ds_order_sn') . ':' . implode('`', $order_sn_list), 1);
             return ds_callback(true, lang('ds_common_op_succ'));
         }

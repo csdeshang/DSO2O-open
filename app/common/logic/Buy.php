@@ -1,6 +1,7 @@
 <?php
 
 namespace app\common\logic;
+
 use think\facade\Db;
 
 /**
@@ -15,7 +16,7 @@ use think\facade\Db;
  * ============================================================================
  * 逻辑层模型
  */
-class  Buy {
+class Buy {
 
     /**
      * 会员信息
@@ -28,6 +29,7 @@ class  Buy {
      * @var array
      */
     private $_store_list = array();
+
     /**
      * 重量信息
      * @var array
@@ -102,7 +104,7 @@ class  Buy {
         }
 
         //购物车列表
-        $condition = array(array('cart_id','in', array_keys($buy_items)), array('buyer_id' ,'=', $member_id));
+        $condition = array(array('cart_id', 'in', array_keys($buy_items)), array('buyer_id', '=', $member_id));
         $cart_list = $cart_model->getCartList('db', $condition);
 
         //购物车列表 [得到最新商品属性及促销信息]
@@ -180,15 +182,15 @@ class  Buy {
         foreach ($store_cart_list as $store_id => $store_cart) {
             if ($store_model->isO2oSupport($this->_store_list[$store_id])) {
                 $result['weight_list'][$store_id] = 0;
-                foreach($store_cart as $goods){
-                    $result['weight_list'][$store_id] += $goods['goods_weight']*$goods['goods_num'];
+                foreach ($store_cart as $goods) {
+                    $result['weight_list'][$store_id] += $goods['goods_weight'] * $goods['goods_num'];
                 }
                 if ($this->_store_list[$store_id]['store_o2o_distribute_type'] == 1) {
                     $result['store_o2o_fee_list'][$store_id] = 0;
                 } else {
-                    if(intval(config('ds_config.dada_open'))==1){
+                    if (intval(config('ds_config.dada_open')) == 1) {
                         $result['store_o2o_fee_list'][$store_id] = 0;
-                    }else{
+                    } else {
                         $result['store_o2o_fee_list'][$store_id] = 0;
                     }
                 }
@@ -221,8 +223,7 @@ class  Buy {
         $result['store_voucher_list'] = $store_voucher_list;
 
         //输出用户默认收货地址
-        $result['address_info'] = model('address')->getDefaultAddressInfo(array(array('member_id' ,'=', $member_id),array('address_o2o_errand_type' ,'=', 0)));
-
+        $result['address_info'] = model('address')->getDefaultAddressInfo(array(array('member_id', '=', $member_id), array('address_o2o_errand_type', '=', 0)));
 
         //发票 :只有所有商品都支持增值税发票才提供增值税发票
         $vat_deny = false;
@@ -278,11 +279,12 @@ class  Buy {
         $this->_member_info['member_email'] = $member_email;
         $this->_post_data = $post;
 
+        Db::startTrans();
         try {
 
             $order_model = model('order');
-            Db::startTrans();
-            $this->_logic_buy_1->lock=true;
+
+            $this->_logic_buy_1->lock = true;
             //第1步 表单验证
             $this->_createOrderStep1();
 
@@ -298,7 +300,6 @@ class  Buy {
             //第6步 订单后续处理
             $this->_createOrderStep6();
             Db::commit();
-
 
             return ds_callback(true, '', $this->_order_data);
         } catch (\Exception $e) {
@@ -322,17 +323,13 @@ class  Buy {
         $inviter_ratio_3 = config('ds_config.inviter_ratio_3');
         $orderinviter_model = model('orderinviter');
         foreach ($order_list as $order_id => $order) {
-            //如果是线下支付因为不会生成结算单所以不生成推广记录
-            if($order['payment_code']=='offline'){
-                continue;
-            }
             foreach ($order['order_goods'] as $goods) {
                 //查询商品的分销信息
                 $goods_common_info = Db::name('goodscommon')->alias('gc')->join('goods g', 'g.goods_commonid=gc.goods_commonid')->where('g.goods_id=' . $goods['goods_id'])->field('gc.goods_commonid,gc.inviter_open,gc.inviter_ratio')->find();
                 if (!$goods_common_info['inviter_open']) {
                     continue;
                 }
-                $goods_amount = $goods['goods_pay_price']*$goods_common_info['inviter_ratio']/100;
+                $goods_amount = $goods['goods_pay_price'] * $goods_common_info['inviter_ratio'] / 100;
                 $inviter_ratios = array(
                     $inviter_ratio_1,
                     $inviter_ratio_2,
@@ -342,7 +339,7 @@ class  Buy {
                 if (config('ds_config.inviter_return')) {
                     if (Db::name('inviter')->where('inviter_state=1 AND inviter_id=' . $order['buyer_id'])->value('inviter_id')) {
                         if (isset($inviter_ratios[0]) && floatval($inviter_ratios[0]) > 0) {
-                        $ratio=round($inviter_ratios[0]*$goods_common_info['inviter_ratio']/100,2);
+                            $ratio = round($inviter_ratios[0] * $goods_common_info['inviter_ratio'] / 100, 2);
                             $money_1 = round($inviter_ratios[0] / 100 * $goods_amount, 2);
                             if ($money_1 > 0) {
 
@@ -357,7 +354,7 @@ class  Buy {
                                     'orderinviter_goods_commonid' => $goods_common_info['goods_commonid'],
                                     'orderinviter_goods_id' => $goods['goods_id'],
                                     'orderinviter_level' => 1,
-                                        'orderinviter_ratio' => $ratio,
+                                    'orderinviter_ratio' => $ratio,
                                     'orderinviter_goods_name' => $goods['goods_name'],
                                     'orderinviter_order_id' => $order_id,
                                     'orderinviter_order_sn' => $order['order_sn'],
@@ -379,7 +376,7 @@ class  Buy {
 
                 $inviter_1 = Db::name('member')->where('member_id', $inviter_1_id)->field('inviter_id,member_id,member_name')->find();
                 if ($inviter_1 && isset($inviter_ratios[0]) && floatval($inviter_ratios[0]) > 0) {
-                $ratio=round($inviter_ratios[0]*$goods_common_info['inviter_ratio']/100,2);
+                    $ratio = round($inviter_ratios[0] * $goods_common_info['inviter_ratio'] / 100, 2);
                     $money_1 = round($inviter_ratios[0] / 100 * $goods_amount, 2);
                     if ($money_1 > 0) {
 
@@ -415,7 +412,7 @@ class  Buy {
                 }
                 $inviter_2 = Db::name('member')->where('member_id', $inviter_2_id)->field('inviter_id,member_id,member_name')->find();
                 if ($inviter_2 && isset($inviter_ratios[1]) && floatval($inviter_ratios[1]) > 0) {
-                $ratio=round($inviter_ratios[1]*$goods_common_info['inviter_ratio']/100,2);
+                    $ratio = round($inviter_ratios[1] * $goods_common_info['inviter_ratio'] / 100, 2);
                     $money_2 = round($inviter_ratios[1] / 100 * $goods_amount, 2);
                     if ($money_2 > 0) {
 
@@ -451,7 +448,7 @@ class  Buy {
                 }
                 $inviter_3 = Db::name('member')->where('member_id', $inviter_3_id)->field('inviter_id,member_id,member_name')->find();
                 if ($inviter_3 && isset($inviter_ratios[2]) && floatval($inviter_ratios[2]) > 0) {
-                $ratio=round($inviter_ratios[2]*$goods_common_info['inviter_ratio']/100,2);
+                    $ratio = round($inviter_ratios[2] * $goods_common_info['inviter_ratio'] / 100, 2);
                     $money_3 = round($inviter_ratios[2] / 100 * $goods_amount, 2);
                     if ($money_3 > 0) {
 
@@ -492,9 +489,9 @@ class  Buy {
         $cart_id_str = implode(',', $cart_ids);
         if (preg_match('/^[\d,]+$/', $cart_id_str)) {
             $condition = array();
-            $condition[] = array('buyer_id','=',$member_id);
-            $condition[] = array('cart_id','in',$cart_ids);
-            model('cart')->delCart('db', $condition,$member_id);
+            $condition[] = array('buyer_id', '=', $member_id);
+            $condition[] = array('cart_id', 'in', $cart_ids);
+            model('cart')->delCart('db', $condition, $member_id);
         }
     }
 
@@ -532,7 +529,6 @@ class  Buy {
         }
         $input_if_vat = ($input_if_vat == 'allow_vat') ? true : false;
 
-
         $input_pay_name = 'online';
 
         //验证发票信息
@@ -568,7 +564,7 @@ class  Buy {
         $this->_order_data['input_address_info'] = $input_address_info;
         $this->_order_data['input_invoice_info'] = $input_invoice_info;
         $this->_order_data['input_voucher_list'] = $input_voucher_list;
-        $this->_order_data['order_from'] = $post['order_from'] == 2 ? 2 : 1;
+        $this->_order_data['order_from'] = isset($post['order_from']) ? $post['order_from'] : '未知来源';
     }
 
     /**
@@ -583,7 +579,7 @@ class  Buy {
             //购物车列表
             $cart_model = model('cart');
             $condition = array(
-                array('cart_id','in', array_keys($input_buy_items)), array('buyer_id' ,'=', $this->_member_info['member_id'])
+                array('cart_id', 'in', array_keys($input_buy_items)), array('buyer_id', '=', $this->_member_info['member_id'])
             );
             $cart_list = $cart_model->getCartList('db', $condition);
 
@@ -619,7 +615,7 @@ class  Buy {
             $store_cart_list = array();
             $goods_list = array();
             $goods_list[0] = $store_cart_list[$goods_info['store_id']][0] = $goods_info;
-            $this->_weight_list[$goods_info['store_id']]=$goods_info['goods_weight']*$quantity;
+            $this->_weight_list[$goods_info['store_id']] = $goods_info['goods_weight'] * $quantity;
         }
 
         //保存数据
@@ -657,7 +653,6 @@ class  Buy {
 
         //计算每个店铺(所有店铺级优惠活动)总共优惠多少
         $store_promotion_total = $this->_logic_buy_1->getStorePromotionTotal($store_goods_total, $store_final_goods_total);
-
 
         //计算店铺最终订单实际支付金额(加上运费)
         $store_final_order_total = $store_final_goods_total;
@@ -706,7 +701,6 @@ class  Buy {
         //存储通知信息
         $notice_list = array();
 
-
         $pay_sn = makePaySn($member_id);
         $order_pay = array();
         $order_pay['pay_sn'] = $pay_sn;
@@ -754,7 +748,7 @@ class  Buy {
             $order['order_state'] = ORDER_STATE_NEW;
             $order['order_amount'] = $store_final_order_total[$store_id] + $res['data'][$store_id]['o2o_fee'];
             //配送信息
-            $order['goods_weight'] = round($this->_weight_list[$store_id],3);
+            $order['goods_weight'] = round($this->_weight_list[$store_id], 3);
             $order['o2o_third'] = $res['data'][$store_id]['o2o_third'];
             $order['o2o_order_distributor_type'] = $res['data'][$store_id]['distributor_type'];
             $order['o2o_order_distance'] = $res['data'][$store_id]['o2o_distance'];
@@ -763,10 +757,6 @@ class  Buy {
             $order['shipping_fee'] = $res['data'][$store_id]['o2o_fee'];
             $order['goods_amount'] = $order['order_amount'] - $order['shipping_fee'];
             $order['order_from'] = $order_from;
-            //如果支持方式为空时，默认为货到付款 
-            if ($order['payment_code'] == "") {
-                $order['payment_code'] = "offline";
-            }
             $order_id = $order_model->addOrder($order);
             if (!$order_id) {
                 throw new \think\Exception('订单保存失败[未生成订单数据]', 10006);
@@ -800,22 +790,22 @@ class  Buy {
             if (!$order_id) {
                 throw new \think\Exception('订单保存失败[未生成订单扩展数据]', 10006);
             }
-            $order_list[$order_id]['order_common']=$order_common;
+            $order_list[$order_id]['order_common'] = $order_common;
             //生成order_goods订单商品数据
             $i = 0;
-            
-            $required_goods_id=Db::name('goods')->where(array(array('store_id','=',$order['store_id']),array('goods_verify','=',1),array('goods_state','=',1),array('goods_if_required','=',1)))->column('goods_id');
-            if(empty($required_goods_id)){
-                $required=true;
-            }else{
-                $required=false;
-            }        
+
+            $required_goods_id = Db::name('goods')->where(array(array('store_id', '=', $order['store_id']), array('goods_verify', '=', 1), array('goods_state', '=', 1), array('goods_if_required', '=', 1)))->column('goods_id');
+            if (empty($required_goods_id)) {
+                $required = true;
+            } else {
+                $required = false;
+            }
             foreach ($goods_list as $goods_info) {
                 if (!$goods_info['state'] || !$goods_info['storage_state']) {
                     throw new \think\Exception('部分商品已经下架或库存不足，请重新选择', 10006);
                 }
-                if(!$required && !empty($required_goods_id) && in_array($goods_info['goods_id'],$required_goods_id)){
-                    $required=true;
+                if (!$required && !empty($required_goods_id) && in_array($goods_info['goods_id'], $required_goods_id)) {
+                    $required = true;
                 }
                 //如果不是优惠套装
                 $order_goods[$i]['order_id'] = $order_id;
@@ -823,6 +813,7 @@ class  Buy {
                 $order_goods[$i]['store_id'] = $store_id;
                 $order_goods[$i]['goods_name'] = $goods_info['goods_name'];
                 $order_goods[$i]['goods_price'] = $goods_info['goods_price'];
+                $order_goods[$i]['goods_original_price'] = $goods_info['goods_original_price'];
                 $order_goods[$i]['goods_num'] = $goods_info['goods_num'];
                 $order_goods[$i]['goods_image'] = $goods_info['goods_image'];
                 $order_goods[$i]['buyer_id'] = $member_id;
@@ -851,25 +842,25 @@ class  Buy {
                     $param = array();
                     $param['common_id'] = $goods_info['goods_commonid'];
                     $param['sku_id'] = $goods_info['goods_id'];
-                        $ten_param=array($param['common_id'],$param['sku_id']);
-                    $weixin_param=array(
-                            'url' => config('ds_config.h5_store_site_url').'/pages/seller/goods/GoodsForm2?commonid='.$goods_info['goods_commonid'].'&class_id='.$goods_info['gc_id'],
-                            'data'=>array(
-                                "keyword1" => array(
-                                    "value" => $goods_info['goods_storage'] - $goods_info['goods_num'],
-                                    "color" => "#333"
-                                ),
-                                "keyword2" => array(
-                                    "value" => date('Y-m-d H:i'),
-                                    "color" => "#333"
-                                )
+                    $ten_param = array($param['common_id'], $param['sku_id']);
+                    $weixin_param = array(
+                        'url' => config('ds_config.h5_store_site_url') . '/pages/seller/goods/GoodsForm2?commonid=' . $goods_info['goods_commonid'] . '&class_id=' . $goods_info['gc_id'],
+                        'data' => array(
+                            "keyword1" => array(
+                                "value" => $goods_info['goods_storage'] - $goods_info['goods_num'],
+                                "color" => "#333"
                             ),
-                        );
-                    $notice_list['goods_storage_alarm'][$goods_info['store_id']] = array('param'=>$param,'ali_param'=>$param,'ten_param'=>$ten_param,'weixin_param'=>$weixin_param);
+                            "keyword2" => array(
+                                "value" => date('Y-m-d H:i'),
+                                "color" => "#333"
+                            )
+                        ),
+                    );
+                    $notice_list['goods_storage_alarm'][$goods_info['store_id']] = array('param' => $param, 'ali_param' => $param, 'ten_param' => $ten_param, 'weixin_param' => $weixin_param);
                 }
             }
-            if(!$required){
-                throw new \think\Exception('没有选择必点商品['.$order['store_name'].']', 10006);
+            if (!$required) {
+                throw new \think\Exception('没有选择必点商品[' . $order['store_name'] . ']', 10006);
             }
             //将因舍出小数部分出现的差值补到最后一个商品的实际成交价中(商品goods_price=0时不给补，可能是赠品)
             if ($promotion_total > $promotion_sum) {
@@ -893,7 +884,6 @@ class  Buy {
         $this->_order_data['order_list'] = $order_list;
         $this->_order_data['notice_list'] = $notice_list;
     }
-
 
     /**
      * 订单后续其它处理
@@ -926,9 +916,9 @@ class  Buy {
         //发送提醒类信息
         if (!empty($notice_list)) {
             foreach ($notice_list as $code => $value) {
-                $temp=current($value);
-                model('cron')->addCron(array('cron_exetime'=>TIMESTAMP,'cron_type'=>'sendStoremsg','cron_value'=>serialize(array(
-                    'code' => $code, 'store_id' => key($value), 'param' => $temp['param'], 'weixin_param' => $temp['weixin_param'], 'ali_param' => $temp['ali_param'], 'ten_param' => $temp['ten_param']))
+                $temp = current($value);
+                model('cron')->addCron(array('cron_exetime' => TIMESTAMP, 'cron_type' => 'sendStoremsg', 'cron_value' => serialize(array(
+                        'code' => $code, 'store_id' => key($value), 'param' => $temp['param'], 'weixin_param' => $temp['weixin_param'], 'ali_param' => $temp['ali_param'], 'ten_param' => $temp['ten_param']))
                 ));
             }
         }
@@ -941,7 +931,7 @@ class  Buy {
      * @return mixed arrray/string
      */
     public function buyEncrypt($string, $member_id) {
-        $buy_key = sha1(md5($member_id . '&' . md5(config('ds_config.setup_date'))));
+        $buy_key = sha1(md5($member_id . '&' . md5(config('ds_config.site_uniqid'))));
         if (is_array($string)) {
             $string = serialize($string);
         } else {
@@ -957,7 +947,7 @@ class  Buy {
      * @param number $ttl
      */
     public function buyDecrypt($string, $member_id, $ttl = 0) {
-        $buy_key = sha1(md5($member_id . '&' . md5(config('ds_config.setup_date'))));
+        $buy_key = sha1(md5($member_id . '&' . md5(config('ds_config.site_uniqid'))));
         if (empty($string))
             return;
         $string = base64_decode(ds_decrypt(strval($string), $buy_key, $ttl));
@@ -992,7 +982,7 @@ class  Buy {
             return $cart_list;
         $goods_list = array();
         $i = 0;
-        $this->_weight_list=array();
+        $this->_weight_list = array();
         foreach ($cart_list as $key => $cart) {
             if (!$cart['state'] || !$cart['storage_state'])
                 continue;
@@ -1011,10 +1001,10 @@ class  Buy {
             $goods_list[$i]['goods_image'] = $cart['goods_image'];
             $goods_list[$i]['goods_vat'] = $cart['goods_vat'];
             $i++;
-            if(!isset($this->_weight_list[$cart['store_id']])){
-                $this->_weight_list[$cart['store_id']]=$cart['goods_weight']*$quantity;
-            }else{
-                $this->_weight_list[$cart['store_id']]+=$cart['goods_weight']*$quantity;
+            if (!isset($this->_weight_list[$cart['store_id']])) {
+                $this->_weight_list[$cart['store_id']] = $cart['goods_weight'] * $quantity;
+            } else {
+                $this->_weight_list[$cart['store_id']] += $cart['goods_weight'] * $quantity;
             }
         }
         return $goods_list;
@@ -1073,5 +1063,4 @@ class  Buy {
         }
         return ds_callback(true);
     }
-
 }

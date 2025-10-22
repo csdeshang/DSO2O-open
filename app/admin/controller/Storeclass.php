@@ -55,6 +55,9 @@ class Storeclass extends AdminControl {
             $insert_array['storeclass_name'] = input('post.storeclass_name');
             $insert_array['storeclass_bail'] = intval(input('post.storeclass_bail'));
             $insert_array['storeclass_sort'] = intval(input('post.storeclass_sort'));
+            
+            $this->validate($insert_array, 'app\common\validate\Storeclass.add');
+            
             //新增店铺分类图片
             if (!empty($_FILES['pic']['name'])) {//上传图片
                 $res = ds_upload_pic(ATTACH_STORECLASS, 'pic');
@@ -64,10 +67,6 @@ class Storeclass extends AdminControl {
                 } else {
                     $this->error($res['msg']);
                 }
-            }
-            $storeclass_validate = ds_validate('storeclass');
-            if (!$storeclass_validate->scene('store_class_add')->check($insert_array)) {
-                $this->error($storeclass_validate->getError());
             }
 
             $result = $storeclass_model->addStoreclass($insert_array);
@@ -104,6 +103,9 @@ class Storeclass extends AdminControl {
             $update_array['storeclass_name'] = input('post.storeclass_name');
             $update_array['storeclass_bail'] = intval(input('post.storeclass_bail'));
             $update_array['storeclass_sort'] = intval(input('post.storeclass_sort'));
+            
+            $this->validate($update_array, 'app\common\validate\Storeclass.edit');
+            
             if (!empty($_FILES['pic']['name'])) {//上传图片
                 if (!empty($_FILES['pic']['name'])) {//上传图片
                     $res = ds_upload_pic(ATTACH_STORECLASS, 'pic');
@@ -115,13 +117,8 @@ class Storeclass extends AdminControl {
                     }
                 }
             }
-            $storeclass_validate = ds_validate('storeclass');
-            if (!$storeclass_validate->scene('store_class_edit')->check($update_array)) {
-                $this->error($storeclass_validate->getError());
-            }
 
             $result = $storeclass_model->editStoreclass($update_array, array('storeclass_id' => $storeclass_id));
-
 
             if ($result >= 0) {
                 $this->log(lang('ds_edit') . lang('store_class') . '[' . input('post.storeclass_name') . ']', 1);

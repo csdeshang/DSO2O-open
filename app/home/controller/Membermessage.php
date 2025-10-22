@@ -199,10 +199,8 @@ class  Membermessage extends BaseMember
             'to_member_name'=>input('post.to_member_name'),
             'msg_content'=>input('post.msg_content')
         ];
-        $message_validate = ds_validate('message');
-        if (!$message_validate->scene('savemsg')->check($data)) {
-            ds_json_encode(10001,$message_validate->getError());
-        }
+        
+        $this->validate($data, 'app\common\validate\Message.savemsg');
 
             $msg_content = trim(input('post.msg_content'));
             $membername_arr = explode(',', input('post.to_member_name'));

@@ -50,8 +50,8 @@
         </tr>
         <tr>
             <th colspan="20"><span class="ml10">{$Think.lang.store_order_order_sn}{$Think.lang.ds_colon}<em>{$order.order_sn}</em>
-                    {if $order.order_from == 2}
-                    <i class="iconfont">&#xe60e;</i>
+                    {if $order.order_from}
+                    ({$order.order_from})
                     {/if}
                 </span> <span>{$Think.lang.store_order_add_time}{$Think.lang.ds_colon}<em class="goods-time">{$order.add_time|date="Y-m-d H:i:s"}</em></span> 
                 <span class="fr mr5"> <a href="{:url('Sellerorder/print_order',['order_id'=>$order_id])}" class="dssc-btn-mini" target="_blank" title="{$Think.lang.store_show_order_printorder}"/><i class="iconfont">&#xe7ca;</i>{$Think.lang.store_show_order_printorder}</a></span>

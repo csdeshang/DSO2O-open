@@ -48,7 +48,9 @@
                 <th>{$Think.lang.admin_storemoney_membername}</th>
                 <th class="align-center">{$Think.lang.admin_storemoney_changetime}</th>
                 <th>{$Think.lang.admin_storemoney_pricetype_available}({$Think.lang.currency_zh})</th>
+                <th>余额(可用)</th>
                 <th>{$Think.lang.admin_storemoney_pricetype_freeze}({$Think.lang.currency_zh})</th>
+                <th>余额(冻结)</th>
                 <th>{$Think.lang.admin_storemoney_log_desc}</th>
             </tr>
         </thead>
@@ -58,8 +60,10 @@
             <tr class="hover">
                 <td>{$v.store_name}</td>
                 <td class="nowarp align-center">{notempty name="$v.storemoneylog_add_time"}{$v.storemoneylog_add_time|date='Y-m-d H:i:s'}{/notempty}</td>
-                <td><?php echo floatval($v['store_avaliable_money']) ? (floatval($v['store_avaliable_money']) > 0 ? '+' : null ).$v['store_avaliable_money'] : null;?></td>
-                <td><?php echo floatval($v['store_freeze_money']) ? (floatval($v['store_freeze_money']) > 0 ? '+' : null ).$v['store_freeze_money'] : null;?></td>
+                <td><?php echo floatval($v['storemoneylog_avaliable_money']) ? (floatval($v['storemoneylog_avaliable_money']) > 0 ? '+' : null ).$v['storemoneylog_avaliable_money'] : null;?></td>
+                <td>{$v.storemoneylog_avaliable_total_money}</td>
+                <td><?php echo floatval($v['storemoneylog_freeze_money']) ? (floatval($v['storemoneylog_freeze_money']) > 0 ? '+' : null ).$v['storemoneylog_freeze_money'] : null;?></td>
+                <td>{$v.storemoneylog_freeze_total_money}</td>
                 <td>{$v.storemoneylog_desc}
                 </td>
             </tr>

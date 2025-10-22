@@ -1,6 +1,7 @@
 <?php
 
 namespace app\common\model;
+
 use think\facade\Db;
 
 /**
@@ -15,7 +16,7 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Trade extends BaseModel {
+class Trade extends BaseModel {
 
     /**
      * 订单处理天数
@@ -37,7 +38,6 @@ class  Trade extends BaseModel {
             $max_data[$day_type] = 1; //最小的值设置为1
         return $max_data[$day_type];
     }
-
 
     /**
      * 更新退款申请
@@ -75,27 +75,26 @@ class  Trade extends BaseModel {
             $message['refund_sn'] = $val['refund_sn'];
             $ten_message = array($message['refund_sn']);
             $weixin_param = array(
-                    'url' => config('ds_config.h5_store_site_url').'/pages/seller/refund/RefundView?refund_id='.$val['refund_id'].'&refund_type='.$val['refund_type'],
-                    'data'=>array(
-                        "keyword1" => array(
-                            "value" => $val['order_sn'],
-                            "color" => "#333"
-                        ),
-                        "keyword2" => array(
-                            "value" => $val['refund_amount'],
-                            "color" => "#333"
-                        )
-                        )
-                    );
+                'url' => config('ds_config.h5_store_site_url') . '/pages/seller/refund/RefundView?refund_id=' . $val['refund_id'] . '&refund_type=' . $val['refund_type'],
+                'data' => array(
+                    "keyword1" => array(
+                        "value" => $val['order_sn'],
+                        "color" => "#333"
+                    ),
+                    "keyword2" => array(
+                        "value" => $val['refund_amount'],
+                        "color" => "#333"
+                    )
+                )
+            );
             if (intval($val['refund_type']) == 1) {
 // 退款
-                $this->sendStoremsg('refund_auto_process', $val['store_id'], $message,$weixin_param, $message,$ten_message);
+                $this->sendStoremsg('refund_auto_process', $val['store_id'], $message, $weixin_param, $message, $ten_message);
             } else {
 // 退货
-                $this->sendStoremsg('return_auto_process', $val['store_id'], $message,$weixin_param, $message,$ten_message);
+                $this->sendStoremsg('return_auto_process', $val['store_id'], $message, $weixin_param, $message, $ten_message);
             }
         }
-
     }
 
     /**
@@ -106,10 +105,9 @@ class  Trade extends BaseModel {
      * @param int $store_id 店铺ID
      * @param array $message 消息
      */
-    private function sendStoremsg($code, $store_id, $message,$weixin_param=array(),$ali_param=array(),$ten_param=array()) {
-        model('cron')->addCron(array('cron_exetime'=>TIMESTAMP,'cron_type'=>'sendStoremsg','cron_value'=>serialize(array('code' => $code, 'store_id' => $store_id, 'param' => $message,'weixin_param'=>$weixin_param,'ali_param'=>$ali_param,'ten_param'=>$ten_param))));
+    private function sendStoremsg($code, $store_id, $message, $weixin_param = array(), $ali_param = array(), $ten_param = array()) {
+        model('cron')->addCron(array('cron_exetime' => TIMESTAMP, 'cron_type' => 'sendStoremsg', 'cron_value' => serialize(array('code' => $code, 'store_id' => $store_id, 'param' => $message, 'weixin_param' => $weixin_param, 'ali_param' => $ali_param, 'ten_param' => $ten_param))));
     }
-
 }
 
 ?>

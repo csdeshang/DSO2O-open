@@ -291,7 +291,6 @@ class  Goods extends BaseGoods {
      */
     public function consulting_list() {
 
-        View::assign('hidden_nctoolbar', 1);
         $goods_id = intval(input('param.goods_id'));
         if ($goods_id <= 0) {
             $this->error(lang('param_error'));
@@ -372,22 +371,10 @@ class  Goods extends BaseGoods {
         if ($goods_id <= 0) {
             ds_json_encode(10001,lang('param_error'));
         }
+        $consult_content = trim(input('post.goods_content'));
         //咨询内容的非空验证
-        if (trim(input('post.goods_content')) == "") {
+        if ($consult_content == "") {
             ds_json_encode(10001,lang('goods_index_input_consult'));
-        }
-        //表单验证
-        $data = [
-            'goods_content' => input('post.goods_content')
-        ];
-        $res=word_filter($data['goods_content']);
-        if(!$res['code']){
-            ds_json_encode(10001,$res['msg']);
-        }
-        $data['goods_content']=$res['data']['text'];
-        $goods_validate = ds_validate('goods');
-        if (!$goods_validate->scene('save_consult')->check($data)) {
-            ds_json_encode(10001,$goods_validate->getError());
         }
 
         if (session('member_id')) {
@@ -424,8 +411,11 @@ class  Goods extends BaseGoods {
         $input['store_name'] = $store_info['store_name'];
         $input['consulttype_id'] = intval(input('post.consult_type_id',1));
         $input['consult_addtime'] = TIMESTAMP;
-        $input['consult_content'] = $data['goods_content'];
+        $input['consult_content'] = $consult_content;
         $input['consult_isanonymous'] = input('post.hide_name')=='hide'?1:0;
+        
+        $this->validate($input, 'app\common\validate\Consult.add');
+        
         $consult_model = model('consult');
         if ($consult_model->addConsult($input)) {
             ds_json_encode(10000,lang('goods_index_consult_success'));

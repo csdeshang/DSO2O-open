@@ -2,11 +2,9 @@
 
 namespace app\common\model;
 
-
-
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -18,11 +16,9 @@ namespace app\common\model;
  */
 class Search extends BaseModel {
 
-
     public function __get($key) {
         return $this->$key;
     }
-
 
     /**
      * 取得商品分类详细信息
@@ -40,7 +36,7 @@ class Search extends BaseModel {
 
         // 获取当前的分类内容
         $class_array = model('goodsclass')->getGoodsclassForCacheModel();
-        $data['class'] = isset($get['cate_id'])&&isset($class_array[$get['cate_id']]) ? $class_array[$get['cate_id']]:array();
+        $data['class'] = isset($get['cate_id']) && isset($class_array[$get['cate_id']]) ? $class_array[$get['cate_id']] : array();
         if (empty($data['class']['child']) && empty($data['class']['childchild'])) {
             // 根据属性查找商品
             if (isset($attr_ids)) {
@@ -49,9 +45,9 @@ class Search extends BaseModel {
                 $data['sign'] = false;
                 foreach ($attr_ids as $val) {
                     $where = array();
-                    $where[] = array('attrvalue_id','=',$val);
+                    $where[] = array('attrvalue_id', '=', $val);
                     if ($data['sign']) {
-                        $where[] = array('goods_id','in', $goodsid_array);
+                        $where[] = array('goods_id', 'in', $goodsid_array);
                     }
                     $goodsattrindex_list = model('goodsattrindex')->getGoodsAttrIndexList($where, 'goods_id');
                     if (!empty($goodsattrindex_list)) {
@@ -73,13 +69,13 @@ class Search extends BaseModel {
             }
         }
 
-        $class = isset($class_array[$default_classid])?$class_array[$default_classid]:"";
+        $class = isset($class_array[$default_classid]) ? $class_array[$default_classid] : "";
         $brand_array = array();
         $initial_array = array();
         $attr_array = array();
         $checked_brand = array();
         $checked_attr = array();
-        
+
         if (empty($class['child']) && empty($class['childchild'])) {
             //获得分类对应的类型ID
             $type_id = isset($class['type_id']) ? $class['type_id'] : '';
@@ -92,7 +88,7 @@ class Search extends BaseModel {
                     foreach ($typebrand_list as $val) {
                         $brandid_array[] = $val['brand_id'];
                     }
-                    $brand_array = model('brand')->getBrandPassedList(array(array('brand_id','in', $brandid_array)), 'brand_id,brand_name,brand_initial,brand_pic,brand_showtype', 0, 'brand_showtype asc,brand_recommend desc,brand_sort asc');
+                    $brand_array = model('brand')->getBrandPassedList(array(array('brand_id', 'in', $brandid_array)), 'brand_id,brand_name,brand_initial,brand_pic,brand_showtype', 0, 'brand_showtype asc,brand_recommend desc,brand_sort asc');
                     if (!empty($brand_array)) {
                         $brand_list = array();
                         foreach ($brand_array as $val) {
@@ -114,20 +110,19 @@ class Search extends BaseModel {
 
                 //属性列表
                 $attribute_model = model('attribute');
-                $attribute_list = $attribute_model->getAttributeShowList(array(array('type_id' ,'=', $type_id)), 'attr_id,attr_name');
+                $attribute_list = $attribute_model->getAttributeShowList(array(array('type_id', '=', $type_id)), 'attr_id,attr_name');
                 $attributevalue_list = $attribute_model->getAttributeValueList(array('type_id' => $type_id), 'attrvalue_id,attrvalue_name,attr_id');
                 $attributevalue_list = array_under_reset($attributevalue_list, 'attr_id', 2);
 
                 if (!empty($attribute_list)) {
                     foreach ($attribute_list as $val) {
                         $attr_array[$val['attr_id']]['name'] = $val['attr_name'];
-                        if(isset($attributevalue_list[$val['attr_id']])){
+                        if (isset($attributevalue_list[$val['attr_id']])) {
                             $tpl_array = array_under_reset($attributevalue_list[$val['attr_id']], 'attrvalue_id');
                             $attr_array[$val['attr_id']]['value'] = $tpl_array;
-                        }else{
+                        } else {
                             $attr_array[$val['attr_id']]['value'] = array();
                         }
-                        
                     }
                 }
                 // 被选中的属性
@@ -142,7 +137,6 @@ class Search extends BaseModel {
                         }
                     }
                 }
-    
             }
         }
 
@@ -164,7 +158,7 @@ class Search extends BaseModel {
             if (!empty($tag_list) && is_array($tag_list)) {
                 foreach ($tag_list as $key => $val) {
                     $tag_value = $val['gctag_value'];
-                    if (strpos($tag_value, $keyword)!==false) {
+                    if (strpos($tag_value, $keyword) !== false) {
                         $data[] = $val['gc_id'];
                     }
                 }
@@ -271,8 +265,6 @@ class Search extends BaseModel {
         }
         return $tpl_data;
     }
-
-
 }
 
 ?>

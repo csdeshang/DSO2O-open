@@ -1,11 +1,12 @@
 <?php
 
 namespace app\common\model;
+
 use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,9 +16,8 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Storemsgread extends BaseModel
-{
- 
+class Storemsgread extends BaseModel {
+
     /**
      * 新增店铺纤细阅读
      * @access public
@@ -25,8 +25,7 @@ class  Storemsgread extends BaseModel
      * @param array $data 参数内容
      * @return bool
      */
-    public function addStoremsgread($data)
-    {
+    public function addStoremsgread($data) {
         $data['storemsg_readtime'] = TIMESTAMP;
         return Db::name('storemsgread')->insert($data);
     }
@@ -39,8 +38,7 @@ class  Storemsgread extends BaseModel
      * @param type $field 字段
      * @return type
      */
-    public function getStoremsgreadInfo($condition, $field = '*')
-    {
+    public function getStoremsgreadInfo($condition, $field = '*') {
         return Db::name('storemsgread')->field($field)->where($condition)->find();
     }
 
@@ -53,8 +51,7 @@ class  Storemsgread extends BaseModel
      * @param string $order 排序
      * @return array 
      */
-    public function getStoremsgreadList($condition, $field = '*', $order = 'storemsg_readtime desc')
-    {
+    public function getStoremsgreadList($condition, $field = '*', $order = 'storemsg_readtime desc') {
         return Db::name('storemsgread')->field($field)->where($condition)->order($order)->select()->toArray();
     }
 
@@ -65,8 +62,7 @@ class  Storemsgread extends BaseModel
      * @param type $condition 条件
      * @return bool
      */
-    public function delStoremsgread($condition)
-    {
+    public function delStoremsgread($condition) {
         Db::name('storemsgread')->where($condition)->delete();
     }
 }

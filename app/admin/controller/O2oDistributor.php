@@ -148,10 +148,8 @@ class O2oDistributor extends AdminControl {
                 'o2o_distributor_region_name' => input('post.o2o_distributor_region_name'),
                 'o2o_distributor_errand_deposit' => input('post.o2o_distributor_errand_deposit'),
             );
-            $o2o_distributor_validate = ds_validate('o2o_distributor');
-            if (!$o2o_distributor_validate->scene('o2o_distributor_register')->check($validate_data)) {
-                $this->error($o2o_distributor_validate->getError());
-            }
+            
+            $this->validate($validate_data, 'app\common\validate\O2oDistributor.o2o_distributor_register');
 
             $condition[]=array('o2o_distributor_name','=',$data['o2o_distributor_name']);
             $result = $o2o_distributor_model->getO2oDistributorInfo($condition);
@@ -225,13 +223,10 @@ class O2oDistributor extends AdminControl {
                 'o2o_distributor_region_name' => input('post.o2o_distributor_region_name'),
                 'o2o_distributor_errand_deposit' => input('post.o2o_distributor_errand_deposit'),
             );
-            $o2o_distributor_validate = ds_validate('o2o_distributor');
-            if (!$o2o_distributor_validate->scene('o2o_distributor_edit')->check($validate_data)) {
-                $this->error($o2o_distributor_validate->getError());
-            }
+            $this->validate($validate_data, 'app\common\validate\O2oDistributor.o2o_distributor_edit');
 
             if (isset($data['o2o_distributor_avatar']) && $o2o_distributor_array['o2o_distributor_avatar']) {
-                @unlink(BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . ATTACH_O2O_DISTRIBUTOR . DIRECTORY_SEPARATOR . $o2o_distributor_array['o2o_distributor_avatar']);
+                ds_del_pic(ATTACH_O2O_DISTRIBUTOR,$o2o_distributor_array['o2o_distributor_avatar']);
             }
             $result = $o2o_distributor_model->editO2oDistributor($data, array('o2o_distributor_id' => $id, 'store_id' => 0));
             if ($result) {

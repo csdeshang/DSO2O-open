@@ -3,9 +3,10 @@
 namespace app\common\model;
 
 use think\facade\Db;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,8 +16,8 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Pointprod extends BaseModel
-{
+class Pointprod extends BaseModel {
+
     public $page_info;
 
     /**
@@ -25,8 +26,7 @@ class  Pointprod extends BaseModel
      * @author csdeshang
      * @return array
      */
-    public function getPgoodsShowState()
-    {
+    public function getPgoodsShowState() {
         $pgoodsshowstate_arr = array('unshow' => array(0, '下架'), 'show' => array(1, '上架'));
         return $pgoodsshowstate_arr;
     }
@@ -37,8 +37,7 @@ class  Pointprod extends BaseModel
      * @author csdeshang
      * @return array
      */
-    public function getPgoodsOpenState()
-    {
+    public function getPgoodsOpenState() {
         $pgoodsopenstate_arr = array('open' => array(0, '开启'), 'close' => array(1, '禁售'));
         return $pgoodsopenstate_arr;
     }
@@ -49,8 +48,7 @@ class  Pointprod extends BaseModel
      * 获取兑换商品的推荐状态
      * @return array
      */
-    public function getPgoodsRecommendState()
-    {
+    public function getPgoodsRecommendState() {
         $pgoodsrecommendstate_arr = array('uncommend' => array(0, '未推荐'), 'commend' => array(1, '已推荐'));
         return $pgoodsrecommendstate_arr;
     }
@@ -62,16 +60,14 @@ class  Pointprod extends BaseModel
      * @param type $data 商品数据
      * @return boolean
      */
-    public function addPointgoods($data)
-    {
+    public function addPointgoods($data) {
         if (empty($data)) {
             return false;
         }
         $insert_id = Db::name('pointsgoods')->insertGetId($data);
         if ($insert_id) {
             return $insert_id;
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -87,24 +83,21 @@ class  Pointprod extends BaseModel
      * @param int $pagesize 分页
      * @return array
      */
-    public function getPointProdList($where = '', $field = '*', $order = '', $limit = 0, $pagesize = '')
-    {
+    public function getPointProdList($where = '', $field = '*', $order = '', $limit = 0, $pagesize = '') {
         if (empty($order)) {
             $order = 'pgoods_sort asc';
         }
         if ($pagesize) {
-            $res = Db::name('pointsgoods')->field($field)->where($where)->order($order)->paginate(['list_rows'=>$pagesize,'query' => request()->param()],false);
+            $res = Db::name('pointsgoods')->field($field)->where($where)->order($order)->paginate(['list_rows' => $pagesize, 'query' => request()->param()], false);
             $this->page_info = $res;
             $list = $res->items();
-        }else {
+        } else {
             $list = Db::name('pointsgoods')->field($field)->where($where)->order($order)->limit($limit)->select()->toArray();
         }
         if (is_array($list) && count($list) > 0) {
             foreach ($list as $k => $v) {
-                $v['pgoods_image_old'] = $v['pgoods_image'];
 
-                $v['pgoods_image_small'] = pointprod_thumb($v['pgoods_image'], 'small');
-                $v['pgoods_image'] = pointprod_thumb($v['pgoods_image'], 'normal');
+                $v['pgoods_image_url'] = pointprod_thumb($v['pgoods_image']);
 
                 $v['ex_state'] = $this->getPointProdExstate($v);
                 //处理限制的会员等级
@@ -136,12 +129,11 @@ class  Pointprod extends BaseModel
      * @param type $pagesize  分页
      * @return type
      */
-    public function getOnlinePointProdList($where = '', $field = '*', $order = '', $limit = 0, $pagesize = '')
-    {
+    public function getOnlinePointProdList($where = '', $field = '*', $order = '', $limit = 0, $pagesize = '') {
         $pgoodsshowstate_arr = $this->getPgoodsShowState();
         $pgoodsopenstate_arr = $this->getPgoodsOpenState();
-        $where[]=array('pgoods_show','=',$pgoodsshowstate_arr['show'][0]);
-        $where[]=array('pgoods_state','=',$pgoodsopenstate_arr['open'][0]);
+        $where[] = array('pgoods_show', '=', $pgoodsshowstate_arr['show'][0]);
+        $where[] = array('pgoods_state', '=', $pgoodsopenstate_arr['open'][0]);
         $list = $this->getPointProdList($where, $field, $order, $limit, $pagesize);
         return $list;
     }
@@ -154,15 +146,11 @@ class  Pointprod extends BaseModel
      * @param type $field 字段
      * @return type
      */
-    public function getPointProdInfo($where = '', $field = '*')
-    {
+    public function getPointProdInfo($where = '', $field = '*') {
         $prodinfo = Db::name('pointsgoods')->where($where)->find();
         if (!empty($prodinfo)) {
-            $prodinfo['pgoods_image_old'] = $prodinfo['pgoods_image'];
 
-            $prodinfo['pgoods_image_max'] = pointprod_thumb($prodinfo['pgoods_image']);
-            $prodinfo['pgoods_image_small'] = pointprod_thumb($prodinfo['pgoods_image'], 'small');
-            $prodinfo['pgoods_image'] = pointprod_thumb($prodinfo['pgoods_image'], 'normal');
+            $prodinfo['pgoods_image_url'] = pointprod_thumb($prodinfo['pgoods_image']);
 
             $prodinfo['ex_state'] = $this->getPointProdExstate($prodinfo);
             //处理兑换时间限制
@@ -197,12 +185,11 @@ class  Pointprod extends BaseModel
      * @param type $field 字段
      * @return type
      */
-    public function getOnlinePointProdInfo($where = array(), $field = '*')
-    {
+    public function getOnlinePointProdInfo($where = array(), $field = '*') {
         $pgoodsshowstate_arr = $this->getPgoodsShowState();
         $pgoodsopenstate_arr = $this->getPgoodsOpenState();
-        $where[]=array('pgoods_show','=',$pgoodsshowstate_arr['show'][0]);
-        $where[]=array('pgoods_state','=',$pgoodsopenstate_arr['open'][0]);
+        $where[] = array('pgoods_show', '=', $pgoodsshowstate_arr['show'][0]);
+        $where[] = array('pgoods_state', '=', $pgoodsopenstate_arr['open'][0]);
         $prodinfo = $this->getPointProdInfo($where, $field);
         return $prodinfo;
     }
@@ -215,13 +202,12 @@ class  Pointprod extends BaseModel
      * @param type $pgoods_view 浏览
      * @return int
      */
-    public function getPointProdViewNum($prod_id, $pgoods_view = '')
-    {
+    public function getPointProdViewNum($prod_id, $pgoods_view = '') {
         $prod_id = intval($prod_id);
         if ($prod_id <= 0) {
             return 0;
         }
-        $is_data = true;//是否从数据库读取
+        $is_data = true; //是否从数据库读取
         if (config('ds_config.cache_open')) {//如果开启缓存，则读取缓存的浏览次数
             $prod_info = rcache($prod_id, 'pointprod');
             if ($prod_info) {
@@ -233,8 +219,7 @@ class  Pointprod extends BaseModel
                 $prod_info = Db::name('pointsgoods')->field('pgoods_view')->where(array('pgoods_id' => $prod_id))->find();
                 $pgoods_view = intval($prod_info['pgoods_view']);
             }
-        }
-        else {
+        } else {
             $pgoods_view = intval($prod_info['pgoods_view']);
         }
         return $pgoods_view;
@@ -247,10 +232,9 @@ class  Pointprod extends BaseModel
      * @param type $prodinfo 礼品信息
      * @return string
      */
-    public function getPointProdExstate($prodinfo)
-    {
+    public function getPointProdExstate($prodinfo) {
         $datetime = TIMESTAMP;
-        $ex_state = 'end';//兑换按钮的可用状态
+        $ex_state = 'end'; //兑换按钮的可用状态
         if ($prodinfo['pgoods_islimittime'] == 1) {
             //即将开始
             if ($prodinfo['pgoods_starttime'] > $datetime && $prodinfo['pgoods_storage'] > 0) {
@@ -260,8 +244,7 @@ class  Pointprod extends BaseModel
             if ($prodinfo['pgoods_starttime'] <= $datetime && $datetime < $prodinfo['pgoods_endtime'] && $prodinfo['pgoods_storage'] > 0) {
                 $ex_state = 'going';
             }
-        }
-        else {
+        } else {
             if ($prodinfo['pgoods_storage'] > 0) {
                 $ex_state = 'going';
             }
@@ -276,28 +259,28 @@ class  Pointprod extends BaseModel
      * @param type $pg_id 礼品ID
      * @return boolean
      */
-    public function delPointProdById($pg_id)
-    {
+    public function delPointProdById($pg_id) {
         //$pg_id  为整形或者数组
-        $where[]=array('pgoods_id','in', $pg_id);
-        $result = Db::name('pointsgoods')->where($where)->delete();
+        $condition = array();
+        $condition[] = array('pgoods_id', 'in', $pg_id);
+        $result = Db::name('pointsgoods')->where($condition)->delete();
         //删除积分礼品下的图片信息
         if ($result) {
             //删除积分礼品下的图片信息
             $upload_model = model('upload');
             $condition = array();
-            $condition[] = array('upload_type','in',array('5','6'));
-            $condition[]=array('item_id','in',$pg_id);
+            $condition[] = array('upload_type', 'in', array('5', '6'));
+            $condition[] = array('item_id', 'in', $pg_id);
             $upload_list = $upload_model->getUploadList($condition);
             if (is_array($upload_list) && count($upload_list) > 0) {
                 $upload_idarr = array();
                 foreach ($upload_list as $v) {
-                    @unlink(BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . ATTACH_POINTPROD . DIRECTORY_SEPARATOR . $v['file_name']);
+                    ds_del_pic(ATTACH_POINTPROD, $v['file_name']);
                     $upload_idarr[] = $v['upload_id'];
                 }
                 //删除图片
                 $condition = array();
-                $condition[]=array('upload_id','in',$upload_idarr);
+                $condition[] = array('upload_id', 'in', $upload_idarr);
                 $upload_model->delUpload($condition);
             }
         }
@@ -312,8 +295,7 @@ class  Pointprod extends BaseModel
      * @param type $where 条件
      * @return boolean
      */
-    public function editPointProd($update_arr, $where)
-    {
+    public function editPointProd($update_arr, $where) {
         if (empty($update_arr)) {
             return true;
         }
@@ -328,12 +310,11 @@ class  Pointprod extends BaseModel
      * @param type $num 
      * @return type
      */
-    public function getRecommendPointProd($num)
-    {
+    public function getRecommendPointProd($num) {
         $condition = array();
-        $condition[] = array('pgoods_show','=',1);
-        $condition[] = array('pgoods_state','=',0);
-        $condition[] = array('pgoods_commend','=',1);
+        $condition[] = array('pgoods_show', '=', 1);
+        $condition[] = array('pgoods_state', '=', 0);
+        $condition[] = array('pgoods_commend', '=', 1);
         $recommend_pointsprod = $this->getPointProdList($condition, '*', 'pgoods_sort asc,pgoods_id desc', $num);
         if ($recommend_pointsprod && is_array($recommend_pointsprod)) {
             foreach ($recommend_pointsprod as $k => $v) {
@@ -356,36 +337,7 @@ class  Pointprod extends BaseModel
      * @param type $prod_id 礼品ID
      * @return int
      */
-    public function editPointProdViewnum($prod_id)
-    {
-        if (intval($prod_id) <= 0) {
-            return array('state' => false, 'msg' => '参数错误');
-        }
-        $viewnum = 0;//最新浏览次数
-        $cache_arr = array();
-        $tmptime = TIMESTAMP;
-        if (!config('ds_config.cache_open')) {//直接更新数据库浏览次数
-            $this->editPointProd(array('pgoods_view' => Db::raw('pgoods_view+1')), array('pgoods_id' => $prod_id));
-        }
-        else {//通过缓存记录浏览次数
-            $prod_info = rcache($prod_id, 'pointprod');
-            if (empty($prod_info)) {//如果兑换礼品的浏览次数缓存不存在，则查询兑换礼品数据库信息，建立缓存
-                //查询兑换礼品信息
-                $prod_info = $this->getPointProdInfo(array('pgoods_id' => $prod_id), 'pgoods_view');
-                $viewnum = intval($prod_info['pgoods_view']) + 1;
-                wcache($prod_id, array('pgoods_view' => $viewnum, 'view_updatetime' => $tmptime), 'pointprod');
-            }
-            else {
-                $viewnum = intval($prod_info['pgoods_view']) + 1;
-                if (($prod_info['view_updatetime'] + 3600) < $tmptime) {//如果缓存时间超出1小时，则将更新进入数据库，时间初始为当前时间
-                    $this->editPointProd(array('pgoods_view' => $viewnum), array('pgoods_id' => $prod_id));
-                    wcache($prod_id, array('pgoods_view' => $viewnum, 'view_updatetime' => $tmptime), 'pointprod');
-                }
-                else {//如果缓存时间未超出1小时，则更新浏览次数
-                    wcache($prod_id, array('pgoods_view' => $viewnum), 'pointprod');
-                }
-            }
-        }
-        return array('state' => true);
+    public function editPointProdViewnum($prod_id) {
+        $this->editPointProd(array('pgoods_view' => Db::raw('pgoods_view+1')), array('pgoods_id' => $prod_id));
     }
 }

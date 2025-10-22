@@ -112,9 +112,9 @@ class  O2oErrandOrder extends AdminControl {
             View::assign('order_info', $order_info);
             //显示支付接口列表
             $payment_list = model('payment')->getPaymentOpenList();
-            //去掉预存款和货到付款
+            //去掉预存款
             foreach ($payment_list as $key => $value) {
-                if ($value['payment_code'] == 'predeposit' || $value['payment_code'] == 'offline') {
+                if ($value['payment_code'] == 'predeposit') {
                     unset($payment_list[$key]);
                 }
             }
@@ -145,7 +145,7 @@ class  O2oErrandOrder extends AdminControl {
             $this->error(lang('miss_order_number'));
         }
         $order_model = $order_model = model('o2o_errand_order');;
-        $order_info = $order_model->getO2oErrandOrderInfo(array('o2o_errand_order_id' => $order_id));
+        $order_info = $order_model->getO2oErrandOrderInfo(array('o2o_errand_order_id' => $order_id),'*',array('orderlog'));
         $order_info['o2o_errand_order_state_text']= $order_model->getO2oErrandOrderStateText($order_info['o2o_errand_order_state']);
         View::assign('order_info', $order_info);
         return View::fetch('show_order');
@@ -253,6 +253,13 @@ class  O2oErrandOrder extends AdminControl {
             if (!$order_model->editO2oErrandOrder(array('o2o_distributor_id' => $o2o_distributor_info['o2o_distributor_id'], 'o2o_distributor_name' => $o2o_distributor_info['o2o_distributor_name'], 'o2o_distributor_realname' => $o2o_distributor_info['o2o_distributor_realname'], 'o2o_distributor_phone' => $o2o_distributor_info['o2o_distributor_phone'], 'o2o_errand_order_state' => ORDER_STATE_DELIVER, 'o2o_errand_order_receipt_time' => TIMESTAMP), $condition)) {
                 throw new \think\Exception('手慢无，被别人抢了', 10006);
             }
+
+            $data = array();
+            $data['order_id'] = $order_id;
+            $data['log_role'] = 'system';
+            $data['log_user'] = '';
+            $data['log_msg'] = '系统指派订单';
+            model('orderlog')->addErrandOrderlog($data);
 
             Db::commit();
         } catch (\Exception $e) {

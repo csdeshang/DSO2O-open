@@ -1,11 +1,12 @@
 <?php
 
 namespace app\common\model;
+
 use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,8 +16,7 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Storemsgtpl extends BaseModel {
-    
+class Storemsgtpl extends BaseModel {
 
     /**
      * 店铺消息模板列表
@@ -27,7 +27,7 @@ class  Storemsgtpl extends BaseModel {
      * @param string $order 排序
      * @return array 
      */
-    public function getStoremsgtplList($condition, $field = '*',  $order = 'storemt_code asc') {
+    public function getStoremsgtplList($condition, $field = '*', $order = 'storemt_code asc') {
         return Db::name('storemsgtpl')->field($field)->where($condition)->order($order)->select()->toArray();
     }
 
@@ -54,6 +54,6 @@ class  Storemsgtpl extends BaseModel {
     public function editStoremsgtpl($condition, $update) {
         return Db::name('storemsgtpl')->where($condition)->update($update);
     }
-    
 }
+
 ?>

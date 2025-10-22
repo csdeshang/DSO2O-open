@@ -4,10 +4,9 @@ namespace app\common\model;
 
 use think\facade\Db;
 
-
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -17,8 +16,8 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class Mallconsult extends BaseModel
-{
+class Mallconsult extends BaseModel {
+
     public $page_info;
 
     /**
@@ -32,11 +31,11 @@ class Mallconsult extends BaseModel
      * @return array
      */
     public function getMallconsultList($condition, $field = '*', $pagesize = 0, $order = 'mallconsult_id desc') {
-        if($pagesize){
-            $res= Db::name('mallconsult')->where($condition)->field($field)->order($order)->paginate(['list_rows'=>$pagesize,'query' => request()->param()],false);
-            $this->page_info=$res;
+        if ($pagesize) {
+            $res = Db::name('mallconsult')->where($condition)->field($field)->order($order)->paginate(['list_rows' => $pagesize, 'query' => request()->param()], false);
+            $this->page_info = $res;
             return $res->items();
-        }else{
+        } else {
             return Db::name('mallconsult')->where($condition)->field($field)->order($order)->select()->toArray();
         }
     }
@@ -88,9 +87,9 @@ class Mallconsult extends BaseModel
      * @param array $insert 参数内容
      * @return bool
      */
-    public function addMallconsult($insert) {
-        $insert['mallconsult_addtime'] = TIMESTAMP;
-        return Db::name('mallconsult')->insertGetId($insert);
+    public function addMallconsult($data) {
+        $data['mallconsult_addtime'] = TIMESTAMP;
+        return Db::name('mallconsult')->insertGetId($data);
     }
 
     /**

@@ -1,11 +1,13 @@
 <?php
 
 namespace app\common\model;
+
 use think\facade\Db;
+
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,7 +17,7 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Area extends BaseModel
+class Area extends BaseModel
 {
 
 
@@ -90,7 +92,7 @@ class  Area extends BaseModel
 
         $arr = array();
         foreach ($data['parent'] as $k => $v) {
-            if ($v && $data['parent'][$v] == 0) {
+            if ($v && isset($data['parent'][$v]) && $data['parent'][$v] == 0) {
                 $arr[$k] = $v;
             }
         }
@@ -188,8 +190,9 @@ class  Area extends BaseModel
         if (empty($area_arr)) {
             return false;
         }
-
-        $child_list = $this->getAreaList(array(array('area_parent_id','in', $area_arr)));
+        $condition = array();
+        $condition[] = array('area_parent_id','in', $area_arr);
+        $child_list = $this->getAreaList($condition);
         if (!empty($child_list)) {
             foreach ($child_list as $v) {
                 $area_child_arr[] = $v['area_id'];
@@ -199,7 +202,9 @@ class  Area extends BaseModel
             $this->delAreaByAreaIds($area_child_ids);
         }
         // 删除地区
-        $this->delArea(array(array('area_id','in', $area_arr)));
+        $condition = array();
+        $condition[] = array('area_id','in', $area_arr);
+        $this->delArea($condition);
     }
 
     /**

@@ -51,6 +51,14 @@ class  SellerO2oPrinter extends BaseSeller {
                 'yly_machine_code' => $token->machine_code,
             );
             $store_model = model('store');
+            //判断当前打印机是否被绑定,一台打印机只能绑定一个店铺,因为绑定的打印机的token是存在店铺表中, 需要多个店铺使用一台打印 需要公共表与店铺进行关联
+            $condition = array();
+            $condition[] = array('yly_machine_code', '=', $token->machine_code);
+            $count = $store_model->getStoreCount($condition);
+            if($count>0){
+                throw new \think\Exception('系统错误,此打印机已被店铺绑定');
+            }
+            
             $store_model->editStore($data, array('store_id' => $this->store_info['store_id']));
             $this->recordSellerlog(lang('bind_o2o_printer'));
         }catch (\Exception $e) {

@@ -1,11 +1,12 @@
 <?php
 
 namespace app\admin\controller;
-use think\facade\Lang;
 use think\facade\View;
+use think\facade\Lang;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能 充值卡
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,7 +16,7 @@ use think\facade\View;
  * ============================================================================
  * 控制器
  */
-class  Rechargecard extends AdminControl
+class Rechargecard extends AdminControl
 {
     const EXPORT_SIZE = 100;
     public function initialize()
@@ -62,10 +63,10 @@ class  Rechargecard extends AdminControl
         else {
             $denomination = (float)input('post.denomination');
             if ($denomination < 0.01) {
-                $this->error('面额不能小于0.01');
+                $this->error(lang('rechargecard_denomination_min'));
             }
             if ($denomination > 1000) {
-                $this->error('面额不能大于1000');
+                $this->error(lang('rechargecard_denomination_max'));
             }
 
             $snKeys = array();
@@ -74,11 +75,11 @@ class  Rechargecard extends AdminControl
                 case '0':
                     $total = (int)input('post.total');
                     if ($total < 1 || $total > 5000) {
-                        $this->error('总数只能是1~5000之间的整数');
+                        $this->error(lang('r0total_message'));
                     }
                     $prefix = (string)input('post.prefix');
                     if (!preg_match('/^[0-9a-zA-Z]{0,16}$/', $prefix)) {
-                        $this->error('前缀只能是16字之内字母数字的组合');
+                        $this->error(lang('r0prefix_message'));
                     }
                     while (count($snKeys) < $total) {
                         $snKeys[$prefix . md5(uniqid(mt_rand(), true))] = null;
@@ -88,10 +89,10 @@ class  Rechargecard extends AdminControl
                 case '1':
                     $f = $_FILES['_textfile'];
                     if (!$f || $f['error'] != 0) {
-                        $this->error('文件上传失败');
+                        $this->error(lang('file_upload_fail'));
                     }
                     if (!is_uploaded_file($f['tmp_name'])) {
-                        $this->error('未找到已上传的文件');
+                        $this->error(lang('file_empty'));
                     }
                     foreach (file($f['tmp_name']) as $sn) {
                         $sn = trim($sn);
@@ -115,11 +116,11 @@ class  Rechargecard extends AdminControl
 
             $totalKeys = count($snKeys);
             if ($totalKeys < 1 || $totalKeys > 9999) {
-                $this->error('只能在一次操作中增加1~9999个充值卡号');
+                $this->error(lang('recharge_number_error'));
             }
 
             if (empty($snKeys)) {
-                $this->error('请输入至少一个合法的卡号');
+                $this->error(lang('recharge_number_invalid'));
             }
 
             $snOccupied = 0;
@@ -134,7 +135,7 @@ class  Rechargecard extends AdminControl
             }
 
             if (empty($snKeys)) {
-                $this->error('操作失败，所有新增的卡号都与已有的卡号冲突');
+                $this->error(lang('recharge_number_exist'));
             }
 
             $batchflag = input('post.batchflag');
@@ -158,7 +159,7 @@ class  Rechargecard extends AdminControl
 
             $msg = lang('ds_common_op_succ');
             if ($snOccupied > 0)
-                $msg .= "有 {$snOccupied} 个卡号与已有的未使用卡号冲突";
+                $msg .= sprintf(lang('rechargecard_number_exist_error'),$snOccupied);
 
             dsLayerOpenSuccess($msg);
         }
@@ -223,7 +224,7 @@ class  Rechargecard extends AdminControl
                 for ($i = 1; $i <= $page; $i++) {
                     $limit1 = ($i - 1) * self::EXPORT_SIZE + 1;
                     $limit2 = $i * self::EXPORT_SIZE > $count ? $count : $i * self::EXPORT_SIZE;
-                    $export_list[$i] = $limit1 . ' ~ ' . $limit2;
+                    $export_list[]=array($i,'=',$limit1 . ' ~ ' . $limit2);
                 }
                 View::assign('export_list', $export_list);
                 return View::fetch('/public/excel');
@@ -258,12 +259,12 @@ class  Rechargecard extends AdminControl
                                  'id' => 's_title', 'Font' => array('FontName' => '宋体', 'Size' => '12', 'Bold' => '1')
                              ));
         //header
-        $excel_data[0][] = array('styleid' => 's_title', 'data' => '充值卡卡号');
-        $excel_data[0][] = array('styleid' => 's_title', 'data' => '批次标识');
-        $excel_data[0][] = array('styleid' => 's_title', 'data' => '面额(元)');
-        $excel_data[0][] = array('styleid' => 's_title', 'data' => '发布管理员');
-        $excel_data[0][] = array('styleid' => 's_title', 'data' => '发布时间');
-        $excel_data[0][] = array('styleid' => 's_title', 'data' => '领取人');
+        $excel_data[0][] = array('styleid' => 's_title', 'data' => lang('rc_sn'));
+        $excel_data[0][] = array('styleid' => 's_title', 'data' => lang('rc_batchflag'));
+        $excel_data[0][] = array('styleid' => 's_title', 'data' => lang('rc_denomination'));
+        $excel_data[0][] = array('styleid' => 's_title', 'data' => lang('rc_admin_name'));
+        $excel_data[0][] = array('styleid' => 's_title', 'data' => lang('rc_tscreated'));
+        $excel_data[0][] = array('styleid' => 's_title', 'data' => lang('receive_user'));
 
         //data
         foreach ((array)$data as $k => $v) {
@@ -283,8 +284,8 @@ class  Rechargecard extends AdminControl
         }
         $excel_data = $excel_obj->charset($excel_data, CHARSET);
         $excel_obj->addArray($excel_data);
-        $excel_obj->addWorksheet($excel_obj->charset('充值卡', CHARSET));
-        $excel_obj->generateXML($excel_obj->charset('充值卡', CHARSET) . input('param.page') . '-' . date('Y-m-d-H', TIMESTAMP));
+        $excel_obj->addWorksheet($excel_obj->charset(lang('rechargecard'), CHARSET));
+        $excel_obj->generateXML($excel_obj->charset(lang('rechargecard'), CHARSET) . input('param.page') . '-' . date('Y-m-d-H', TIMESTAMP));
     }
 
 
@@ -292,9 +293,9 @@ class  Rechargecard extends AdminControl
     {
         $menu_array = array(
             array(
-                'name' => 'index', 'text' => '列表', 'url' => url('Rechargecard/index')
+                'name' => 'index', 'text' => lang('ds_list'), 'url' => (string)url('Rechargecard/index')
             ), array(
-                'name' => 'add_card', 'text' => '新增','url' => "javascript:dsLayerOpen('" . url('Rechargecard/add_card') . "','新增')"
+                'name' => 'add_card', 'text' => lang('ds_new'),'url' => "javascript:dsLayerOpen('" . (string)url('Rechargecard/add_card') . "','".lang('ds_new')."')"
             ),
         );
         return $menu_array;

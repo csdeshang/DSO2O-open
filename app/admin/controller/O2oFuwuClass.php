@@ -63,7 +63,11 @@ class O2oFuwuClass extends AdminControl {
      */
     public function add() {
         if (!(request()->isPost())) {
-            $this->get_common_data();
+            
+            $o2o_fuwu_class_model = model('o2o_fuwu_class');
+            $o2o_fuwu_class_list = $o2o_fuwu_class_model->getO2oFuwuClassList(array('o2o_fuwu_class_parent_id' => 0));
+            View::assign('o2o_fuwu_class_list', $o2o_fuwu_class_list);
+        
             return View::fetch('form');
         } else {
             $data = $this->post_data();
@@ -91,7 +95,11 @@ class O2oFuwuClass extends AdminControl {
             $this->error(lang('o2o_fuwu_class_empty'));
         }
         if (!request()->isPost()) {
-            $this->get_common_data();
+            
+            $o2o_fuwu_class_model = model('o2o_fuwu_class');
+            $o2o_fuwu_class_list = $o2o_fuwu_class_model->getO2oFuwuClassList(array('o2o_fuwu_class_parent_id' => 0));
+            View::assign('o2o_fuwu_class_list', $o2o_fuwu_class_list);
+        
             View::assign('o2o_fuwu_class', $o2o_fuwu_class);
             return View::fetch('form');
         } else {
@@ -105,7 +113,7 @@ class O2oFuwuClass extends AdminControl {
 
 
             if (isset($data['o2o_fuwu_class_logo']) && $o2o_fuwu_class['o2o_fuwu_class_logo']) {
-                @unlink(BASE_UPLOAD_PATH . '/' . ATTACH_O2O_FUWU_CLASS . '/' . $o2o_fuwu_class['o2o_fuwu_class_logo']);
+                ds_del_pic(ATTACH_O2O_FUWU_CLASS,$o2o_fuwu_class['o2o_fuwu_class_logo']);
             }
             $result = $o2o_fuwu_class_model->editO2oFuwuClass($data, $condition);
             if ($result >= 0) {
@@ -120,11 +128,6 @@ class O2oFuwuClass extends AdminControl {
         }
     }
 
-    public function get_common_data() {
-        $o2o_fuwu_class_model = model('o2o_fuwu_class');
-        $o2o_fuwu_class_list = $o2o_fuwu_class_model->getO2oFuwuClassList(array('o2o_fuwu_class_parent_id' => 0));
-        View::assign('o2o_fuwu_class_list', $o2o_fuwu_class_list);
-    }
 
     public function post_data() {
         $data = array(
@@ -133,10 +136,7 @@ class O2oFuwuClass extends AdminControl {
             'o2o_fuwu_class_sort_order' => input('post.o2o_fuwu_class_sort_order'),
             'o2o_fuwu_class_remark' => input('post.o2o_fuwu_class_remark'),
         );
-        $o2o_fuwu_class_validate = ds_validate('o2o_fuwu_class');
-        if (!$o2o_fuwu_class_validate->scene('o2o_fuwu_class_save')->check($data)) {
-            $this->error($o2o_fuwu_class_validate->getError());
-        }
+        $this->validate($data, 'app\common\validate\O2oFuwuClass.o2o_fuwu_class_save');
         //图片
         if (!empty($_FILES['_pic']['name'])) {
                 $res=ds_upload_pic(ATTACH_O2O_FUWU_CLASS,'_pic');

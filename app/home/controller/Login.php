@@ -45,14 +45,13 @@ class  Login extends BaseMall {
             if (config('ds_config.captcha_status_login') == 1 && !captcha_check(input('post.captcha_normal'))) {
                 ds_json_encode(10001,lang('image_verification_code_error'));
             }
+            if (empty(input('post.member_name')) || empty(input('post.member_password'))) {
+                ds_json_encode(10001, lang('param_error'));
+            }
             $data = array(
                 'member_name' => input('post.member_name'),
                 'member_password' => input('post.member_password'),
             );
-            $login_validate = ds_validate('member');
-            if (!$login_validate->scene('login')->check($data)) {
-                ds_json_encode(10001,$login_validate->getError());
-            }
             $map = array(
                 'member_name' => $data['member_name'],
                 'member_password' => md5($data['member_password']),
@@ -144,13 +143,6 @@ class  Login extends BaseMall {
                 'member_password' => $password,
                 'member_password_confirm' => $password_confirm,
             );
-            $res=word_filter($data['member_name']);
-            if(!$res['code']){
-                ds_json_encode(10001,$res['msg']);
-            }
-            if($res['data']['if_sensitive']){
-                ds_json_encode(10001,implode('、',$res['data']['sensitive_msg']));
-            }
             if(input('param.inviter_id')){
                 $inviter_id = intval(input('param.inviter_id'));
             }else{
@@ -163,16 +155,14 @@ class  Login extends BaseMall {
                 $sms_mobile = trim(input('sms_mobile'));
                 $sms_captcha = trim(input('sms_captcha'));
                 $logic_connect_api = model('connectapi','logic');
-                $state_data = $logic_connect_api->smsRegister($sms_mobile, $sms_captcha, $password, 'pc',$inviter_id);
+                $state_data = $logic_connect_api->smsRegister($sms_mobile, $sms_captcha, $password,$inviter_id);
                 if($state_data['state']=='1'){
                     $member_info = $state_data['info'];
                 }
             }else if(config('ds_config.member_normal_register')==1){
-                $login_validate = ds_validate('member');
-                if (!$login_validate->scene('register')->check($data)) {
-                    ds_json_encode(10001,$login_validate->getError());
-                }
+                
                 $member_info = $member_model->register($data);
+                
             }else{
                 ds_json_encode(10001,lang('login_register_cancel'));
             }

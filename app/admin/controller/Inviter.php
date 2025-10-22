@@ -1,7 +1,4 @@
 <?php
-/**
- * 推荐人设置
- */
 
 namespace app\admin\controller;
 use think\facade\View;
@@ -9,7 +6,7 @@ use think\facade\Db;
 use think\facade\Lang;
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能 推荐人
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -19,7 +16,7 @@ use think\facade\Lang;
  * ============================================================================
  * 控制器
  */
-class  Inviter extends AdminControl
+class Inviter extends AdminControl
 {
 public function initialize()
 {
@@ -57,7 +54,6 @@ public function initialize()
             $update_array['inviter_view']=floatval(input('post.inviter_view'));
             $update_array['inviter_condition']=floatval(input('post.inviter_condition'));
             $update_array['inviter_condition_amount']=floatval(input('post.inviter_condition_amount'));
-            
             
             if($update_array['inviter_return']){
                 if(($update_array['inviter_ratio_1']*2+$update_array['inviter_ratio_2']+$update_array['inviter_ratio_3'])>100){
@@ -414,28 +410,28 @@ public function initialize()
         $menu_array = array(
             array(
                 'name' => 'index',
-                'text' => '分销设置',
-                'url' => url('Inviter/setting')
+                'text' => lang('inviter_setting'),
+                'url' => (string)url('Inviter/setting')
             ),
             array(
                 'name' => 'goods',
-                'text' => '分销商品',
-                'url' => url('Inviter/goods')
+                'text' => lang('inviter_goods'),
+                'url' => (string)url('Inviter/goods')
             ),
             array(
                 'name' => 'member',
-                'text' => '分销员管理',
-                'url' => url('Inviter/member')
+                'text' => lang('inviter_member'),
+                'url' => (string)url('Inviter/member')
             ),
             array(
                 'name' => 'memberclass',
-                'text' => '分销员等级',
-                'url' => url('Inviter/memberclass')
+                'text' => lang('inviter_memberclass'),
+                'url' => (string)url('Inviter/memberclass')
             ),
             array(
                 'name' => 'order',
-                'text' => '分销订单',
-                'url' => url('Inviter/order')
+                'text' => lang('inviter_order'),
+                'url' => (string)url('Inviter/order')
             ),
         );
         return $menu_array;

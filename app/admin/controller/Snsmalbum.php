@@ -2,10 +2,12 @@
 
 namespace app\admin\controller;
 use think\facade\View;
+
 use think\facade\Lang;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能 相册管理
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,7 +17,7 @@ use think\facade\Lang;
  * ============================================================================
  * 控制器
  */
-class  Snsmalbum extends AdminControl
+class Snsmalbum extends AdminControl
 {
     public function initialize()
     {
@@ -119,16 +121,15 @@ class  Snsmalbum extends AdminControl
         if($id_array === FALSE){
             ds_json_encode(10001, lang('param_error'));
         }
-        $condition = array(array('ap_id','in', $id_array));
+        $condition = array(array('ap_id' ,'in', $id_array));
         $snsmalbum_model = model('snsalbum');
         $ap_list = $snsmalbum_model->getSnsalbumpicList($condition);
             if (empty($ap_list)) {
                 ds_json_encode(10001, lang('snsalbum_choose_need_del_img'));
             }
             foreach ($ap_list as $val) {
-                @unlink(BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . ATTACH_MALBUM . DIRECTORY_SEPARATOR . $val['member_id'] . DIRECTORY_SEPARATOR . $val['ap_cover']);
-                @unlink(BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . ATTACH_MALBUM . DIRECTORY_SEPARATOR . $val['member_id'] . DIRECTORY_SEPARATOR . str_ireplace('.', '_240.', $val['ap_cover']));
-                @unlink(BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . ATTACH_MALBUM . DIRECTORY_SEPARATOR . $val['member_id'] . DIRECTORY_SEPARATOR . str_ireplace('.', '_1280.', $val['ap_cover']));
+                //删除图片
+                ds_del_pic(ATTACH_MALBUM.'/'.$val['member_id'], $val['ap_cover']);
             }
             $result = $snsmalbum_model->delSnsalbumpic($condition);
             if($result){
@@ -146,18 +147,18 @@ class  Snsmalbum extends AdminControl
             array(
                 'name' => 'index', 
                 'text' => lang('snsalbum_class_list'),
-                'url' => url('Snsmalbum/index')
+                'url' => (string)url('Snsmalbum/index')
             ), array(
                 'name' => 'setting', 
                 'text' => lang('snsalbum_album_setting'),
-                'url' => "javascript:dsLayerOpen('".url('Snsmalbum/setting')."','".lang('snsalbum_album_setting')."')"
+                'url' => "javascript:dsLayerOpen('".(string)url('Snsmalbum/setting')."','".lang('snsalbum_album_setting')."')"
             ),
         );
         if(request()->action()=='pic_list'){
             $menu_array[]=array(
                 'name' => 'pic_list', 
                 'text' => lang('snsalbum_pic_list'),
-                'url' => url('Snsmalbum/pic_list',['id'=>input('param.id')])
+                'url' => (string)url('Snsmalbum/pic_list',['id'=>input('param.id')])
             );
         }
         return $menu_array;

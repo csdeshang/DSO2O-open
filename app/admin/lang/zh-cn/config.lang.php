@@ -28,11 +28,6 @@ $lang['fixed_suspension_url_notice']= '首页悬浮图片地址 例如：https:/
 
 $lang['web_set'] = '站点设置';
 $lang['dis_dump'] = '防灌水设置';
-$lang['word_filter_set'] = '敏感图文过滤设置';
-$lang['word_filter_open'] = '是否开启敏感图文过滤';
-$lang['word_filter_appid'] = '百度应用API Key';
-$lang['word_filter_secret'] = '百度应用Secret Key';
-$lang['word_filter_appid_tips'] = '<a href="https://ai.baidu.com/censoring" target="_blank">申请密钥</a>';
 $lang['im_set'] = 'IM设置';
 $lang['auto_set'] = '自动执行时间设置';
 
@@ -169,9 +164,6 @@ $lang['sina_wb_skey_error'] = '请添加应用密钥';
 $lang['sina_function_fail_tip'] = '该功能需要在  php.ini 中 开启 php_curl 扩展，才能使用。';
 $lang['sina_settings'] = '微博同步登录';
 
-$lang['weixin_isuse'] = '是否启用微信扫码登录功能';
-$lang['weixin_appid'] = '应用标识(appid)';
-$lang['weixin_secret'] = '应用密钥';
 $lang['sina_weixin_akey_error'] = '请添加应用标识';
 $lang['sina_weixin_skey_error'] = '请添加应用密钥';
 

@@ -17,7 +17,9 @@ use think\facade\Db;
  * 逻辑层模型
  */
 class Buy_1 {
-    public $lock=false;//是否加锁
+
+    public $lock = false; //是否加锁
+
     /**
      * 取得商品最新的属性及促销[购物车]
      * @param unknown $cart_list
@@ -391,7 +393,6 @@ class Buy_1 {
         }
     }
 
-
     /**
      * 计算每个店铺(所有店铺级优惠活动)总共优惠多少金额
      * @param array $store_goods_total 最初店铺商品总金额
@@ -527,12 +528,9 @@ class Buy_1 {
         $order_model = model('order');
         $logic_order = model('order', 'logic');
         $predeposit_model = model('predeposit');
-        $canPay=false;
+        $canPay = false;
         foreach ($order_list as $key => $order_info) {
 
-            //货到付款的订单跳过
-            if ($order_info['payment_code'] == 'offline')
-                continue;
             if (!isset($order_info['rcb_amount'])) {
                 $order_list[$key]['rcb_amount'] = $order_info['rcb_amount'] = 0;
             }
@@ -547,15 +545,15 @@ class Buy_1 {
             $data_pd['order_sn'] = $order_info['order_sn'];
 
             //暂冻结充值卡,后面还需要 API彻底完成支付
-            if ($available_rcb_amount > 0 && $order_amount>0) {
+            if ($available_rcb_amount > 0 && $order_amount > 0) {
                 if ($available_rcb_amount >= $order_amount) {
                     $available_rcb_amount -= $order_amount;
                     $data_pd['amount'] = $order_amount;
-                    $canPay=true;
+                    $canPay = true;
                 } else {
                     $data_pd['amount'] = $available_rcb_amount;
                     $available_rcb_amount = 0;
-                    $canPay=false;
+                    $canPay = false;
                 }
 
                 $predeposit_model->changeRcb('order_freeze', $data_pd);
@@ -566,12 +564,11 @@ class Buy_1 {
                 if (!$result) {
                     throw new \think\Exception('订单更新失败', 10006);
                 }
-               
             }
         }
         if ($canPay) {//收到货款
-                    $logic_order->changeOrderReceivePay($order_list, 'buyer', $member_name,array('payment_code'=>'predeposit'));
-                }
+            $logic_order->changeOrderReceivePay($order_list, 'buyer', $member_name, array('payment_code' => 'predeposit'));
+        }
         return $order_list;
     }
 
@@ -594,12 +591,9 @@ class Buy_1 {
         $order_model = model('order');
         $logic_order = model('order', 'logic');
         $predeposit_model = model('predeposit');
-        $canPay=false;
+        $canPay = false;
         foreach ($order_list as $key => $order_info) {
 
-            //货到付款的订单、已经充值卡支付的订单跳过
-            if ($order_info['payment_code'] == 'offline')
-                continue;
             if ($order_info['order_state'] == ORDER_STATE_PAY)
                 continue;
             if (!isset($order_info['rcb_amount'])) {
@@ -616,15 +610,15 @@ class Buy_1 {
             $data_pd['member_name'] = $member_name;
             $data_pd['order_sn'] = $order_info['order_sn'];
             //暂冻结预存款,后面还需要 API彻底完成支付
-            if ($available_pd_amount > 0 && $order_amount>0) {
+            if ($available_pd_amount > 0 && $order_amount > 0) {
                 if ($available_pd_amount >= $order_amount) {
                     $data_pd['amount'] = $order_amount;
                     $available_pd_amount -= $order_amount;
-                    $canPay=true;
+                    $canPay = true;
                 } else {
                     $data_pd['amount'] = $available_pd_amount;
                     $available_pd_amount = 0;
-                    $canPay=false;
+                    $canPay = false;
                 }
                 $predeposit_model->changePd('order_freeze', $data_pd);
                 //预存款支付金额保存到订单
@@ -634,12 +628,11 @@ class Buy_1 {
                 if (!$result) {
                     throw new \think\Exception('订单更新失败', 10006);
                 }
-           
             }
         }
         if ($canPay) {//收到货款
-                    $logic_order->changeOrderReceivePay($order_list, 'buyer', $member_name,array('payment_code'=>'predeposit'));
-                }
+            $logic_order->changeOrderReceivePay($order_list, 'buyer', $member_name, array('payment_code' => 'predeposit'));
+        }
         return $order_list;
     }
 
@@ -714,7 +707,7 @@ class Buy_1 {
         $reciver_info['area'] = $address_info['area_info'];
         $reciver_info['street'] = $address_info['address_detail'];
         $reciver_info['dada_lng_lat'] = $address_info['dada_lng_lat'];
-		$reciver_info['house_number'] = $address_info['house_number'];
+        $reciver_info['house_number'] = $address_info['house_number'];
         $reciver_info = serialize($reciver_info);
         $reciver_name = $address_info['address_realname'];
         return array($reciver_info, $reciver_name);
@@ -748,7 +741,6 @@ class Buy_1 {
         return !empty($inv) ? serialize($inv) : serialize(array());
     }
 
-
     /**
      * 直接购买时返回最新的在售商品信息（需要在售）
      *
@@ -758,8 +750,8 @@ class Buy_1 {
      */
     private function _getGoodsOnlineInfo($goods_id, $quantity) {
         //取目前在售商品
-        $goods_model=model('goods');
-        $goods_model->lock=$this->lock;
+        $goods_model = model('goods');
+        $goods_model->lock = $this->lock;
         $goods_info = $goods_model->getGoodsOnlineInfoAndPromotionById($goods_id);
         if (empty($goods_info)) {
             return null;
@@ -787,7 +779,6 @@ class Buy_1 {
         //填充必要下标，方便后面统一使用购物车方法与模板
         //cart_id=goods_id,优惠套装目前只能进购物车,不能立即购买
         $new_array['cart_id'] = $goods_id;
-
 
         return $new_array;
     }
@@ -829,7 +820,7 @@ class Buy_1 {
             $goods_id_array[] = $cart_info['goods_id'];
         }
         $goods_model = model('goods');
-        $goods_model->lock=$this->lock;
+        $goods_model->lock = $this->lock;
         $goods_online_list = $goods_model->getGoodsOnlineListAndPromotionByIdArray($goods_id_array);
         $goods_online_array = array();
         foreach ($goods_online_list as $goods) {
@@ -974,5 +965,4 @@ class Buy_1 {
         $goods_desc = (!empty($rule_info['mansong_goods_name']) && !empty($rule_info['goods_storage'])) ? " 送<a href='" . url('home/Goods/index', ['goods_id' => $rule_info['goods_id']]) . "' title='{$rule_info['mansong_goods_name']}' target='_blank'>[赠品]</a>" : '';
         return sprintf('满%s%s%s', $rule_info['mansongrule_price'], $discount_desc, $goods_desc);
     }
-
 }

@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS `#__address`;
 CREATE TABLE IF NOT EXISTS `#__address` (
   `address_id` mediumint(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '地址ID',
-  `member_id` mediumint(10) unsigned NOT NULL DEFAULT '0' COMMENT '会员ID',
+  `member_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '会员ID',
   `address_realname` varchar(50) NOT NULL COMMENT '会员姓名',
   `city_id` mediumint(9) DEFAULT NULL COMMENT '市级ID',
   `area_id` mediumint(10) unsigned NOT NULL DEFAULT '0' COMMENT '地区ID',
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS `#__adv` (
 DROP TABLE IF EXISTS `#__advposition`;
 CREATE TABLE IF NOT EXISTS `#__advposition` (
   `ap_id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT COMMENT '广告位置自增ID',
-  `ap_name` varchar(100) NOT NULL COMMENT '广告位名称',
+  `ap_name` varchar(50) NOT NULL COMMENT '广告位名称',
   `ap_intro` varchar(255) NOT NULL DEFAULT '' COMMENT '广告位简介',
   `ap_isuse` smallint(1) unsigned NOT NULL DEFAULT '1' COMMENT '广告位是否启用：0不启用1启用',
   `ap_width` int(10) DEFAULT '0' COMMENT '广告位宽度',
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS `#__advposition` (
 DROP TABLE IF EXISTS `#__albumclass`;
 CREATE TABLE IF NOT EXISTS `#__albumclass` (
   `aclass_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '相册自增ID',
-  `aclass_name` varchar(100) NOT NULL COMMENT '相册名称',
+  `aclass_name` varchar(50) NOT NULL COMMENT '相册名称',
   `store_id` int(10) unsigned NOT NULL COMMENT '店铺id',
   `aclass_des` varchar(255) NOT NULL COMMENT '相册描述',
   `aclass_sort` tinyint(3) unsigned NOT NULL DEFAULT '255' COMMENT '相册排序',
@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS `#__albumclass` (
 DROP TABLE IF EXISTS `#__albumpic`;
 CREATE TABLE IF NOT EXISTS `#__albumpic` (
   `apic_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '相册图片自增ID',
-  `apic_name` varchar(100) NOT NULL COMMENT '图片名称',
+  `apic_name` varchar(50) NOT NULL COMMENT '图片名称',
   `apic_tag` varchar(255) NOT NULL COMMENT '图片标签',
   `aclass_id` int(10) unsigned NOT NULL COMMENT '相册ID',
   `apic_cover` varchar(255) NOT NULL COMMENT '图片路径',
@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS `#__appadv` (
 DROP TABLE IF EXISTS `#__appadvposition`;
 CREATE TABLE IF NOT EXISTS `#__appadvposition` (
   `ap_id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT COMMENT 'APP广告位自增ID',
-  `ap_name` varchar(100) NOT NULL COMMENT 'APP广告位名称',
+  `ap_name` varchar(50) NOT NULL COMMENT 'APP广告位名称',
   `ap_intro` varchar(255) NOT NULL DEFAULT '' COMMENT 'APP广告位简介',
   `ap_isuse` smallint(1) unsigned NOT NULL DEFAULT '1' COMMENT 'APP广告位是否启用：0不启用1启用',
   `ap_width` int(10) DEFAULT '0' COMMENT 'APP广告位宽度',
@@ -161,7 +161,7 @@ DROP TABLE IF EXISTS `#__articleclass`;
 CREATE TABLE IF NOT EXISTS `#__articleclass` (
   `ac_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '文章分类自增ID',
   `ac_code` varchar(20) DEFAULT NULL COMMENT '文章分类标识码',
-  `ac_name` varchar(100) NOT NULL COMMENT '文章分类名称',
+  `ac_name` varchar(50) NOT NULL COMMENT '文章分类名称',
   `ac_parent_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '文章分类父ID',
   `ac_sort` tinyint(3) unsigned NOT NULL DEFAULT '255' COMMENT '文章分类排序',
   PRIMARY KEY (`ac_id`),
@@ -171,7 +171,7 @@ CREATE TABLE IF NOT EXISTS `#__articleclass` (
 DROP TABLE IF EXISTS `#__attribute`;
 CREATE TABLE IF NOT EXISTS `#__attribute` (
   `attr_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '属性自增ID',
-  `attr_name` varchar(100) NOT NULL COMMENT '属性名称',
+  `attr_name` varchar(50) NOT NULL COMMENT '属性名称',
   `type_id` int(10) unsigned NOT NULL COMMENT '所属类型id',
   `attr_value` text NOT NULL COMMENT '属性值',
   `attr_show` tinyint(1) unsigned NOT NULL COMMENT '属性是否显示。0不显示、1显示',
@@ -183,7 +183,7 @@ CREATE TABLE IF NOT EXISTS `#__attribute` (
 DROP TABLE IF EXISTS `#__attributevalue`;
 CREATE TABLE IF NOT EXISTS `#__attributevalue` (
   `attrvalue_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '属性值id',
-  `attrvalue_name` varchar(100) NOT NULL COMMENT '属性值名称',
+  `attrvalue_name` varchar(50) NOT NULL COMMENT '属性值名称',
   `attr_id` int(10) unsigned NOT NULL COMMENT '所属属性id',
   `type_id` int(10) unsigned NOT NULL COMMENT '类型id',
   `attrvalue_sort` tinyint(3) unsigned NOT NULL DEFAULT '255' COMMENT '属性值排序',
@@ -196,7 +196,7 @@ DROP TABLE IF EXISTS `#__bonus`;
 CREATE TABLE IF NOT EXISTS `#__bonus` (
   `bonus_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '红包自增ID',
   `bonus_type` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '红包类型 1活动红包 2关注红包 3奖品红包',
-  `bonus_name` varchar(20) NOT NULL DEFAULT '' COMMENT '红包名称',
+  `bonus_name` varchar(50) NOT NULL DEFAULT '' COMMENT '红包名称',
   `bonus_blessing` varchar(255) NOT NULL DEFAULT '' COMMENT '红包祝福语',
   `bonus_totalprice` decimal(10,2) NOT NULL COMMENT '总面额',
   `bonus_pricetype` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否固定金额 1固定金额',
@@ -228,9 +228,9 @@ CREATE TABLE IF NOT EXISTS `#__bonusreceive` (
 DROP TABLE IF EXISTS `#__brand`;
 CREATE TABLE IF NOT EXISTS `#__brand` (
   `brand_id` mediumint(11) NOT NULL AUTO_INCREMENT COMMENT '品牌自增ID',
-  `store_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '店铺ID',
+  `store_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '店铺ID',
   `gc_id` int(10) unsigned DEFAULT '0' COMMENT '商品分类id',
-  `brand_name` varchar(100) DEFAULT NULL COMMENT '品牌名称',
+  `brand_name` varchar(50) DEFAULT NULL COMMENT '品牌名称',
   `brand_initial` varchar(1) DEFAULT NULL COMMENT '品牌首字母',
   `brand_class` varchar(50) DEFAULT NULL COMMENT '类别名称',
   `brand_pic` varchar(100) DEFAULT NULL COMMENT '品牌图片',
@@ -247,7 +247,7 @@ DROP TABLE IF EXISTS `#__cart`;
 CREATE TABLE IF NOT EXISTS `#__cart` (
   `cart_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '购物车自增ID',
   `buyer_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '买家ID',
-  `store_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '店铺ID',
+  `store_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '店铺ID',
   `store_name` varchar(50) NOT NULL DEFAULT '' COMMENT '店铺名称',
   `goods_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '商品ID',
   `goods_name` varchar(200) NOT NULL COMMENT '商品名称',
@@ -331,8 +331,8 @@ CREATE TABLE IF NOT EXISTS `#__consult` (
   `goods_id` int(11) unsigned DEFAULT '0' COMMENT '商品编号',
   `goods_name` varchar(200) NOT NULL COMMENT '商品名称',
   `member_id` int(11) NOT NULL DEFAULT '0' COMMENT '咨询发布者会员ID 0:游客',
-  `member_name` varchar(100) DEFAULT NULL COMMENT '会员名称',
-  `store_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '店铺ID',
+  `member_name` varchar(50) DEFAULT NULL COMMENT '会员名称',
+  `store_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '店铺ID',
   `store_name` varchar(50) NOT NULL COMMENT '店铺名称',
   `consulttype_id` int(10) unsigned NOT NULL COMMENT '咨询类型',
   `consult_content` varchar(255) DEFAULT NULL COMMENT '咨询内容',
@@ -457,13 +457,13 @@ CREATE TABLE IF NOT EXISTS `#__exppointslog` (
 DROP TABLE IF EXISTS `#__favorites`;
 CREATE TABLE IF NOT EXISTS `#__favorites` (
   `favlog_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '收藏记录自增ID',
-  `member_id` int(10) unsigned NOT NULL COMMENT '会员ID',
+  `member_id` int(11) unsigned NOT NULL COMMENT '会员ID',
   `member_name` varchar(50) NOT NULL COMMENT '会员名',
   `fav_id` int(10) unsigned NOT NULL COMMENT '商品ID或店铺ID',
   `fav_type` char(5) NOT NULL DEFAULT 'goods' COMMENT '类型:goods为商品,store为店铺',
   `fav_time` int(10) unsigned NOT NULL COMMENT '收藏时间',
   `store_id` int(10) unsigned NOT NULL COMMENT '店铺ID',
-  `store_name` varchar(20) NOT NULL COMMENT '店铺名称',
+  `store_name` varchar(50) NOT NULL COMMENT '店铺名称',
   `storeclass_id` int(10) unsigned DEFAULT '0' COMMENT '店铺分类ID',
   `goods_name` varchar(200) DEFAULT NULL COMMENT '商品名称',
   `goods_image` varchar(100) DEFAULT NULL COMMENT '商品图片',
@@ -479,10 +479,10 @@ CREATE TABLE IF NOT EXISTS `#__favorites` (
 DROP TABLE IF EXISTS `#__feedback`;
 CREATE TABLE IF NOT EXISTS `#__feedback` (
   `fb_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '反馈自增ID',
-  `fb_content` varchar(500) DEFAULT NULL COMMENT '反馈内容',
+  `fb_content` varchar(255) DEFAULT NULL COMMENT '反馈内容',
   `fb_type` varchar(50) DEFAULT NULL COMMENT '1:手机端 2:PC端',
   `fb_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '反馈时间',
-  `member_id` int(10) unsigned NOT NULL COMMENT '用户ID',
+  `member_id` int(11) unsigned NOT NULL COMMENT '用户ID',
   `member_name` varchar(50) NOT NULL COMMENT '用户名',
   PRIMARY KEY (`fb_id`),
   KEY `member_id` (`member_id`)
@@ -493,7 +493,7 @@ CREATE TABLE IF NOT EXISTS `#__flowstat` (
   `flowstat_stattime` int(11) unsigned NOT NULL COMMENT '访问日期',
   `flowstat_clicknum` int(11) unsigned NOT NULL COMMENT '访问量',
   `flowstat_type` varchar(10) NOT NULL COMMENT '类型',
-  `store_id` int(11) unsigned NOT NULL COMMENT '店铺ID',
+  `store_id` int(10) unsigned NOT NULL COMMENT '店铺ID',
   `goods_id` int(11) unsigned NOT NULL COMMENT '商品ID',
   KEY `store_id` (`store_id`),
   KEY `goods_id` (`goods_id`)
@@ -591,10 +591,10 @@ CREATE TABLE IF NOT EXISTS `#__goodsbrowse` (
 DROP TABLE IF EXISTS `#__goodsclass`;
 CREATE TABLE IF NOT EXISTS `#__goodsclass` (
   `gc_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '商品分类自增ID',
-  `gc_name` varchar(100) NOT NULL COMMENT '商品分类名称',
+  `gc_name` varchar(50) NOT NULL COMMENT '商品分类名称',
   `gc_image` varchar(100) DEFAULT '' COMMENT '商品分类图',
   `type_id` int(10) unsigned NOT NULL COMMENT '类型id',
-  `type_name` varchar(100) NOT NULL COMMENT '类型名称',
+  `type_name` varchar(50) NOT NULL COMMENT '类型名称',
   `gc_parent_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '商品分类上级ID',
   `commis_rate` float unsigned NOT NULL DEFAULT '0' COMMENT '商品分类佣金比例',
   `gc_sort` tinyint(3) unsigned NOT NULL DEFAULT '255' COMMENT '商品分类排序',
@@ -625,12 +625,12 @@ DROP TABLE IF EXISTS `#__goodsclassstaple`;
 CREATE TABLE IF NOT EXISTS `#__goodsclassstaple` (
   `staple_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '常用分类id',
   `staple_counter` int(10) unsigned NOT NULL DEFAULT '1' COMMENT '计数器',
-  `staple_name` varchar(255) NOT NULL COMMENT '常用分类名称',
+  `staple_name` varchar(50) NOT NULL COMMENT '常用分类名称',
   `gc_id_1` int(10) unsigned NOT NULL COMMENT '一级分类id',
   `gc_id_2` int(10) unsigned NOT NULL COMMENT '二级商品分类',
   `gc_id_3` int(10) unsigned NOT NULL COMMENT '三级商品分类',
   `type_id` int(10) unsigned NOT NULL COMMENT '类型id',
-  `member_id` int(10) unsigned NOT NULL COMMENT '会员id',
+  `member_id` int(11) unsigned NOT NULL COMMENT '会员id',
   PRIMARY KEY (`staple_id`),
   KEY `store_id` (`member_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='店铺常用分类表';
@@ -638,7 +638,7 @@ CREATE TABLE IF NOT EXISTS `#__goodsclassstaple` (
 DROP TABLE IF EXISTS `#__goodsclasstag`;
 CREATE TABLE IF NOT EXISTS `#__goodsclasstag` (
   `gctag_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'TAG自增ID',
-  `gctag_name` varchar(255) NOT NULL COMMENT '分类TAG名称',
+  `gctag_name` varchar(50) NOT NULL COMMENT '分类TAG名称',
   `gctag_value` text NOT NULL COMMENT '分类TAG值',
   `type_id` int(10) unsigned NOT NULL COMMENT '类型ID',
   `gc_id` int(10) unsigned NOT NULL COMMENT '商品分类ID',
@@ -673,13 +673,13 @@ CREATE TABLE IF NOT EXISTS `#__goodscommon` (
   `gc_id_1` int(10) unsigned DEFAULT NULL COMMENT '一级分类id',
   `gc_id_2` int(10) unsigned DEFAULT NULL COMMENT '二级分类id',
   `gc_id_3` int(10) unsigned DEFAULT NULL COMMENT '三级分类id',
-  `gc_name` varchar(200) NOT NULL COMMENT '商品分类',
+  `gc_name` varchar(50) NOT NULL COMMENT '商品分类',
   `store_id` int(10) unsigned NOT NULL COMMENT '店铺id',
   `store_name` varchar(50) NOT NULL COMMENT '店铺名称',
-  `spec_name` varchar(255) NOT NULL COMMENT '规格名称',
+  `spec_name` varchar(50) NOT NULL COMMENT '规格名称',
   `spec_value` text NOT NULL COMMENT '规格值',
   `brand_id` int(10) unsigned DEFAULT '0' COMMENT '品牌id',
-  `brand_name` varchar(100) DEFAULT NULL COMMENT '品牌名称',
+  `brand_name` varchar(50) DEFAULT NULL COMMENT '品牌名称',
   `type_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '类型id',
   `goods_image` varchar(100) DEFAULT NULL COMMENT '商品主图',
   `goods_attr` text NOT NULL COMMENT '商品属性',
@@ -789,14 +789,14 @@ CREATE TABLE IF NOT EXISTS `#__inform` (
   `inform_pic2` varchar(100) NOT NULL COMMENT '图片2',
   `inform_pic3` varchar(100) NOT NULL COMMENT '图片3',
   `inform_datetime` int(11) NOT NULL COMMENT '举报时间',
-  `inform_store_id` int(11) NOT NULL COMMENT '被举报商品的店铺ID',
+  `inform_store_id` int(10) NOT NULL COMMENT '被举报商品的店铺ID',
   `inform_state` tinyint(4) NOT NULL COMMENT '举报状态(1未处理/2已处理)',
   `inform_handle_type` tinyint(4) DEFAULT NULL COMMENT '举报处理结果(1无效举报/2恶意举报/3有效举报)',
   `inform_handle_message` varchar(100) NOT NULL COMMENT '举报处理信息',
   `inform_handle_datetime` int(11) NOT NULL DEFAULT '0' COMMENT '举报处理时间',
   `inform_handle_member_id` int(11) NOT NULL DEFAULT '0' COMMENT '管理员ID',
   `inform_goods_image` varchar(150) DEFAULT NULL COMMENT '商品图',
-  `inform_store_name` varchar(100) DEFAULT NULL COMMENT '店铺名',
+  `inform_store_name` varchar(50) DEFAULT NULL COMMENT '店铺名',
   PRIMARY KEY (`inform_id`),
   KEY `inform_member_id` (`inform_member_id`),
   KEY `inform_store_id` (`inform_store_id`)
@@ -827,11 +827,11 @@ CREATE TABLE IF NOT EXISTS `#__instant_message` (
   `instant_message_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '消息自增ID',
   `instant_message_from_id` int(10) unsigned NOT NULL COMMENT '发送ID',
   `instant_message_from_type` tinyint(1) unsigned NOT NULL COMMENT '发送类型（0用户1商家2直播）',
-  `instant_message_from_name` varchar(500) NOT NULL COMMENT '发送名称',
+  `instant_message_from_name` varchar(50) NOT NULL COMMENT '发送名称',
   `instant_message_from_ip` varchar(15) NOT NULL COMMENT '发自IP',
   `instant_message_to_id` int(10) unsigned NOT NULL COMMENT '接收ID',
   `instant_message_to_type` tinyint(1) unsigned NOT NULL COMMENT '接收类型（0用户1商家2直播）',
-  `instant_message_to_name` varchar(500) NOT NULL COMMENT '接收名称',
+  `instant_message_to_name` varchar(50) NOT NULL COMMENT '接收名称',
   `instant_message` text COMMENT '消息内容',
   `instant_message_type` tinyint(1) unsigned DEFAULT '0' COMMENT '消息类型（0文字1商品）',
   `instant_message_state` tinyint(1) unsigned DEFAULT '2' COMMENT '状态:1为已读,2为未读,默认为2',
@@ -858,7 +858,7 @@ CREATE TABLE IF NOT EXISTS `#__inviter` (
 DROP TABLE IF EXISTS `#__inviterclass`;
 CREATE TABLE IF NOT EXISTS `#__inviterclass` (
   `inviterclass_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '推广员等级id',
-  `inviterclass_name` varchar(60) NOT NULL COMMENT '等级名',
+  `inviterclass_name` varchar(50) NOT NULL COMMENT '等级名',
   `inviterclass_amount` decimal(10,2) NOT NULL COMMENT '等级门槛',
   PRIMARY KEY (`inviterclass_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='推广等级表';
@@ -866,7 +866,7 @@ CREATE TABLE IF NOT EXISTS `#__inviterclass` (
 DROP TABLE IF EXISTS `#__invoice`;
 CREATE TABLE IF NOT EXISTS `#__invoice` (
   `invoice_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '发票信息ID',
-  `member_id` int(10) unsigned NOT NULL COMMENT '会员ID',
+  `member_id` int(11) unsigned NOT NULL COMMENT '会员ID',
   `invoice_state` enum('1','2') DEFAULT NULL COMMENT '发票类型 1:普通发票 2:增值税发票',
   `invoice_title` varchar(50) DEFAULT '' COMMENT '发票抬头[普通发票]',
   `invoice_code` varchar(50) DEFAULT '' COMMENT '纳税人识别号[普通发票]',
@@ -919,12 +919,12 @@ DROP TABLE IF EXISTS `#__mallconsult`;
 CREATE TABLE IF NOT EXISTS `#__mallconsult` (
   `mallconsult_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '平台客服咨询自增ID',
   `mallconsulttype_id` int(10) unsigned NOT NULL COMMENT '咨询类型ID',
-  `member_id` int(10) unsigned NOT NULL COMMENT '会员ID',
+  `member_id` int(11) unsigned NOT NULL COMMENT '会员ID',
   `member_name` varchar(50) NOT NULL COMMENT '会员名称',
-  `mallconsult_content` varchar(500) NOT NULL COMMENT '咨询内容',
+  `mallconsult_content` varchar(255) NOT NULL COMMENT '咨询内容',
   `mallconsult_addtime` int(10) unsigned NOT NULL COMMENT '咨询时间',
   `mallconsult_isreply` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '是否回复 1:是 0:否',
-  `mallconsult_reply_content` varchar(500) NOT NULL DEFAULT '' COMMENT '平台回复内容',
+  `mallconsult_reply_content` varchar(255) NOT NULL DEFAULT '' COMMENT '平台回复内容',
   `mallconsult_replytime` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '平台回复时间',
   `admin_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '管理员id',
   `admin_name` varchar(50) NOT NULL DEFAULT '' COMMENT '管理员名称',
@@ -944,7 +944,7 @@ CREATE TABLE IF NOT EXISTS `#__mallconsulttype` (
 DROP TABLE IF EXISTS `#__marketmanage`;
 CREATE TABLE IF NOT EXISTS `#__marketmanage` (
   `marketmanage_id` int(11) NOT NULL AUTO_INCREMENT,
-  `marketmanage_name` varchar(100) NOT NULL DEFAULT '' COMMENT '营销活动活动名称',
+  `marketmanage_name` varchar(50) NOT NULL DEFAULT '' COMMENT '营销活动活动名称',
   `marketmanage_detail` varchar(255) NOT NULL DEFAULT '' COMMENT '营销活动详情',
   `marketmanage_begintime` int(11) NOT NULL DEFAULT '0' COMMENT '开始时间',
   `marketmanage_endtime` int(11) NOT NULL DEFAULT '0' COMMENT '结束时间',
@@ -988,33 +988,21 @@ CREATE TABLE IF NOT EXISTS `#__marketmanagelog` (
   KEY `member_id` (`member_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='营销活动活动领取记录';
 
-DROP TABLE IF EXISTS `#__mbsellertoken`;
-CREATE TABLE IF NOT EXISTS `#__mbsellertoken` (
-  `seller_token_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '令牌编号',
-  `seller_id` int(10) unsigned NOT NULL COMMENT '用户编号',
-  `seller_name` varchar(50) NOT NULL COMMENT '用户名',
-  `seller_token` varchar(50) NOT NULL COMMENT '登录令牌',
-  `seller_logintime` int(10) unsigned NOT NULL COMMENT '登录时间',
-  `seller_clienttype` varchar(10) NOT NULL COMMENT '客户端类型 windows',
-  PRIMARY KEY (`seller_token_id`),
-  KEY `seller_token` (`seller_token`),
-  KEY `seller_id` (`seller_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='客户端商家登录令牌表';
-
-DROP TABLE IF EXISTS `#__mbusertoken`;
-CREATE TABLE IF NOT EXISTS `#__mbusertoken` (
-  `member_token_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '令牌编号',
-  `member_id` int(10) unsigned NOT NULL COMMENT '用户编号',
-  `member_name` varchar(50) NOT NULL COMMENT '用户名',
-  `member_token` varchar(50) NOT NULL COMMENT '登录令牌',
-  `member_logintime` int(10) unsigned NOT NULL COMMENT '登录时间',
-  `member_operationtime` int(10) unsigned NOT NULL COMMENT '最近活跃时间',
-  `member_clienttype` varchar(10) NOT NULL COMMENT '客户端访问类型 APP H5 weixin 小程序',
-  `member_devicetype` varchar(20) NOT NULL DEFAULT '' COMMENT '客户端设备类型及系统',
-  `member_openid` varchar(50) DEFAULT NULL COMMENT '微信支付jsapi的openid缓存',
-  PRIMARY KEY (`member_token_id`),
-  KEY `member_id` (`member_id`),
-  KEY `member_token` (`member_token`)
+DROP TABLE IF EXISTS `#__platformtoken`;
+CREATE TABLE IF NOT EXISTS `#__platformtoken` (
+  `platformtoken_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '令牌编号',
+  `platform_userid` int(10) unsigned NOT NULL COMMENT '用户编号',
+  `platform_username` varchar(50) NOT NULL COMMENT '用户名',
+  `platform_token` char(32) NOT NULL COMMENT '登录令牌',
+  `platform_type` varchar(15) NOT NULL COMMENT '用户类型 member seller chain distributor fuwu',
+  `platform_logintime` int(10) unsigned NOT NULL COMMENT '登录时间',
+  `platform_operationtime` int(10) unsigned NOT NULL COMMENT '最近活跃时间',
+  `platform_clienttype` varchar(10) NOT NULL DEFAULT '' COMMENT '客户端访问类型 APP H5 weixin 小程序',
+  `platform_devicetype` varchar(20) NOT NULL DEFAULT '' COMMENT '客户端设备类型及系统',
+  `platform_openid` varchar(50) DEFAULT NULL COMMENT '微信支付jsapi的openid缓存',
+  PRIMARY KEY (`platformtoken_id`),
+  KEY `platform_userid` (`platform_userid`),
+  KEY `platform_token` (`platform_token`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='移动端登录令牌表';
 
 DROP TABLE IF EXISTS `#__member`;
@@ -1049,9 +1037,12 @@ CREATE TABLE IF NOT EXISTS `#__member` (
   `member_qqinfo` text COMMENT 'qq账号相关信息',
   `member_sinaopenid` varchar(100) DEFAULT NULL COMMENT '新浪微博登录id',
   `member_sinainfo` text COMMENT '新浪账号相关信息序列化值',
-  `member_wxopenid` varchar(100) DEFAULT '' COMMENT '微信互联openid',
-  `member_wxunionid` varchar(100) DEFAULT '' COMMENT '微信用户统一标识',
-  `member_wxinfo` text COMMENT '微信用户相关信息',
+  `member_pc_wxopenid` char(30) DEFAULT '' COMMENT 'PC微信互联openid',
+  `member_h5_wxopenid` char(30) DEFAULT '' COMMENT 'H5微信互联openid',
+  `member_mini_wxopenid` char(30) DEFAULT '' COMMENT '小程序微信互联openid',
+  `member_app_wxopenid` char(30) DEFAULT '' COMMENT 'APP微信互联openid',
+  `member_wxunionid` char(100) DEFAULT '' COMMENT '微信用户统一标识',
+  `member_wxnickname` char(100) DEFAULT '' COMMENT '微信用户昵称',
   `member_points` int(11) NOT NULL DEFAULT '0' COMMENT '会员积分',
   `available_predeposit` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '预存款可用金额',
   `freeze_predeposit` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '预存款冻结金额',
@@ -1098,7 +1089,7 @@ DROP TABLE IF EXISTS `#__membermsgsetting`;
 CREATE TABLE IF NOT EXISTS `#__membermsgsetting` (
   `membermt_code` varchar(50) NOT NULL COMMENT '用户消息模板代码',
   `membermt_isreceive` tinyint(3) unsigned NOT NULL COMMENT '是否接收 1是，0否',
-  `member_id` int(10) unsigned NOT NULL COMMENT '会员ID',
+  `member_id` int(11) unsigned NOT NULL COMMENT '会员ID',
   PRIMARY KEY (`membermt_code`,`member_id`),
   KEY `member_id` (`member_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户消息接收设置表';
@@ -1162,13 +1153,13 @@ CREATE TABLE IF NOT EXISTS `#__navigation` (
 
 DROP TABLE IF EXISTS `#__o2o_complaint`;
 CREATE TABLE IF NOT EXISTS `#__o2o_complaint` (
-  `order_id` int(10) unsigned NOT NULL COMMENT '订单id',
-  `member_id` int(10) unsigned NOT NULL COMMENT '买家id',
-  `member_name` varchar(60) NOT NULL COMMENT '买家账号',
+  `order_id` int(11) unsigned NOT NULL COMMENT '订单id',
+  `member_id` int(11) unsigned NOT NULL COMMENT '买家id',
+  `member_name` varchar(50) NOT NULL COMMENT '买家账号',
   `o2o_distributor_id` int(10) unsigned NOT NULL COMMENT '配送员id',
-  `o2o_distributor_name` varchar(60) NOT NULL COMMENT '配送员账号',
+  `o2o_distributor_name` varchar(50) NOT NULL COMMENT '配送员账号',
   `store_id` int(10) unsigned NOT NULL COMMENT '店铺id',
-  `store_name` varchar(60) NOT NULL COMMENT '店铺名称',
+  `store_name` varchar(50) NOT NULL COMMENT '店铺名称',
   `o2o_complaint_content` varchar(255) NOT NULL COMMENT '投诉内容',
   `o2o_complaint_addtime` int(10) unsigned NOT NULL COMMENT '投诉时间',
   `o2o_complaint_reply` varchar(255) NOT NULL DEFAULT '' COMMENT '店长回复',
@@ -1187,7 +1178,7 @@ DROP TABLE IF EXISTS `#__o2o_distributor`;
 CREATE TABLE IF NOT EXISTS `#__o2o_distributor` (
   `o2o_distributor_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '配送员id',
   `o2o_distributor_avatar` varchar(255) NOT NULL DEFAULT '' COMMENT '配送员头像',
-  `o2o_distributor_name` varchar(60) NOT NULL COMMENT '配送员账号',
+  `o2o_distributor_name` varchar(50) NOT NULL COMMENT '配送员账号',
   `o2o_distributor_password` varchar(60) NOT NULL COMMENT '配送员密码',
   `o2o_distributor_realname` varchar(60) NOT NULL COMMENT '配送员姓名',
   `store_id` int(10) unsigned NOT NULL COMMENT '所属店铺id,处理店铺订单',
@@ -1203,12 +1194,12 @@ CREATE TABLE IF NOT EXISTS `#__o2o_distributor` (
   `o2o_distributor_total_count` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '总订单',
   `o2o_distributor_average_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '平均用时（分钟）',
   `o2o_distributor_region_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '配送地区id',
-  `o2o_distributor_region_name` varchar(60) NOT NULL DEFAULT '' COMMENT '配送地区名称',
+  `o2o_distributor_region_name` varchar(50) NOT NULL DEFAULT '' COMMENT '配送地区名称',
   `o2o_distributor_avaliable_money` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '配送员可用金额',
   `o2o_distributor_freeze_money` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '配送员冻结金额',
   `o2o_distributor_lng` varchar(20) DEFAULT '' COMMENT '经度',
   `o2o_distributor_lat` varchar(20) DEFAULT '' COMMENT '纬度',
-  `o2o_distributor_payment_account` varchar(500) NOT NULL DEFAULT '' COMMENT '结款账号',
+  `o2o_distributor_payment_account` varchar(50) NOT NULL DEFAULT '' COMMENT '结款账号',
   `o2o_distributor_identify_image` varchar(255) NOT NULL DEFAULT '' COMMENT '身份证图片',
   `o2o_distributor_errand_deposit` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '跑腿保证金',
   `o2o_distributor_deposit_image` varchar(255) NOT NULL DEFAULT '' COMMENT '保证金图片',
@@ -1240,9 +1231,9 @@ DROP TABLE IF EXISTS `#__o2o_distributor_notice`;
 CREATE TABLE IF NOT EXISTS `#__o2o_distributor_notice` (
   `o2o_distributor_notice_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '通知id',
   `o2o_distributor_id` int(10) unsigned NOT NULL COMMENT '配送员id',
-  `o2o_distributor_name` varchar(60) NOT NULL COMMENT '配送员账号',
+  `o2o_distributor_name` varchar(50) NOT NULL COMMENT '配送员账号',
   `o2o_distributor_notice_type` tinyint(1) unsigned NOT NULL COMMENT '通知类型（0默认通知1接单通知2转单通知）',
-  `order_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '订单id',
+  `order_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '订单id',
   `o2o_distributor_notice_content` varchar(255) NOT NULL COMMENT '通知内容',
   `o2o_distributor_notice_read` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '是否已读',
   `o2o_distributor_notice_add_time` int(10) unsigned NOT NULL COMMENT '添加时间',
@@ -1252,23 +1243,10 @@ CREATE TABLE IF NOT EXISTS `#__o2o_distributor_notice` (
   KEY `order_id` (`order_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='配送员通知表';
 
-DROP TABLE IF EXISTS `#__o2o_distributor_token`;
-CREATE TABLE IF NOT EXISTS `#__o2o_distributor_token` (
-  `o2o_distributor_token_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'token id',
-  `o2o_distributor_id` int(10) unsigned NOT NULL COMMENT '配送员id',
-  `o2o_distributor_name` varchar(60) NOT NULL COMMENT '配送员账号',
-  `o2o_distributor_token` varchar(60) NOT NULL COMMENT 'token',
-  `o2o_distributor_token_login_time` int(10) unsigned NOT NULL COMMENT '登录时间',
-  `o2o_distributor_token_client_type` varchar(10) NOT NULL COMMENT '客户端类型',
-  PRIMARY KEY (`o2o_distributor_token_id`),
-  UNIQUE KEY `o2o_distributor_token` (`o2o_distributor_token`),
-  UNIQUE KEY `o2o_distributor_id` (`o2o_distributor_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='配送员登录token表';
-
 DROP TABLE IF EXISTS `#__o2o_errand_class`;
 CREATE TABLE IF NOT EXISTS `#__o2o_errand_class` (
   `o2o_errand_class_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '跑腿类别ID',
-  `o2o_errand_class_name` varchar(60) NOT NULL COMMENT '跑腿类别名称',
+  `o2o_errand_class_name` varchar(50) NOT NULL COMMENT '跑腿类别名称',
   `o2o_errand_class_logo` varchar(255) NOT NULL COMMENT '图片',
   `o2o_errand_class_sort_order` tinyint(3) unsigned NOT NULL DEFAULT '255' COMMENT '排序',
   `o2o_errand_class_recommend` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '推荐（0否1是）',
@@ -1283,9 +1261,9 @@ CREATE TABLE IF NOT EXISTS `#__o2o_errand_order` (
   `o2o_errand_order_type` tinyint(1) unsigned NOT NULL COMMENT '跑腿订单类型（0帮我买1帮我送）',
   `o2o_errand_order_sn` varchar(60) NOT NULL COMMENT '跑腿订单号',
   `member_id` int(11) unsigned NOT NULL COMMENT '用户ID',
-  `member_name` varchar(60) NOT NULL COMMENT '用户名称',
+  `member_name` varchar(50) NOT NULL COMMENT '用户名称',
   `o2o_distributor_id` int(11) unsigned DEFAULT NULL COMMENT '配送员ID',
-  `o2o_distributor_name` varchar(60) DEFAULT NULL COMMENT '配送员名称',
+  `o2o_distributor_name` varchar(50) DEFAULT NULL COMMENT '配送员名称',
   `o2o_distributor_realname` varchar(60) DEFAULT NULL COMMENT '配送员姓名',
   `o2o_distributor_phone` varchar(60) DEFAULT NULL COMMENT '配送员手机号',
   `o2o_errand_order_add_time` int(11) unsigned NOT NULL COMMENT '下单时间',
@@ -1336,7 +1314,7 @@ CREATE TABLE IF NOT EXISTS `#__o2o_errand_order` (
 DROP TABLE IF EXISTS `#__o2o_fuwu_account`;
 CREATE TABLE IF NOT EXISTS `#__o2o_fuwu_account` (
   `o2o_fuwu_account_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '服务账号id',
-  `o2o_fuwu_account_name` varchar(60) NOT NULL COMMENT '服务账号名称',
+  `o2o_fuwu_account_name` varchar(50) NOT NULL COMMENT '服务账号名称',
   `o2o_fuwu_account_password` varchar(60) NOT NULL COMMENT '密码',
   `o2o_fuwu_account_add_time` int(10) unsigned NOT NULL COMMENT '添加时间',
   `o2o_fuwu_organization_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '服务机构ID',
@@ -1349,7 +1327,7 @@ CREATE TABLE IF NOT EXISTS `#__o2o_fuwu_account` (
 DROP TABLE IF EXISTS `#__o2o_fuwu_class`;
 CREATE TABLE IF NOT EXISTS `#__o2o_fuwu_class` (
   `o2o_fuwu_class_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '服务分类ID',
-  `o2o_fuwu_class_name` varchar(60) NOT NULL COMMENT '服务分类名称',
+  `o2o_fuwu_class_name` varchar(50) NOT NULL COMMENT '服务分类名称',
   `o2o_fuwu_class_parent_id` int(10) unsigned NOT NULL COMMENT '上级ID',
   `o2o_fuwu_class_logo` varchar(255) NOT NULL DEFAULT '' COMMENT '服务分类logo',
   `o2o_fuwu_class_sort_order` tinyint(3) unsigned NOT NULL DEFAULT '255' COMMENT '排序',
@@ -1362,7 +1340,7 @@ DROP TABLE IF EXISTS `#__o2o_fuwu_goods`;
 CREATE TABLE IF NOT EXISTS `#__o2o_fuwu_goods` (
   `o2o_fuwu_goods_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '服务商品ID',
   `o2o_fuwu_organization_id` int(10) unsigned NOT NULL COMMENT '服务机构ID',
-  `o2o_fuwu_organization_name` varchar(60) NOT NULL DEFAULT '' COMMENT '服务机构名称',
+  `o2o_fuwu_organization_name` varchar(50) NOT NULL DEFAULT '' COMMENT '服务机构名称',
   `o2o_fuwu_goods_name` varchar(200) NOT NULL COMMENT '服务商品名称',
   `o2o_fuwu_goods_advword` varchar(255) DEFAULT '' COMMENT '服务商品广告词',
   `o2o_fuwu_goods_image` varchar(255) NOT NULL COMMENT '图片',
@@ -1374,7 +1352,7 @@ CREATE TABLE IF NOT EXISTS `#__o2o_fuwu_goods` (
   `o2o_fuwu_goods_state` tinyint(1) unsigned NOT NULL COMMENT '商品状态（0未发布1已发布10违规）',
   `o2o_fuwu_class_id_1` int(10) unsigned NOT NULL COMMENT '一级服务分类ID',
   `o2o_fuwu_class_id_2` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '二级服务分类ID',
-  `o2o_fuwu_class_name` varchar(60) NOT NULL COMMENT '服务分类名称',
+  `o2o_fuwu_class_name` varchar(50) NOT NULL COMMENT '服务分类名称',
   `o2o_fuwu_goods_default_spec` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '默认规格',
   `o2o_fuwu_goods_spec_quantity` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '规格数量',
   PRIMARY KEY (`o2o_fuwu_goods_id`),
@@ -1389,7 +1367,7 @@ CREATE TABLE IF NOT EXISTS `#__o2o_fuwu_goods_spec` (
   `o2o_fuwu_goods_spec_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '服务规格ID',
   `o2o_fuwu_goods_id` int(10) unsigned NOT NULL COMMENT '服务商品ID',
   `o2o_fuwu_goods_spec_unit` varchar(10) NOT NULL COMMENT '单位',
-  `o2o_fuwu_goods_spec_name` varchar(60) NOT NULL COMMENT '规格名称',
+  `o2o_fuwu_goods_spec_name` varchar(50) NOT NULL COMMENT '规格名称',
   `o2o_fuwu_goods_spec_type` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '规格类型（0默认服务1增值服务）',
   `o2o_fuwu_goods_spec_price` decimal(10,2) unsigned NOT NULL COMMENT '价格',
   `o2o_fuwu_organization_id` int(10) unsigned NOT NULL COMMENT '服务机构ID',
@@ -1401,12 +1379,12 @@ DROP TABLE IF EXISTS `#__o2o_fuwu_money_log`;
 CREATE TABLE IF NOT EXISTS `#__o2o_fuwu_money_log` (
   `o2o_fuwu_money_log_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '资金记录ID',
   `o2o_fuwu_organization_id` int(10) unsigned NOT NULL COMMENT '服务机构ID',
-  `o2o_fuwu_organization_name` varchar(60) NOT NULL COMMENT '服务机构名称',
+  `o2o_fuwu_organization_name` varchar(50) NOT NULL COMMENT '服务机构名称',
   `o2o_fuwu_organization_avaliable_money` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '可用资金',
   `o2o_fuwu_organization_freeze_money` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '冻结资金',
   `o2o_fuwu_money_log_type` tinyint(1) unsigned NOT NULL COMMENT '资金记录类型',
   `o2o_fuwu_money_log_state` tinyint(1) unsigned NOT NULL COMMENT '资金记录状态（0无效1有效2待审核3已同意4已拒绝）',
-  `o2o_fuwu_money_log_desc` varchar(500) NOT NULL COMMENT '资金记录详情',
+  `o2o_fuwu_money_log_desc` varchar(255) NOT NULL COMMENT '资金记录详情',
   `o2o_fuwu_money_log_add_time` int(10) unsigned NOT NULL COMMENT '添加时间',
   PRIMARY KEY (`o2o_fuwu_money_log_id`),
   KEY `o2o_fuwu_organization_id` (`o2o_fuwu_organization_id`)
@@ -1416,7 +1394,7 @@ DROP TABLE IF EXISTS `#__o2o_fuwu_notice`;
 CREATE TABLE IF NOT EXISTS `#__o2o_fuwu_notice` (
   `o2o_fuwu_notice_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '通知id',
   `o2o_fuwu_account_id` int(10) unsigned NOT NULL COMMENT '服务机构id',
-  `o2o_fuwu_account_name` varchar(60) NOT NULL COMMENT '服务机构账号',
+  `o2o_fuwu_account_name` varchar(50) NOT NULL COMMENT '服务机构账号',
   `o2o_fuwu_notice_type` tinyint(1) unsigned NOT NULL COMMENT '通知类型',
   `o2o_fuwu_notice_content` varchar(255) NOT NULL COMMENT '通知内容',
   `o2o_fuwu_notice_read` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '是否已读',
@@ -1428,14 +1406,14 @@ CREATE TABLE IF NOT EXISTS `#__o2o_fuwu_notice` (
 
 DROP TABLE IF EXISTS `#__o2o_fuwu_order`;
 CREATE TABLE IF NOT EXISTS `#__o2o_fuwu_order` (
-  `o2o_fuwu_order_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '订单ID',
+  `o2o_fuwu_order_id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '订单ID',
   `o2o_fuwu_order_sn` varchar(60) NOT NULL COMMENT '订单编号',
   `o2o_fuwu_organization_id` int(10) unsigned NOT NULL COMMENT '服务机构ID',
-  `o2o_fuwu_organization_name` varchar(60) NOT NULL COMMENT '服务机构名称',
+  `o2o_fuwu_organization_name` varchar(50) NOT NULL COMMENT '服务机构名称',
   `o2o_fuwu_organization_parent_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '服务机构上级ID',
-  `o2o_fuwu_organization_parent_name` varchar(60) NOT NULL DEFAULT '' COMMENT '服务机构上级名称',
-  `member_id` int(10) unsigned NOT NULL COMMENT '用户ID',
-  `member_name` varchar(60) NOT NULL COMMENT '用户名称',
+  `o2o_fuwu_organization_parent_name` varchar(50) NOT NULL DEFAULT '' COMMENT '服务机构上级名称',
+  `member_id` int(11) unsigned NOT NULL COMMENT '用户ID',
+  `member_name` varchar(50) NOT NULL COMMENT '用户名称',
   `o2o_fuwu_order_state` tinyint(1) unsigned NOT NULL COMMENT '订单状态 0:已取消 10:未付款 20:待服务 30:服务中 40:已服务',
   `o2o_fuwu_order_add_time` int(10) unsigned NOT NULL COMMENT '添加时间',
   `o2o_fuwu_order_appointment_time` int(10) unsigned NOT NULL COMMENT '预约时间',
@@ -1443,7 +1421,7 @@ CREATE TABLE IF NOT EXISTS `#__o2o_fuwu_order` (
   `o2o_fuwu_order_arrange_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '安排时间',
   `o2o_fuwu_order_serve_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '服务时间',
   `o2o_fuwu_order_finish_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '结束时间',
-  `o2o_fuwu_order_employer_name` varchar(60) NOT NULL COMMENT '雇主名字',
+  `o2o_fuwu_order_employer_name` varchar(50) NOT NULL COMMENT '雇主名字',
   `o2o_fuwu_order_employer_address` varchar(255) NOT NULL COMMENT '雇主地址',
   `o2o_fuwu_order_employer_phone` varchar(60) NOT NULL COMMENT '雇主手机',
   `o2o_fuwu_order_employer_lat` varchar(60) NOT NULL COMMENT '雇主纬度',
@@ -1451,7 +1429,7 @@ CREATE TABLE IF NOT EXISTS `#__o2o_fuwu_order` (
   `o2o_fuwu_goods_id` int(10) unsigned NOT NULL COMMENT '服务商品ID',
   `o2o_fuwu_goods_name` varchar(200) NOT NULL COMMENT '服务商品名称',
   `o2o_fuwu_goods_spec_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '服务规格ID',
-  `o2o_fuwu_goods_spec_name` varchar(60) NOT NULL DEFAULT '' COMMENT '服务规格名称',
+  `o2o_fuwu_goods_spec_name` varchar(50) NOT NULL DEFAULT '' COMMENT '服务规格名称',
   `o2o_fuwu_goods_spec_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '服务规格价格',
   `o2o_fuwu_order_default_quantity` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '默认服务数量',
   `o2o_fuwu_order_default_amount` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '默认服务价格',
@@ -1462,7 +1440,6 @@ CREATE TABLE IF NOT EXISTS `#__o2o_fuwu_order` (
   `o2o_fuwu_order_pd_amount` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '预存款支付金额',
   `o2o_fuwu_order_if_added` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '是否有增值服务',
   `o2o_fuwu_order_payment_code` varchar(60) NOT NULL DEFAULT '' COMMENT '支付代码',
-  `o2o_fuwu_order_payment_name` varchar(60) NOT NULL DEFAULT '' COMMENT '支付名称',
   `o2o_fuwu_order_payment_sn` varchar(255) NOT NULL DEFAULT '' COMMENT '第三方支付流水号',
   `o2o_fuwu_order_if_evaluate` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '是否已评',
   `o2o_fuwu_order_evaluate_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '评论时间',
@@ -1478,33 +1455,22 @@ CREATE TABLE IF NOT EXISTS `#__o2o_fuwu_order` (
 DROP TABLE IF EXISTS `#__o2o_fuwu_order_goods_spec`;
 CREATE TABLE IF NOT EXISTS `#__o2o_fuwu_order_goods_spec` (
   `o2o_fuwu_order_goods_spec_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '订单增值服务ID',
-  `o2o_fuwu_order_id` int(10) unsigned NOT NULL COMMENT '订单ID',
+  `o2o_fuwu_order_id` int(11) unsigned NOT NULL COMMENT '订单ID',
   `o2o_fuwu_goods_spec_id` int(10) unsigned NOT NULL COMMENT '服务规格ID',
-  `o2o_fuwu_goods_spec_name` varchar(60) NOT NULL COMMENT '规格名称',
+  `o2o_fuwu_goods_spec_name` varchar(50) NOT NULL COMMENT '规格名称',
   `o2o_fuwu_goods_spec_price` decimal(10,2) unsigned NOT NULL COMMENT '价格',
   `o2o_fuwu_order_goods_spec_quantity` int(10) unsigned NOT NULL COMMENT '数量',
   PRIMARY KEY (`o2o_fuwu_order_goods_spec_id`),
   KEY `o2o_fuwu_order_id` (`o2o_fuwu_order_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='订单增值服务';
 
-DROP TABLE IF EXISTS `#__o2o_fuwu_order_log`;
-CREATE TABLE IF NOT EXISTS `#__o2o_fuwu_order_log` (
-  `o2o_fuwu_order_log_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '日志ID',
-  `o2o_fuwu_order_id` int(10) unsigned NOT NULL COMMENT '订单ID',
-  `o2o_fuwu_order_log_msg` varchar(255) NOT NULL COMMENT '描述',
-  `o2o_fuwu_order_log_time` int(10) unsigned NOT NULL COMMENT '操作时间',
-  `o2o_fuwu_order_log_role` varchar(20) NOT NULL COMMENT '操作角色',
-  `o2o_fuwu_order_log_user` varchar(60) NOT NULL COMMENT '操作人',
-  PRIMARY KEY (`o2o_fuwu_order_log_id`),
-  KEY `o2o_fuwu_order_id` (`o2o_fuwu_order_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='服务订单日志';
 
 DROP TABLE IF EXISTS `#__o2o_fuwu_organization`;
 CREATE TABLE IF NOT EXISTS `#__o2o_fuwu_organization` (
   `o2o_fuwu_organization_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '服务机构ID',
-  `o2o_fuwu_organization_name` varchar(60) NOT NULL DEFAULT '' COMMENT '服务机构名称',
+  `o2o_fuwu_organization_name` varchar(50) NOT NULL DEFAULT '' COMMENT '服务机构名称',
   `o2o_fuwu_account_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '主账号id',
-  `o2o_fuwu_account_name` varchar(60) NOT NULL DEFAULT '' COMMENT '主账号名称',
+  `o2o_fuwu_account_name` varchar(50) NOT NULL DEFAULT '' COMMENT '主账号名称',
   `o2o_fuwu_organization_avatar` varchar(255) NOT NULL DEFAULT '' COMMENT '头像',
   `o2o_fuwu_organization_type` tinyint(1) unsigned NOT NULL COMMENT '类型（0个人1企业）',
   `o2o_fuwu_organization_parent_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '服务机构上级ID',
@@ -1514,7 +1480,7 @@ CREATE TABLE IF NOT EXISTS `#__o2o_fuwu_organization` (
   `o2o_fuwu_organization_collect_count` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '收藏次数',
   `o2o_fuwu_organization_auth_level` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '认证等级',
   `o2o_fuwu_organization_region_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '地区ID',
-  `o2o_fuwu_organization_region_name` varchar(60) NOT NULL DEFAULT '' COMMENT '地区名称',
+  `o2o_fuwu_organization_region_name` varchar(50) NOT NULL DEFAULT '' COMMENT '地区名称',
   `o2o_fuwu_organization_address` varchar(255) NOT NULL DEFAULT '' COMMENT '地址',
   `o2o_fuwu_organization_lat` varchar(60) NOT NULL DEFAULT '' COMMENT '纬度',
   `o2o_fuwu_organization_lng` varchar(60) NOT NULL DEFAULT '' COMMENT '经度',
@@ -1530,12 +1496,12 @@ CREATE TABLE IF NOT EXISTS `#__o2o_fuwu_organization` (
   `o2o_fuwu_organization_avaliable_money` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '可用资金',
   `o2o_fuwu_organization_freeze_money` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '冻结资金',
   `o2o_fuwu_organization_city_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '城市ID',
-  `o2o_fuwu_organization_city_name` varchar(60) NOT NULL DEFAULT '' COMMENT '城市名称',
-  `o2o_fuwu_class_name_1` varchar(60) NOT NULL DEFAULT '' COMMENT '主服务分类名称',
-  `o2o_fuwu_class_name_2` varchar(60) NOT NULL DEFAULT '' COMMENT '次服务分类名称',
-  `o2o_fuwu_class_name_3` varchar(60) NOT NULL DEFAULT '' COMMENT '次服务分类名称',
+  `o2o_fuwu_organization_city_name` varchar(50) NOT NULL DEFAULT '' COMMENT '城市名称',
+  `o2o_fuwu_class_name_1` varchar(50) NOT NULL DEFAULT '' COMMENT '主服务分类名称',
+  `o2o_fuwu_class_name_2` varchar(50) NOT NULL DEFAULT '' COMMENT '次服务分类名称',
+  `o2o_fuwu_class_name_3` varchar(50) NOT NULL DEFAULT '' COMMENT '次服务分类名称',
   `o2o_fuwu_organization_birthday` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '成立时间',
-  `o2o_fuwu_organization_payment_account` varchar(500) NOT NULL DEFAULT '' COMMENT '结款账号',
+  `o2o_fuwu_organization_payment_account` varchar(50) NOT NULL DEFAULT '' COMMENT '结款账号',
   `o2o_fuwu_organization_comment_count` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '评论次数',
   PRIMARY KEY (`o2o_fuwu_organization_id`),
   KEY `o2o_fuwu_account_id` (`o2o_fuwu_account_id`),
@@ -1547,20 +1513,6 @@ CREATE TABLE IF NOT EXISTS `#__o2o_fuwu_organization` (
   KEY `o2o_fuwu_class_id_1` (`o2o_fuwu_class_id_1`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='服务机构';
 
-DROP TABLE IF EXISTS `#__o2o_fuwu_token`;
-CREATE TABLE IF NOT EXISTS `#__o2o_fuwu_token` (
-  `o2o_fuwu_token_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'token id',
-  `o2o_fuwu_account_id` int(10) unsigned NOT NULL COMMENT '服务机构id',
-  `o2o_fuwu_account_name` varchar(60) NOT NULL COMMENT '服务机构账号',
-  `o2o_fuwu_token` varchar(255) NOT NULL COMMENT 'token',
-  `o2o_fuwu_token_login_time` int(10) unsigned NOT NULL COMMENT '登录时间',
-  `o2o_fuwu_token_client_type` varchar(10) NOT NULL COMMENT '客户端类型',
-  `o2o_fuwu_organization_id` int(10) unsigned NOT NULL COMMENT '服务机构ID',
-  PRIMARY KEY (`o2o_fuwu_token_id`),
-  KEY `o2o_fuwu_account_id` (`o2o_fuwu_account_id`),
-  KEY `o2o_fuwu_token` (`o2o_fuwu_token`),
-  KEY `o2o_fuwu_organization_id` (`o2o_fuwu_organization_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='服务机构token';
 
 DROP TABLE IF EXISTS `#__o2o_fuwu_upload`;
 CREATE TABLE IF NOT EXISTS `#__o2o_fuwu_upload` (
@@ -1580,7 +1532,7 @@ CREATE TABLE IF NOT EXISTS `#__order` (
   `order_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '订单自增id',
   `order_sn` varchar(20) NOT NULL COMMENT '订单编号',
   `pay_sn` varchar(20) NOT NULL COMMENT '支付单号',
-  `store_id` int(11) unsigned NOT NULL COMMENT '卖家店铺ID',
+  `store_id` int(10) unsigned NOT NULL COMMENT '卖家店铺ID',
   `store_name` varchar(50) NOT NULL COMMENT '卖家店铺名称',
   `buyer_id` int(11) unsigned NOT NULL COMMENT '买家ID',
   `buyer_name` varchar(50) NOT NULL COMMENT '买家姓名',
@@ -1603,14 +1555,14 @@ CREATE TABLE IF NOT EXISTS `#__order` (
   `delete_state` tinyint(4) NOT NULL DEFAULT '0' COMMENT '删除状态 0:未删除 1:放入回收站 2:彻底删除',
   `refund_amount` decimal(10,2) DEFAULT '0.00' COMMENT '退款金额',
   `delay_time` int(10) unsigned DEFAULT '0' COMMENT '延迟时间,默认为0',
-  `order_from` tinyint(4) NOT NULL DEFAULT '1' COMMENT '订单来源，1:PC 2:手机',
+  `order_from` char(15) DEFAULT '' COMMENT '订单来源',
   `order_type` tinyint(4) DEFAULT NULL COMMENT '订单类型',
   `ob_no` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '相关结算单号',
   `o2o_third` varchar(35) DEFAULT NULL COMMENT '第三方配送（dada达达）',
   `o2o_third_info` text DEFAULT NULL COMMENT '第三方配送返回信息（dada达达）',
   `o2o_order_distributor_type` tinyint(1) unsigned NOT NULL COMMENT '配送方式（0平台1店铺）',
   `o2o_distributor_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '配送员id',
-  `o2o_distributor_name` varchar(60) NOT NULL DEFAULT '' COMMENT '配送员账号',
+  `o2o_distributor_name` varchar(50) NOT NULL DEFAULT '' COMMENT '配送员账号',
   `o2o_distributor_realname` varchar(60) NOT NULL DEFAULT '' COMMENT '配送员姓名',
   `o2o_distributor_phone` varchar(60) NOT NULL DEFAULT '' COMMENT '配送员手机号',
   `o2o_order_score` enum('0','1','2','3','4','5') NOT NULL DEFAULT '5' COMMENT '配送评分',
@@ -1625,7 +1577,7 @@ CREATE TABLE IF NOT EXISTS `#__order` (
   `o2o_order_pickup_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '配送单取货时间',
   `o2o_order_transfer_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '配送单转单时间',
   `o2o_order_transfer_distributor_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '转单配送员id',
-  `o2o_order_transfer_distributor_name` varchar(60) NOT NULL DEFAULT '' COMMENT '转单配送员账号',
+  `o2o_order_transfer_distributor_name` varchar(50) NOT NULL DEFAULT '' COMMENT '转单配送员账号',
   `o2o_order_is_transfer` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否为转单，0:否 1:是',
   `o2o_order_receipt_priority` smallint(3) unsigned NOT NULL DEFAULT '0' COMMENT '自动接单优先级',
   `o2o_order_source` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '订单来源（0自己抢单1系统派单2店铺派单3转单）',
@@ -1641,18 +1593,18 @@ CREATE TABLE IF NOT EXISTS `#__ordercommon` (
   `evaluation_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '评价时间',
   `evalseller_state` enum('0','1') NOT NULL DEFAULT '0' COMMENT '卖家是否已评价买家',
   `evalseller_time` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '卖家评价买家的时间',
-  `order_message` varchar(300) DEFAULT NULL COMMENT '订单留言',
+  `order_message` varchar(255) DEFAULT NULL COMMENT '订单留言',
   `order_pointscount` int(11) NOT NULL DEFAULT '0' COMMENT '订单赠送积分',
   `voucher_price` int(11) DEFAULT NULL COMMENT '代金券面额',
   `voucher_code` varchar(32) DEFAULT NULL COMMENT '代金券编码',
   `deliver_explain` text COMMENT '订单发货备注',
   `daddress_id` mediumint(9) NOT NULL DEFAULT '0' COMMENT '发货地址ID',
   `reciver_name` varchar(50) NOT NULL COMMENT '收货人姓名',
-  `reciver_info` varchar(500) NOT NULL COMMENT '收货人其它信息',
+  `reciver_info` varchar(255) NOT NULL COMMENT '收货人其它信息',
   `reciver_province_id` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT '收货人省级ID',
   `reciver_city_id` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT '收货人市级ID',
-  `invoice_info` varchar(500) DEFAULT NULL COMMENT '订单发票信息',
-  `promotion_info` varchar(500) DEFAULT NULL COMMENT '订单促销信息备注',
+  `invoice_info` varchar(255) DEFAULT NULL COMMENT '订单发票信息',
+  `promotion_info` varchar(255) DEFAULT NULL COMMENT '订单促销信息备注',
   `dlyo_pickup_code` varchar(4) DEFAULT NULL COMMENT '订单提货码',
   PRIMARY KEY (`order_id`),
   KEY `store_id` (`store_id`)
@@ -1665,6 +1617,7 @@ CREATE TABLE IF NOT EXISTS `#__ordergoods` (
   `goods_id` int(11) NOT NULL COMMENT '商品ID',
   `goods_name` varchar(200) NOT NULL COMMENT '商品名称',
   `goods_price` decimal(10,2) NOT NULL COMMENT '商品价格',
+  `goods_original_price` decimal(10,2) NOT NULL COMMENT '商品原价',
   `goods_num` smallint(5) unsigned NOT NULL DEFAULT '1' COMMENT '商品数量',
   `goods_image` varchar(100) DEFAULT NULL COMMENT '商品图片',
   `goods_pay_price` decimal(10,2) unsigned NOT NULL COMMENT '商品实际成交价',
@@ -1681,11 +1634,11 @@ CREATE TABLE IF NOT EXISTS `#__ordergoods` (
 DROP TABLE IF EXISTS `#__orderinviter`;
 CREATE TABLE IF NOT EXISTS `#__orderinviter` (
   `orderinviter_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '分销详情自增ID',
-  `orderinviter_order_id` int(10) unsigned NOT NULL COMMENT '订单ID',
-  `orderinviter_member_id` int(10) unsigned NOT NULL COMMENT '推荐人ID',
+  `orderinviter_order_id` int(11) unsigned NOT NULL COMMENT '订单ID',
+  `orderinviter_member_id` int(11) unsigned NOT NULL COMMENT '推荐人ID',
   `orderinviter_money` decimal(10,2) unsigned NOT NULL COMMENT '佣金',
   `orderinviter_remark` varchar(255) NOT NULL COMMENT '分销详情备注',
-  `orderinviter_member_name` varchar(60) NOT NULL COMMENT '推荐人用户名',
+  `orderinviter_member_name` varchar(50) NOT NULL COMMENT '推荐人用户名',
   `orderinviter_order_sn` varchar(20) NOT NULL COMMENT '订单号',
   `orderinviter_goods_commonid` int(10) unsigned NOT NULL COMMENT '商品公共id',
   `orderinviter_goods_id` int(10) unsigned NOT NULL COMMENT '商品id',
@@ -1697,7 +1650,7 @@ CREATE TABLE IF NOT EXISTS `#__orderinviter` (
   `orderinviter_order_type` tinyint(1) unsigned NOT NULL COMMENT '订单类型（0实物订单）',
   `orderinviter_goods_quantity` int(10) unsigned NOT NULL COMMENT '商品数量',
   `orderinviter_goods_amount` decimal(10,2) unsigned NOT NULL COMMENT '商品金额',
-  `orderinviter_store_name` varchar(60) NOT NULL COMMENT '店铺名',
+  `orderinviter_store_name` varchar(50) NOT NULL COMMENT '店铺名',
   `orderinviter_addtime` int(10) unsigned NOT NULL COMMENT '添加时间',
   PRIMARY KEY (`orderinviter_id`),
   KEY `orderinviter_member_id` (`orderinviter_member_id`)
@@ -1709,9 +1662,9 @@ CREATE TABLE IF NOT EXISTS `#__orderlog` (
   `order_id` int(11) NOT NULL COMMENT '订单id',
   `log_msg` varchar(150) DEFAULT '' COMMENT '订单记录文字描述',
   `log_time` int(10) unsigned NOT NULL COMMENT '订单记录处理时间',
-  `log_role` varchar(10) NOT NULL COMMENT '操作角色',
+  `log_role` varchar(15) NOT NULL COMMENT '操作角色',
   `log_user` varchar(30) DEFAULT '' COMMENT '操作人',
-  `log_orderstate` enum('0','10','20','23','26','30','40') DEFAULT NULL COMMENT '订单状态 0:已取消;10:未付款;20:已付款;23:待分配;26:待取货;30:已发货;40:已收货;',
+  `log_type` varchar(10) NOT NULL DEFAULT 'order' COMMENT 'order普通订单 vrorder虚拟订单 fuwu服务订单 errand跑腿订单',
   PRIMARY KEY (`log_id`),
   KEY `order_id` (`order_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='订单记录表';
@@ -1766,7 +1719,9 @@ CREATE TABLE IF NOT EXISTS `#__pdlog` (
   `lg_admin_name` varchar(50) DEFAULT NULL COMMENT '管理员名称',
   `lg_type` varchar(50) NOT NULL DEFAULT '' COMMENT 'order_pay下单支付预存款,order_freeze下单冻结预存款,order_cancel取消订单解冻预存款,order_comb_pay下单支付被冻结的预存款,recharge充值,cash_apply申请提现冻结预存款,cash_pay提现成功,cash_del取消提现申请，解冻预存款,refund退款',
   `lg_av_amount` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '可用金额变更0:未变更',
+  `lg_av_total_amount` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '可用金额总金额(总额)',
   `lg_freeze_amount` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '冻结金额变更0:未变更',
+  `lg_freeze_total_amount` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '冻结金额总金额(总额)',
   `lg_addtime` int(11) NOT NULL COMMENT '变更添加时间',
   `lg_desc` varchar(150) DEFAULT NULL COMMENT '变更描述',
   PRIMARY KEY (`lg_id`),
@@ -1797,7 +1752,7 @@ CREATE TABLE IF NOT EXISTS `#__pmansong` (
   `mansongquota_id` int(10) unsigned NOT NULL COMMENT '套餐编号',
   `mansong_starttime` int(10) unsigned NOT NULL COMMENT '活动开始时间',
   `mansong_endtime` int(10) unsigned NOT NULL COMMENT '活动结束时间',
-  `member_id` int(10) unsigned NOT NULL COMMENT '用户ID',
+  `member_id` int(11) unsigned NOT NULL COMMENT '用户ID',
   `member_name` varchar(50) NOT NULL COMMENT '用户名',
   `store_id` int(10) unsigned NOT NULL COMMENT '店铺ID',
   `store_name` varchar(50) NOT NULL COMMENT '店铺名称',
@@ -1810,7 +1765,7 @@ CREATE TABLE IF NOT EXISTS `#__pmansong` (
 DROP TABLE IF EXISTS `#__pmansongquota`;
 CREATE TABLE IF NOT EXISTS `#__pmansongquota` (
   `mansongquota_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '满就送套餐编号',
-  `member_id` int(10) unsigned NOT NULL COMMENT '用户ID',
+  `member_id` int(11) unsigned NOT NULL COMMENT '用户ID',
   `member_name` varchar(50) NOT NULL COMMENT '用户名',
   `store_id` int(10) unsigned NOT NULL COMMENT '店铺ID',
   `store_name` varchar(50) NOT NULL COMMENT '店铺名称',
@@ -1828,7 +1783,7 @@ CREATE TABLE IF NOT EXISTS `#__pmansongrule` (
   `mansong_id` int(10) unsigned NOT NULL COMMENT '满就送活动ID',
   `mansongrule_price` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '满就送级别价格',
   `mansongrule_discount` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '满就送减现金优惠金额',
-  `mansong_goods_name` varchar(200) DEFAULT NULL COMMENT '满就送礼品名称',
+  `mansong_goods_name` varchar(50) DEFAULT NULL COMMENT '满就送礼品名称',
   `goods_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '满就送商品ID',
   PRIMARY KEY (`mansongrule_id`),
   KEY `mansong_id` (`mansong_id`)
@@ -1905,7 +1860,7 @@ CREATE TABLE IF NOT EXISTS `#__pointsorder` (
   `point_shipping_ecode` varchar(30) DEFAULT NULL COMMENT '兑换物流公司编码',
   `point_finnshedtime` int(11) DEFAULT NULL COMMENT '兑换订单完成时间',
   `point_allpoint` int(11) NOT NULL DEFAULT '0' COMMENT '兑换总积分',
-  `point_ordermessage` varchar(300) DEFAULT NULL COMMENT '兑换订单留言',
+  `point_ordermessage` varchar(255) DEFAULT NULL COMMENT '兑换订单留言',
   `point_orderstate` int(11) NOT NULL DEFAULT '20' COMMENT '订单状态：20:已兑换并扣除积分;30:已发货;40:已收货;50:已完成;2:已取消',
   PRIMARY KEY (`point_orderid`),
   KEY `point_buyerid` (`point_buyerid`)
@@ -1942,7 +1897,7 @@ CREATE TABLE IF NOT EXISTS `#__pointsordergoods` (
 DROP TABLE IF EXISTS `#__pxianshi`;
 CREATE TABLE IF NOT EXISTS `#__pxianshi` (
   `xianshi_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '限时折扣自增ID',
-  `member_id` int(10) unsigned NOT NULL COMMENT '用户ID',
+  `member_id` int(11) unsigned NOT NULL COMMENT '用户ID',
   `member_name` varchar(50) NOT NULL COMMENT '用户名',
   `store_name` varchar(50) NOT NULL COMMENT '店铺名称',
   `store_id` int(10) unsigned NOT NULL COMMENT '店铺ID',
@@ -1986,7 +1941,7 @@ CREATE TABLE IF NOT EXISTS `#__pxianshigoods` (
 DROP TABLE IF EXISTS `#__pxianshiquota`;
 CREATE TABLE IF NOT EXISTS `#__pxianshiquota` (
   `xianshiquota_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '限时折扣套餐ID',
-  `member_id` int(10) unsigned NOT NULL COMMENT '用户ID',
+  `member_id` int(11) unsigned NOT NULL COMMENT '用户ID',
   `member_name` varchar(50) NOT NULL COMMENT '用户名',
   `store_id` int(10) unsigned NOT NULL COMMENT '店铺ID',
   `store_name` varchar(50) NOT NULL COMMENT '店铺名称',
@@ -2038,11 +1993,11 @@ CREATE TABLE IF NOT EXISTS `#__refundreason` (
 DROP TABLE IF EXISTS `#__refundreturn`;
 CREATE TABLE IF NOT EXISTS `#__refundreturn` (
   `refund_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '退款退货记录自增ID',
-  `order_id` int(10) unsigned NOT NULL COMMENT '订单ID',
+  `order_id` int(11) unsigned NOT NULL COMMENT '订单ID',
   `order_sn` varchar(20) NOT NULL COMMENT '订单编号',
   `refund_sn` varchar(50) NOT NULL COMMENT '申请编号',
   `store_id` int(10) unsigned NOT NULL COMMENT '店铺ID',
-  `store_name` varchar(20) NOT NULL COMMENT '店铺名称',
+  `store_name` varchar(50) NOT NULL COMMENT '店铺名称',
   `buyer_id` int(10) unsigned NOT NULL COMMENT '买家ID',
   `buyer_name` varchar(50) NOT NULL COMMENT '买家会员名',
   `goods_id` int(10) unsigned NOT NULL COMMENT '商品ID,0:全部退款',
@@ -2056,15 +2011,15 @@ CREATE TABLE IF NOT EXISTS `#__refundreturn` (
   `refundreturn_goods_state` tinyint(1) unsigned DEFAULT '1' COMMENT '物流状态:1:待发货,2:待收货,3:未收到,4:已收货',
   `refundreturn_seller_state` tinyint(1) unsigned DEFAULT '1' COMMENT '卖家处理状态:1:待审核,2:同意,3:不同意',
   `refundreturn_seller_time` int(10) unsigned DEFAULT '0' COMMENT '卖家处理时间',
-  `refundreturn_seller_message` varchar(300) DEFAULT NULL COMMENT '卖家备注',
+  `refundreturn_seller_message` varchar(255) DEFAULT NULL COMMENT '卖家备注',
   `refundreturn_admin_state` tinyint(1) unsigned DEFAULT '1' COMMENT '申请状态:1:处理中,2:待管理员处理,3:已完成,4:已拒绝',
   `refundreturn_admin_time` int(10) unsigned DEFAULT '0' COMMENT '管理员处理时间',
-  `refundreturn_admin_message` varchar(300) DEFAULT NULL COMMENT '管理员备注',
+  `refundreturn_admin_message` varchar(255) DEFAULT NULL COMMENT '管理员备注',
   `refundreturn_add_time` int(10) unsigned NOT NULL COMMENT '添加时间',
-  `refundreturn_buyer_message` varchar(300) DEFAULT NULL COMMENT '退款退货申请原因',
+  `refundreturn_buyer_message` varchar(255) DEFAULT NULL COMMENT '退款退货申请原因',
   `reason_id` int(10) unsigned DEFAULT '0' COMMENT '原因ID:0:其它',
-  `reason_info` varchar(300) DEFAULT '' COMMENT '原因内容',
-  `pic_info` varchar(300) DEFAULT '' COMMENT '退款退货图片',
+  `reason_info` varchar(255) DEFAULT '' COMMENT '原因内容',
+  `pic_info` varchar(255) DEFAULT '' COMMENT '退款退货图片',
   `refundreturn_money_state` tinyint(1) unsigned DEFAULT '0' COMMENT '是否支付:0:未支付,1:已支付',
   `commis_rate` smallint(6) DEFAULT '0' COMMENT '佣金比例',
   PRIMARY KEY (`refund_id`),
@@ -2078,7 +2033,7 @@ DROP TABLE IF EXISTS `#__seller`;
 CREATE TABLE IF NOT EXISTS `#__seller` (
   `seller_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '卖家自增ID',
   `seller_name` varchar(50) NOT NULL COMMENT '卖家用户名',
-  `member_id` int(10) unsigned NOT NULL COMMENT '用户ID',
+  `member_id` int(11) unsigned NOT NULL COMMENT '用户ID',
   `sellergroup_id` int(10) unsigned NOT NULL COMMENT '卖家组ID',
   `store_id` int(10) unsigned NOT NULL COMMENT '店铺ID',
   `is_admin` tinyint(3) unsigned NOT NULL COMMENT '是否管理员 0:不是 1:是',
@@ -2134,7 +2089,7 @@ CREATE TABLE IF NOT EXISTS `#__smslog` (
   `smslog_msg` text COMMENT '短信内容',
   `smslog_type` tinyint(1) unsigned NOT NULL DEFAULT '1' COMMENT '短信类型:1为注册,2为登录,3为找回密码,4绑定手机,5安全验证,默认为1',
   `smslog_smstime` int(10) unsigned NOT NULL COMMENT '短信添加时间',
-  `member_id` int(10) unsigned DEFAULT '0' COMMENT '短信会员ID,注册为0',
+  `member_id` int(11) unsigned DEFAULT '0' COMMENT '短信会员ID,注册为0',
   `member_name` varchar(50) DEFAULT '' COMMENT '短信会员名',
   `smslog_state` tinyint(1) unsigned DEFAULT '0' COMMENT '0待发送1发送成功2发送失败',
   PRIMARY KEY (`smslog_id`),
@@ -2146,8 +2101,8 @@ CREATE TABLE IF NOT EXISTS `#__smslog` (
 DROP TABLE IF EXISTS `#__snsalbumclass`;
 CREATE TABLE IF NOT EXISTS `#__snsalbumclass` (
   `ac_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '相册自增ID',
-  `member_id` int(10) unsigned NOT NULL COMMENT '会员ID',
-  `ac_name` varchar(100) NOT NULL COMMENT '相册名称',
+  `member_id` int(11) unsigned NOT NULL COMMENT '会员ID',
+  `ac_name` varchar(50) NOT NULL COMMENT '相册名称',
   `ac_des` varchar(255) NOT NULL COMMENT '相册描述',
   `ac_sort` tinyint(3) unsigned NOT NULL DEFAULT '255' COMMENT '相册排序',
   `ac_cover` varchar(255) DEFAULT NULL COMMENT '相册封面',
@@ -2161,8 +2116,8 @@ DROP TABLE IF EXISTS `#__snsalbumpic`;
 CREATE TABLE IF NOT EXISTS `#__snsalbumpic` (
   `ap_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '相册图片自增ID',
   `ac_id` int(10) unsigned DEFAULT NULL COMMENT '相册ID',
-  `member_id` int(10) unsigned NOT NULL COMMENT '会员ID',
-  `ap_name` varchar(100) NOT NULL COMMENT '图片名称',
+  `member_id` int(11) unsigned NOT NULL COMMENT '会员ID',
+  `ap_name` varchar(50) NOT NULL COMMENT '图片名称',
   `ap_cover` varchar(255) NOT NULL COMMENT '图片路径',
   `ap_size` int(10) unsigned NOT NULL COMMENT '图片大小',
   `ap_spec` varchar(100) NOT NULL COMMENT '图片规格',
@@ -2213,10 +2168,10 @@ CREATE TABLE IF NOT EXISTS `#__snsmtagmember` (
 DROP TABLE IF EXISTS `#__spec`;
 CREATE TABLE IF NOT EXISTS `#__spec` (
   `sp_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '规格自增ID',
-  `sp_name` varchar(100) NOT NULL COMMENT '规格名称',
+  `sp_name` varchar(50) NOT NULL COMMENT '规格名称',
   `sp_sort` tinyint(3) unsigned NOT NULL DEFAULT '255' COMMENT '规格排序',
   `gc_id` int(10) unsigned DEFAULT '0' COMMENT '所属商品分类id',
-  `gc_name` varchar(100) DEFAULT NULL COMMENT '所属商品分类名称',
+  `gc_name` varchar(50) DEFAULT NULL COMMENT '所属商品分类名称',
   PRIMARY KEY (`sp_id`),
   KEY `gc_id` (`gc_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='商品规格表';
@@ -2264,7 +2219,7 @@ CREATE TABLE IF NOT EXISTS `#__statorder` (
   `order_state` enum('0','10','20','23','26','30','40') NOT NULL DEFAULT '10' COMMENT '订单状态 0:已取消;10:未付款;20:已付款;23:待分配;26:待取货;30:已发货;40:已收货;',
   `refund_state` tinyint(1) unsigned DEFAULT '0' COMMENT '退款状态:0是无退款,1是部分退款,2是全部退款',
   `refund_amount` decimal(10,2) DEFAULT '0.00' COMMENT '退款金额',
-  `order_from` enum('1','2') NOT NULL DEFAULT '1' COMMENT '订单来源，1:PC 2:手机',
+  `order_from` char(15) DEFAULT '' COMMENT '订单来源',
   `order_isvalid` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否为计入统计的有效订单，0为无效 1为有效',
   `reciver_province_id` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT '收货人省级ID',
   `store_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '店铺ID',
@@ -2292,7 +2247,7 @@ CREATE TABLE IF NOT EXISTS `#__statordergoods` (
   `order_state` enum('0','10','20','23','26','30','40') NOT NULL DEFAULT '10' COMMENT '订单状态 0:已取消;10:未付款;20:已付款;23:待分配;26:待取货;30:已发货;40:已收货;',
   `refund_state` tinyint(1) unsigned DEFAULT '0' COMMENT '退款状态:0:无退款,1:部分退款,2:全部退款',
   `refund_amount` decimal(10,2) DEFAULT '0.00' COMMENT '退款金额',
-  `order_from` enum('1','2') NOT NULL DEFAULT '1' COMMENT '来源 1:PC 2:手机',
+  `order_from` char(15) DEFAULT '' COMMENT '订单来源',
   `order_isvalid` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否为计入统计的有效订单，0为无效 1为有效',
   `reciver_province_id` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT '收货人省级ID',
   `store_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '店铺ID',
@@ -2310,7 +2265,7 @@ CREATE TABLE IF NOT EXISTS `#__statordergoods` (
   `gc_parentid_2` int(11) NOT NULL DEFAULT '0' COMMENT '二级父类ID',
   `gc_parentid_3` int(11) NOT NULL DEFAULT '0' COMMENT '三级父类ID',
   `brand_id` int(10) unsigned NOT NULL COMMENT '品牌id',
-  `brand_name` varchar(100) NOT NULL COMMENT '品牌名称',
+  `brand_name` varchar(50) NOT NULL COMMENT '品牌名称',
   `goods_serial` varchar(50) NOT NULL COMMENT '商家编号',
   `goods_price` decimal(10,2) NOT NULL COMMENT '商品价格',
   `goods_num` smallint(5) unsigned NOT NULL DEFAULT '1' COMMENT '商品数量',
@@ -2326,8 +2281,8 @@ CREATE TABLE IF NOT EXISTS `#__statordergoods` (
 
 DROP TABLE IF EXISTS `#__store`;
 CREATE TABLE IF NOT EXISTS `#__store` (
-  `store_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '店铺自增ID',
-  `store_name` varchar(100) NOT NULL COMMENT '店铺名称',
+  `store_id` int(10) NOT NULL AUTO_INCREMENT COMMENT '店铺自增ID',
+  `store_name` varchar(50) NOT NULL COMMENT '店铺名称',
   `grade_id` int(11) DEFAULT '0' COMMENT '店铺等级ID',
   `member_id` int(11) NOT NULL COMMENT '用户ID',
   `member_name` varchar(50) NOT NULL COMMENT '用户名',
@@ -2362,7 +2317,7 @@ CREATE TABLE IF NOT EXISTS `#__store` (
   `store_slide` text COMMENT '店铺幻灯片',
   `store_slide_url` text COMMENT '店铺幻灯片链接',
   `store_seal` varchar(255) DEFAULT NULL COMMENT '店铺印章',
-  `store_printexplain` varchar(500) DEFAULT NULL COMMENT '打印订单页面下方说明文字',
+  `store_printexplain` varchar(255) DEFAULT NULL COMMENT '打印订单页面下方说明文字',
   `store_sales` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '店铺销量',
   `store_presales` text COMMENT '售前客服',
   `store_aftersales` text COMMENT '售后客服',
@@ -2409,7 +2364,7 @@ CREATE TABLE IF NOT EXISTS `#__store` (
 DROP TABLE IF EXISTS `#__storebindclass`;
 CREATE TABLE IF NOT EXISTS `#__storebindclass` (
   `storebindclass_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '类目自增ID',
-  `store_id` int(11) unsigned DEFAULT '0' COMMENT '店铺ID',
+  `store_id` int(10) unsigned DEFAULT '0' COMMENT '店铺ID',
   `commis_rate` tinyint(4) unsigned DEFAULT '0' COMMENT '佣金比例',
   `class_1` mediumint(9) unsigned DEFAULT '0' COMMENT '一级分类',
   `class_2` mediumint(9) unsigned DEFAULT '0' COMMENT '二级分类',
@@ -2449,10 +2404,10 @@ DROP TABLE IF EXISTS `#__storedepositlog`;
 CREATE TABLE IF NOT EXISTS `#__storedepositlog` (
   `storedepositlog_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '保证金日志id',
   `store_id` int(10) unsigned NOT NULL COMMENT '店铺id',
-  `store_name` varchar(60) NOT NULL COMMENT '店铺名称',
-  `store_avaliable_deposit` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '已缴保证金',
-  `store_freeze_deposit` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '审核保证金',
-  `store_payable_deposit` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '应缴保证金',
+  `store_name` varchar(50) NOT NULL COMMENT '店铺名称',
+  `storedepositlog_avaliable_deposit` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '已缴保证金',
+  `storedepositlog_freeze_deposit` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '审核保证金',
+  `storedepositlog_payable_deposit` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '应缴保证金',
   `storedepositlog_state` tinyint(1) unsigned NOT NULL COMMENT '状态（0无效1有效2待审核3已同意4已拒绝5已缴纳6已取消）',
   `storedepositlog_type` smallint(5) unsigned NOT NULL COMMENT '日志类型',
   `storedepositlog_desc` varchar(255) NOT NULL COMMENT '日志详情',
@@ -2463,7 +2418,7 @@ CREATE TABLE IF NOT EXISTS `#__storedepositlog` (
 
 DROP TABLE IF EXISTS `#__storeextend`;
 CREATE TABLE IF NOT EXISTS `#__storeextend` (
-  `store_id` mediumint(8) unsigned NOT NULL COMMENT '店铺ID',
+  `store_id` int(10) unsigned NOT NULL COMMENT '店铺ID',
   `pricerange` text COMMENT '店铺统计设置的商品价格区间',
   `orderpricerange` text COMMENT '店铺统计设置的订单价格区间',
   PRIMARY KEY (`store_id`)
@@ -2472,7 +2427,7 @@ CREATE TABLE IF NOT EXISTS `#__storeextend` (
 DROP TABLE IF EXISTS `#__storegoodsclass`;
 CREATE TABLE IF NOT EXISTS `#__storegoodsclass` (
   `storegc_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '店铺商品分类ID',
-  `store_id` int(11) NOT NULL DEFAULT '0' COMMENT '店铺ID',
+  `store_id` int(10) NOT NULL DEFAULT '0' COMMENT '店铺ID',
   `storegc_name` varchar(50) NOT NULL COMMENT '店铺商品分类名称',
   `storegc_parent_id` int(11) NOT NULL COMMENT '上级ID',
   `storegc_state` tinyint(1) NOT NULL DEFAULT '0' COMMENT '店铺商品分类状态',
@@ -2501,7 +2456,7 @@ CREATE TABLE IF NOT EXISTS `#__storegrade` (
 
 DROP TABLE IF EXISTS `#__storejoinin`;
 CREATE TABLE IF NOT EXISTS `#__storejoinin` (
-  `member_id` int(10) unsigned NOT NULL COMMENT '用户ID',
+  `member_id` int(11) unsigned NOT NULL COMMENT '用户ID',
   `member_name` varchar(50) DEFAULT NULL COMMENT '店主用户名',
   `store_type` tinyint(1) NOT NULL DEFAULT '0' COMMENT '店铺类型:0公司，1个人',
   `company_name` varchar(50) DEFAULT NULL COMMENT '公司名称',
@@ -2557,9 +2512,11 @@ DROP TABLE IF EXISTS `#__storemoneylog`;
 CREATE TABLE IF NOT EXISTS `#__storemoneylog` (
   `storemoneylog_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '金额日志id',
   `store_id` int(10) unsigned NOT NULL COMMENT '店铺id',
-  `store_name` varchar(60) NOT NULL COMMENT '店铺名称',
-  `store_avaliable_money` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '变动可用金额',
-  `store_freeze_money` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '变动冻结金额',
+  `store_name` varchar(50) NOT NULL COMMENT '店铺名称',
+  `storemoneylog_avaliable_money` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '变动可用金额',
+  `storemoneylog_avaliable_total_money` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '余额(可用)',
+  `storemoneylog_freeze_money` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '变动冻结金额',
+  `storemoneylog_freeze_total_money` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '余额(冻结)',
   `storemoneylog_type` smallint(5) unsigned NOT NULL COMMENT '日志类型',
   `storemoneylog_desc` varchar(255) NOT NULL COMMENT '日志详情',
   `storemoneylog_state` tinyint(1) unsigned NOT NULL COMMENT '状态（0无效1有效2待审核3已同意4已拒绝）',
@@ -2680,7 +2637,7 @@ CREATE TABLE IF NOT EXISTS `#__storewatermark` (
   `swm_text_pos` tinyint(1) NOT NULL DEFAULT '3' COMMENT '水印文字位置',
   `swm_text_font` varchar(50) DEFAULT NULL COMMENT '水印文字字体',
   `swm_text_color` varchar(7) NOT NULL DEFAULT '#CCCCCC' COMMENT '水印字体颜色值',
-  `store_id` int(11) DEFAULT NULL COMMENT '店铺ID',
+  `store_id` int(10) DEFAULT NULL COMMENT '店铺ID',
   PRIMARY KEY (`swm_id`),
   KEY `store_id` (`store_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='店铺水印图片表';
@@ -2688,7 +2645,7 @@ CREATE TABLE IF NOT EXISTS `#__storewatermark` (
 DROP TABLE IF EXISTS `#__type`;
 CREATE TABLE IF NOT EXISTS `#__type` (
   `type_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '类型自增ID',
-  `type_name` varchar(100) NOT NULL COMMENT '类型名称',
+  `type_name` varchar(50) NOT NULL COMMENT '类型名称',
   `type_sort` tinyint(3) unsigned NOT NULL DEFAULT '255' COMMENT '类型排序',
   `class_id` int(10) unsigned DEFAULT '0' COMMENT '所属商品分类id',
   `class_name` varchar(100) NOT NULL COMMENT '所属商品分类名称',
@@ -2727,7 +2684,7 @@ CREATE TABLE IF NOT EXISTS `#__verify_code` (
   `verify_code` char(6) NOT NULL COMMENT '验证码',
   `verify_code_user_type` tinyint(1) unsigned NOT NULL COMMENT '发送验证码的用户类型（1会员2店长3配送员）',
   `verify_code_user_id` int(10) unsigned NOT NULL COMMENT '发送验证码的用户id',
-  `verify_code_user_name` varchar(60) NOT NULL COMMENT '发送验证码的用户名',
+  `verify_code_user_name` varchar(50) NOT NULL COMMENT '发送验证码的用户名',
   `verify_code_add_time` int(10) unsigned NOT NULL COMMENT '发送时间',
   `verify_code_ip` varchar(15) NOT NULL COMMENT 'ip地址',
   PRIMARY KEY (`verify_code_id`),
@@ -2745,7 +2702,7 @@ CREATE TABLE IF NOT EXISTS `#__voucher` (
   `voucher_enddate` int(11) NOT NULL COMMENT '代金券有效期结束时间',
   `voucher_price` int(11) NOT NULL COMMENT '代金券面额',
   `voucher_limit` decimal(10,2) NOT NULL COMMENT '代金券使用时的订单限额',
-  `voucher_store_id` int(11) NOT NULL COMMENT '代金券的店铺id',
+  `voucher_store_id` int(10) NOT NULL COMMENT '代金券的店铺id',
   `voucher_state` tinyint(4) NOT NULL COMMENT '代金券状态 1:未用 2:已用 3:过期 4:收回 ',
   `voucher_activedate` int(11) NOT NULL COMMENT '代金券发放日期',
   `voucher_type` tinyint(4) NOT NULL DEFAULT '0' COMMENT '代金券类别',
@@ -2790,7 +2747,7 @@ CREATE TABLE IF NOT EXISTS `#__vouchertemplate` (
   `vouchertemplate_enddate` int(11) NOT NULL COMMENT '代金券模版有效期结束时间',
   `vouchertemplate_price` int(11) NOT NULL COMMENT '代金券模版面额',
   `vouchertemplate_limit` decimal(10,2) NOT NULL COMMENT '代金券使用时的订单限额',
-  `vouchertemplate_store_id` int(11) NOT NULL COMMENT '代金券模版的店铺ID',
+  `vouchertemplate_store_id` int(10) NOT NULL COMMENT '代金券模版的店铺ID',
   `vouchertemplate_storename` varchar(100) DEFAULT NULL COMMENT '店铺名称',
   `vouchertemplate_sc_id` int(11) NOT NULL DEFAULT '0' COMMENT '所属店铺分类ID',
   `vouchertemplate_creator_id` int(11) NOT NULL COMMENT '代金券模版的创建者ID',
@@ -2922,6 +2879,7 @@ INSERT INTO `#__config` (`id`, `code`, `value`, `remark`) VALUES
 (54, 'email_id', '', '身份验证用户名'),
 (55, 'email_pass', '', '用户名密码'),
 (56, 'email_secure', '', '邮箱发送协议'),
+(59, 'site_uniqid', '', '系统标识'),
 (60, 'setup_date', '2015-01-01 00:00:00', '安装时间'),
 (61, 'upload_type', 'local', '图片上传保存方式'),
 (62, 'alioss_accessid', NULL, 'accessid'),
@@ -2932,23 +2890,39 @@ INSERT INTO `#__config` (`id`, `code`, `value`, `remark`) VALUES
 (91, 'order_auto_receive_day', '7', '自动确认收货的天数'),
 (92, 'order_auto_cancel_day', '3', '自动取消订单的天数'),
 (93, 'code_invalid_refund', '7', '兑换码过期自动退款的天数'),
+
+(94, 'complain_time_limit', '864000', '商品详情页咨询文字提示'),
+(95, 'malbum_max_sum', '10', '个人相册数量'),
+(96, 'hot_search', '', '热门搜索关键字'),
+(97, 'image_allow_ext', 'gif,jpg,jpeg,bmp,png,swf', '允许后缀'),
+(98, 'image_max_filesize', '1024', '允许上传最大值'),
+
 (101, 'qq_isuse', '1', '是否使用QQ互联'),
 (102, 'qq_appid', '', 'qq互联id'),
 (103, 'qq_appkey', '', 'qq秘钥'),
 (111, 'sina_isuse', '1', '是的使用微博登录'),
 (112, 'sina_wb_akey', '', '新浪id'),
 (113, 'sina_wb_skey', '', '新浪秘钥'),
-(121, 'sms_register', '0', '是否手机注册'),
-(122, 'sms_login', '0', '是否手机登录'),
-(123, 'sms_password', '0', '是否手机找回密码'),
-(131, 'weixin_isuse', NULL, '是否微信登录'),
-(132, 'weixin_appid', NULL, '微信appid'),
-(133, 'weixin_secret', NULL, '微信appserite'),
-(135, 'complain_time_limit', '864000', '商品详情页咨询文字提示'),
-(136, 'malbum_max_sum', '10', '个人相册数量'),
-(137, 'hot_search', '', '热门搜索关键字'),
-(138, 'image_allow_ext', 'gif,jpg,jpeg,bmp,png,swf', '允许后缀'),
-(139, 'image_max_filesize', '1024', '允许上传最大值'),
+
+
+(121, 'weixin_pc_isuse', '', '是否微信PC登录'),
+(122, 'weixin_pc_appid', '', '网站应用appid'),
+(123, 'weixin_pc_secret', '', '网站应用appserite'),
+(124, 'weixin_h5_isuse', '', '是否微信公众号登录'),
+(125, 'weixin_h5_appid', '', '公众号appid'),
+(126, 'weixin_h5_secret', '', '公众号appserite'),
+(127, 'weixin_xcx_isuse', '', '是否微信小程序登录'),
+(128, 'weixin_xcx_appid', '', '小程序appid'),
+(129, 'weixin_xcx_secret', '', '小程序appserite'),
+(130, 'weixin_app_isuse', '', '是否微信APP登录'),
+(131, 'weixin_app_appid', '', '移动应用appid'),
+(132, 'weixin_app_secret', '', '移动应用appserite'),
+
+
+(141, 'sms_register', '0', '是否手机注册'),
+(142, 'sms_login', '0', '是否手机登录'),
+(143, 'sms_password', '0', '是否手机找回密码'),
+
 (202, 'promotion_allow', '1', '商品促销'),
 (204, 'points_isuse', '1', '开启积分机制'),
 (205, 'pointshop_isuse', '1', '积分中心'),
@@ -2994,7 +2968,6 @@ INSERT INTO `#__config` (`id`, `code`, `value`, `remark`) VALUES
 (717 ,  'o2o_open',  '1',  '开启配送'), 
 (719 ,  'o2o_auto_distribute',  '1',  '自动派单'), 
 (723 ,  'o2o_complaint_fine',  '1',  '投诉罚款'),
-(724 ,  'auto_register',  '0',  '自动注册'),
 (725, 'o2o_errand_distance_price', 'a:4:{i:0;a:7:{s:14:"start_distance";i:0;s:12:"end_distance";i:3;s:8:"if_fixed";i:1;s:5:"price";i:14;s:17:"interval_distance";i:0;s:5:"title";s:9:"0~3公里";s:7:"content";s:5:"14元";}i:1;a:7:{s:14:"start_distance";i:3;s:12:"end_distance";i:10;s:8:"if_fixed";i:0;s:5:"price";i:2;s:17:"interval_distance";i:1;s:5:"title";s:10:"3~10公里";s:7:"content";s:20:"每1公里加价2元";}i:2;a:7:{s:14:"start_distance";i:10;s:12:"end_distance";i:20;s:8:"if_fixed";i:0;s:5:"price";i:7;s:17:"interval_distance";i:5;s:5:"title";s:11:"10~20公里";s:7:"content";s:20:"每3公里加价8元";}i:3;a:7:{s:14:"start_distance";i:20;s:12:"end_distance";i:98;s:8:"if_fixed";i:0;s:5:"price";i:8;s:17:"interval_distance";i:3;s:5:"title";s:11:"20~98公里";s:7:"content";s:20:"每3公里加价8元";}}', '跑腿基础运费'),
 (726, 'o2o_errand_weight_price', 'a:1:{i:0;a:7:{s:10:"end_weight";s:1:"5";s:8:"if_fixed";s:1:"1";s:15:"interval_weight";s:1:"0";s:5:"price";s:1:"0";s:12:"start_weight";i:0;s:5:"title";s:9:"0~5公斤";s:7:"content";s:4:"0元";}}', '跑腿重量附加费'),
 (727, 'o2o_errand_time_price', 'a:4:{i:0;a:5:{s:10:"start_time";i:0;s:8:"end_time";i:420;s:5:"price";i:8;s:5:"title";s:11:"00:00~07:00";s:7:"content";s:7:"加8元";}i:1;a:5:{s:10:"start_time";i:660;s:8:"end_time";i:780;s:5:"price";i:2;s:5:"title";s:11:"11:00~13:00";s:7:"content";s:7:"加2元";}i:2;a:5:{s:10:"start_time";i:1020;s:8:"end_time";i:1140;s:5:"price";i:2;s:5:"title";s:11:"17:00~19:00";s:7:"content";s:7:"加2元";}i:3;a:5:{s:10:"start_time";i:1320;s:8:"end_time";i:1440;s:5:"price";i:4;s:5:"title";s:17:"22:00~次日00:00";s:7:"content";s:7:"加4元";}}', '跑腿特殊时段费'),
@@ -3022,11 +2995,6 @@ INSERT INTO `#__config` (`id`, `code`, `value`, `remark`) VALUES
 (783, 'o2o_weight_price', 'a:1:{i:0;a:7:{s:10:"end_weight";s:1:"5";s:8:"if_fixed";s:1:"1";s:15:"interval_weight";s:1:"0";s:5:"price";s:1:"0";s:12:"start_weight";i:0;s:5:"title";s:9:"0~5公斤";s:7:"content";s:4:"0元";}}', '重量附加费'),
 (784, 'o2o_time_price', 'a:4:{i:0;a:5:{s:10:"start_time";i:0;s:8:"end_time";i:420;s:5:"price";i:8;s:5:"title";s:11:"00:00~07:00";s:7:"content";s:7:"加8元";}i:1;a:5:{s:10:"start_time";i:660;s:8:"end_time";i:780;s:5:"price";i:2;s:5:"title";s:11:"11:00~13:00";s:7:"content";s:7:"加2元";}i:2;a:5:{s:10:"start_time";i:1020;s:8:"end_time";i:1140;s:5:"price";i:2;s:5:"title";s:11:"17:00~19:00";s:7:"content";s:7:"加2元";}i:3;a:5:{s:10:"start_time";i:1320;s:8:"end_time";i:1440;s:5:"price";i:4;s:5:"title";s:17:"22:00~次日00:00";s:7:"content";s:7:"加4元";}}', '特殊时段费'),
 (790 ,  'wab_number',  '',  '网安备'),
-(791 ,  'word_filter_open',  '0',  '是否开启敏感词过滤'),
-(792 ,  'word_filter_appid',  '',  '百度应用appid'),
-(793 ,  'word_filter_secret',  '',  '百度应用secret'),
-(794 ,  'word_filter_access_token',  '',  '百度应用access_token'),
-(795 ,  'word_filter_access_token_expire',  '',  '百度应用access_token过期时间'),
 (800 ,  'member_normal_register',  '1',  '用户普通注册（0关闭1开启）'),
 (801 ,  'instant_message_open',  '0',  '开启GatewayWorker'),
 (802 ,  'instant_message_gateway_url',  '',  'GatewayWorker gateway地址'),
@@ -3091,8 +3059,10 @@ INSERT INTO `#__consulttype` (`consulttype_id`, `consulttype_name`, `consulttype
 (3, '发票及保修', '后台->交易->咨询管理->咨询类型->编辑', 3),
 (4, '促销及赠品', '后台->交易->咨询管理->咨询类型->编辑', 4);
 
-INSERT INTO `#__document` (`document_id`, `document_code`, `document_title`, `document_content`, `document_time`) VALUES (1, 'agreement', '用户服务协议', '', 1435672310),
-(4, 'open_store', '开店协议', '', 1435672310),
+INSERT INTO `#__document` (`document_id`, `document_code`, `document_title`, `document_content`, `document_time`) VALUES
+(1, 'agreement', '用户服务协议', '&lt;p&gt;欢迎您注册、使用德尚网络账号！&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;《德尚网络账号使用协议》（如下简称“本协议”）系您与德尚网络科技有限责任公司及其关联公司（如下简称“德尚网络”或“我们”）就德尚网络账号的注册和使用而订立的协议。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;在您使用德尚网络账号的注册和使用服务（如下简称“本服务”）之前，我们在此特别提醒您，请您认真阅读、充分理解本协议各条款，特别是涉及服务费用条款，免除或者限制德尚网络责任的条款，对您的权利限制条款，争议解决和法律适用条款等，此类条款将以加粗的形式提示您注意。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;您通过网络页面点击同意和/或注册和使用德尚网络账号的行为，即视为您已阅读、理解并同意接受本协议，并同意接受本协议各项条款的约束。若您不同意本协议，则您有充分且完全的权利退出本服务。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h2&gt;一、 概述&lt;/h2&gt;&lt;p&gt;1.1 德尚网络账号：是指德尚网络通过本协议授权您注册、登录或使用相关德尚网络服务的标识，是德尚网络服务的通行凭证。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;1.2 协议范围：本协议内容同时包括德尚网络可能不断发布的关于本服务的相关协议、服务声明、业务规则及公告提示等内容（以下统称为“本协议”）。上述内容一经正式发布，即为本协议不可分割的组成部分，您同样应当遵守。此外，您在使用德尚网络为您提供的任何单项服务时，应认真阅读各单项服务的相关协议规则，并同意受本协议及单项协议规则的约束。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;1.3 账号基本功能：您可通过德尚网络账号使用德尚网络提供的各类产品或服务，在您使用德尚网络网、应用商店、云服务、浏览器、德尚网络社区、米家等产品或服务，以及德尚网络终端类设备和相关合作伙伴服务时，为您提供账号注册、账号登录与安全、实名认证、家人服务等功能。为了在您使用德尚网络产品或服务时提供安全、便捷和统一的账号登录体验，德尚网络账号将为您开启自动登录功能。您亦可通过德尚网络账号向德尚网络购买米币以便您享受德尚网络的各种虚拟产品和增值服务（如游戏、主题、电子书等）。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;1.4 德尚网络授予您一项有限的、非排他性、不可转让、不可转授及免费使用（除本协议另有声明外）的许可，以供您使用本服务。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h2&gt;二、账号使用规范&lt;/h2&gt;&lt;h3&gt;2.1 账号注册&lt;/h3&gt;&lt;p&gt;2.1.1 您确认，在您独立注册和使用德尚网络账号前，您已经具备中华人民共和国法律所规定的完全民事行为能力。若您不具备前述的完全民事行为能力，则您及您的监护人应依照法律规定承担因此而导致的一切后果。如果您是未满十八周岁的未成年人，若您想使用我们的服务，请在您的父母或其他监护人的同意下为您创建未成年人账号后，您方可使用本服务。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;2.1.2 您保证在注册时所提交的所有资料（包括但不限于手机号码、邮箱等）真实、准确、合法、有效且系您本人的资料，否则可能无法使用本服务，或在使用过程中受到限制。因您提供的注册信息不真实、不准确或不完整而引发的相关责任或损失， 应由您自行承担。您应当通过真实身份信息认证注册账号，且您提交的账号名称、头像等注册信息中不得出现违法和不良信息，经德尚网络审核，如存在上述情况，德尚网络将不予注册；在您注册后，如发现您以虚假信息骗取账号或账号名称注册，或您的账号头像、简介等注册信息存在违法和不良信息的，德尚网络有权不经通知单方采取限期改正、暂停使用、终止账号等措施。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;2.1.3 您在使用德尚网络账号的过程中，所提供的信息发生变动的，应当及时进行变更。您可以通过德尚网络账号设置页面查询、更正您的信息。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h3&gt;2.2 账号使用&lt;/h3&gt;&lt;p&gt;2.2.1 德尚网络账号系您有权使用我们提供的服务的凭证。德尚网络账号的所有权属于德尚网络，您作为初始申请注册人仅拥有您所注册的德尚网络账号的使用权。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;2.2.2 您应对您账号项下的所有行为结果（包括但不限于在线签署各类单项条款、发布信息、购买商品及服务及披露信息等）负责。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;2.2.3 您可在本协议约定的范围内使用德尚网络账号，您不得恶意注册德尚网络账号，未经德尚网络书面同意，您不得赠与、出借、出租、有偿或无偿转让或售卖德尚网络账号或者以其他方式许可非初始申请注册人使用德尚网络账号。德尚网络有权对上述行为进行独立判断并处理，您应当自行承担由此产生的任何责任，同时德尚网络保留追究上述行为人法律责任的权利。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;2.2.4 由于您的德尚网络账号关联您的个人信息及德尚网络商业信息，您的德尚网络账号仅限您本人使用。未经德尚网络同意，您直接或间接授权第三方使用您德尚网络账号或获取您账号项下信息的行为无效。如德尚网络根据德尚网络各平台规则中约定的违约认定程序及标准判断您德尚网络账号的使用可能危及您的账号安全及或德尚网络信息安全的，德尚网络可拒绝提供相应服务或终止本协议。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;2.2.5 如您违反上述账号使用规范，德尚网络有权根据法律法规对您采取以下限制措施：&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;（1）如您违反我国相关法律法规、德尚网络各单项条款或业务规则的规定，德尚网络有权进行独立判断并随时采取限期改正、暂停使用、终止您对德尚网络账号的使用等措施，且根据实际情况决定是否恢复您对德尚网络账号的继续使用。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;（2）如果德尚网络发现您并非该账号初始申请注册人，德尚网络有权在未经通知的情况下终止您使用该账号。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;（3）德尚网络按照本协议或相关法律法规，限期改正、暂停使用或终止您对德尚网络账号的使用，而由此给您带来的损失（包括但不限于通信中断，用户资料、邮件和相关数据等的清空等），由您自行承担。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;2.2.6 若您选择第三方账号登录德尚网络的服务，第三方账号将与您的德尚网络账号相关联，德尚网络将根据您授权第三方提供的信息而使用您的信息（如头像）。您后续使用该德尚网络账号的行为受本协议约束。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h3&gt;2.3 账号保管和安全&lt;/h3&gt;&lt;p&gt;2.3.1 德尚网络账号包括账号名称和密码，您的账号和密码均由您自行设置并保管，您可使用设置的账号名称（包括账号ID、手机号和邮箱）和密码登录并使用相关德尚网络服务。德尚网络任何时候均不会主动要求您提供您的账号密码。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;2.3.2 您应妥善保管好您的账号信息及密码，建议您采取特定措施保护您的账号安全，包括但不限于采取定期更改密码等相关措施。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;2.3.3 如果您当前使用的德尚网络账号并非您初始申请注册的或是通过非德尚网络提供的其他途径获得的，但您却知悉该德尚网络账号当前的密码，您不得用该德尚网络账号登录或进行任何操作，并请您在第一时间通知德尚网络或者该德尚网络账号的初始申请注册人。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;2.3.4 因您个人原因导致的账号信息遗失，如您需找回德尚网络账号信息，请按照德尚网络账号找回流程提供相应的信息，并确保提供的信息合法真实有效，若提供的信息不符合要求，无法通过德尚网络安全验证，德尚网络有权拒绝提供账号找回服务。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;2.3.5 因您主动泄露或因您遭受他人攻击、诈骗，以及丢失手机等智能设备等行为而产生的与德尚网络账号相关的损失及后果，德尚网络并不承担责任，您应通过司法、行政等救济途径向侵权行为人追偿。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;2.4 账号回收&lt;/p&gt;&lt;p&gt;为了防止德尚网络账号资源被恶意占用，如您连续24个月未使用您的德尚网络账号或未通过德尚网络认可的其他方式登录过您的账号，德尚网络有权终止您对该账号的使用，您将不能再通过该账号登录或使用相关德尚网络服务，德尚网络保留删除该账号相关的所有数据信息以及回收该账号的权利。如该账号有关联的待处理交易或余额等，德尚网络将通过合适的方式（如短信或邮件等）通知您并尽最大努力在合理范围内协助您处理，请您按照德尚网络提示的方式进行操作。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h2&gt;三、第三方服务&lt;/h2&gt;&lt;p&gt;3.1 如您使用德尚网络账号登录我们的关联公司或其他合作伙伴独立运营的第三方软件或平台（如下简称“第三方服务提供商”），并使用相关产品或服务时，除遵守本协议外，您还需仔细阅读并遵守上述第三方服务提供商的用户协议及隐私政策。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;3.2 德尚网络无权也没有义务控制或审查第三方服务提供商所提供产品或服务的内容，对于您在使用此类第三方产品与服务时遭受的权益侵犯，德尚网络不承担任何责任。德尚网络不对任何第三方服务提供商的产品或服务的可用性、可靠性、安全性负责，也不为第三方在本服务中提供的任何内容、广告、产品、服务或其他信息作出任何形式的承诺、保证或担保。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;3.3 在第三方服务提供商向您收集用户信息或记录您的行为信息时，您应当自行查看相关协议或警示等，我们对此不承担任何提示、审查义务，并不对因此对您可能承担的风险、损失负责，您应当与第三方服务提供商自行协商解决。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h2&gt;四、用户权利和义务&lt;/h2&gt;&lt;p&gt;4.1 为顺利使用本服务，您需要具备一台或多台与本服务兼容的终端设备，并完成移动数据服务或WLAN网络连接，您应自行支付前述设备和网络连接服务的相关费用。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;4.2 您在使用本服务时，必须遵守《网络安全法》、《互联网新闻信息服务管理规定》、《网络信息内容生态治理规定》《互联网用户账号信息管理规定》《移动互联网应用程序信息服务管理规定》等中华人民共和国相关法律法规的规定，您同意不会利用本服务进行任何违法犯罪行为或不正当的活动，包括但不限于下列行为:&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;4.2.1 上载、展示、张贴、传播或以其他方式传送含有下列内容之一的信息：&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;反对宪法所确定的基本原则的；&lt;/p&gt;&lt;p&gt;危害国家安全，泄露国家秘密，颠覆国家政权，破坏国家统一的；&lt;/p&gt;&lt;p&gt;损害国家荣誉和利益的；&lt;/p&gt;&lt;p&gt;煽动民族仇恨、民族歧视、破坏民族团结的；&lt;/p&gt;&lt;p&gt;破坏国家宗教政策，宣扬邪教和封建迷信的；&lt;/p&gt;&lt;p&gt;散布谣言，扰乱社会秩序，破坏社会稳定的；&lt;/p&gt;&lt;p&gt;散布淫秽、色情、赌博、暴力、凶杀、恐怖或者教唆犯罪的；&lt;/p&gt;&lt;p&gt;侮辱或者诽谤他人，侵害他人合法权利的；&lt;/p&gt;&lt;p&gt;含有虚假、有害、胁迫、侵害他人隐私、骚扰、侵害、中伤、粗俗、猥亵、或其他道德上令人反感的内容；&lt;/p&gt;&lt;p&gt;含有中国法律、法规、规章、条例以及任何具有法律效力之规范所限制或禁止的其他内容的。&lt;/p&gt;&lt;p&gt;4.2.2 不得利用本服务从事以下活动：&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;未经允许，进入计算机信息网络或者使用计算机信息网络资源的；&lt;/p&gt;&lt;p&gt;未经允许，对计算机信息网络功能进行删除、修改或者增加的；&lt;/p&gt;&lt;p&gt;未经允许，对进入计算机信息网络中存储、处理或者传输的数据和应用程序进行删除、修改或者增加的；&lt;/p&gt;&lt;p&gt;故意制作、传播计算机病毒等破坏性程序的；&lt;/p&gt;&lt;p&gt;进行任何诸如发布广告、销售商品的商业行为，或者进行任何非法的侵害德尚网络利益的行为，如贩卖可币、游戏币、外挂、道具等；&lt;/p&gt;&lt;p&gt;其他危害计算机信息网络安全的行为。&lt;/p&gt;&lt;p&gt;4.3 您违反本协议或其他单项服务条款的规定，导致或产生的第三方向德尚网络与合作公司、关联公司主张的任何索赔、要求或损失，包括合理的律师费，您同意赔偿德尚网络与合作公司、关联公司，并使之免受损害。同时，德尚网络有权视您的行为性质，采取包括但不限于删除发布信息内容、暂停使用许可、终止服务、限制使用德尚网络账号、追究法律责任等措施。同时，德尚网络会视司法部门的要求，协助调查。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;4.4 您不得对本服务任何部分或本服务之使用或获得，进行复制、拷贝、出售、转售或用于任何其他商业目的。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;4.5 您须对自己在使用本服务过程中的行为承担法律责任。您承担法律责任的形式包括但不限于对受到侵害者进行赔偿，以及在德尚网络首先承担了因您的行为导致的行政处罚或侵权损害赔偿责任后，您应给予德尚网络等额的赔偿。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h2&gt;五、免责声明&lt;/h2&gt;&lt;p&gt;5.1 本服务仅按照“现状”和“现有”提供。在法律允许的最大范围内，我们不承担任何明示或默示的保证、条件或其他协定，也未就此作出任何相保、承诺、声明或保证，包括对本服务及相关单项服务或功能的完整性、准确性、及时性或可靠性等。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;5.2 在法律允许的最大范围内，对于您或其他任何人因下列原因无法访问或使用本服务导致的任何损失，德尚网络不承担任何责任：&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;5.2.1 任何由于黑客攻击，电脑病毒的侵入，非法内容信息、骚扰信息的屏蔽，政府管制以及其他任何网络、技术、通信线路、信息安全管理措施等原因造成的服务中断、延迟、受阻等情形；&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;5.2.2 因第三方如运营商的通讯线路故障、技术问题、网络、电脑故障、系统不稳定及其他原因等造成的损失的情形；&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;5.2.3 德尚网络对系统或软硬件进行维护或升级导致本服务中止或终止；&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;5.2.4 因台风、地震、停电、洪水、战争、恐怖袭击等不可抗力因素导致的服务中断；&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;5.2.5 由于法律法规的变更、司法机关及行政机关等的命令、裁定等原因而导致的本服务中断、延迟或终止等情形。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;5.3 本服务仅供您个人使用，未经德尚网络同意，您直接或间接授权第三方使用您德尚网络账号或获取您账号项下信息导致的任何损失，均由您自行承担，德尚网络不承担任何责任。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;5.4 您可以选择使用您已有的第三方账号关联德尚网络账号，德尚网络对于因第三方原因对您造成的损失不承担任何责任。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;5.5 我们依法律、诉讼、司法机关或政府机关的要求或其他合理必要的情况下，可能访问、使用、保存、和/或披露您的账号信息和内容。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;5.6 由于您的使用不当或其他自身原因而导致任何与您相关的个人信息的泄露，德尚网络对此不承担任何责任。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;5.7 使用德尚网络产品、程序及服务可能存在的来自他人匿名或冒名的含有威胁、诽谤、令人反感或非法内容的信息而招致的风险，或用户之间通过本服务与其他用户交流，因受误导或欺骗而导致或可能导致的任何心理、生理上的伤害以及经济上的损失，均由侵权方承担所有责任，德尚网络对此不承担任何责任。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;5.8 您在利用德尚网络账号所发布的任何内容并不代表和反映德尚网络的任何观点或政策，德尚网络对此不承担任何责任。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;5.9 在任何情况下，德尚网络均不对任何间接性、后果性、惩罚性、偶然性、特殊性或刑罚性的损害，包括因您使用德尚网络服务而遭受的利润损失，承担责任。您同意，我们对您承担的全部责任，无论因何原因或何种行为方式，始终不超过您在协议有效期内因使用德尚网络服务而支付给德尚网络的费用（如有）。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h2&gt;六、知识产权&lt;/h2&gt;&lt;p&gt;6.1 您使用德尚网络账号在任何平台发布的信息不得侵犯任何第三人的知识产权，未经具有相关所有权人之事先书面同意，您不得以任何方式上传、发布、修改、传播或复制任何受著作权保护的材料、商标或属于其他人的专有信息。如果收到任何著作权人或其合法代表发给德尚网络的适当通知后，我们将在审查的基础上移除该等侵犯他人著作权的内容。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;6.2 您在使用本服务时利用德尚网络账号发表、上传的文字、图片、视频、软件以及表演等原创信息的知识产权归您所有，但是您确认您对该等信息的发表、上传行为视同为对德尚网络非独占地、永久地、不可撤销地授予该等信息相关全部知识产权的使用、复制等权利，并且您同意德尚网络可转授权上述权利。您同意您不会向德尚网络提供任何您视为保密或专有的信息或资料。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h2&gt;七、修订&lt;/h2&gt;&lt;p&gt;7.1 鉴于互联网相关技术、市场、业务模式等发展迅速，您同意，德尚网络有权随时根据中华人民共和国有关法律、法规的变化、互联网的发展以及公司经营状况和经营策略的调整等不定时地制定、修改本协议及各类规则。更新后的协议、规则经合理的公示期后即生效，并代替原来的协议、规则。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;7.2 我们将以合适的方式通知您阅读新的协议，您可以在相关服务页面查阅最新版本的协议条款。若修订后的协议、规则会严重影响或限制您继续使用本服务的，我们将通过弹窗、网页显著位置公示、短信等方式获取您的同意。如您不同意修订后的相关条款，则请您立即停止使用本协议下各项服务。您继续登录德尚网络账号或继续使用德尚网络各单项服务的行为，视为您认可并接受经修订的协议、规则。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;7.3 我们可能会依据法律的规定，保留您使用德尚网络服务、或者德尚网络账号的权利；无论是否通知，我们将在任何时间以任何原因终止本协议，包括出于善意地相信您违反了我们可接受使用政策或本协议的其他规定。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;7.4 不受前款规定所限，如果您侵犯第三人的著作权且德尚网络接到著作权人或著作权人的合法代理人的通知后，德尚网络保留终止本协议的权利。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h2&gt;八、服务终止&lt;/h2&gt;&lt;p&gt;8.1 如果您存在违反法律法规规定及本协议约定情形的，我们有权中止、限制或终止该账号的使用，停止向您提供服务。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;8.2 我们有权根据自身经营的实际需要，在合理期限内暂时或永久终止德尚网络账号服务（或任何一部分），您应及时备份该账号中存储的所有数据及信息。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;8.3 我们可能会依法律规定、诉讼裁决、司法机关或政府机关的要求终止为您提供德尚网络账号服务。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;8.4 若属于上述条款中服务终止的情形，我们会以平台公告、短信、邮件或其他方式尽可能通知您。但存在以下情形时，我们可能在不事先通知您的情况下立即中止、限制或终止您访问全部或部分本服务：&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;8.4.1 您违反本协议或德尚网络有理由认为您即将违反本协议；&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;8.4.2 您或代表您行事的任何人进行欺诈或违法活动，或向德尚网络提供虚假或误导信息；&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;8.4.3 依照有效法律程序响应执法部门或政府机关提出的要求；&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;8.4.4 执行紧急的系统或硬件维护更新工作；&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;8.4.5 因无法预料的技术、安全或业务原因。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;8.5 如果您的德尚网络账号发布的信息内容存在侵犯第三人的知识产权的情形，且德尚网络接到知识产权人或知识产权人的合法代理人的通知，德尚网络保留终止本协议的权利。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h2&gt;九、个人信息保护&lt;/h2&gt;&lt;p&gt;9.1 尊重用户隐私并保护您的个人信息安全是我们的一贯态度，德尚网络将会采取合理的措施保护您的个人信息与隐私。我们承诺，除非获得用户同意，德尚网络不会收集、使用其提供服务所必需以外的用户个人信息或者将信息用于提供服务之外的目的。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;9.2 我们将采取法律法规以及约定的必要安全措施，以尽到信息安全保护义务。但请您知悉并理解，我们无法对相关第三方的信息安全保护能力或其处理行为做超出能力范围的保证。如您对相关第三方收集、提供、存储、使用您的个人信息有任何疑问，或决定行使法律法规规定的权利，您可以直接联系该第三方处理。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;9.3 在遵守本协议项下特别约定的个人信息保护与隐私政策外，我们希望您认真并完整阅读《德尚网络账号隐私政策》，这将更有助于保障您的个人信息。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h2&gt;十、适用法律与争议解决&lt;/h2&gt;&lt;p&gt;10.1 本协议适用中华人民共和国法律。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;10.2 如果双方发生纠纷，应本着友好的原则协商解决；如协商不成，应向北京市海淀区人民法院提起诉讼。若单项条款与本协议在管辖约定内容上存在冲突，则在单项条款约束范围内应以单项条款为准。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h2&gt;十一、其他&lt;/h2&gt;&lt;p&gt;11.1 协议生效&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;本协议自您接受之日起生效，在您使用本服务的过程中持续有效，直至依据本协议终止。如果您实际使用本服务的时间早于您接受本协议的时间，您在此知晓或应当知晓并同意本协议于您第一次使用本服务时生效，除非依据本协议提前终止。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;11.2 通知&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;在注册德尚网络账号时，您应该向德尚网络提供真实有效的联系方式（包括您的电子邮件地址、手机号码等），对于联系方式发生变更的，您有义务及时更新有关信息，并保持可被联系的状态。德尚网络将向您的上述联系方式的其中之一或其中若干送达各类通知，而此类通知的内容可能对您的权利义务产生重大的有利或不利影响，请您务必及时关注。您所提供的电子邮件地址或手机号码无法使用或者因任何原因我们无法将通知送达给您而产生的风险，由您自行承担。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;11.3 独立性&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;如本协议中的任一条款被认定为或视为废止、无效、不可执行，其余条款仍具有法律效力，对双方均具有约束力。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;11.4 权利义务的转让&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;未经我们事先书面许可，您不得转让或以其它方式转移您在本协议下的任何权利或义务。任何未受许可的转让或转移都将视为无效。出于业务升级或运营主体发生变化等情况，德尚网络有权转让、分包或更替德尚网络在本协议下的权利和义务。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;', 1435672310),
+(2, 'privacy', '用户隐私政策', '&lt;p&gt;请花一些时间熟悉我们的隐私政策，如果您有任何问题，请联系我们。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h2&gt;引言&lt;/h2&gt;&lt;p&gt;德尚网络账号是由德尚网络科技有限责任公司及其关联公司（以下简称“德尚网络”或“我们”）为您提供的一项账号注册、登录和管理服务。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;我们非常重视您的个人信息保护及隐私安全。《德尚网络账号隐私政策》（以下简称“本隐私政策”）是德尚网络针对德尚网络公司德尚网络账号做出的隐私方面的陈述与承诺，属于《德尚网络隐私政策》的重要组成部分。涉及到德尚网络账号特殊约定的，若与《德尚网络隐私政策》之间存在不一致的，以本隐私政策为准；若本隐私政策未约定的，以《德尚网络隐私政策》为准。特别是关于“安全措施、跨境传输”等部分的约定，建议您详细阅读《德尚网络隐私政策》。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;本隐私政策在制定时充分考虑到您的需求，您全面了解我们的个人信息收集和使用惯例，同时确保您最终能控制提供给我们的个人信息，这一点至关重要。本隐私政策规定我们如何收集、使用、披露、处理和存储您使用我们的德尚网络账号时提供给我们的信息。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;注意，您登录德尚网络账号后使用对应产品或服务的个人信息收集使用规则请查看该产品或服务的隐私政策。本隐私政策下“个人信息”指通过信息本身或通过关联其他信息后能够识别特定个人的信息数据。我们将严格遵守本隐私政策来处理使用这些信息。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;最后，我们希望为用户带来最好的体验。如果您对本隐私政策中描述的个人信息处理实践有任何疑问，请联系我们，以便我们处理您的特殊需求。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;一、我们收集哪些信息以及如何使用信息&lt;/p&gt;&lt;p&gt;（一）您须授权我们收集和使用您个人信息的情形&lt;/p&gt;&lt;p&gt;收集个人信息的目的在于向您提供适用于德尚网络账号的产品和/或服务，并且保证我们遵守适用的相关法律、法规及其他规范性文件。您有权自行选择是否提供该信息，但多数情况下，如果您不提供，我们可能无法向您提供相应的服务，也无法回应您遇到的问题。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;德尚网络仅会出于本隐私政策所述目的收集和使用您提供的个人信息。我们出于提供如下服务功能目的时，可能会以相关特定方式处理您的相关个人信息，这些功能包括：&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h2&gt;1、提供账号基础功能&lt;/h2&gt;&lt;h3&gt;（1）注册或登录&lt;/h3&gt;&lt;p&gt;您在注册时需要向我们提供手机号码或邮箱地址作为您的德尚网络账号名称。同时，您还可以为您的德尚网络账号设置密码。您的账号和密码会将被加密保存在服务器，建议您妥善保管好您的密码信息，谨防您的德尚网络账号被他人盗用。&lt;/p&gt;&lt;p&gt;在您成功注册德尚网络账号后，您可以随时使用德尚网络账号登录德尚网络各类系统应用或服务。为了实现同一设备上所有支持德尚网络账号登录的系统应用或服务能够准确接入德尚网络账号服务，判断德尚网络系统应用或服务的账号登录状态，我们需要获取已安装的应用列表信息。&lt;/p&gt;&lt;p&gt;当您登录德尚网络账号后，德尚网络账号在您使用德尚网络系统应用或服务时开启了自动登录功能，以为您提供流畅的服务体验，这些应用或服务会收集您的德尚网络账号信息以为您提供登录服务。&lt;/p&gt;&lt;p&gt;为提供便捷的登录体验，在注册或登录时，您可以选择自动填写您的手机号码。为此我们需要获取您的SIM卡IMSI、ICCID、设备型号、系统版本信息、联网状态。上述功能可能需要您在您的设备中向我们开启您的网络权限、WIFI状态权限以实现这些功能所涉及的信息的收集和使用。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h3&gt;（2）完善账号信息&lt;/h3&gt;&lt;p&gt;您在使用德尚网络提供的各类服务过程中，您可以通过完善头像、昵称、性别等基础信息，以及设置密保问题，来获得更好的服务与体验，如不提供也不会影响德尚网络账号的基本功能。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h3&gt;2、保障注册、登录安全所必须的功能&lt;/h3&gt;&lt;p&gt;为提高您使用我们的产品与/或服务时系统的安全性，更准确地预防钓鱼网站欺诈和保护账号安全，我们还会通过短信、邮箱、密码、密保来验证您的身份。&lt;/p&gt;&lt;p&gt;出于风控的目的，我们还会收集您的注册/登录时间、设备相关信息（如设备IMEI/（在Android Q上的）OAID、设备型号、操作系统版本）、设备传感器信息（如手机角速度、手机加速度）、蓝牙地址、网络信息（如Wi-Fi SSID、常用登录IP地址），为此我们需要获取您的设备信息权限，收集您的设备IMEI/OAID，以保障您注册或登录环境的安全。此外，我们还会将您的手机号码提供给第三方（如手机号码风险等级库、运营商的二次号检查服务）进行查验，以保障您的账号安全。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h3&gt;（二）您可选择是否授权我们收集和使用您的个人信息的情形&lt;/h3&gt;&lt;p&gt;为提升您使用德尚网络账号的体验，我们的以下附加功能中可能会收集和使用您的个人信息。如果您不提供这些个人信息，您依然可以使用德尚网络账号，但您可能无法使用这些附加功能。这些附加功能包括：&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;1、家人服务&lt;/p&gt;&lt;p&gt;您可以通过家人服务功能邀请您的家人、朋友共享德尚网络的服务、内容及购买项目。为此，我们会收集您的德尚网络ID、被邀请人的德尚网络ID/手机号码。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;2、未成年人账号&lt;/p&gt;&lt;p&gt;您可以为您的未成年子女创建专属的德尚网络未成年人账号，您需要授权我们获取您的未成年子女的账号昵称、出生日期信息；我们会记录您的未成年子女的出生日期，在您的未成年子女年满十八周岁时及时更正账号状态。此外，您还需要提供给我们您用来绑定未成年人账号的手机号码（未注册过德尚网络账号）信息，以实现后续的登录、账号安全与验证等操作。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h3&gt;（三）您充分知晓，以下情形中，我们收集、使用个人信息无需征得您的同意：&lt;/h3&gt;&lt;p&gt;1、与国家安全、国防安全有关的；&lt;/p&gt;&lt;p&gt;2、与公共安全、公共卫生、重大公共利益有关的；&lt;/p&gt;&lt;p&gt;3、与犯罪侦查、起诉、审判和判决执行等有关的；&lt;/p&gt;&lt;p&gt;4、出于维护个人信息主体或其他个人的生命、财产等重大合法权益但又很难得到本人同意的；&lt;/p&gt;&lt;p&gt;5、所收集的个人信息是个人信息主体自行向社会公众公开的；&lt;/p&gt;&lt;p&gt;6、从合法公开披露的信息中收集的您的个人信息的，如合法的新闻报道、政府信息公开等渠道；&lt;/p&gt;&lt;p&gt;7、根据您的要求签订合同所必需的；&lt;/p&gt;&lt;p&gt;8、用于维护所提供的产品与/或服务的安全稳定运行所必需的，例如发现、处置产品与/或服务的故障；&lt;/p&gt;&lt;p&gt;9、为合法的新闻报道所必需的；&lt;/p&gt;&lt;p&gt;10、学术研究机构基于公共利益开展统计或学术研究所必要，且对外提供学术研究或描述的结果时，对结果中所包含的个人信息进行去标识化处理的。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h3&gt;（四）我们从第三方获得您个人信息的情形&lt;/h3&gt;&lt;p&gt;在一些法律允许的情况下，我们可能从第三方处获得您的个人信息。例如，您授权第三方账号绑定德尚网络账号并登录使用德尚网络的服务或授权导入的您在第三方平台的信息如头像、昵称；出于风控的目的，我们会通过第三方（如手机号码风险等级库、运营商的二次号检查服务）来查验您手机号码的安全情况，以了解您当前注册/登录环境是否安全；在您使用一键登录服务时从运营商处获取您的手机号码；您的家人、朋友邀请您使用共享相关的服务时输入您的德尚网络ID和手机号码。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h3&gt;（五）非个人信息&lt;/h3&gt;&lt;p&gt;我们还可能收集其他无法识别到特定个人的信息（即不属于个人信息的信息），例如您使用特定服务时产生的统计类数据，如您使用德尚网络账号服务时的登录/退出记录、交互记录、错误记录。收集此类信息的目的在于改善我们向您提供的服务。所收集信息的类别和数量取决于您如何使用我们产品和/或服务。我们会将此类信息汇总。就本隐私政策而言，汇总数据被视为非个人信息。如果我们将非个人信息与个人信息结合使用，则在结合使用期间，此类信息将被视为个人信息。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h2&gt;二、我们如何共享、转让、公开披露您的个人信息&lt;/h2&gt;&lt;h3&gt;（一）共享：&lt;/h3&gt;&lt;p&gt;我们不会将任何个人信息出售给第三方。&lt;/p&gt;&lt;p&gt;我们有时可能会向第三方（定义见下文）共享您的个人信息，以便提供或改进我们的产品或服务，包括根据您的要求提供产品或服务。如果您不再希望允许我们共享这些信息，请联系我们。&lt;/p&gt;&lt;p&gt;1、与国家安全、国防安全有关的； 您主动选择的共享&lt;/p&gt;&lt;p&gt;在获得您的明确同意或主动选择的情况下，向您指定的第三方共享您授权范围内的信息。&lt;/p&gt;&lt;p&gt;2、与我们集团共享信息&lt;/p&gt;&lt;p&gt;为了顺利地从事商业经营，以向您提供产品或服务的全部功能，我们可能不时向其他的德尚网络关联公司共享您的个人信息。&lt;/p&gt;&lt;p&gt;3、与第三方服务提供商共享您的个人信息&lt;/p&gt;&lt;p&gt;当您在第三方网站/应用使用德尚网络账号登录时，我们会获取您的授权，授权页面上会展示具体的授权对象以及授权信息类型，在您授权同意后，我们会将您的授权信息（取决于该第三方的服务和产品性质）传给该第三方。若您不同意该第三方获得您的个人信息，请您不要同意授权。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;本业务中部分服务内容由第三方服务提供商提供，为此我们需要向第三方服务提供商提供您的部分个人信息，[点击查看]我们向关联方、合作伙伴及第三方共享您的个人信息的情形。如我们与这些第三方分享您的个人信息，我们将采取加密等手段保障您的信息安全。对我们与之共享个人信息的公司、组织，我们会对其数据安全环境进行合理审查，并与其签署严格的数据处理协议，要求第三方对您的信息采取足够的保护措施，严格遵守相关法律法规与监管要求。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h3&gt;（二）转让&lt;/h3&gt;&lt;p&gt;我们不会将您的个人信息转让给任何公司、组织和个人，但以下情况除外：&lt;/p&gt;&lt;p&gt;1、在获取明确同意的情况下转让：获得您的明确同意后，我们会向其他方转让您的个人信息。&lt;/p&gt;&lt;p&gt;2、在涉及合并、分立、解散、被宣告破产、收购等原因需要转移您的个人信息时，我们将向您告知接收方的名称和联系方式。我们将要求接收方继续履行个人信息处理者的义务。接收方变更本隐私政策约定的处理目的、处理方式的，应当依照规定重新取得您的个人同意。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h3&gt;（三）公开披露&lt;/h3&gt;&lt;p&gt;我们仅会在以下情况下，公开披露您的个人信息：&lt;/p&gt;&lt;p&gt;1、获得您明确同意后；&lt;/p&gt;&lt;p&gt;2、基于法律的披露：在法律、法律程序、诉讼或政府主管部门强制性要求的情况下，我们可能会对上述监管部门披露您的个人信息。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h2&gt;四、保留政策&lt;/h2&gt;&lt;p&gt;我们基于本隐私政策中所述的信息收集的目的所必需的期间，或者遵守适用的相关法律要求保留个人信息。个人信息在完成收集目的，或在我们确认您的删除或注销申请后，或我们终止运营相应产品或服务后，我们将停止保留，并做删除或匿名化处理。如果是出于公众利益、科学、历史研究或统计的目的，我们将基于适用的法律继续保留相关数据，即使进一步的数据处理与原有的收集目的无关。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h2&gt;五、我们如何保护未成年人的个人信息安全&lt;/h2&gt;&lt;p&gt;我们重视并关注未成年人的个人信息保护。我们不会在明知且未经授权的情况下收集未成年人个人信息，如果我们发现在未事先获得可证实的父母或监护人同意的情况下收集了未成年人的个人信息，则会设法尽快删除相关信息。但请您知悉并同意，在某些特定场景和功能中（如创建未成年人账号），您需要授权我们获取您的未成年子女的部分个人信息。如果您的未成年子女为14周岁以下的儿童，关于德尚网络对于儿童个人信息的保护规则，请您点击查阅《德尚网络账号儿童信息保护规则》。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h2&gt;六、第三方服务说明&lt;/h2&gt;&lt;p&gt;德尚网络的产品或服务中可能含有第三方网站、产品与服务的链接。德尚网络的产品或服务也可能使用或提供来自第三方的产品或服务，如德尚网络应用商店内内上架的第三方应用。所有含有第三方网站、产品与服务的链接仅为方便用户而提供。请您注意，该第三方可能会处理您的相关信息，建议您在使用第三方服务前，仔细阅读、充分理解其相关的个人信息保护规则后再使用第三方的产品或服务。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;h2&gt;七、本隐私政策如何更新&lt;/h2&gt;&lt;p&gt;我们会根据业务和技术的变更，根据适用法律，依循良好做法，定期审核隐私政策，并可能更新本隐私政策。如果我们对本隐私政策进行重大变更，我们将通过系统内弹窗等合理的方式通知您，这样您可以了解我们收集的信息以及我们如何使用这些信息。此类隐私政策将从规定的生效日期开始适用。我们建议您定期查阅本页面以获取我们个人信息处理实践的最新信息。您继续使用德尚网络账号并登录德尚网络相关系统应用或服务的行为，将被视为接受更新的隐私政策。在我们向您收集更多的个人信息或我们因为新的目的使用或披露您的个人信息时，我们会根据适用法律要求，再次征得您的同意。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;', 1435672310),
+(3, 'open_store', '开店协议', '&lt;h2 style=&quot;padding: 0px; margin: 0px; font-size: 16px; font-weight: normal; color: rgb(51, 51, 51); line-height: 30px;&quot;&gt;&lt;span style=&quot;font-family: 宋体, SimSun; font-size: 12px;&quot;&gt;1.本协议的订立&lt;/span&gt;&lt;/h2&gt;&lt;p class=&quot;cont&quot; style=&quot;padding: 0px; margin-top: 0px; margin-bottom: 0px; line-height: 28px;&quot;&gt;&lt;span style=&quot;font-family: 宋体, SimSun; font-size: 12px;&quot;&gt;在本网站（&lt;/span&gt;&lt;a target=&quot;_blank&quot; href=&quot;http://www.ecmoban.com/&quot; class=&quot;link&quot; style=&quot;padding: 0px; margin: 0px; text-decoration: underline; color: rgb(85, 85, 85); font-family: 宋体, SimSun; font-size: 12px;&quot;&gt;&lt;span style=&quot;font-family: 宋体, SimSun; font-size: 12px;&quot;&gt;dsmall.csdeshang.com&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot;font-family: 宋体, SimSun; font-size: 12px;&quot;&gt;）依据《德尚商城网站用户注册协议》登记注册，且符合本网站 商家入驻标准的用户（以下简称&amp;quot;商 家&amp;quot;），在同意本协议全部条款后，方有资格使用&amp;quot;德尚商城商家在线入驻系统&amp;quot;（以 下简称&amp;quot;入驻系统&amp;quot;）申请入驻。一经商家点击&amp;quot;同意以上协议，下一步&amp;quot;按键， 即意味着商家同意与本网站签订本协议并同意受本协议约束。&lt;/span&gt;&lt;/p&gt;&lt;h2 style=&quot;padding: 0px; margin: 0px; font-size: 16px; font-weight: normal; color: rgb(51, 51, 51); line-height: 30px;&quot;&gt;&lt;span style=&quot;font-family: 宋体, SimSun; font-size: 12px;&quot;&gt;2.入驻系统使用说明&lt;/span&gt;&lt;/h2&gt;&lt;p class=&quot;cont&quot; style=&quot;padding: 0px; margin-top: 0px; margin-bottom: 0px; line-height: 28px;&quot;&gt;&lt;span style=&quot;font-family: 宋体, SimSun; font-size: 12px;&quot;&gt;2.1 商家通过入驻系统提出入驻申请，并按照要求填写商家信息、提供商家资质资料后，由 本网站审核并与有合作意向的商家联系协商合作相关事宜，经双方协商一致线下签订书面《开放平台 供应商合作运营协议》（以下简称&amp;quot;运营协议&amp;quot;），且商家按照&amp;quot;运营协议&amp;quot;约定 支付相应平台使用费及保证金等必要费用后，商家正式入驻本网站。本网站将为入驻商家开通商家后 台系统，商家可通过商家后台系统在本网站运营 自己的入驻店铺。&lt;/span&gt;&lt;/p&gt;&lt;p class=&quot;cont&quot; style=&quot;padding: 0px; margin-top: 0px; margin-bottom: 0px; line-height: 28px;&quot;&gt;&lt;span style=&quot;font-family: 宋体, SimSun; font-size: 12px;&quot;&gt;2.2 商家以及本网站通过入驻系统做出的申请、资料提交及确认等各类沟通，仅为双方合作 的意向以及本网站对商家资格审核的必备程序，除遵守本协议各项约定外，对双方不产生法律约束力 。双方间最终合作事宜及运营规则均以&amp;quot;运营协议&amp;quot;的约定及商家后台系统公示的各项规则 为准。&lt;/span&gt;&lt;/p&gt;&lt;h2 style=&quot;padding: 0px; margin: 0px; font-size: 16px; font-weight: normal; color: rgb(51, 51, 51); line-height: 30px;&quot;&gt;&lt;span style=&quot;font-family: 宋体, SimSun; font-size: 12px;&quot;&gt;3.商家权利义务&lt;/span&gt;&lt;/h2&gt;&lt;p style=&quot;padding: 0px; margin-top: 0px; margin-bottom: 0px; line-height: 28px;&quot;&gt;&lt;span style=&quot;font-family: 宋体, SimSun; font-size: 12px;&quot;&gt;用户使用&amp;quot;德尚商城商家在线入驻系统&amp;quot;前请认真阅读并理解本协议内容，本协议 内容中以加粗方式显著标识的条款，请用户着重阅读、慎重考虑。&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;', 1435672310),
 (5, 'o2o_distributor', '配送员协议', '', 1556092975),
 (6, 'o2o_fuwu', '服务机构协议', '', 1556092975),
 (7, 'o2o_errand', '跑腿协议', '', 1556092975);
@@ -3185,8 +3155,6 @@ INSERT INTO `#__storemsgtpl` (`storemt_code`, `storemt_name`, `storemt_message_s
 ('return', '退货提醒', 1, '您有一个${type}退货单需要处理。退货编号：${refund_sn}。', 1, 0, '您有一个${type}退货单需要处理。退货编号：${refund_sn}。', 0, 0, '${site_name}提醒：您有一个${type}退货单需要处理。退货编号：${refund_sn}。', '<p>\r\n	${site_name}提醒：\r\n</p>\r\n<p>\r\n	您有一个${type}退货单需要处理。退货编号：${refund_sn}。\r\n</p>\r\n<p>\r\n	<br />\r\n</p>\r\n<p>\r\n	<br />\r\n</p>\r\n<p>\r\n	<br />\r\n</p>\r\n<p style="text-align:right;">\r\n	${site_name}\r\n</p>\r\n<p style="text-align:right;">\r\n	${mail_send_time}\r\n</p>\r\n<p>\r\n	<br />\r\n</p>\r\n<br />', 0),
 ('return_auto_process', '退货自动处理提醒', 1, '您的${type}退货单超期未处理，已自动同意买家退货申请（弃货）。退货单编号：${refund_sn}。', 1, 0, '您的${type}退货单超期未处理，已自动同意买家退货申请（弃货）。退货单编号：${refund_sn}。', 0, 0, '${site_name}提醒：您的${type}退货单超期未处理，已自动同意买家退货申请（弃货）。退货单编号：${refund_sn}。', '<p>\r\n	${site_name}提醒：\r\n</p>\r\n<p>\r\n	您的${type}退货单超期未处理，已自动同意买家退货申请（弃货）。退货单编号：${refund_sn}。\r\n</p>\r\n<p>\r\n	<br />\r\n</p>\r\n<p>\r\n	<br />\r\n</p>\r\n<p>\r\n	<br />\r\n</p>\r\n<p style="text-align:right;">\r\n	${site_name}\r\n</p>\r\n<p style="text-align:right;">\r\n	${mail_send_time}\r\n</p>', 0),
 ('return_auto_receipt', '退货未收货自动处理提醒', 1, '您的${type}退货单不处理收货超期未处理，已自动按弃货处理。退货单编号：${refund_sn}。', 1, 0, '您的${type}退货单不处理收货超期未处理，已自动按弃货处理。退货单编号：${refund_sn}。', 0, 0, '${site_name}提醒：您的${type}退货单超期未处理，已自动同意买家退货申请（弃货）。退货单编号：${refund_sn}。', '<p>\r\n	${site_name}提醒：\r\n</p>\r\n<p>\r\n	您的${type}退货单超期未处理，已自动同意买家退货申请（弃货）。退货单编号：${refund_sn}。\r\n</p>\r\n<p>\r\n	<br />\r\n</p>\r\n<p>\r\n	<br />\r\n</p>\r\n<p>\r\n	<br />\r\n</p>\r\n<p style="text-align:right;">\r\n	${site_name}\r\n</p>\r\n<p style="text-align:right;">\r\n	${mail_send_time}\r\n</p>\r\n<p>\r\n	<br />\r\n</p>', 0),
-('store_bill_affirm', '结算单等待确认提醒', 1, '您有新的结算单等待确认，开始时间：${state_time}，结束时间：${end_time}，结算单号：${bill_no}。', 1, 0, '您有新的结算单等待确认，开始时间：${state_time}，结束时间：${end_time}，结算单号：${bill_no}。', 0, 0, '${site_name}提醒：您有新的结算单等待确认。', '<p>\r\n	${site_name}提醒：\r\n</p>\r\n<p>\r\n	您有新的结算单等待确认，起止时间：开始时间：${state_time}，结束时间：${end_time}，结算单号：${bill_no}。\r\n</p>\r\n<p>\r\n	<br />\r\n</p>\r\n<p>\r\n	<br />\r\n</p>\r\n<p>\r\n	<br />\r\n</p>\r\n<p style="text-align:right;">\r\n	${site_name}\r\n</p>\r\n<p style="text-align:right;">\r\n	${mail_send_time}\r\n</p>\r\n<p>\r\n	<br />\r\n</p>', 0),
-('store_bill_gathering', '结算单已经付款提醒', 1, '您的结算单平台已付款，请注意查收，结算单编号：${bill_no}。', 1, 0, '您的结算单平台已付款，请注意查收，结算单编号：${bill_no}。', 0, 0, '${site_name}提醒：您的结算单平台已付款，请注意查收。', '<p>\r\n	</p><p>\r\n		${site_name}提醒：\r\n	</p>\r\n\r\n<p>\r\n	您的结算单平台已付款，请注意查收，结算单编号：${bill_no}。\r\n	</p><p>\r\n		<br />\r\n	</p>\r\n	<p>\r\n		<br />\r\n	</p>\r\n	<p>\r\n		<br />\r\n	</p>\r\n	<p style="text-align:right;">\r\n		${site_name}\r\n	</p>\r\n	<p style="text-align:right;">\r\n		${mail_send_time}\r\n	</p>\r\n\r\n<br />', 0),
 ('store_cost', '店铺消费提醒', 1, '您有一条新的店铺消费记录，金额：${price}，操作人：${seller_name}，备注：${remark}。', 1, 1, '您有一条新的店铺消费记录，金额：${price}，操作人：${seller_name}，备注：${remark}。', 1, 0, '${site_name}提醒：您有一条新的店铺消费记录。', '<p>\r\n	${site_name}提醒：\r\n</p>\r\n<p>\r\n	您有一条新的店铺消费记录，金额：${price}，操作人：${seller_name}，备注：${remark}。\r\n</p>\r\n<p>\r\n	<br />\r\n</p>\r\n<p>\r\n	<br />\r\n</p>\r\n<p>\r\n	<br />\r\n</p>\r\n<p style="text-align:right;">\r\n	${site_name}\r\n</p>\r\n<p style="text-align:right;">\r\n	${mail_send_time}\r\n</p>', 0),
 ('store_expire', '店铺到期提醒', 1, '你的店铺即将到期，请及时续期。', 1, 0, '你的店铺即将到期，请及时续期。', 0, 0, '${site_name}提醒：你的店铺即将到期，请及时续期。', '<p>\r\n	${site_name}提醒：\r\n</p>\r\n<p>\r\n	你的店铺即将到期，请及时续期。\r\n</p>\r\n<p>\r\n	<br />\r\n</p>\r\n<p>\r\n	<br />\r\n</p>\r\n<p>\r\n	<br />\r\n</p>\r\n<p style="text-align:right;">\r\n	${site_name}\r\n</p>\r\n<p style="text-align:right;">\r\n	${mail_send_time}\r\n</p>\r\n<p>\r\n	<br />\r\n</p>', 0);
 

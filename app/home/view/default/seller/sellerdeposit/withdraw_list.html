@@ -46,7 +46,7 @@
         {foreach name="withdraw_list" item="v"  }
         <tr class="bd-line">
                 <td class="nowrap align-center">{notempty name="$v.storedepositlog_add_time"}{$v.storedepositlog_add_time|date='Y-m-d H:i:s'}{/notempty}</td>
-                <td class="align-center">{if $v.storedepositlog_state == '2' || $v.storedepositlog_state == '3' || $v.storedepositlog_state == '4'}{$v.store_freeze_deposit}{else}{$v.store_payable_deposit}{/if}</td>
+                <td class="align-center">{if $v.storedepositlog_state == '2' || $v.storedepositlog_state == '3' || $v.storedepositlog_state == '4'}{$v.storedepositlog_freeze_deposit}{else}{$v.storedepositlog_payable_deposit}{/if}</td>
                 <td>{$v.storedepositlog_desc}</td>
                 <td class="align-center">{if $v.storedepositlog_state==2}{$Think.lang.sellerdeposit_wait}{elseif $v.storedepositlog_state==3}{$Think.lang.sellerdeposit_agree}{elseif $v.storedepositlog_state==4}{$Think.lang.sellerdeposit_reject}{elseif $v.storedepositlog_state==5}{$Think.lang.sellerdeposit_payed}{elseif $v.storedepositlog_state==6}{$Think.lang.sellerdeposit_cancel}{elseif $v.storedepositlog_state==7}{$Think.lang.sellerdeposit_paying}{/if}</td>
                 

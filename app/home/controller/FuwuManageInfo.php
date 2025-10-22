@@ -54,10 +54,7 @@ class FuwuManageInfo extends BaseFuwu {
                 }
                 $validate_data['o2o_fuwu_organization_city_name'] = $city_info['area_name'];
             }
-            $o2o_fuwu_organization_validate = ds_validate('o2o_fuwu_organization');
-            if (!$o2o_fuwu_organization_validate->scene('o2o_fuwu_organization_edit_base')->check($validate_data)) {
-                ds_json_encode(10001, $o2o_fuwu_organization_validate->getError());
-            }
+            $this->validate($validate_data, 'app\common\validate\O2oFuwuOrganization.o2o_fuwu_organization_edit_base');
 
             $o2o_fuwu_organization_model = model('o2o_fuwu_organization');
             $validate_data['o2o_fuwu_organization_birthday'] = strtotime($validate_data['o2o_fuwu_organization_birthday']);
@@ -126,10 +123,8 @@ class FuwuManageInfo extends BaseFuwu {
                 $validate_data['o2o_fuwu_class_name_3'] = '';
             }
 
-            $o2o_fuwu_organization_validate = ds_validate('o2o_fuwu_organization');
-            if (!$o2o_fuwu_organization_validate->scene('o2o_fuwu_organization_edit_operate')->check($validate_data)) {
-                ds_json_encode(10001, $o2o_fuwu_organization_validate->getError());
-            }
+            $this->validate($validate_data, 'app\common\validate\O2oFuwuOrganization.o2o_fuwu_organization_edit_operate');
+            
             $o2o_fuwu_organization_model = model('o2o_fuwu_organization');
             $result = $o2o_fuwu_organization_model->editO2oFuwuOrganization($validate_data, array('o2o_fuwu_organization_id' => $this->o2o_fuwu_organization_info['o2o_fuwu_organization_id']));
             if ($result) {
@@ -187,7 +182,7 @@ class FuwuManageInfo extends BaseFuwu {
                     $file_url = $file_name;
                 if ($type == 'avatar') {
                     if ($this->o2o_fuwu_organization_info[$key]) {
-                        @unlink($upload_file . DIRECTORY_SEPARATOR . $this->o2o_fuwu_organization_info[$key]);
+                        ds_del_pic(ATTACH_O2O_FUWU_ORGANIZATION . '/' . $this->o2o_fuwu_organization_info['o2o_fuwu_organization_id'],$this->o2o_fuwu_organization_info[$key]);
                     }
                     $o2o_fuwu_organization_model = model('o2o_fuwu_organization');
                     $result = $o2o_fuwu_organization_model->editO2oFuwuOrganization(array($key => $file_url), array('o2o_fuwu_organization_id' => $this->o2o_fuwu_organization_info['o2o_fuwu_organization_id']));

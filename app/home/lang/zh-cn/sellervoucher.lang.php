@@ -88,7 +88,7 @@ $lang['voucher_voucher_code'] = "编码";
 $lang['set_meal_renewal']		= '套餐续费';
 $lang['set_expiration_time']		= '套餐过期时间';
 $lang['please_buy_package_first']		= '当前没有可用套餐，请先购买套餐';
-$lang['deduction_settlement_payment_days']		= '相关费用会在店铺的账期结算中扣除';
+$lang['deduction_settlement_payment_days']		= '相关费用会在店铺的资金中扣除';
 
 //templateadd
 $lang['store_classification']		= '店铺分类';

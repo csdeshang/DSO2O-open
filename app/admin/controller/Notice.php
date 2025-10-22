@@ -2,9 +2,10 @@
 namespace app\admin\controller;
 use think\facade\View;
 use think\facade\Lang;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能 消息通知
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -14,7 +15,7 @@ use think\facade\Lang;
  * ============================================================================
  * 控制器
  */
-class  Notice extends AdminControl
+class Notice extends AdminControl
 {
     public function initialize()
     {
@@ -31,6 +32,9 @@ class  Notice extends AdminControl
         $special_condition['message_type'] = 1;
         $message_model = model('message');
         $message_list = $message_model->getMessageList($special_condition,10);
+        foreach($message_list as $key=>$val){
+            $message_list[$key]['message_body'] = preg_replace("/<a[^>]*>(.*?)<\/a>/is","$1", htmlspecialchars_decode($val['message_body']));
+        } 
         View::assign('message_list', $message_list);
         View::assign('show_page', $message_model->page_info->render());
         $this->setAdminCurItem('index');
@@ -78,7 +82,7 @@ class  Notice extends AdminControl
                             $tmp[$k] = trim($v);
                         }
                         //查询会员列表
-                        $member_list = $member_model->getMemberList(array(array('member_name','in', $tmp)));
+                        $member_list = $member_model->getMemberList(array(array('member_name' ,'in', $tmp)));
                         unset($membername_str);
                         if (!empty($member_list)) {
                             foreach ($member_list as $k => $v) {
@@ -123,10 +127,10 @@ class  Notice extends AdminControl
     {
         $menu_array=array(
             array(
-                'name'=>'index','text'=>'会员通知','url'=>url('Notice/index')
+                'name'=>'index','text'=>lang('notice_index_member_notice'),'url'=>(string)url('Notice/index')
             ),
             array(
-                'name'=>'notice','text'=>'发送通知','url'=>"javascript:dsLayerOpen('".url('Notice/notice')."','新增用户')"
+                'name'=>'notice','text'=>lang('notice_index_send'),'url'=>"javascript:dsLayerOpen('".(string)url('Notice/notice')."','".lang('notice_index_send')."')"
             )
         );
         return $menu_array;

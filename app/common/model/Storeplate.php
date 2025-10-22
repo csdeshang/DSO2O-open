@@ -1,13 +1,16 @@
 <?php
+
 /**
  * 店铺模型管理
  */
+
 namespace app\common\model;
+
 use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -17,9 +20,10 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Storeplate extends BaseModel {
+class Storeplate extends BaseModel {
+
     public $page_info;
-    
+
     /**
      * 版式列表
      * @access public
@@ -30,16 +34,15 @@ class  Storeplate extends BaseModel {
      * @return array
      */
     public function getStoreplateList($condition, $field = '*', $pagesize = 0) {
-        if($pagesize){
-            $result = Db::name('storeplate')->field($field)->where($condition)->paginate(['list_rows'=>$pagesize,'query' => request()->param()],false);
+        if ($pagesize) {
+            $result = Db::name('storeplate')->field($field)->where($condition)->paginate(['list_rows' => $pagesize, 'query' => request()->param()], false);
             $this->page_info = $result;
             return $result->items();
-        }else{
+        } else {
             return Db::name('storeplate')->field($field)->where($condition)->select()->toArray();
         }
-        
     }
-    
+
     /**
      * 版式详细信息
      * @access public
@@ -50,7 +53,7 @@ class  Storeplate extends BaseModel {
     public function getStoreplateInfo($condition) {
         return Db::name('storeplate')->where($condition)->find();
     }
-    
+
     public function getStoreplateInfoByID($storeplate_id) {
         $info = $this->_rStoreplateCache($storeplate_id);
         if (empty($info)) {
@@ -59,7 +62,7 @@ class  Storeplate extends BaseModel {
         }
         return $info;
     }
-    
+
     /**
      * 添加版式
      * @access public
@@ -70,21 +73,22 @@ class  Storeplate extends BaseModel {
     public function addStoreplate($data) {
         return Db::name('storeplate')->insertGetId($data);
     }
-    
+
     /**
      * 更新版式
      * @access public
      * @author csdeshang
-     * @param array $update 更新数据
+     * @param array $data 更新数据
      * @param array $condition 条件
      * @return boolean
      */
-    public function editStoreplate($update, $condition) {
+    public function editStoreplate($data, $condition) {
         $list = $this->getStoreplateList($condition, 'storeplate_id');
         if (empty($list)) {
             return true;
         }
-        $result = Db::name('storeplate')->where($condition)->update($update);
+
+        $result = Db::name('storeplate')->where($condition)->update($data);
         if ($result) {
             foreach ($list as $val) {
                 $this->_dStoreplateCache($val['storeplate_id']);
@@ -92,7 +96,7 @@ class  Storeplate extends BaseModel {
         }
         return $result;
     }
-    
+
     /**
      * 删除版式
      * @access public
@@ -113,7 +117,7 @@ class  Storeplate extends BaseModel {
         }
         return $result;
     }
-    
+
     /**
      * 读取店铺关联板式缓存缓存
      * @access public
@@ -124,7 +128,7 @@ class  Storeplate extends BaseModel {
     private function _rStoreplateCache($storeplate_id) {
         return rcache($storeplate_id, 'store_plate');
     }
-    
+
     /**
      * 写入店铺关联板式缓存缓存
      * @access public
@@ -136,7 +140,7 @@ class  Storeplate extends BaseModel {
     private function _wStoreplateCache($storeplate_id, $info) {
         return wcache($storeplate_id, $info, 'store_plate');
     }
-    
+
     /**
      * 删除店铺关联板式缓存缓存
      * @access public
@@ -147,6 +151,4 @@ class  Storeplate extends BaseModel {
     private function _dStoreplateCache($storeplate_id) {
         return dcache($storeplate_id, 'store_plate');
     }
-    
 }
-

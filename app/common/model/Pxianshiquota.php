@@ -1,16 +1,11 @@
 <?php
-
-/**
- * 秒杀套餐模型
- */
-
 namespace app\common\model;
 
-
 use think\facade\Db;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -20,8 +15,8 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class Pxianshiquota extends BaseModel
-{
+class Pxianshiquota extends BaseModel {
+
     public $page_info;
 
     /**
@@ -34,13 +29,12 @@ class Pxianshiquota extends BaseModel
      * @param string $field 字段
      * @return array 秒杀套餐列表
      */
-    public function getXianshiquotaList($condition, $pagesize = null, $order = '', $field = '*')
-    {
-        if($pagesize){
-        $res = Db::name('pxianshiquota')->field($field)->where($condition)->order($order)->paginate(['list_rows'=>$pagesize,'query' => request()->param()],false);
-        $this->page_info = $res;
-        $result = $res->items();
-        }else{
+    public function getXianshiquotaList($condition, $pagesize = null, $order = '', $field = '*') {
+        if ($pagesize) {
+            $res = Db::name('pxianshiquota')->field($field)->where($condition)->order($order)->paginate(['list_rows' => $pagesize, 'query' => request()->param()], false);
+            $this->page_info = $res;
+            $result = $res->items();
+        } else {
             $result = Db::name('pxianshiquota')->field($field)->where($condition)->order($order)->select()->toArray();
         }
         return $result;
@@ -53,8 +47,7 @@ class Pxianshiquota extends BaseModel
      * @param type $condition 条件
      * @return type
      */
-    public function getXianshiquotaInfo($condition)
-    {
+    public function getXianshiquotaInfo($condition) {
         $result = Db::name('pxianshiquota')->where($condition)->find();
         return $result;
     }
@@ -66,8 +59,7 @@ class Pxianshiquota extends BaseModel
      * @param type $store_id 店铺ID
      * @return type
      */
-    public function getXianshiquotaCurrent($store_id)
-    {
+    public function getXianshiquotaCurrent($store_id) {
         $condition = array();
         $condition[] = array('store_id', '=', $store_id);
         $condition[] = array('xianshiquota_endtime', '>', TIMESTAMP);
@@ -81,8 +73,7 @@ class Pxianshiquota extends BaseModel
      * @param type $data 数据
      * @return bool
      */
-    public function addXianshiquota($data)
-    {
+    public function addXianshiquota($data) {
         return Db::name('pxianshiquota')->insertGetId($data);
     }
 
@@ -94,8 +85,7 @@ class Pxianshiquota extends BaseModel
      * @param type $condition 检索条件
      * @return bool
      */
-    public function editXianshiquota($update, $condition)
-    {
+    public function editXianshiquota($update, $condition) {
         return Db::name('pxianshiquota')->where($condition)->update($update);
     }
 
@@ -106,9 +96,7 @@ class Pxianshiquota extends BaseModel
      * @param type $condition 条件
      * @return bool
      */
-    public function delXianshiquota($condition)
-    {
+    public function delXianshiquota($condition) {
         return Db::name('pxianshiquota')->where($condition)->delete();
     }
-
 }

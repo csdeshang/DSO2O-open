@@ -5,7 +5,7 @@ use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,7 +15,7 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Cache extends BaseModel {
+class Cache extends BaseModel {
     /**
      * @access public
      * @author csdeshang 
@@ -99,6 +99,24 @@ class  Cache extends BaseModel {
     }
 
     /**
+     * 快递公司
+     * @access private
+     * @author csdeshang
+     * @return array
+     */
+    private function _express() {
+        $fields = 'express_id,express_name,express_state,express_code,express_letter,express_order,express_url';
+        $list = Db::name('express')->field($fields)->order('express_order,express_letter')->where(array('express_state' => 1))->select()->toArray();
+        if (!is_array($list))
+            return null;
+        $array = array();
+        foreach ($list as $k => $v) {
+            $array[$v['express_id']] = $v;
+        }
+        return $array;
+    }
+
+    /**
      * 自定义导航
      * @access private
      * @author csdeshang
@@ -111,6 +129,21 @@ class  Cache extends BaseModel {
         return $list;
     }
 
+    /**
+     * 抢购价格区间
+     * @access private
+     * @author csdeshang
+     * @return array
+     */
+    private function _groupbuyprice() {
+        $price = Db::name('groupbuypricerange')->order('gprange_start')->select()->toArray();
+        if (!is_array($price)){
+            $price = array();
+        }else{
+            $price = ds_change_arraykey($price, 'gprange_id');
+        }
+        return $price;
+    }
 
     /**
      * 商品TAG

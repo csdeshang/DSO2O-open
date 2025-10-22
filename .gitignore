@@ -1,3 +1,2 @@
-/.idea
-/.vscode
-*.log
+/nbproject/private/
+/application/home/lang/zh-cn/sellerfinance.lang.php

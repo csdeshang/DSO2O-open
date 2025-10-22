@@ -50,7 +50,15 @@ class Sellersetting extends BaseSeller {
             /**
              * 更新入库
              */
+            $store_name = input('post.store_name');
+            //验证器在model层,验证器未有必填项,在此验证
+            if(empty($store_name)){
+                ds_json_encode(10001, '请填写店铺名称');
+            }
+            
             $param = array(
+                'store_id' => $store_id,
+                'store_name' => $store_name,
                 'store_qq' => input('post.store_qq'),
                 'store_ww' => input('post.store_ww'),
                 'store_phone' => input('post.store_phone'),
@@ -59,33 +67,15 @@ class Sellersetting extends BaseSeller {
                 'store_description' => input('post.seo_description')
             );
 
-
-
-            if (!empty(input('post.store_name'))) {
-                $store = $store_model->getStoreInfo(array('store_name' => input('param.store_name')));
-                //店铺名存在,则提示错误
-                if (!empty($store) && ($store_id != $store['store_id'])) {
-                    ds_json_encode(10001, lang('please_change_another_name'));
-                }
-                $param['store_name'] = input('post.store_name');
-            }
-            //店铺名称修改处理
-            if (input('param.store_name') != $store_info['store_name'] && !empty(input('post.store_name'))) {
-                $condition = array();
-                $condition[] = array('store_id','=',$store_id);
-                $update = array();
-                $update['store_name'] = input('param.store_name');
-                Db::name('goodscommon')->where($condition)->update($update);
-                Db::name('goods')->where($condition)->update($update);
+            
+            $this->getMiniProCode(1);
+            $result = $store_model->editStore($param, array('store_id' => $store_id));
+            
+            //当修改了店铺修改 store_name , 则同时修改数据中其他相关的store_name
+            if ($result && $store_name != $store_info['store_name']) {
+                $store_model->updateAllStorename($store_id, $store_name);
             }
             
-            $store_validate = ds_validate('store');
-            if (!$store_validate->scene('seller_setting')->check($param)) {
-                ds_json_encode(10001, $store_validate->getError());
-            }
-
-            $this->getMiniProCode(1);
-            $store_model->editStore($param, array('store_id' => $store_id));
             ds_json_encode(10000, lang('ds_common_save_succ'));
         }
         /**
@@ -185,8 +175,7 @@ class Sellersetting extends BaseSeller {
         $store_model = model('store');
         //删除原图
         $store_info = $store_model->getStoreInfoByID($store_id);
-        @unlink($upload_file . DIRECTORY_SEPARATOR . $store_info[$store_image_name]);
-        @unlink($upload_file . DIRECTORY_SEPARATOR . 'm_'.$store_info[$store_image_name]);
+        ds_del_pic(ATTACH_STORE . '/' . $store_id,$store_info[$store_image_name]);
         $result = $store_model->editStore(array($store_image_name => $file_name), array('store_id' => $store_id));
         if ($result) {
             $data = array();
@@ -228,7 +217,7 @@ class Sellersetting extends BaseSeller {
             $upload_info = $upload_model->getUploadList(array('upload_type' => 3, 'item_id' => session('store_id')), 'file_name');
             if (is_array($upload_info) && !empty($upload_info)) {
                 foreach ($upload_info as $val) {
-                    @unlink(BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . ATTACH_SLIDE . DIRECTORY_SEPARATOR . $val['file_name']);
+                    ds_del_pic(ATTACH_SLIDE,$val['file_name']);
                 }
             }
             $upload_model->delUpload(array('upload_type' => 3, 'item_id' => session('store_id')));
@@ -283,7 +272,7 @@ class Sellersetting extends BaseSeller {
         }
         $ext =  strrchr($img_src, '.');
         $file_name = session('store_id') . '_' . $file_id .$ext;
-        @unlink(BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . ATTACH_SLIDE . DIRECTORY_SEPARATOR . $file_name);
+        ds_del_pic(ATTACH_SLIDE,$file_name);
         echo json_encode(array('succeed' => lang('ds_common_save_succ')));
         die;
     }

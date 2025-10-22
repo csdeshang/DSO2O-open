@@ -3,9 +3,10 @@
 namespace app\admin\controller;
 use think\facade\View;
 use think\facade\Lang;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能 评价管理
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,7 +16,7 @@ use think\facade\Lang;
  * ============================================================================
  * 控制器
  */
-class  Evaluate extends AdminControl
+class Evaluate extends AdminControl
 {
     public function initialize()
     {
@@ -68,7 +69,7 @@ class  Evaluate extends AdminControl
         $evaluategoods_model = model('evaluategoods');
         $result = $evaluategoods_model->delEvaluategoods(array('geval_id'=>$geval_id));
         if ($result) {
-            $this->log('删除商品评价，评价编号'.$geval_id);
+            $this->log(lang('del_evaluategoods').$geval_id);
             ds_json_encode(10000, lang('ds_common_del_succ'));
         } else {
             ds_json_encode(10001, lang('ds_common_del_fail'));
@@ -117,7 +118,7 @@ class  Evaluate extends AdminControl
         $evaluatestore_model = model('evaluatestore');
         $result = $evaluatestore_model->delEvaluatestore(array('seval_id'=>$seval_id));
         if ($result) {
-            $this->log('删除店铺评价，评价编号'.$seval_id);
+            $this->log(lang('del_evaluatestore').$seval_id);
             ds_json_encode(10000, lang('ds_common_del_succ'));
         } else {
             ds_json_encode(10001, lang('ds_common_del_fail'));
@@ -129,12 +130,12 @@ class  Evaluate extends AdminControl
             array(
                 'name' => 'evalgoods_list',
                 'text' => lang('admin_evaluate_list'),
-                'url' => url('Evaluate/evalgoods_list')
+                'url' => (string)url('Evaluate/evalgoods_list')
             ),
             array(
                 'name' => 'evalstore_list',
                 'text' => lang('admin_evalstore_list'),
-                'url' => url('Evaluate/evalstore_list')
+                'url' => (string)url('Evaluate/evalstore_list')
             )
         );
         return $menu_array;

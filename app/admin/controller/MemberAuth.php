@@ -6,7 +6,7 @@ use think\facade\Lang;
 use PHPExcel;
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能 身份证认证
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -128,7 +128,7 @@ class MemberAuth extends AdminControl {
             array(
                 'name' => 'index',
                 'text' => lang('ds_list'),
-                'url' => url('MemberAuth/index')
+                'url' => (string)url('MemberAuth/index')
             ),
         );
 

@@ -5,6 +5,7 @@ namespace app\home\controller;
 use think\facade\View;
 use think\facade\Lang;
 use think\facade\Db;
+
 /**
  * ============================================================================
  * DSO2O多用户商城
@@ -51,7 +52,7 @@ class Sellerorder extends BaseSeller {
         $if_start_date = preg_match('/^20\d{2}-\d{2}-\d{2}$/', input('get.query_start_date'));
         $if_end_date = preg_match('/^20\d{2}-\d{2}-\d{2}$/', input('get.query_end_date'));
         $start_unixtime = $if_start_date ? strtotime(input('get.query_start_date')) : null;
-        $end_unixtime = $if_end_date ? (strtotime(input('get.query_end_date'))+86399) : null;
+        $end_unixtime = $if_end_date ? (strtotime(input('get.query_end_date')) + 86399) : null;
         if ($start_unixtime) {
             $condition[] = array('add_time', '>=', $start_unixtime);
         }
@@ -65,10 +66,10 @@ class Sellerorder extends BaseSeller {
         }
 
         $order_list = $order_model->getOrderList($condition, 10, '*', 'order_id desc', '', array('order_goods', 'order_common', 'member'));
-        
+
         $refundreturn_model = model('refundreturn');
         $order_list = $refundreturn_model->getGoodsRefundList($order_list);
-        
+
         View::assign('show_page', $order_model->page_info->render());
 
         //页面中显示那些操作
@@ -109,7 +110,6 @@ class Sellerorder extends BaseSeller {
         }
 
         View::assign('order_list', $order_list);
-
 
         /* 设置卖家当前菜单 */
         $this->setSellerCurMenu('sellerorder');
@@ -163,9 +163,7 @@ class Sellerorder extends BaseSeller {
             $data['log_role'] = 'seller';
             $data['log_user'] = session('seller_name');
             $data['log_msg'] = '店铺派单给配送员' . $update_order['o2o_distributor_name'];
-            $data['log_orderstate'] = ORDER_STATE_DELIVER;
-            $order_model->addOrderlog($data);
-
+            model('orderlog')->addOrderlog($data);
 
             //生成订单通知
             $o2o_distributor_notice_model->addO2oDistributorNotice(array(
@@ -214,7 +212,7 @@ class Sellerorder extends BaseSeller {
             'order_id' => $temp['order_id'],
             'order_sn' => $temp['order_sn'],
             'reciver_name' => $temp['extend_order_common']['reciver_name'],
-            'reciver_address' => $temp['extend_order_common']['reciver_info']['address'].$temp['extend_order_common']['reciver_info']['house_number'],
+            'reciver_address' => $temp['extend_order_common']['reciver_info']['address'] . $temp['extend_order_common']['reciver_info']['house_number'],
             'reciver_phone' => $temp['extend_order_common']['reciver_info']['mob_phone'],
             'order_distance' => $temp['o2o_order_distance'],
             'order_lng' => $temp['o2o_order_lng'],
@@ -258,29 +256,29 @@ class Sellerorder extends BaseSeller {
         $o2o_distributor_model = model('o2o_distributor');
         $condition = array();
         $condition[] = array('o2o_distributor_state', '=', 1);
-        $condition[] = array('o2o_distributor_lng','>',0);
-        $condition[] = array('o2o_distributor_lat','>',0);
-        
-        //判断是否只能指定店铺下的配送员
-//        if ($order_info['o2o_order_distributor_type'] == 1) {
-//            $condition[] = array('store_id', '=', session('store_id'));
-//        } else {
-//            $condition[] = array('store_id', '=', 0);
-//        }
-        
+        $condition[] = array('o2o_distributor_lng', '>', 0);
+        $condition[] = array('o2o_distributor_lat', '>', 0);
+
+        //判断是否只能指定店铺下的配送员[因为开启店铺配送,配送价格是按店铺设置的配送费]
+        if ($order_info['o2o_order_distributor_type'] == 1) {
+            $condition[] = array('store_id', '=', session('store_id'));
+        } else {
+            $condition[] = array('store_id', '=', 0);
+        }
+
         $order = 'o2o_distributor_addtime asc';
         $field = '*';
         //如果传了位置经纬度，则按照经纬度的距离排序
         $lat = floatval(input('param.lat'));
         $lng = floatval(input('param.lng'));
-        if($lat>0 && $lng>0){
-            $field.= ',(2 * 6378.137* ASIN(SQRT(POW(SIN(PI()*(' . $lat . '-o2o_distributor_lat)/360),2)+COS(PI()*' . $lat . '/180)* COS(o2o_distributor_lat * PI()/180)*POW(SIN(PI()*(' . $lng . '-o2o_distributor_lng)/360),2)))) as poi_distance';
+        if ($lat > 0 && $lng > 0) {
+            $field .= ',(2 * 6378.137* ASIN(SQRT(POW(SIN(PI()*(' . $lat . '-o2o_distributor_lat)/360),2)+COS(PI()*' . $lat . '/180)* COS(o2o_distributor_lat * PI()/180)*POW(SIN(PI()*(' . $lng . '-o2o_distributor_lng)/360),2)))) as poi_distance';
             $order = 'poi_distance asc';
         }
-        
-        $o2o_distributor_list = $o2o_distributor_model->getO2oDistributorList($condition, $field, 10,$order);
+
+        $o2o_distributor_list = $o2o_distributor_model->getO2oDistributorList($condition, $field, 10, $order);
         foreach ($o2o_distributor_list as $key => $val) {
-            
+
             $o2o_distributor_list[$key]['o2o_distributor_avatar'] = get_o2o_distributor_file($val['o2o_distributor_avatar'], 'avatar');
             $o2o_distributor_list[$key]['count_wait'] = $order_model->getOrderCount(array(array('o2o_order_deliver_time', '>', strtotime(date('Y-m-d 0:0:0'))), array('o2o_distributor_id', '=', $val['o2o_distributor_id']), array('order_state', 'in', [ORDER_STATE_DELIVER, ORDER_STATE_SEND])));
             $o2o_distributor_list[$key]['count_complete'] = $order_model->getOrderCount(array(array('o2o_order_deliver_time', '>', strtotime(date('Y-m-d 0:0:0'))), array('o2o_distributor_id', '=', $val['o2o_distributor_id']), array('order_state', 'in', [ORDER_STATE_SUCCESS])));
@@ -349,7 +347,7 @@ class Sellerorder extends BaseSeller {
                 include_once root_path() . 'extend/dada/index.php';
                 $body = array(
                     'shop_no' => $this->store_info['dada_shop_no'],
-                    'origin_id' => 'real_order-'.$order_info['order_sn'],
+                    'origin_id' => 'real_order-' . $order_info['order_sn'],
                     'city_code' => $this->store_info['dada_city_code'],
                     'cargo_price' => $order_info['goods_amount'],
                     'is_prepay' => 0,
@@ -380,8 +378,7 @@ class Sellerorder extends BaseSeller {
             $data['log_role'] = 'seller';
             $data['log_user'] = session('seller_name');
             $data['log_msg'] = '店铺手动接单';
-            $data['log_orderstate'] = ORDER_STATE_RECEIPT;
-            $order_model->addOrderlog($data);
+            model('orderlog')->addOrderlog($data);
 
             Db::commit();
         } catch (\Exception $e) {
@@ -413,7 +410,7 @@ class Sellerorder extends BaseSeller {
         }
         Db::startTrans();
         try {
-            model('order', 'logic')->changeOrderStateCancel($order_info, 'seller', session('seller_name'), '店铺拒绝订单',true);
+            model('order', 'logic')->changeOrderStateCancel($order_info, 'seller', session('seller_name'), '店铺拒绝订单', true);
             Db::commit();
         } catch (\Exception $e) {
 
@@ -581,8 +578,7 @@ class Sellerorder extends BaseSeller {
             $data['log_role'] = 'seller';
             $data['log_user'] = session('seller_name');
             $data['log_msg'] = '店铺确认配送员取货';
-            $data['log_orderstate'] = ORDER_STATE_SEND;
-            $order_model->addOrderlog($data);
+            model('orderlog')->addOrderlog($data);
             Db::commit();
         } catch (\Exception $e) {
 
@@ -593,7 +589,7 @@ class Sellerorder extends BaseSeller {
         $order_info = $order_model->formatO2oOrder($this->store_info, $order_info);
         ds_json_encode(10000, lang('ds_common_op_succ'), array('order_info' => $order_info));
     }
-    
+
     /**
      * 查看订单
      */
@@ -603,8 +599,8 @@ class Sellerorder extends BaseSeller {
             $this->error(lang('param_error'));
         }
         $order_model = model('order');
-        $condition[] = array('order_id','=',$order_id);
-        $condition[] = array('store_id','=',session('store_id'));
+        $condition[] = array('order_id', '=', $order_id);
+        $condition[] = array('store_id', '=', session('store_id'));
         $order_info = $order_model->getOrderInfo($condition, array('order_common', 'order_goods'));
         if (empty($order_info)) {
             $this->error(lang('member_printorder_ordererror'));
@@ -615,17 +611,17 @@ class Sellerorder extends BaseSeller {
         $store_model = model('store');
         $store_info = $store_model->getStoreInfoByID($order_info['store_id']);
         if (!empty($store_info['store_logo'])) {
-            $store_info['store_avatar'] = ds_get_pic( ATTACH_STORE . DIRECTORY_SEPARATOR .$store_info['store_id'],$store_info['store_avatar']);
+            $store_info['store_avatar'] = ds_get_pic(ATTACH_STORE . DIRECTORY_SEPARATOR . $store_info['store_id'], $store_info['store_avatar']);
         }
         if (!empty($store_info['store_seal'])) {
-            $store_info['store_seal'] = ds_get_pic( ATTACH_STORE , $store_info['store_seal']);
+            $store_info['store_seal'] = ds_get_pic(ATTACH_STORE, $store_info['store_seal']);
         }
         View::assign('store_info', $store_info);
 
         //订单商品
         $condition = array();
-        $condition[] = array('order_id','=',$order_id);
-        $condition[] = array('store_id','=',session('store_id'));
+        $condition[] = array('order_id', '=', $order_id);
+        $condition[] = array('store_id', '=', session('store_id'));
         $goods_new_list = array();
         $goods_all_num = 0;
         $goods_total_price = 0;
@@ -648,8 +644,8 @@ class Sellerorder extends BaseSeller {
         View::assign('goods_all_num', $goods_all_num);
         View::assign('goods_total_price', ds_price_format($goods_total_price));
         View::assign('goods_list', $goods_new_list);
-        
-        return View::fetch($this->template_dir.'print_order');
+
+        return View::fetch($this->template_dir . 'print_order');
     }
 
     /**
@@ -671,14 +667,15 @@ class Sellerorder extends BaseSeller {
                 return ds_callback(false, '无权操作');
             }
             $msg = $post['state_info1'] != '' ? $post['state_info1'] : $post['state_info'];
-            try{
-                Db::startTrans();
+            Db::startTrans();
+            try {
                 $logic_order->changeOrderStateCancel($order_info, 'seller', session('member_name'), $msg);
+                Db::commit();
             } catch (\Exception $e) {
                 Db::rollback();
                 return ds_callback(false, $e->getMessage());
             }
-            Db::commit();    
+
             return ds_callback(true, lang('ds_common_op_succ'));
         }
     }
@@ -772,7 +769,6 @@ class Sellerorder extends BaseSeller {
         );
         return $menu_array;
     }
-
 }
 
 ?>

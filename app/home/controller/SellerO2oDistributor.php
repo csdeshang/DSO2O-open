@@ -117,11 +117,8 @@ class SellerO2oDistributor extends BaseSeller {
             $o2o_distributor_model = model('o2o_distributor');
             $data = $this->post_data();
 
-
-            $o2o_distributor_validate = ds_validate('o2o_distributor');
-            if (!$o2o_distributor_validate->scene('o2o_distributor_register')->check($data)) {
-                ds_json_encode(10001, $o2o_distributor_validate->getError());
-            }
+            $this->validate($data, 'app\common\validate\O2oDistributor.o2o_distributor_register');
+            
             $condition = array();
             $condition[] = array('o2o_distributor_name','=',$data['o2o_distributor_name']);
             $result = $o2o_distributor_model->getO2oDistributorInfo($condition);
@@ -158,11 +155,8 @@ class SellerO2oDistributor extends BaseSeller {
 
             $data = $this->post_data();
 
-
-            $o2o_distributor_validate = ds_validate('o2o_distributor');
-            if (!$o2o_distributor_validate->scene('o2o_distributor_edit')->check($data)) {
-                ds_json_encode(10001, $o2o_distributor_validate->getError());
-            }
+            $this->validate($data, 'app\common\validate\O2oDistributor.o2o_distributor_edit');
+            
             if (isset($data['o2o_distributor_password'])) {
                 $data['o2o_distributor_password'] = md5($data['o2o_distributor_password']);
             }
@@ -224,7 +218,6 @@ class SellerO2oDistributor extends BaseSeller {
     }
 
     public function image_upload() {
-        $upload_file = BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . ATTACH_O2O_DISTRIBUTOR;
         $store_image_name = input('param.type');
         $id = input('param.id');
         $file = input('param.file');
@@ -249,7 +242,7 @@ class SellerO2oDistributor extends BaseSeller {
             //删除原图
             $o2o_distributor_array = $o2o_distributor_model->getO2oDistributorInfo(array('o2o_distributor_id' => $id, 'store_id' => session('store_id')));
             if ($o2o_distributor_array['o2o_distributor_avatar']) {
-                @unlink($upload_file . DIRECTORY_SEPARATOR . $o2o_distributor_array['o2o_distributor_avatar']);
+                ds_del_pic(ATTACH_O2O_DISTRIBUTOR,$o2o_distributor_array['o2o_distributor_avatar']);
             }
             $result = $o2o_distributor_model->editO2oDistributor(array($store_image_name => $file_name), array('o2o_distributor_id' => $id));
         }

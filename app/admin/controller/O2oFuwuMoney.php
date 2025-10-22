@@ -142,11 +142,12 @@ class  O2oFuwuMoney extends AdminControl {
             }
             $admininfo = $this->getAdminInfo();
             $data['o2o_fuwu_money_log_desc']=lang('order_admin_operator')."【" . $admininfo['admin_name'] . "】".((input('param.verify_state')==1)?lang('ds_pass'):lang('ds_refuse')).'服务机构'."【" . $info['o2o_fuwu_organization_name'] . "】".lang('admin_storemoney_log_stage_cash').'：'.input('param.verify_reason');
+            Db::startTrans();
             try {
-                Db::startTrans();
+
                 $o2o_fuwu_money_log_model->changeO2oFuwuMoney($data);
                 //修提现状态
-                if(!$o2o_fuwu_money_log_model->editO2oFuwuMoneyLog(array('o2o_fuwu_money_log_id'=>$id,'o2o_fuwu_money_log_state'=>O2oFuwuMoneyLog::STATE_WAIT),array('o2o_fuwu_money_log_state'=>$o2o_fuwu_money_log_state))){
+                if (!$o2o_fuwu_money_log_model->editO2oFuwuMoneyLog(array('o2o_fuwu_money_log_id' => $id, 'o2o_fuwu_money_log_state' => O2oFuwuMoneyLog::STATE_WAIT), array('o2o_fuwu_money_log_state' => $o2o_fuwu_money_log_state))) {
                     throw new \think\Exception(lang('admin_storemoney_cash_edit_fail'), 10006);
                 }
                 Db::commit();
@@ -237,8 +238,9 @@ class  O2oFuwuMoney extends AdminControl {
                     break;
             }
             $data['o2o_fuwu_money_log_desc']=$log_msg;
+            
+            Db::startTrans();
             try {
-                Db::startTrans();
                 $o2o_fuwu_money_log_model->changeO2oFuwuMoney($data);
                 Db::commit();
                 $this->log($log_msg, 1);

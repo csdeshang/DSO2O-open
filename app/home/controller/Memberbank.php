@@ -52,10 +52,7 @@ class Memberbank extends BaseMember {
                 'memberbank_name' => input('post.memberbank_name'),
                 'memberbank_no' => input('post.memberbank_no'),
             );
-            $memberbank_validate = ds_validate('memberbank');
-            if (!$memberbank_validate->scene('add')->check($data)) {
-                ds_json_encode(10001,$memberbank_validate->getError());
-            }
+            $this->validate($data, 'app\common\validate\Memberbank.add');
 
             $memberbank_model=model('memberbank');
             $result = $memberbank_model->addMemberbank($data);
@@ -92,10 +89,7 @@ class Memberbank extends BaseMember {
                 'memberbank_name' => input('post.memberbank_name'),
                 'memberbank_no' => input('post.memberbank_no'),
             );
-            $memberbank_validate = ds_validate('memberbank');
-            if (!$memberbank_validate->scene('edit')->check($data)) {
-                ds_json_encode(10001,$memberbank_validate->getError());
-            }
+            $this->validate($data, 'app\common\validate\Memberbank.edit');
 
             $result = $memberbank_model->editMemberbank($data,array('member_id' => session('member_id'), 'memberbank_id' => $memberbank_id));
             if ($result) {

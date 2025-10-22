@@ -1,11 +1,12 @@
 <?php
 
 namespace app\common\model;
+
 use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,13 +16,13 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Payment extends BaseModel {
+class Payment extends BaseModel {
+
     /**
      * 开启状态标识
      * @var unknown
      */
     const STATE_OPEN = 1;
-    
 
     /**
      * 读取单行信息
@@ -42,7 +43,7 @@ class  Payment extends BaseModel {
      * @return type
      */
     public function getPaymentOpenInfo($condition = array()) {
-        $condition[]=array('payment_state','=',self::STATE_OPEN);
+        $condition[] = array('payment_state', '=', self::STATE_OPEN);
         return Db::name('payment')->where($condition)->find();
     }
 
@@ -65,21 +66,21 @@ class  Payment extends BaseModel {
      * @return array 数组格式的返回结果
      */
     public function getPaymentOpenList($condition = array()) {
-        $condition[]=array('payment_state','=',self::STATE_OPEN);
+        $condition[] = array('payment_state', '=', self::STATE_OPEN);
         if (strpos($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger') == false) {
             //非微信内置浏览器,过滤微信支付
-            $condition[] = array('payment_code','not in',array('wxpay_jsapi','wxpay_minipro','allinpay_h5')); 
-        }else{
+            $condition[] = array('payment_code', 'not in', array('wxpay_jsapi', 'wxpay_minipro', 'allinpay_h5'));
+        } else {
             //微信内置浏览器,过滤微信H5支付,以及支付宝H5支付
-            if( strpos($_SERVER['HTTP_USER_AGENT'], 'miniprogram') !== false || strpos($_SERVER['HTTP_USER_AGENT'], 'miniProgram') !== false ){
-                $condition[] = array('payment_code','not in',array('wxpay_h5','alipay_h5','wxpay_jsapi'));
-           }else{
-                $condition[] = array('payment_code','not in',array('wxpay_h5','alipay_h5'));
-           }
+            if (strpos($_SERVER['HTTP_USER_AGENT'], 'miniprogram') !== false || strpos($_SERVER['HTTP_USER_AGENT'], 'miniProgram') !== false) {
+                $condition[] = array('payment_code', 'not in', array('wxpay_h5', 'alipay_h5', 'wxpay_jsapi'));
+            } else {
+                $condition[] = array('payment_code', 'not in', array('wxpay_h5', 'alipay_h5'));
+            }
         }
         return Db::name('payment')->where($condition)->select()->toArray();
     }
-    
+
     /**
      * 新增支付方式
      * @access public
@@ -87,10 +88,10 @@ class  Payment extends BaseModel {
      * @param type $data 参数内容
      * @return type
      */
-    public function addPayment($data){
+    public function addPayment($data) {
         return Db::name('payment')->insert($data);
     }
-    
+
     /**
      * 删除支付方式
      * @access public
@@ -98,10 +99,9 @@ class  Payment extends BaseModel {
      * @param array $condition 条件
      * @return bool
      */
-    public function delPayment($condition){
+    public function delPayment($condition) {
         return Db::name('payment')->where($condition)->delete();
     }
-    
 
     /**
      * 更新信息
@@ -124,7 +124,7 @@ class  Payment extends BaseModel {
      * @return type
      */
     public function getRowByCondition($conditionfield, $conditionvalue) {
-        return Db::name('payment')->where($conditionfield,$conditionvalue)->find();
+        return Db::name('payment')->where($conditionfield, $conditionvalue)->find();
     }
 
     /**
@@ -151,7 +151,7 @@ class  Payment extends BaseModel {
         }
         return $payments;
     }
-    
+
     /**
      * 获取内置支付方式的配置信息
      * @access public
@@ -163,7 +163,6 @@ class  Payment extends BaseModel {
         $payment_path = PLUGINS_PATH . '/payments/' . $code . '/payment.info.php';
         return include($payment_path);
     }
-
 }
 
 ?>

@@ -3,9 +3,11 @@
 namespace app\common\model;
 use think\facade\Db;
 
+
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,7 +17,7 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Link extends BaseModel
+class Link extends BaseModel
 {
     public $page_info;
     /**
@@ -45,9 +47,11 @@ class  Link extends BaseModel
      * @param type $id 链接ID
      * @return type
      */
-    public function getOneLink($id)
+    public function getOneLink($link_id)
     {
-        return Db::name('link')->where('link_id',$id)->find();
+        $condition = array();
+        $condition[] = array('link_id','=',$link_id);
+        return Db::name('link')->where($condition)->find();
     }
 
     /**
@@ -72,7 +76,9 @@ class  Link extends BaseModel
      */
     public function editLink($data,$link_id)
     {
-        return Db::name('link')->where('link_id',$link_id)->update($data);
+        $condition = array();
+        $condition[] = array('link_id','=',$link_id);
+        return Db::name('link')->where($condition)->update($data);
     }
 
     /**
@@ -82,11 +88,13 @@ class  Link extends BaseModel
      * @param array $id 链接id
      * @return bool
      */
-    public function delLink($id)
+    public function delLink($link_id)
     {
-        $link = $this->getOneLink($id);
+        $link = $this->getOneLink($link_id);
         //删除友情链接图片
-        @unlink(BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . DIR_ADMIN . DIRECTORY_SEPARATOR .'link'.DIRECTORY_SEPARATOR.$link['link_pic']);
-        return Db::name('link')->where('link_id',intval($id))->delete();
+        ds_del_pic(DIR_ADMIN.'/link',$link['link_pic']);
+        $condition = array();
+        $condition[] = array('link_id','=',$link_id);
+        return Db::name('link')->where($condition)->delete();
     }
 }

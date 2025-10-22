@@ -175,10 +175,8 @@ class  Region extends AdminControl {
                 'area_deep'=> $area_deep,
                 'area_sort' => input('post.area_sort'),
             );
-            $region_validate = ds_validate('region');
-            if (!$region_validate->scene('add')->check($data)) {
-                $this->error($region_validate->getError());
-            }
+            
+            $this->validate($data, 'app\common\validate\Region.add');
 
             $result = $area_mod->addArea($data);
             if ($result) {
@@ -194,16 +192,16 @@ class  Region extends AdminControl {
 
     public function edit() {
         $area_id = intval(input('param.area_id'));
-        if ($area_id<=0) {
+        if ($area_id <= 0) {
             $this->error(lang('param_error'));
         }
-        $area_mod=model('area');
-        $area = $area_mod->getAreaInfo(array('area_id'=>$area_id));
-        if(!$area){
+        $area_mod = model('area');
+        $area = $area_mod->getAreaInfo(array('area_id' => $area_id));
+        if (!$area) {
             $this->error(lang('area_empty'));
         }
         if (!request()->isPost()) {
-            
+
             View::assign('area', $area);
             View::assign('parents', $this->_get_options());
             return View::fetch('form');
@@ -215,54 +213,54 @@ class  Region extends AdminControl {
                 'area_parent_id' => $area_parent_id,
                 'area_sort' => input('post.area_sort'),
             );
-            $region_validate = ds_validate('region');
-            if (!$region_validate->scene('edit')->check($data)) {
-                $this->error($region_validate->getError());
-            }
+            
+            $this->validate($data, 'app\common\validate\Region.edit');
 
-            if($data['area_parent_id']==$area_id){
+            if ($data['area_parent_id'] == $area_id) {
                 $this->error(lang('area_parent_error'));
             }
+            Db::startTrans();
             try {
-                Db::startTrans();
-            if($data['area_parent_id']!=$area['area_parent_id']){
-                //如果不同级
-                $now_deep=intval(Db::name('area')->where('area_id='.$data['area_parent_id'])->value('area_deep'))+1;
-                $old_deep=intval(Db::name('area')->where('area_id='.$area['area_parent_id'])->value('area_deep'))+1;
-                if($now_deep!=$old_deep){
-                    if($now_deep>MAX_LAYER){
-                        $this->error(sprintf(lang('area_deep_error'), MAX_LAYER));
-                    }
-                    $data['area_deep']=$now_deep;
-                    $j=$old_deep;
-                    $subQuery='('.$area_id.')';
-                    while($j<=MAX_LAYER){
-                        //如果自己的上级是自己的下级则报错
-                        if(Db::name('area')->where('area_id='.$data['area_parent_id'].' AND area_parent_id IN '.$subQuery)->value('area_id')){
-                            Db::rollback();
-                            $this->error(lang('area_parent_error'));
-                        }
-                        $subQuery=Db::name('area')->field('area_id')->where('area_parent_id IN '.$subQuery)->buildSql();
-                        $j++;
-                    }
-                    //给他的下级修改深度
-                    $i=$now_deep+1;
-                    $subQuery='('.$area_id.')';
-                    while($i<=MAX_LAYER){
 
-                        Db::name('area')->where('area_parent_id IN '.$subQuery)->update(array('area_deep'=>$i));
-                        $subQuery='(SELECT area_id FROM '.Db::name('area')->field('area_id')->where('area_parent_id IN '.$subQuery)->buildSql().' a)';
-                        $i++;
+                if ($data['area_parent_id'] != $area['area_parent_id']) {
+                    //如果不同级
+                    $now_deep = intval(Db::name('area')->where('area_id=' . $data['area_parent_id'])->value('area_deep')) + 1;
+                    $old_deep = intval(Db::name('area')->where('area_id=' . $area['area_parent_id'])->value('area_deep')) + 1;
+                    if ($now_deep != $old_deep) {
+                        if ($now_deep > MAX_LAYER) {
+                            $this->error(sprintf(lang('area_deep_error'), MAX_LAYER));
+                        }
+                        $data['area_deep'] = $now_deep;
+                        $j = $old_deep;
+                        $subQuery = '(' . $area_id . ')';
+                        while ($j <= MAX_LAYER) {
+                            //如果自己的上级是自己的下级则报错
+                            if (Db::name('area')->where('area_id=' . $data['area_parent_id'] . ' AND area_parent_id IN ' . $subQuery)->value('area_id')) {
+                                Db::rollback();
+                                $this->error(lang('area_parent_error'));
+                            }
+                            $subQuery = Db::name('area')->field('area_id')->where('area_parent_id IN ' . $subQuery)->buildSql();
+                            $j++;
+                        }
+                        //给他的下级修改深度
+                        $i = $now_deep + 1;
+                        $subQuery = '(' . $area_id . ')';
+                        while ($i <= MAX_LAYER) {
+
+                            Db::name('area')->where('area_parent_id IN ' . $subQuery)->update(array('area_deep' => $i));
+                            $subQuery = '(SELECT area_id FROM ' . Db::name('area')->field('area_id')->where('area_parent_id IN ' . $subQuery)->buildSql() . ' a)';
+                            $i++;
+                        }
                     }
                 }
+                $result = $area_mod->editArea($data, array('area_id' => $area_id));
+                Db::commit();
+            } catch (\Exception $e) {
+                Db::rollback();
+                $this->error($e->getMessage());
             }
-            $result = $area_mod->editArea($data,array('area_id'=>$area_id));
-        } catch (Exception $e) {
-            Db::rollback();
-            $this->error($e->getMessage());
-        }
-        Db::commit();
-            if ($result>=0) {
+
+            if ($result >= 0) {
                 \areacache::deleteCacheFile();
                 \areacache::updateAreaArrayJs();
                 \areacache::updateAreaPhp();

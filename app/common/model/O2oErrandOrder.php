@@ -49,8 +49,20 @@ class O2oErrandOrder extends BaseModel {
      * @param string $fields 字段
      * @return array
      */
-    public function getO2oErrandOrderInfo($condition = array(), $fields = '*') {
-        return Db::name('o2o_errand_order')->where($condition)->field($fields)->find();
+    public function getO2oErrandOrderInfo($condition = array(), $fields = '*',$extend = array()) {
+        $o2o_errand_order_info =  Db::name('o2o_errand_order')->where($condition)->field($fields)->find();
+        
+        //追加返回订单日志
+        if (in_array('orderlog', $extend)) {
+            //取商品列表
+            $orderlog_list = model('orderlog')->getOrderlogList(array('order_id' => $o2o_errand_order_info['o2o_errand_order_id'],'log_type' => 'errand'));
+            foreach ($orderlog_list as $orderlog_key => $orderlog) {
+                $orderlog_list[$orderlog_key]['log_time_desc'] = date('Y-m-d H:i:s',$orderlog['log_time']);
+            }
+            $o2o_errand_order_info['extend_orderlog'] = $orderlog_list;
+        }
+        
+        return $o2o_errand_order_info;
     }
 
     /*

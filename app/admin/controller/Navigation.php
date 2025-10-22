@@ -3,9 +3,10 @@
 namespace app\admin\controller;
 use think\facade\View;
 use think\facade\Lang;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能 导航
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,7 +16,7 @@ use think\facade\Lang;
  * ============================================================================
  * 控制器
  */
-class  Navigation extends AdminControl {
+class Navigation extends AdminControl {
 
     public function initialize() {
         parent::initialize();
@@ -54,11 +55,9 @@ class  Navigation extends AdminControl {
             $data['nav_url'] = input('post.nav_url');
             $data['nav_new_open'] = intval(input('post.nav_new_open'));
             $data['nav_sort'] = intval(input('post.nav_sort'));
-            $navigation_validate = ds_validate('navigation');
-            if (!$navigation_validate->scene('add')->check($data)) {
-                $this->error($navigation_validate->getError());
-            }
-
+            
+            $this->validate($data, 'app\common\validate\Navigation.add');
+            
             $navigation_model= model('navigation');
             $result=$navigation_model->addNavigation($data);
             if ($result) {
@@ -77,8 +76,7 @@ class  Navigation extends AdminControl {
         }
         if (!request()->isPost()) {
             $condition = array();
-            $condition[]=array('nav_id','=',$nav_id);
-
+            $condition[] = array('nav_id','=',$nav_id);
             $nav=$navigation_model->getOneNavigation($condition);
             View::assign('nav', $nav);
             return View::fetch('form');
@@ -88,12 +86,11 @@ class  Navigation extends AdminControl {
             $data['nav_url'] = input('post.nav_url');
             $data['nav_new_open'] = intval(input('post.nav_new_open'));
             $data['nav_sort'] = intval(input('post.nav_sort'));
-            $navigation_validate = ds_validate('navigation');
-            if (!$navigation_validate->scene('edit')->check($data)) {
-                $this->error($navigation_validate->getError());
-            }
+            
+            $this->validate($data, 'app\common\validate\Navigation.edit');
+
             $condition = array();
-            $condition[]=array('nav_id','=',$nav_id);
+            $condition[] = array('nav_id','=',$nav_id);
             $result = $navigation_model->eidtNavigation($data,$condition);
             if ($result>=0) {
                 dsLayerOpenSuccess(lang('ds_common_op_succ'));
@@ -110,7 +107,7 @@ class  Navigation extends AdminControl {
         if($nav_id_array === FALSE){
             ds_json_encode('10001', lang('param_error'));
         }
-        $condition = array(array('nav_id','in', $nav_id_array));
+        $condition = array(array('nav_id', 'in', $nav_id_array));
         $result =$navigation_model->delNavigation($condition);
         if ($result) {
             ds_json_encode('10000', lang('ds_common_del_succ'));
@@ -126,13 +123,13 @@ class  Navigation extends AdminControl {
         $menu_array = array(
             array(
                 'name' => 'index',
-                'text' => '管理',
-                'url' => url('Navigation/index')
+                'text' => lang('ds_manage'),
+                'url' => (string)url('Navigation/index')
             ),
             array(
                 'name' => 'add',
-                'text' => '新增',
-                'url' => "javascript:dsLayerOpen('".url('Navigation/add')."','新增导航')"
+                'text' => lang('ds_add'),
+                'url' => "javascript:dsLayerOpen('".(string)url('Navigation/add')."','".lang('ds_add')."')"
             ),
         );
         return $menu_array;

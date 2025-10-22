@@ -2,11 +2,11 @@
 
 namespace app\common\validate;
 
-
 use think\Validate;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -16,25 +16,20 @@ use think\Validate;
  * ============================================================================
  * 验证器
  */
-class  Mallconsult extends Validate
-{
+class Mallconsult extends Validate {
+
     protected $rule = [
-        'mallconsulttype_name'=>'require',
-        'mallconsulttype_sort'=>'require|number',
-        'type_id'=>'require|number',
-        'consult_content'=>'require'
+        'mallconsulttype_id' => 'require|number',
+        'mallconsult_content' => 'require|length:0,255'
     ];
     protected $message = [
-        'mallconsulttype_name.require'=>'请填写咨询类型名称',
-        'mallconsulttype_sort.require'=>'请正确填写咨询类型排序',
-        'mallconsulttype_sort.number'=>'请正确填写咨询类型排序',
-        'type_id.require'=>'请选择咨询类型',
-        'type_id.number'=>'请选择咨询类型',
-        'consult_content.require'=>'请填写咨询内容'
+        'mallconsulttype_id.require' => '请选择咨询类型',
+        'mallconsulttype_id.number' => '请选择咨询类型',
+        'mallconsult_content.require' => '请填写咨询内容',
+        'mallconsult_content.length' => '咨询内容不能大于255个字符',
     ];
     protected $scene = [
-        'type_add' => ['mallconsulttype_name', 'mallconsulttype_sort'],
-        'type_edit' => ['mallconsulttype_name', 'mallconsulttype_sort'],
-        'save_mallconsult' => ['type_id', 'consult_content'],
+        'add' => ['mallconsulttype_id', 'mallconsult_content'],
+        'edit' => ['mallconsult_content'],
     ];
 }

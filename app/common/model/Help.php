@@ -6,7 +6,7 @@ use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -101,7 +101,7 @@ class Help extends BaseModel {
             $upload_list = $this->getHelpPicList($condition);
             if (!empty($upload_list) && is_array($upload_list)) {
                 foreach ($upload_list as $key => $value) {
-                    @unlink(BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR .'admin/storehelp'. DIRECTORY_SEPARATOR . $value['file_name']);
+                    ds_del_pic('admin/storehelp', $value['file_name']);
                 }
             }
             $result = Db::name('upload')->where($condition)->delete();

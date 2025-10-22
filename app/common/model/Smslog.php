@@ -6,7 +6,7 @@ use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -69,6 +69,7 @@ class Smslog extends BaseModel {
         if ($this->getSmsCount($condition) > 3) {
             return array('state' => FALSE, 'code' => 10001, 'message' => '相同的短信内容，一天不能发送3次！');
         }
+
         //通过手机号获取现绑定的客户信息
         if (empty($member_id) || empty($member_name)) {
             //通过手机号查询用户名
@@ -80,7 +81,6 @@ class Smslog extends BaseModel {
         if (!$if_queue) {
             $sms = new \sendmsg\Sms();
             $send_result = $sms->send($smslog_phone, $smslog_param);
-
             if ($send_result['code'] == true) {
                 $smslog_state = 1;
             } else {
@@ -183,7 +183,6 @@ class Smslog extends BaseModel {
     public function delSmsLog($condition) {
         return Db::name('smslog')->where($condition)->delete();
     }
-
 }
 
 ?>

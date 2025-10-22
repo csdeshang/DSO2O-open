@@ -1,11 +1,12 @@
 <?php
 
 namespace app\common\model;
+
 use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,8 +16,8 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Mailcron extends BaseModel
-{
+class Mailcron extends BaseModel {
+
     /**
      * 新增商家消息任务计划
      * @access public
@@ -26,7 +27,7 @@ class  Mailcron extends BaseModel
     public function addMailCron($insert) {
         return Db::name('mailcron')->insertGetId($insert);
     }
- 
+
     /**
      * 查看商家消息任务计划
      * @access public

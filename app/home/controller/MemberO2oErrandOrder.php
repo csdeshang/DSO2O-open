@@ -235,10 +235,7 @@ class MemberO2oErrandOrder extends BaseMember {
             'o2o_errand_order_check_receive' => input('param.o2o_errand_order_check_receive') ? 1 : 0,
         );
 
-        $o2o_errand_order_validate = ds_validate('o2o_errand_order');
-        if (!$o2o_errand_order_validate->scene('o2o_errand_order_add')->check($data)) {
-            ds_json_encode(10001, $o2o_errand_order_validate->getError());
-        }
+        $this->validate($data, 'app\common\validate\O2oErrandOrder.o2o_errand_order_add');
 
 
         $order_id = $o2o_errand_order_model->addO2oErrandOrder($data);

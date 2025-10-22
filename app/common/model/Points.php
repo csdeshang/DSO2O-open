@@ -1,15 +1,12 @@
 <?php
 
-/**
- * 积分
- */
-
 namespace app\common\model;
 
 use think\facade\Db;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -19,7 +16,7 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Points extends BaseModel {
+class Points extends BaseModel {
 
     public $page_info;
 
@@ -71,10 +68,11 @@ class  Points extends BaseModel {
                 //订单添加赠送积分列
                 $obj_order = model('order');
                 $data = array();
-                $data['order_pointscount'] = Db::raw('order_pointscount+'.$insertarr['pl_points']);
+                $data['order_pointscount'] = Db::raw('order_pointscount+' . $insertarr['pl_points']);
                 $obj_order->editOrdercommon($data, array('order_id' => $insertarr['order_id']));
                 break;
             case 'system':
+            case 'gift':
                 break;
             case 'pointorder':
                 if (!isset($insertarr['pl_desc'])) {
@@ -103,7 +101,7 @@ class  Points extends BaseModel {
                 }
                 break;
             case 'marketmanage':
-                break; 
+                break;
             case 'other':
                 break;
         }
@@ -111,8 +109,8 @@ class  Points extends BaseModel {
         if ($if_repeat == false) {
             //检测是否有相关信息存在，如果没有，入库
             $condition = array();
-            $condition[] = array('pl_memberid','=',$insertarr['pl_memberid']);
-            $condition[] = array('pl_stage','=',$stage);
+            $condition[] = array('pl_memberid', '=', $insertarr['pl_memberid']);
+            $condition[] = array('pl_stage', '=', $stage);
             $log_array = self::getPointsInfo($condition);
             if (!empty($log_array)) {
                 $save_sign = false;
@@ -143,8 +141,8 @@ class  Points extends BaseModel {
             //更新member内容
             $obj_member = model('member');
             $upmember_array = array();
-            $upmember_array['member_points'] = Db::raw('member_points+'.$insertarr['pl_points']);
-            $obj_member->editMember(array('member_id' => $insertarr['pl_memberid']), $upmember_array,$insertarr['pl_memberid']);
+            $upmember_array['member_points'] = Db::raw('member_points+' . $insertarr['pl_points']);
+            $obj_member->editMember(array('member_id' => $insertarr['pl_memberid']), $upmember_array, $insertarr['pl_memberid']);
             return true;
         } else {
             return false;
@@ -175,9 +173,9 @@ class  Points extends BaseModel {
      * @param type $field
      * @return type
      */
-    public function getPointslogList($condition, $pagesize = '', $field = '*',$limit = 0,$order='pl_addtime desc') {
+    public function getPointslogList($condition, $pagesize = '', $field = '*', $limit = 0, $order = 'pl_addtime desc') {
         if ($pagesize) {
-            $result = Db::name('pointslog')->where($condition)->field($field)->order($order)->paginate(['list_rows'=>$pagesize,'query' => request()->param()],false);
+            $result = Db::name('pointslog')->where($condition)->field($field)->order($order)->paginate(['list_rows' => $pagesize, 'query' => request()->param()], false);
             $this->page_info = $result;
             return $result->items();
         } else {
@@ -197,12 +195,11 @@ class  Points extends BaseModel {
         //得到条件语句
         return Db::name('pointslog')->field($field)->where($condition)->find();
     }
-    
+
     /**
      * 
      */
     public function getPointsCount($condition) {
         return Db::name('pointslog')->where($condition)->count();
     }
-
 }

@@ -152,15 +152,7 @@ class  Pointprod extends BasePointShop {
         View::assign('prodinfo', $prodinfo);
 
         //更新礼品浏览次数
-        $tm_tm_visite_pgoods = cookie('tm_visite_pgoods');
-        $tm_tm_visite_pgoods = $tm_tm_visite_pgoods ? explode(',', $tm_tm_visite_pgoods) : array();
-        if (!in_array($pid, $tm_tm_visite_pgoods)) {//如果已经浏览过该商品则不重复累计浏览次数
-            $result = $pointprod_model->editPointProdViewnum($pid);
-            if ($result['state'] == true) {//累加成功则cookie中增加该商品ID
-                $tm_tm_visite_pgoods[] = $pid;
-                cookie('tm_visite_pgoods', implode(',', $tm_tm_visite_pgoods));
-            }
-        }
+        $pointprod_model->editPointProdViewnum($pid);
 
         //查询兑换信息
         $pointorder_model = model('pointorder');

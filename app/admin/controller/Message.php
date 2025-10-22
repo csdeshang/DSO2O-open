@@ -184,19 +184,14 @@ class  Message extends AdminControl {
             $this->setAdminCurItem('email_tpl_edit');
             return View::fetch('email_tpl_edit');
         } else {
-            $data = array(
-                'code' => input('post.code'),
-                'title' => input('post.title'),
-                'content' => input('post.content'),
-            );
-            $mailtemplatese_validate = ds_validate('mailtemplates');
-            if (!$mailtemplatese_validate->scene('email_tpl_edit')->check($data)) {
-                $this->error($mailtemplatese_validate->getError());
-            } else {
+            
                 $update_array = array();
                 $update_array['mailmt_code'] = input('post.code');
                 $update_array['mailmt_title'] = input('post.title');
                 $update_array['mailmt_content'] = input('post.content');
+                
+                $this->validate($update_array, 'app\common\validate\Mailtemplates.email_tpl_edit');
+                
                 $result = $mailtemplates_model->editTpl($update_array, array('mailmt_code' => input('post.code')));
                 if ($result>=0) {
                     $this->log(lang('ds_edit') . lang('email_tpl'), 1);
@@ -205,7 +200,6 @@ class  Message extends AdminControl {
                     $this->log(lang('ds_edit') . lang('email_tpl'), 0);
                     $this->error(lang('mailtemplates_edit_fail'));
                 }
-            }
         }
     }
 

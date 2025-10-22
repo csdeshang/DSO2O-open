@@ -3,9 +3,10 @@
 namespace app\admin\controller;
 use think\facade\View;
 use think\facade\Lang;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能 账号登录
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,36 +16,14 @@ use think\facade\Lang;
  * ============================================================================
  * 控制器
  */
-class  Account extends AdminControl {
+class Account extends AdminControl {
 
     public function initialize() {
         parent::initialize();
         Lang::load(base_path() . 'admin/lang/'.config('lang.default_lang').'/account.lang.php');
         Lang::load(base_path() . 'admin/lang/'.config('lang.default_lang').'/config.lang.php');
     }
-    /**
-     * 设置
-     */
-    public function setting() {
-        $config_model = model('config');
-        if (!request()->isPost()) {
-            $list_config = rkcache('config', true);
-            View::assign('list_config', $list_config);
-            /* 设置卖家当前栏目 */
-            $this->setAdminCurItem('setting');
-            return View::fetch();
-        } else {
-            $update_array=array();
-            $update_array['auto_register'] = input('post.auto_register');
-            $result = $config_model->editConfig($update_array);
-            if ($result) {
-                $this->log(lang('ds_edit').lang('ds_account'),1);
-                $this->success(lang('ds_common_save_succ'));
-            }else{
-                $this->log(lang('ds_edit').lang('ds_account'),0);
-            }
-        }
-    }
+
     
     /**
      * QQ互联
@@ -63,11 +42,6 @@ class  Account extends AdminControl {
             $update_array['qq_isuse'] = input('post.qq_isuse');
             $update_array['qq_appid'] = input('post.qq_appid');
             $update_array['qq_appkey'] = input('post.qq_appkey');
-
-            $account_validate = ds_validate('account');
-            if (!$account_validate->scene('qq')->check($update_array)){
-                $this->error($account_validate->getError());
-            }
 
             $result = $config_model->editConfig($update_array);
             if ($result === true) {
@@ -97,11 +71,6 @@ class  Account extends AdminControl {
             $update_array['sina_isuse'] = input('post.sina_isuse');
             $update_array['sina_wb_akey'] = input('post.sina_wb_akey');
             $update_array['sina_wb_skey'] = input('post.sina_wb_skey');
-            //定义验证规则
-            $account_validate = ds_validate('account');
-            if (!$account_validate->scene('sina')->check($update_array)){
-                $this->error($account_validate->getError());
-            }
 
             $result = $config_model->editConfig($update_array);
             if ($result === true) {
@@ -127,14 +96,22 @@ class  Account extends AdminControl {
             return View::fetch('wx');
         } else {
             $update_array = array();
-            $update_array['weixin_isuse'] = input('post.weixin_isuse');
-            $update_array['weixin_appid'] = input('post.weixin_appid');
-            $update_array['weixin_secret'] = input('post.weixin_secret');
-            //定义验证规则
-            $account_validate = ds_validate('account');
-            if (!$account_validate->scene('wx')->check($update_array)){
-                $this->error($account_validate->getError());
-            }
+            $update_array['weixin_pc_isuse'] = input('post.weixin_pc_isuse');
+            $update_array['weixin_pc_appid'] = input('post.weixin_pc_appid');
+            $update_array['weixin_pc_secret'] = input('post.weixin_pc_secret');
+            
+            $update_array['weixin_h5_isuse'] = input('post.weixin_h5_isuse');
+            $update_array['weixin_h5_appid'] = input('post.weixin_h5_appid');
+            $update_array['weixin_h5_secret'] = input('post.weixin_h5_secret');
+            
+            $update_array['weixin_xcx_isuse'] = input('post.weixin_xcx_isuse');
+            $update_array['weixin_xcx_appid'] = input('post.weixin_xcx_appid');
+            $update_array['weixin_xcx_secret'] = input('post.weixin_xcx_secret');
+            
+            $update_array['weixin_app_isuse'] = input('post.weixin_app_isuse');
+            $update_array['weixin_app_appid'] = input('post.weixin_app_appid');
+            $update_array['weixin_app_secret'] = input('post.weixin_app_secret');
+            
             $result = $config_model->editConfig($update_array);
             if ($result) {
                 $this->log(lang('account_synchronous_login'));
@@ -151,24 +128,19 @@ class  Account extends AdminControl {
     protected function getAdminItemList() {
         $menu_array = array(
             array(
-                'name' => 'setting',
-                'text' => lang('account_setting'),
-                'url' => url('Account/setting')
-            ),
-            array(
                 'name' => 'qq',
                 'text' => lang('qq_interconnection'),
-                'url' => url('Account/qq')
+                'url' => (string)url('Account/qq')
             ),
             array(
                 'name' => 'sina',
                 'text' => lang('sina_interconnection'),
-                'url' => url('Account/sina')
+                'url' => (string)url('Account/sina')
             ),
             array(
                 'name' => 'wx',
                 'text' => lang('wx_login'),
-                'url' => url('Account/wx')
+                'url' => (string)url('Account/wx')
             ),
         );
         return $menu_array;

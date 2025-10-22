@@ -1,11 +1,13 @@
 <?php
+
 namespace app\admin\controller;
 use think\facade\View;
 use think\facade\Db;
 use think\facade\Lang;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能 类型管理
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -13,9 +15,9 @@ use think\facade\Lang;
  * 这不是一个自由软件！您只能在不用于商业目的的前提下对程序代码进行修改和使用 .
  * 不允许对程序代码以任何形式任何目的的再发布。
  * ============================================================================
- * 类型管理控制器
+ * 控制器
  */
-class  Type extends AdminControl {
+class Type extends AdminControl {
 
     public function initialize() {
         parent::initialize();
@@ -49,16 +51,15 @@ class  Type extends AdminControl {
             $this->setAdminCurItem('type_add');
             return View::fetch('type_form');
         } else {
+
+
             $data = array(
                 'type_name' => input('post.type_name'),
                 'type_sort' => input('post.type_sort'),
                 'class_id' => input('post.class_id'),
                 'class_name' => input('post.class_name'),
             );
-            $type_validate = ds_validate('type');
-            if (!$type_validate->scene('type_add')->check($data)) {
-                $this->error($type_validate->getError());
-            }
+            $this->validate($data, 'app\common\validate\Type.type_add');
 
             //添加类型
             $type_model = model('type');
@@ -164,10 +165,7 @@ class  Type extends AdminControl {
                 'class_id' => input('post.class_id'),
                 'class_name' => input('post.class_name'),
             );
-            $type_validate = ds_validate('type');
-            if (!$type_validate->scene('type_edit')->check($data)) {
-                $this->error($type_validate->getError());
-            }
+            $this->validate($data, 'app\common\validate\Type.type_edit');
 
             //更新前删除对应类型与品牌关联
             $type_model->delTypebrand(array('type_id' => $type_id));
@@ -244,7 +242,7 @@ class  Type extends AdminControl {
                                 }
                                 $return = model('attribute')->addAttributeValueAll($attr_array);
                                 if (!$return) {
-                                    $this->error("添加属性值失败");
+                                    $this->error(lang('ds_common_op_fail'));
                                 }
                             }
                         }
@@ -290,10 +288,7 @@ class  Type extends AdminControl {
                 'attr_show' => intval(input('post.attr_show')),
                 'attr_sort' => input('post.attr_sort'),
             );
-            $type_validate = ds_validate('type');
-            if (!$type_validate->scene('attr_edit')->check($data)) {
-                $this->error($type_validate->getError());
-            }
+            $this->validate($data, 'app\common\validate\Type.attr_edit');
 
             //更新属性值表
             $attr_value = input('post.attr_value/a');
@@ -359,9 +354,9 @@ class  Type extends AdminControl {
         //删除类型
         $result = $type_model->delType($condition);
         if ($result) {
-            ds_json_encode(10000, '删除经营类目成功');
+            ds_json_encode(10000, lang('ds_common_op_succ'));
         } else {
-            ds_json_encode(10001, lang('error'));
+            ds_json_encode(10001, lang('ds_common_op_fail'));
         }
     }
 
@@ -372,22 +367,22 @@ class  Type extends AdminControl {
         $menu_array = array(
             array(
                 'name' => 'index',
-                'text' => '管理',
-                'url' => url('Type/index')
+                'text' => lang('ds_type'),
+                'url' => (string)url('Type/index')
             ),
         );
 
         if (request()->action() == 'type_add' || request()->action() == 'index') {
             $menu_array[] = array(
                 'name' => 'type_add',
-                'text' => '新增类型',
-                'url' => url('Type/type_add')
+                'text' => lang('ds_new').lang('type_index_type_name'),
+                'url' => (string)url('Type/type_add')
             );
         }
         if (request()->action() == 'type_edit') {
             $menu_array[] = array(
                 'name' => 'type_edit',
-                'text' => '编辑类型',
+                'text' => lang('ds_edit').lang('type_index_type_name'),
                 'url' => ''
             );
         }

@@ -6,7 +6,7 @@ use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -46,12 +46,12 @@ class Inform extends BaseModel {
      * 更新
      * @access public
      * @author csdeshang
-     * @param array $update_array 更新数据
+     * @param array $data 更新数据
      * @param array $where_array 更新条件
      * @return bool
      */
-    public function editInform($update_array, $where_array) {
-        return Db::name('inform')->where($where_array)->update($update_array);
+    public function editInform($data, $where_array) {
+        return Db::name('inform')->where($where_array)->update($data);
     }
 
     /**

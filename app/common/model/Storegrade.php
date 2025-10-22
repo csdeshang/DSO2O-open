@@ -1,11 +1,12 @@
 <?php
 
 namespace app\common\model;
+
 use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,9 +16,8 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Storegrade extends BaseModel {
+class Storegrade extends BaseModel {
 
- 
     /**
      * 列表
      * @access public
@@ -26,11 +26,10 @@ class  Storegrade extends BaseModel {
      * @param type $order 排序
      * @return type
      */
-    public function getStoregradeList($condition = array(),$order = 'storegrade_sort asc') {
+    public function getStoregradeList($condition = array(), $order = 'storegrade_sort asc') {
         $result = Db::name('storegrade')->where($condition)->order($order)->select()->toArray();
         return $result;
     }
-
 
     /**
      * 取单个内容
@@ -39,13 +38,11 @@ class  Storegrade extends BaseModel {
      * @param int $id 分类ID
      * @return array 数组类型的返回结果
      */
-    public function getOneStoregrade($id) {
-        if (intval($id) > 0) {
-            $result  = Db::name('storegrade')->where('storegrade_id',$id)->find();
-            return $result;
-        } else {
-            return false;
-        }
+    public function getOneStoregrade($storegrade_id) {
+        $condition = array();
+        $condition[] = array('storegrade_id', '=', $storegrade_id);
+        $result = Db::name('storegrade')->where($condition)->find();
+        return $result;
     }
 
     /**
@@ -56,9 +53,6 @@ class  Storegrade extends BaseModel {
      * @return bool 布尔类型的返回结果
      */
     public function addStoregrade($data) {
-        if (empty($data)) {
-            return false;
-        }
         $result = Db::name('storegrade')->insertGetId($data);
         return $result;
     }
@@ -70,11 +64,10 @@ class  Storegrade extends BaseModel {
      * @param array $data 更新数据
      * @return bool 布尔类型的返回结果
      */
-    public function editStoregrade($storegrade_id,$data) {
-        if (empty($data)) {
-            return false;
-        }
-        $result = Db::name('storegrade')->where('storegrade_id',$storegrade_id)->update($data);
+    public function editStoregrade($storegrade_id, $data) {
+        $condition = array();
+        $condition[] = array('storegrade_id', '=', $storegrade_id);
+        $result = Db::name('storegrade')->where($condition)->update($data);
         return $result;
     }
 
@@ -86,15 +79,11 @@ class  Storegrade extends BaseModel {
      * @return bool 布尔类型的返回结果
      */
     public function delStoregrade($storegrade_id) {
-        $storegrade_id = intval($storegrade_id);
-        if ($storegrade_id > 0) {
-            $result = Db::name('storegrade')->where('storegrade_id',  $storegrade_id)->delete();
-            return $result;
-        } else {
-            return false;
-        }
+        $condition = array();
+        $condition[] = array('storegrade_id', '=', $storegrade_id);
+        $result = Db::name('storegrade')->where($condition)->delete();
+        return $result;
     }
-
 }
 
 ?>

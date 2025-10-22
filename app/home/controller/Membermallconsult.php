@@ -88,30 +88,15 @@ class  Membermallconsult extends BaseMember {
             ds_json_encode(10001,lang('param_error'));
         }
 
-        //验证表单信息
-        $data = [
-            'type_id' => input('post.type_id'),
-            'consult_content' => input('post.consult_content')
-        ];
+        $data = array();
+        $data['mallconsulttype_id'] = input('post.type_id');
+        $data['member_id'] = session('member_id');
+        $data['member_name'] = session('member_name');
+        $data['mallconsult_content'] = input('post.consult_content');
 
-        $mallconsult_validate = ds_validate('mallconsult');
-        if (!$mallconsult_validate->scene('save_mallconsult')->check($data)) {
-            ds_json_encode(10001,$mallconsult_validate->getError());
-        }
+        $this->validate($data, 'app\common\validate\Mallconsult.add');
 
-        $insert = array();
-        $insert['mallconsulttype_id'] = input('post.type_id');
-        $insert['member_id'] = session('member_id');
-        $insert['member_name'] = session('member_name');
-        $insert['mallconsult_content'] = input('post.consult_content');
-
-        $res=word_filter($insert['mallconsult_content']);
-        if(!$res['code']){
-            ds_json_encode(10001,$res['msg']);
-        }
-        $insert['mallconsult_content']=$res['data']['text'];
-
-        $result = model('mallconsult')->addMallconsult($insert);
+        $result = model('mallconsult')->addMallconsult($data);
         if ($result) {
             ds_json_encode(10000,lang('ds_common_op_succ'));
         } else {

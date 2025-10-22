@@ -1,11 +1,12 @@
 <?php
 
 namespace app\common\model;
+
 use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,7 +16,7 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Upload extends BaseModel {
+class Upload extends BaseModel {
 
     public function getUploadList($condition, $field = '*') {
         $result = Db::name('upload')->field($field)->order('upload_id asc')->where($condition)->select()->toArray();
@@ -60,7 +61,6 @@ class  Upload extends BaseModel {
         return $result;
     }
 
-
     /**
      * 删除分类
      * @access public
@@ -71,7 +71,4 @@ class  Upload extends BaseModel {
     public function delUpload($condition) {
         return Db::name('upload')->where($condition)->delete();
     }
-
-
-
 }

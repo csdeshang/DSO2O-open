@@ -64,7 +64,7 @@
             <td class="w12">&nbsp;</td>
             <td>{$v.store_name}</td>
             <td class="nowrap align-center">{notempty name="$v.storedepositlog_add_time"}{$v.storedepositlog_add_time|date='Y-m-d H:i:s'}{/notempty}</td>
-            <td class="align-center">{if $v.storedepositlog_state == '2' || $v.storedepositlog_state == '3' || $v.storedepositlog_state == '4'}{$v.store_freeze_deposit}{else}{$v.store_payable_deposit}{/if}</td>
+            <td class="align-center">{if $v.storedepositlog_state == '2' || $v.storedepositlog_state == '3' || $v.storedepositlog_state == '4'}{$v.storedepositlog_freeze_deposit}{else}{$v.storedepositlog_payable_deposit}{/if}</td>
             <td class="align-center">{$v.storedepositlog_desc}</td>
             <td class="align-center">{if $v.storedepositlog_state==2}{$Think.lang.admin_storedeposit_wait}{elseif $v.storedepositlog_state==3}{$Think.lang.admin_storedeposit_agree}{elseif $v.storedepositlog_state==4}{$Think.lang.admin_storedeposit_reject}{elseif $v.storedepositlog_state==5}{$Think.lang.admin_storedeposit_payed}{elseif $v.storedepositlog_state==6}{$Think.lang.admin_storedeposit_cancel}{elseif $v.storedepositlog_state==7}{$Think.lang.admin_storedeposit_paying}{/if}</td>
             <td class="w90 align-center">

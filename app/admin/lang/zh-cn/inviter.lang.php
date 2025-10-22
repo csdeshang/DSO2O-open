@@ -1,4 +1,11 @@
 <?php
+
+$lang['inviter_setting'] = '分销设置';
+$lang['inviter_goods'] = '分销商品';
+$lang['inviter_member'] = '分销员管理';
+$lang['inviter_memberclass'] = '分销员等级';
+$lang['inviter_order'] = '分销员订单';
+
 /* 分销设置 */
 $lang['yuan']                                = '元';
 $lang['inviter_back']			= '分销背景图片';

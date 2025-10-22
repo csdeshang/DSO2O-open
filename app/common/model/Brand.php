@@ -3,9 +3,10 @@
 namespace app\common\model;
 use think\facade\Db;
 
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * DSMall多用户商城
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,7 +16,7 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Brand extends BaseModel {
+class Brand extends BaseModel {
     
 public $page_info;
     /**
@@ -37,8 +38,8 @@ public $page_info;
      * @param array $update 更新数据
      * @return boolean
      */
-    public function editBrand($condition, $update) {
-        return Db::name('brand')->where($condition)->update($update);
+    public function editBrand($condition, $data) {
+        return Db::name('brand')->where($condition)->update($data);
     }
     
     /**
@@ -53,7 +54,7 @@ public $page_info;
         $brandid_array = array();
         foreach ($brand_array as $value) {
             $brandid_array[] = $value['brand_id'];
-            @unlink(BASE_UPLOAD_PATH.DIRECTORY_SEPARATOR.ATTACH_BRAND.DIRECTORY_SEPARATOR.$value['brand_pic']);
+            ds_del_pic(ATTACH_BRAND,$value['brand_pic']);
         }
         return Db::name('brand')->where(array(array('brand_id','in', $brandid_array)))->delete();
     }
@@ -100,7 +101,7 @@ public $page_info;
      * @return array
      */
     public function getBrandPassedList($condition, $field = '*', $pagesize = 0, $order = 'brand_sort asc, brand_id desc') {
-        $condition[]=array('brand_apply','=',1);
+        $condition[] = array('brand_apply','=',1);
         return $this->getBrandList($condition, $field, $pagesize, $order);
     }
     
@@ -114,7 +115,7 @@ public $page_info;
      * @return array
      */
     public function getBrandNoPassedList($condition, $field = '*', $pagesize = 0) {
-        $condition[]=array('brand_apply','=',0);
+        $condition[] = array('brand_apply','=',0);
         return $this->getBrandList($condition, $field, $pagesize);
     }
     

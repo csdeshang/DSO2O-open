@@ -40,10 +40,7 @@ class  O2oErrandClass extends AdminControl {
             return View::fetch('form');
         } else {
             $data = $this->post_data();
-            $o2o_errand_class_validate = ds_validate('o2o_errand_class');
-            if (!$o2o_errand_class_validate->scene('o2o_errand_class_replace')->check($data)) {
-                $this->error($o2o_errand_class_validate->getError());
-            }
+            $this->validate($data, 'app\common\validate\O2oErrandClass.o2o_errand_class_replace');
 
             $o2o_errand_class_model= model('o2o_errand_class');
             $result=$o2o_errand_class_model->addO2oErrandClass($data);
@@ -72,17 +69,14 @@ class  O2oErrandClass extends AdminControl {
             return View::fetch('form');
         } else {
             $data = $this->post_data();
-            $o2o_errand_class_validate = ds_validate('o2o_errand_class');
-            if (!$o2o_errand_class_validate->scene('o2o_errand_class_replace')->check($data)) {
-                $this->error($o2o_errand_class_validate->getError());
-            }
+            $this->validate($data, 'app\common\validate\O2oErrandClass.o2o_errand_class_replace');
 
             $o2o_errand_class_model= model('o2o_errand_class');
             $condition=array();
             $condition[]=array('o2o_errand_class_id','=',$o2o_errand_class_id);
             
             if (isset($data['o2o_errand_class_logo']) && $o2o_errand_class['o2o_errand_class_logo']) {
-                @unlink(BASE_UPLOAD_PATH . '/' . ATTACH_O2O_ERRAND_CLASS . '/' . $o2o_errand_class['o2o_errand_class_logo']);
+                ds_del_pic(ATTACH_O2O_ERRAND_CLASS,$o2o_errand_class['o2o_errand_class_logo']);
             }
             $result=$o2o_errand_class_model->editO2oErrandClass($data, $condition);
             if ($result>=0) {

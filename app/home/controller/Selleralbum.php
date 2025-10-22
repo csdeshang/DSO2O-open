@@ -126,11 +126,8 @@ class  Selleralbum extends BaseSeller {
             $param['aclass_des'] = input('post.description');
             $param['aclass_sort'] = input('post.sort');
             $param['aclass_uploadtime'] = TIMESTAMP;
-
-            $selleralbum_validate = ds_validate('selleralbum');
-            if (!$selleralbum_validate->scene('album_add_save')->check($param)){
-                ds_json_encode(10001,$selleralbum_validate->getError());
-            }
+            
+            $this->validate($param, 'app\common\validate\Albumclass.add');
 
             $return = $album_model->addAlbumclass($param);
             if ($return) {
@@ -174,10 +171,7 @@ class  Selleralbum extends BaseSeller {
         $param['aclass_des'] = input('post.description');
         $param['aclass_sort'] = input('post.sort');
 
-        $selleralbum_validate = ds_validate('selleralbum');
-        if (!$selleralbum_validate->scene('album_edit_save')->check($param)){
-            ds_json_encode(10001,$selleralbum_validate->getError());
-        }
+        $this->validate($param, 'app\common\validate\Albumclass.edit');
 
         /**
          * 实例化相册模型
@@ -542,14 +536,13 @@ class  Selleralbum extends BaseSeller {
         $store_id = session('store_id');
         $upload_path = ATTACH_GOODS . '/' . $store_id . '/' .date('Ymd',$apic_info['apic_uploadtime']);
         $result=upload_albumpic($upload_path,$file,$pic_name);
-        if($result['code'] == '10000'){
-            $img_path=$result['result'];
-            list($width, $height, $type, $attr) = getimagesize($img_path);
-            $img_path=substr(strrchr($img_path, "/"), 1);
+        if($result['code']){
+            $img_path=$result['data']['file_name'];
+            list($width, $height, $type, $attr) = getimagesize($_FILES[$file]['tmp_name']);
         }else{
             $data['state'] = 'false';
             $data['origin_file_name'] = $_FILES[$file]['name'];
-            $data['message'] = $result['message'];
+            $data['message'] = $result['msg'];
             echo json_encode($data);exit;
         }
 
@@ -695,7 +688,6 @@ class  Selleralbum extends BaseSeller {
             $param['swm_text_color'] = input('post.swm_text_color');
             $param['swm_quality'] = intval(input('post.swm_quality'));
 
-            $upload_file = BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . ATTACH_WATERMARK;
             if (!empty($_FILES['image']['name'])) {
                 if (!empty($_FILES['image']['name'])) {
                     $res = ds_upload_pic(ATTACH_WATERMARK, 'image');
@@ -704,7 +696,7 @@ class  Selleralbum extends BaseSeller {
                         $param['swm_image_name'] = $file_name;
                         //删除旧水印
                         if (!empty($store_wm_info['swm_image_name'])) {
-                            @unlink($upload_file . DIRECTORY_SEPARATOR . $store_wm_info['swm_image_name']);
+                            ds_del_pic(ATTACH_WATERMARK,$store_wm_info['swm_image_name']);
                         }
                     } else {
                         $this->error($res['msg']);
@@ -714,7 +706,7 @@ class  Selleralbum extends BaseSeller {
                  //删除水印
                 if (!empty($store_wm_info['swm_image_name'])) {
                     $param['swm_image_name'] = '';
-                    @unlink($upload_file . DIRECTORY_SEPARATOR . $store_wm_info['swm_image_name']);
+                    ds_del_pic(ATTACH_WATERMARK,$store_wm_info['swm_image_name']);
                 }
             }
             $result = $storewatermark_model->editStorewatermark($store_wm_info['swm_id'], $param);
@@ -770,12 +762,11 @@ class  Selleralbum extends BaseSeller {
         $save_name = session('store_id') . '_' . date('YmdHis',$time) . ($index?(10000+$index):(rand(20000, 99999)));
         $name ='file';
         $result=upload_albumpic($upload_path,$name,$save_name);
-        if($result['code'] == '10000'){
-            $img_path=$result['result'];
-            list($width, $height, $type, $attr) = getimagesize($img_path);
-            $pic=substr(strrchr($img_path, "/"), 1);
+        if($result['code']){
+            $pic=$result['data']['file_name'];
+            list($width, $height, $type, $attr) = getimagesize($_FILES['file']['tmp_name']);
         }else{
-            exit($result['message']);
+            exit($result['msg']);
         }
         $insert_array = array();
         $insert_array['apic_name'] = $pic;

@@ -135,6 +135,30 @@ $lang['admin_predeposit_log_stage_system']		= '系统';
 $lang['admin_predeposit_log_stage_income']	= '收入';
 $lang['admin_predeposit_log_desc']		= '描述';
 
+$lang['payment_time_required'] = '请填写付款时间';
+$lang['payment_code_required'] = '请选择付款方式';
+$lang['trade_no_required'] = '请填写第三方支付平台交易号';
+
+$lang['now_available_predeposit'] = '当前预存款数为';
+$lang['now_freeze_predeposit'] = '当前预存款冻结金额数为';
+$lang['operatetype_1'] = '增加';
+$lang['operatetype_2'] = '减少';
+$lang['operatetype_3'] = '冻结';
+$lang['operatetype_4'] = '解冻';
+
+$lang['lg_desc'] = '描述信息';
+$lang['amount_required'] = '金额不能为空';
+$lang['amount_number'] = '请输入数字';
+$lang['amount_min'] = '请输入大于0的数';
+
+$lang['user_not_exist'] = '用户不存在';
+$lang['avaliable_predeposit_not_enough'] = '预存款不足，会员当前预存款';
+$lang['freezen_predeposit_not_enough'] = '可冻结预存款不足，会员当前预存款';
+$lang['recover_freezen_predeposit_not_enough'] = '可恢复冻结预存款不足，会员当前冻结预存款';
+$lang['pdrecharge_list'] = '充值明细';
+$lang['pdlog_list'] = '预存款明细';
+$lang['pd_add'] = '预存款调节';
+
 
 $lang['pay_method_text']['bank']		= '银行';
 $lang['pay_method_text']['alipay']		= '支付宝';

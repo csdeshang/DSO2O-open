@@ -5,10 +5,12 @@
  */
 
 namespace app\home\controller;
+
 use think\facade\View;
 use think\facade\Db;
 use think\facade\Lang;
 use app\common\model\Storemoneylog;
+
 /**
  * ============================================================================
  * DSO2O多用户商城
@@ -21,7 +23,7 @@ use app\common\model\Storemoneylog;
  * ============================================================================
  * 控制器
  */
-class  Sellermoney extends BaseSeller {
+class Sellermoney extends BaseSeller {
 
     public function initialize() {
         parent::initialize();
@@ -32,8 +34,7 @@ class  Sellermoney extends BaseSeller {
      * 预存款变更日志
      */
     public function index() {
-        $condition = array(array('store_id' ,'=', session('store_id')));
-
+        $condition = array(array('store_id', '=', session('store_id')));
 
         $query_start_date = input('param.query_start_date');
         $query_end_date = input('param.query_end_date');
@@ -50,7 +51,7 @@ class  Sellermoney extends BaseSeller {
 
         $storemoneylog_desc = input('param.storemoneylog_desc');
         if ($storemoneylog_desc) {
-            $condition[]=array('storemoneylog_desc','like', '%' . $storemoneylog_desc . '%');
+            $condition[] = array('storemoneylog_desc', 'like', '%' . $storemoneylog_desc . '%');
         }
         $storemoneylog_model = model('storemoneylog');
         $list_log = $storemoneylog_model->getStoremoneylogList($condition, 10, '*', 'storemoneylog_id desc');
@@ -71,28 +72,23 @@ class  Sellermoney extends BaseSeller {
     public function withdraw_add() {
         $store_info = Db::name('store')->where(array('store_id' => session('store_id')))->field('store_avaliable_money,store_freeze_money')->find();
         if (request()->isPost()) {
-            $data=[
-                'pdc_amount'=>floatval(input('post.pdc_amount')),
-            ];
-            $sellermoney_validate = ds_validate('sellermoney');
-            if (!$sellermoney_validate->scene('withdraw_add')->check($data)) {
-                ds_json_encode(10001,$sellermoney_validate->getError());
-            }
+            $pdc_amount = floatval(input('post.pdc_amount'));
             
-            $pdc_amount = $data['pdc_amount'];
+            $this->validate(array('pdc_amount'=>$pdc_amount), 'app\common\validate\Singlefield.pdc_amount');
+            
             $storemoneylog_model = model('storemoneylog');
             //是否超过提现周期
-            $last_withdraw=$storemoneylog_model->getStoremoneylogInfo(array(array('store_id','=',$this->store_info['store_id']),array('storemoneylog_state','in',[Storemoneylog::STATE_WAIT,Storemoneylog::STATE_AGREE]),array('storemoneylog_type','=',Storemoneylog::TYPE_WITHDRAW),array('storemoneylog_add_time','>',TIMESTAMP-intval(config('ds_config.store_withdraw_cycle'))*86400)),'storemoneylog_add_time');
-            if($last_withdraw){
-                ds_json_encode(10001,lang('sellermoney_last_withdraw_time_error').date('Y-m-d',$last_withdraw['storemoneylog_add_time']));
+            $last_withdraw = $storemoneylog_model->getStoremoneylogInfo(array(array('store_id', '=', $this->store_info['store_id']), array('storemoneylog_state', 'in', [Storemoneylog::STATE_WAIT, Storemoneylog::STATE_AGREE]), array('storemoneylog_type', '=', Storemoneylog::TYPE_WITHDRAW), array('storemoneylog_add_time', '>', TIMESTAMP - intval(config('ds_config.store_withdraw_cycle')) * 86400)), 'storemoneylog_add_time');
+            if ($last_withdraw) {
+                ds_json_encode(10001, lang('sellermoney_last_withdraw_time_error') . date('Y-m-d', $last_withdraw['storemoneylog_add_time']));
             }
             //是否不小于最低提现金额
-            if($pdc_amount<floatval(config('ds_config.store_withdraw_min'))){
-                ds_json_encode(10001,lang('sellermoney_withdraw_min').config('ds_config.store_withdraw_min').lang('currency_zh'));
+            if ($pdc_amount < floatval(config('ds_config.store_withdraw_min'))) {
+                ds_json_encode(10001, lang('sellermoney_withdraw_min') . config('ds_config.store_withdraw_min') . lang('currency_zh'));
             }
             //是否不超过最高提现金额
-            if($pdc_amount>floatval(config('ds_config.store_withdraw_max'))){
-                ds_json_encode(10001,lang('sellermoney_withdraw_max').config('ds_config.store_withdraw_max').lang('currency_zh'));
+            if ($pdc_amount > floatval(config('ds_config.store_withdraw_max'))) {
+                ds_json_encode(10001, lang('sellermoney_withdraw_max') . config('ds_config.store_withdraw_max') . lang('currency_zh'));
             }
             $data = array(
                 'store_id' => $this->store_info['store_id'],
@@ -101,28 +97,29 @@ class  Sellermoney extends BaseSeller {
                 'storemoneylog_state' => Storemoneylog::STATE_WAIT,
                 'storemoneylog_add_time' => TIMESTAMP,
             );
-            $data['store_avaliable_money'] = -$pdc_amount;
-            $data['store_freeze_money'] = $pdc_amount;
+            $data['storemoneylog_avaliable_money'] = -$pdc_amount;
+            $data['storemoneylog_freeze_money'] = $pdc_amount;
 
             $storejoinin_info = Db::name('storejoinin')->where(array('member_id' => $this->store_info['member_id']))->field('settlement_bank_account_name,settlement_bank_account_number,settlement_bank_name,settlement_bank_address')->find();
 
             $joinin_detail = model('storejoinin')->getOneStorejoinin(array('member_id' => $this->store_info['member_id']));
             if ($joinin_detail['business_licence_address'] != '') {
-                $sml_desc = lang('sellermoney_bank_user').'：' . $storejoinin_info['settlement_bank_account_name'] . '，'.lang('sellermoney_bank_number').'：' . $storejoinin_info['settlement_bank_account_number'] . '，'.lang('sellermoney_bank_sub_name').'：' . $storejoinin_info['settlement_bank_name'] . '，'.lang('sellermoney_bank_name').'：' . $storejoinin_info['settlement_bank_address'];
+                $sml_desc = lang('sellermoney_bank_user') . '：' . $storejoinin_info['settlement_bank_account_name'] . '，' . lang('sellermoney_bank_number') . '：' . $storejoinin_info['settlement_bank_account_number'] . '，' . lang('sellermoney_bank_sub_name') . '：' . $storejoinin_info['settlement_bank_name'] . '，' . lang('sellermoney_bank_name') . '：' . $storejoinin_info['settlement_bank_address'];
             } else {
-                $sml_desc = lang('sellermoney_alipay_name').'：' . $storejoinin_info['settlement_bank_account_name'] . '，'.lang('sellermoney_alipay_number').'：' . $storejoinin_info['settlement_bank_account_number'];
+                $sml_desc = lang('sellermoney_alipay_name') . '：' . $storejoinin_info['settlement_bank_account_name'] . '，' . lang('sellermoney_alipay_number') . '：' . $storejoinin_info['settlement_bank_account_number'];
             }
 
             $data['storemoneylog_desc'] = $sml_desc;
+
+            Db::startTrans();
             try {
-                Db::startTrans();
                 $storemoneylog_model->changeStoremoney($data);
                 Db::commit();
                 $this->recordSellerlog(lang('sellermoney_apply_withdraw'));
-                ds_json_encode(10000,lang('ds_common_op_succ'));
+                ds_json_encode(10000, lang('ds_common_op_succ'));
             } catch (\Exception $e) {
                 Db::rollback();
-                ds_json_encode(10001,$e->getMessage());
+                ds_json_encode(10001, $e->getMessage());
             }
         } else {
             View::assign('store_withdraw_cycle', config('ds_config.store_withdraw_cycle'));
@@ -138,13 +135,12 @@ class  Sellermoney extends BaseSeller {
      */
     public function withdraw_list() {
         $condition = array();
-        $condition[] = array('store_id','=',session('store_id'));
-        $condition[] = array('storemoneylog_type','=',Storemoneylog::TYPE_WITHDRAW);
-
+        $condition[] = array('store_id', '=', session('store_id'));
+        $condition[] = array('storemoneylog_type', '=', Storemoneylog::TYPE_WITHDRAW);
 
         $paystate_search = input('param.paystate_search');
         if (isset($paystate_search) && $paystate_search !== '') {
-            $condition[] = array('storemoneylog_state','=',intval($paystate_search));
+            $condition[] = array('storemoneylog_state', '=', intval($paystate_search));
         }
 
         $storemoneylog_model = model('storemoneylog');
@@ -181,5 +177,4 @@ class  Sellermoney extends BaseSeller {
 
         return $item_list;
     }
-
 }

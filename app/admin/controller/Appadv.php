@@ -2,9 +2,10 @@
 namespace app\admin\controller;
 use think\facade\View;
 use think\facade\Lang;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能 广告管理
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -14,7 +15,7 @@ use think\facade\Lang;
  * ============================================================================
  * 控制器
  */
-class  Appadv extends AdminControl {
+class Appadv extends AdminControl {
 
     public function initialize() {
         parent::initialize();
@@ -31,9 +32,10 @@ class  Appadv extends AdminControl {
         if ($search_name != '') {
             $condition[] = array('ap_name','=',$search_name);
         }
-        $appadv_model=model('appadv');
+        $appadv_model = model('appadv');
         $ap_list= $appadv_model->getAppadvpositionList($condition,'10');
         $adv_list = $appadv_model->getAppadvList();
+        
         View::assign('ap_list',$ap_list);
         View::assign('adv_list',$adv_list);
         View::assign('showpage', $appadv_model->page_info->render());
@@ -60,17 +62,14 @@ class  Appadv extends AdminControl {
             $insert_array['ap_isuse'] = intval(input('post.ap_isuse'));
             $insert_array['ap_width'] = intval(input('post.ap_width'));
             $insert_array['ap_height'] = intval(input('post.ap_height'));
-
-            $adv_validate = ds_validate('adv');
-            if (!$adv_validate->scene('app_ap_add')->check($insert_array)) {
-                $this->error($adv_validate->getError());
-            }
+            
+            $this->validate($insert_array, 'app\common\validate\Adv.app_ap_add');
 
             $result = $appadv_model->addAppadvposition($insert_array);
 
             if ($result) {
                 $this->log(lang('ap_add_succ') . '[' . input('post.ap_name') . ']', null);
-                dsLayerOpenSuccess(lang('ap_add_succ'),url('Appadv/index'));
+                dsLayerOpenSuccess(lang('ap_add_succ'),(string)url('Appadv/index'));
             } else {
                 $this->error(lang('ap_add_fail'));
             }
@@ -125,6 +124,7 @@ class  Appadv extends AdminControl {
         $adv_id = intval(input('param.adv_id'));
         $appadv_model = model('appadv');
         //获取指定广告
+        $condition = array();
         $condition[] = array('adv_id','=',$adv_id);
         $adv = $appadv_model->getOneAppadv($condition);
         if (!request()->isPost()) {
@@ -144,15 +144,15 @@ class  Appadv extends AdminControl {
             $param['adv_startdate'] = $this->getunixtime(trim(input('post.adv_startdate')));
             $param['adv_enddate'] = $this->getunixtime(trim(input('post.adv_enddate')));
 
+            $this->validate($param, 'app\common\validate\Adv.app_adv_edit');
 
             if (!empty($_FILES['adv_code']['name'])) {
                 //上传文件保存路径
-                $upload_file = BASE_UPLOAD_PATH . '/' . ATTACH_APPADV;
                 $res=ds_upload_pic(ATTACH_APPADV,'adv_code');
                 if($res['code']){
                     //还需删除原来图片
                     if (!empty($adv['adv_code'])) {
-                        @unlink($upload_file . DIRECTORY_SEPARATOR . $adv['adv_code']);
+                        ds_del_pic(ATTACH_APPADV,$adv['adv_code']);
                     }
                     $file_name=$res['data']['file_name'];
                     $param['adv_code'] = $file_name;
@@ -160,11 +160,6 @@ class  Appadv extends AdminControl {
                     $this->error($res['msg']);
                 }
                 
-            }
-
-            $adv_validate = ds_validate('adv');
-            if (!$adv_validate->scene('app_adv_edit')->check($param)) {
-                $this->error($adv_validate->getError());
             }
 
             $result = $appadv_model->editAppadv($adv_id,$param);
@@ -194,7 +189,7 @@ class  Appadv extends AdminControl {
                 $value = input('param.value');
                 $adv_id = intval(input('param.id'));
                 $param[$column] = trim($value);
-                $result = $appadv_model->editAdv($adv_id,$param);
+                $result = $appadv_model->editAppAdv($adv_id,$param);
                 break;
         }
         if($result>=0){
@@ -223,7 +218,7 @@ class  Appadv extends AdminControl {
             View::assign('ap_list', $ap_list);
             if ($ap_id) {
                 $ap_condition=array();
-                $ap_condition['ap_id']=$ap_id;
+                $ap_condition[] = array('ap_id','=',$ap_id);
                 $ap = $appadv_model->getOneAppadvposition($ap_condition); 
                 View::assign('ap_name', $ap['ap_name']);
             } else {
@@ -266,26 +261,19 @@ class  Appadv extends AdminControl {
             $insert_array['adv_enabled'] = input('post.adv_enabled');
             $insert_array['adv_startdate'] = $this->getunixtime(input('post.adv_startdate'));
             $insert_array['adv_enddate'] = $this->getunixtime(input('post.adv_enddate'));
+            
+            $this->validate($insert_array, 'app\common\validate\Adv.app_adv_add');
 
             //上传文件保存路径
             $upload_file = BASE_UPLOAD_PATH . '/' . ATTACH_APPADV;
             if (!empty($_FILES['adv_code']['name'])) {
                 $res=ds_upload_pic(ATTACH_APPADV,'adv_code');
                 if($res['code']){
-                    //还需删除原来图片
-                    if (!empty($adv['adv_code'])) {
-                        @unlink($upload_file . DIRECTORY_SEPARATOR . $adv['adv_code']);
-                    }
                     $file_name=$res['data']['file_name'];
                     $insert_array['adv_code'] = $file_name;
                 }else{
                     $this->error($res['msg']);
                 }
-            }
-
-            $adv_validate = ds_validate('adv');
-            if (!$adv_validate->scene('app_adv_add')->check($insert_array)) {
-                $this->error($adv_validate->getError());
             }
 
             //广告信息入库
@@ -296,7 +284,7 @@ class  Appadv extends AdminControl {
             $appadv_model->getOneAppadvposition($ap_condition);
             if ($result) {
                 $this->log(lang('adv_add_succ') . '[' . input('post.adv_name') . ']', null);
-                dsLayerOpenSuccess(lang('adv_add_succ'),url('Appadv/adv', ['ap_id' => input('post.ap_id')]));
+                dsLayerOpenSuccess(lang('adv_add_succ'),(string)url('Appadv/adv', ['ap_id' => input('post.ap_id')]));
             } else {
                 $this->error(lang('adv_add_fail'));
             }
@@ -326,10 +314,8 @@ class  Appadv extends AdminControl {
             if (input('post.ap_isuse') != '') {
                 $param['ap_isuse'] = intval(input('post.ap_isuse'));
             }
-            $adv_validate = ds_validate('adv');
-            if (!$adv_validate->scene('app_ap_edit')->check($param)) {
-                $this->error($adv_validate->getError());
-            }
+            
+            $this->validate($param, 'app\common\validate\Adv.app_ap_edit');
 
             $result = $appadv_model->editAppadvposition($ap_id,$param);
 
@@ -358,18 +344,18 @@ class  Appadv extends AdminControl {
             array(
                 'name' => 'index',
                 'text' => lang('ap_manage'),
-                'url' => url('Appadv/index')
+                'url' => (string)url('Appadv/index')
             ),
         );
         $menu_array[] = array(
             'name' => 'adv',
             'text' => lang('adv_manage'),
-            'url' => url('Appadv/adv')
+            'url' => (string)url('Appadv/adv')
         );
         $menu_array[] = array(
             'name' => 'adv_add',
             'text' => lang('adv_add'),
-            'url' => "javascript:dsLayerOpen('".url('Appadv/appadv_add', ['ap_id' => input('param.ap_id')])."','".lang('adv_add')."')"
+            'url' => "javascript:dsLayerOpen('".(string)url('Appadv/appadv_add', ['ap_id' => input('param.ap_id')])."','".lang('adv_add')."')"
         );
         return $menu_array;
     }

@@ -56,4 +56,7 @@ $lang['inform_help2'] = '点击详细，查看举报内容';
 $lang['inform_help3'] = '查看已处理的举报内容';
 $lang['inform_help4'] = '可在同一个举报类型下面，添加多个举报主题';
 $lang['inform_help5']='会员可根据举报主题，举报违规商品';
+
+$lang['goods_be_informed'] = '商品被举报，平台禁售';
+
 return $lang;

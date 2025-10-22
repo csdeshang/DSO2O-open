@@ -16,7 +16,7 @@
                 {/foreach}
                 {foreach name="recommend_pointsprod" item="v"  }
                 <li style='width: 155px;float:left'>
-                    <div class="dsm-goods-thumb-120"><a href="{:url('Pointprod/pinfo',['id'=>$v.pgoods_id])}" target="_blank" tile="{$v.pgoods_name}"><img src="{$v.pgoods_image}"></a>
+                    <div class="dsm-goods-thumb-120"><a href="{:url('Pointprod/pinfo',['id'=>$v.pgoods_id])}" target="_blank" tile="{$v.pgoods_name}"><img src="{$v.pgoods_image_url}"></a>
                         <div class="dsm-goods-price"><em>{$v.pgoods_points}{$Think.lang.points_unit}</em></div>
                     </div>
                     <div class="dsm-goods-name"><a href="{:url('Pointprod/pinfo',['id'=>$v.pgoods_id])}" target="_blank" tile="{$v.pgoods_name}">{$v.pgoods_name}</a></div>

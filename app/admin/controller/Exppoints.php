@@ -1,13 +1,11 @@
 <?php
-/**
- * 经验值管理
- */
 namespace app\admin\controller;
 use think\facade\View;
 use think\facade\Lang;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能 经验值管理
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,9 +13,9 @@ use think\facade\Lang;
  * 这不是一个自由软件！您只能在不用于商业目的的前提下对程序代码进行修改和使用 .
  * 不允许对程序代码以任何形式任何目的的再发布。
  * ============================================================================
- * 控制器
+ *  经验值管理 控制器
  */
-class  Exppoints extends AdminControl
+class Exppoints extends AdminControl
 {
     const EXPORT_SIZE = 5000;
     public function initialize()
@@ -165,11 +163,11 @@ class  Exppoints extends AdminControl
         $stime = input('param.stime')?strtotime(input('param.stime')):0;
         $etime = input('param.etime')?strtotime(input('param.etime')):0;
         if ($stime > 0 && $etime>0){
-            $where[] = array('explog_addtime','between',array($stime,$etime));
+            $where[]=array('explog_addtime','between',array($stime,$etime));
         }elseif ($stime > 0){
-            $where[] = array('explog_addtime','>=',$stime);
+            $where[]=array('explog_addtime','>=',$stime);
         }elseif ($etime > 0){
-            $where[] = array('explog_addtime','<=',$etime);
+            $where[]=array('explog_addtime','<=',$etime);
         }
         $search_desc = trim(input('param.description'));
         $where[]=array('explog_desc','like',"%$search_desc%");
@@ -209,11 +207,11 @@ class  Exppoints extends AdminControl
         //设置样式
         $excel_obj->setStyle(array('id'=>'s_title','Font'=>array('FontName'=>'宋体','Size'=>'12','Bold'=>'1')));
         //header
-        $excel_data[0][] = array('styleid'=>'s_title','data'=>'会员名称');
-        $excel_data[0][] = array('styleid'=>'s_title','data'=>'经验值');
-        $excel_data[0][] = array('styleid'=>'s_title','data'=>'添加时间');
-        $excel_data[0][] = array('styleid'=>'s_title','data'=>'操作阶段');
-        $excel_data[0][] = array('styleid'=>'s_title','data'=>'描述');
+        $excel_data[0][] = array('styleid'=>'s_title','data'=>lang('ds_member_name'));
+        $excel_data[0][] = array('styleid'=>'s_title','data'=>lang('exp_value'));
+        $excel_data[0][] = array('styleid'=>'s_title','data'=>lang('explog_addtime'));
+        $excel_data[0][] = array('styleid'=>'s_title','data'=>lang('explog_stage'));
+        $excel_data[0][] = array('styleid'=>'s_title','data'=>lang('explog_desc'));
         $stage_arr = model('exppoints')->getExppointsStage();
         foreach ((array)$data as $k=>$v){
             $tmp = array();
@@ -226,8 +224,8 @@ class  Exppoints extends AdminControl
         }
         $excel_data = $excel_obj->charset($excel_data,CHARSET);
         $excel_obj->addArray($excel_data);
-        $excel_obj->addWorksheet($excel_obj->charset('经验值明细',CHARSET));
-        $excel_obj->generateXML($excel_obj->charset('经验值明细',CHARSET).input('param.page').'-'.date('Y-m-d-H',TIMESTAMP));
+        $excel_obj->addWorksheet($excel_obj->charset(lang('membergrade_exppoints_list'),CHARSET));
+        $excel_obj->generateXML($excel_obj->charset(lang('membergrade_exppoints_list'),CHARSET).input('param.page').'-'.date('Y-m-d-H',TIMESTAMP));
     }
 
     /**
@@ -237,18 +235,18 @@ class  Exppoints extends AdminControl
         $menu_array = array(
             array(
                 'name' => 'explog',
-                'text' => '经验值明细',
-                'url' =>  url('Exppoints/index')
+                'text' => lang('ds_exppoints_manage'),
+                'url' =>  (string)url('Exppoints/index')
             ),
             array(
                 'name' => 'expset',
-                'text' => '规则设置',
-                'url' =>  "javascript:dsLayerOpen('".url('Exppoints/expsetting')."','规则设置')"
+                'text' => lang('ds_exppoints_setting'),
+                'url' =>  "javascript:dsLayerOpen('".(string)url('Exppoints/expsetting')."','".lang('ds_exppoints_setting')."')"
             ),
             array(
                 'name' => 'edit',
-                'text' => '调整经验值',
-                'url' =>  "javascript:dsLayerOpen('".url('Exppoints/edit')."','调整经验值')"
+                'text' => lang('ds_exppoints_edit'),
+                'url' =>  "javascript:dsLayerOpen('".(string)url('Exppoints/edit')."','".lang('ds_exppoints_edit')."')"
             ),
         );
         return $menu_array;

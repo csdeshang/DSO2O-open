@@ -76,7 +76,7 @@ class  Address extends BaseModel {
      */
     public function addAddress($data) {
         //当设置为默认地址，则此用户其他的地址设置为非默认地址
-        if($data['address_is_default']==1){
+        if(isset($data['address_is_default']) && $data['address_is_default']==1){
             $condition = array();
             $condition[] = array('member_id','=',$data['member_id']);
             if(!isset($data['address_o2o_errand_type'])){
@@ -86,6 +86,9 @@ class  Address extends BaseModel {
             }
             Db::name('address')->where($condition)->update(array('address_is_default'=>0));
         }
+        
+        $this->validate($data, 'app\common\validate\Memberaddress.model_add');
+        
         return Db::name('address')->insertGetId($data);
     }
 
@@ -107,12 +110,26 @@ class  Address extends BaseModel {
     /**
      * 更新地址信息
      * @author csdeshang
-     * @param array $update 更新数据
+     * @param array $data 更新数据
      * @param array $condition 更新条件
      * @return bool 布尔类型的返回结果
      */
-    public function editAddress($update, $condition) {
-        return Db::name('address')->where($condition)->update($update);
+    public function editAddress($data, $condition) {
+        //当设置为默认地址，则此用户其他的地址设置为非默认地址
+        if(isset($data['address_is_default']) && $data['address_is_default']==1){
+            $condition_default = array();
+            $condition_default[] = array('member_id','=',$data['member_id']);
+            if(!isset($data['address_o2o_errand_type'])){
+                $condition_default[]=array('address_o2o_errand_type','=',0);
+            }else{
+                $condition_default[]=array('address_o2o_errand_type','=',$data['address_o2o_errand_type']);
+            }
+            Db::name('address')->where($condition_default)->update(array('address_is_default'=>0));
+        }
+        
+        $this->validate($data, 'app\common\validate\Memberaddress.model_edit');
+        
+        return Db::name('address')->where($condition)->update($data);
     }
 
     /**

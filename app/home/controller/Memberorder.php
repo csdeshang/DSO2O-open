@@ -1,6 +1,7 @@
 <?php
 
 namespace app\home\controller;
+
 use think\facade\View;
 use think\facade\Lang;
 use think\facade\Db;
@@ -17,11 +18,11 @@ use think\facade\Db;
  * ============================================================================
  * 控制器
  */
-class  Memberorder extends BaseMember {
+class Memberorder extends BaseMember {
 
     public function initialize() {
         parent::initialize();
-        Lang::load(base_path() . 'home/lang/'.config('lang.default_lang').'/memberorder.lang.php');
+        Lang::load(base_path() . 'home/lang/' . config('lang.default_lang') . '/memberorder.lang.php');
     }
 
     public function index() {
@@ -29,11 +30,11 @@ class  Memberorder extends BaseMember {
 
         //搜索
         $condition = array();
-        $condition[]=array('buyer_id','=',session('member_id'));
+        $condition[] = array('buyer_id', '=', session('member_id'));
 
         $order_sn = input('param.order_sn');
         if ($order_sn != '') {
-            $condition[]=array('order_sn','like','%'.$order_sn.'%');
+            $condition[] = array('order_sn', 'like', '%' . $order_sn . '%');
         }
         $query_start_date = input('param.query_start_date');
         $query_end_date = input('param.query_end_date');
@@ -42,33 +43,33 @@ class  Memberorder extends BaseMember {
         $start_unixtime = $if_start_date ? strtotime($query_start_date) : null;
         $end_unixtime = $if_end_date ? strtotime($query_end_date) : null;
         if ($start_unixtime) {
-            $condition[] = array('add_time','>=', $start_unixtime);
+            $condition[] = array('add_time', '>=', $start_unixtime);
         }
         if ($end_unixtime) {
-            $end_unixtime=$end_unixtime+86399;
-            $condition[] = array('add_time','<=', $end_unixtime);
+            $end_unixtime = $end_unixtime + 86399;
+            $condition[] = array('add_time', '<=', $end_unixtime);
         }
         $state_type = input('param.state_type');
         if ($state_type != '') {
-            $condition[] = array('order_state','=',str_replace(
-                    array('state_new', 'state_pay', 'state_send', 'state_success', 'state_noeval', 'state_cancel'), array(ORDER_STATE_NEW, ORDER_STATE_PAY, ORDER_STATE_SEND, ORDER_STATE_SUCCESS, ORDER_STATE_SUCCESS, ORDER_STATE_CANCEL),$state_type));
+            $condition[] = array('order_state', '=', str_replace(
+                        array('state_new', 'state_pay', 'state_send', 'state_success', 'state_noeval', 'state_cancel'), array(ORDER_STATE_NEW, ORDER_STATE_PAY, ORDER_STATE_SEND, ORDER_STATE_SUCCESS, ORDER_STATE_SUCCESS, ORDER_STATE_CANCEL), $state_type));
         }
         if ($state_type == 'state_noeval') {
-            $condition[]=array('evaluation_state','=',0);
-            $condition[] = array('refund_state','=',0);
-            $condition[]=array('order_state','=',ORDER_STATE_SUCCESS);
+            $condition[] = array('evaluation_state', '=', 0);
+            $condition[] = array('refund_state', '=', 0);
+            $condition[] = array('order_state', '=', ORDER_STATE_SUCCESS);
         }
-        
+
         //回收站
         $recycle = input('param.recycle');
         if ($recycle) {
-            $condition[]=array('delete_state','=',1);
+            $condition[] = array('delete_state', '=', 1);
         } else {
-            $condition[]=array('delete_state','=',0);
+            $condition[] = array('delete_state', '=', 0);
         }
-        
-        
-        $order_list = $order_model->getOrderList($condition, 5, '*', 'order_id desc','', array('order_common','order_goods','store'));
+
+
+        $order_list = $order_model->getOrderList($condition, 5, '*', 'order_id desc', '', array('order_common', 'order_goods', 'store'));
         View::assign('show_page', $order_model->page_info->render());
 
         $refundreturn_model = model('refundreturn');
@@ -101,10 +102,10 @@ class  Memberorder extends BaseMember {
             $order['if_restore'] = $order_model->getOrderOperateState('restore', $order);
 
             //配送员投诉单
-            if($order['finnshed_time']){
+            if ($order['finnshed_time']) {
                 $order['order_is_complaint'] = $o2o_complaint_model->getO2oComplaintInfo(array('order_id' => $order['order_id']), 'order_id');
             }
-            
+
             foreach ($order['extend_order_goods'] as $value) {
                 $value['goods_type_cn'] = get_order_goodstype($value['goods_type']);
                 $value['goods_url'] = url('Goods/index', ['goods_id' => $value['goods_id']]);
@@ -136,10 +137,10 @@ class  Memberorder extends BaseMember {
         }
 
         //取得这些订单下的支付单列表
-        $condition = array(array('pay_sn','in', array_unique($order_pay_sn_array)));
-        $order_pay_list = $order_model->getOrderpayList($condition,'*','','pay_sn');
+        $condition = array(array('pay_sn', 'in', array_unique($order_pay_sn_array)));
+        $order_pay_list = $order_model->getOrderpayList($condition, '*', '', 'pay_sn');
         foreach ($order_group_list as $pay_sn => $pay_info) {
-            $order_group_list[$pay_sn]['pay_info'] = isset($order_pay_list[$pay_sn])?$order_pay_list[$pay_sn]:'';
+            $order_group_list[$pay_sn]['pay_info'] = isset($order_pay_list[$pay_sn]) ? $order_pay_list[$pay_sn] : '';
         }
         View::assign('order_group_list', $order_group_list);
         View::assign('order_pay_list', $order_pay_list);
@@ -153,9 +154,8 @@ class  Memberorder extends BaseMember {
             $this->setMemberCurItem('member_order');
         }
 
-        return View::fetch($this->template_dir.'index');
+        return View::fetch($this->template_dir . 'index');
     }
-
 
     /**
      * 订单详细
@@ -168,8 +168,8 @@ class  Memberorder extends BaseMember {
         }
         $order_model = model('order');
         $condition = array();
-        $condition[] = array('order_id','=',$order_id);
-        $condition[] = array('buyer_id','=',session('member_id'));
+        $condition[] = array('order_id', '=', $order_id);
+        $condition[] = array('buyer_id', '=', session('member_id'));
         $order_info = $order_model->getOrderInfo($condition, array('order_goods', 'order_common', 'store'));
         if (empty($order_info) || $order_info['delete_state'] == ORDER_DEL_STATE_DROP) {
             $this->error(lang('member_order_none_exist'));
@@ -224,9 +224,9 @@ class  Memberorder extends BaseMember {
                 $order_info['goods_list'][] = $value;
             }
         }
-       /* foreach ($order_info['refund_list'] as $value) {
+        /* foreach ($order_info['refund_list'] as $value) {
 
-        }*/
+          } */
         if (empty($order_info['zengpin_list'])) {
             $order_info['goods_count'] = count($order_info['goods_list']);
         } else {
@@ -245,7 +245,7 @@ class  Memberorder extends BaseMember {
         /* 设置买家当前栏目 */
         $this->setMemberCurItem('my_album');
 
-        return View::fetch($this->template_dir.'show_order');
+        return View::fetch($this->template_dir . 'show_order');
     }
 
     /**
@@ -259,8 +259,8 @@ class  Memberorder extends BaseMember {
         $order_model = model('order');
 
         $condition = array();
-        $condition[] = array('order_id','=',$order_id);
-        $condition[] = array('buyer_id','=',session('member_id'));
+        $condition[] = array('order_id', '=', $order_id);
+        $condition[] = array('buyer_id', '=', session('member_id'));
         $order_info = $order_model->getOrderInfo($condition);
 
         if ($state_type == 'order_cancel') {
@@ -274,9 +274,9 @@ class  Memberorder extends BaseMember {
         }
 
         if (!$result['code']) {
-            ds_json_encode(10001,$result['msg']);
+            ds_json_encode(10001, $result['msg']);
         } else {
-            ds_json_encode(10000,$result['msg']);
+            ds_json_encode(10000, $result['msg']);
         }
     }
 
@@ -286,24 +286,25 @@ class  Memberorder extends BaseMember {
     private function _order_cancel($order_info, $post) {
         if (!request()->isPost()) {
             View::assign('order_info', $order_info);
-            echo View::fetch($this->template_dir.'cancel');
+            echo View::fetch($this->template_dir . 'cancel');
             exit();
         } else {
             $order_model = model('order');
-            $logic_order = model('order','logic');
+            $logic_order = model('order', 'logic');
             $if_allow = $order_model->getOrderOperateState('buyer_cancel', $order_info);
             if (!$if_allow) {
-                return ds_callback(false,  lang('have_right_operate'));
+                return ds_callback(false, lang('have_right_operate'));
             }
             $msg = $post['state_info1'] != '' ? $post['state_info1'] : $post['state_info'];
-            try{
-                Db::startTrans();
+            Db::startTrans();
+            try {
                 $logic_order->changeOrderStateCancel($order_info, 'buyer', session('member_name'), $msg);
+                Db::commit();
             } catch (\Exception $e) {
                 Db::rollback();
                 return ds_callback(false, $e->getMessage());
             }
-            Db::commit();    
+
             return ds_callback(true, lang('ds_common_op_succ'));
         }
     }
@@ -314,16 +315,16 @@ class  Memberorder extends BaseMember {
     private function _order_receive($order_info, $post) {
         if (!request()->isPost()) {
             View::assign('order_info', $order_info);
-            echo View::fetch($this->template_dir.'receive');
+            echo View::fetch($this->template_dir . 'receive');
             exit();
         } else {
             $order_model = model('order');
-            $logic_order = model('order','logic');
+            $logic_order = model('order', 'logic');
             $if_allow = $order_model->getOrderOperateState('receive', $order_info);
             if (!$if_allow) {
-                return ds_callback(false,  lang('have_right_operate'));
+                return ds_callback(false, lang('have_right_operate'));
             }
-            
+
             return $logic_order->changeOrderStateReceive($order_info, 'buyer', session('member_name'));
         }
     }
@@ -333,7 +334,7 @@ class  Memberorder extends BaseMember {
      */
     private function _order_recycle($order_info, $get) {
         $order_model = model('order');
-        $logic_order = model('order','logic');
+        $logic_order = model('order', 'logic');
         $state_type = str_replace(array('order_delete', 'order_drop', 'order_restore'), array('delete', 'drop', 'restore'), input('param.state_type'));
         $if_allow = $order_model->getOrderOperateState($state_type, $order_info);
         if (!$if_allow) {
@@ -356,14 +357,10 @@ class  Memberorder extends BaseMember {
             array(
                 'name' => 'member_order_recycle',
                 'text' => lang('recycle_bin'),
-                'url' => url('Memberorder/index',['recycle'=>'1']),
+                'url' => url('Memberorder/index', ['recycle' => '1']),
             ),
         );
-        
-        return $item_list;
-        
-    }
-    
-    
 
+        return $item_list;
+    }
 }

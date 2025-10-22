@@ -4,6 +4,7 @@ namespace app\common\logic;
 
 use think\facade\Db;
 use app\common\model\Storemoneylog;
+
 /**
  * ============================================================================
  * DSO2O多用户商城
@@ -17,8 +18,6 @@ use app\common\model\Storemoneylog;
  * 逻辑层模型
  */
 class Errandorder {
-    
-    
     /*
      * 获取订单按钮
      * @access public
@@ -93,8 +92,7 @@ class Errandorder {
 
         return $data;
     }
-    
-    
+
     /*
      * 取消跑腿订单
      * @access public
@@ -146,38 +144,47 @@ class Errandorder {
             }
             if ($o2o_errand_order_info['o2o_errand_order_payment_time']) {//已付款则退还费用
                 $order = array(
+                    'order_id' => $o2o_errand_order_info['o2o_errand_order_id'],
                     'order_sn' => $o2o_errand_order_info['o2o_errand_order_sn'],
                     'trade_no' => $o2o_errand_order_info['o2o_errand_order_payment_sn'],
                     'order_amount' => $o2o_errand_order_info['o2o_errand_order_amount'],
                     'total_order_amount' => $o2o_errand_order_info['o2o_errand_order_amount'],
-                    'payment_code'=>$o2o_errand_order_info['o2o_errand_order_payment_code'],
-                    'buyer_id'=>$o2o_errand_order_info['member_id'],
-                    'buyer_name'=>$o2o_errand_order_info['member_name'],
+                    'payment_code' => $o2o_errand_order_info['o2o_errand_order_payment_code'],
+                    'buyer_id' => $o2o_errand_order_info['member_id'],
+                    'buyer_name' => $o2o_errand_order_info['member_name'],
                     'refund_amount' => 0,
                     'rcb_amount' => 0,
                     'pd_amount' => 0,
                 );
                 $refundreturn_model = model('refundreturn');
-                $refundreturn_model->refundAmount($order, $o2o_errand_order_info['o2o_errand_order_amount']);
+                $refundreturn_model->refundAmount($order, $o2o_errand_order_info['o2o_errand_order_amount'], 'errand_order');
             }
-            
+
             $o2o_errand_order_model = model('o2o_errand_order');
             $result = $o2o_errand_order_model->editO2oErrandOrder(array('o2o_errand_order_state' => ORDER_STATE_CANCEL), array('o2o_errand_order_id' => $o2o_errand_order_info['o2o_errand_order_id']));
+
+            $data = array();
+            $data['order_id'] = $o2o_errand_order_info['o2o_errand_order_id'];
+            $data['log_role'] = $operator;
+            $data['log_user'] = '';
+            $data['log_msg'] = '取消跑腿订单';
+            model('orderlog')->addErrandOrderlog($data);
+
             if (!$result) {
                 throw new \think\Exception('订单更新失败', 10006);
             }
+            Db::commit();
         } catch (\Exception $e) {
             Db::rollback();
             return ds_callback(false, $e->getMessage());
         }
-        Db::commit();
+
         return ds_callback(true, '操作成功');
     }
-    
-    
+
     //跑腿订单 确认收货
-    public function receiveO2oErrandOrder($errand_order_info,$role, $user = ''){
-        
+    public function receiveO2oErrandOrder($errand_order_info, $role, $user = '') {
+
         Db::startTrans();
         try {
             $o2o_errand_order_id = $errand_order_info['o2o_errand_order_id'];
@@ -197,7 +204,7 @@ class Errandorder {
             //给配送员结算
             //总费用  基础运费 o2o_errand_order_distance_price  重量附加费  o2o_errand_order_weight_price  特殊时段费  o2o_errand_order_time_price  小费 o2o_errand_order_gratuity
             $o2o_errand_order_amount = $errand_order_info['o2o_errand_order_amount'];
-            
+
             //配送费为0 则 不对配送员的预存款进行操作及记录
             if ($o2o_errand_order_amount > 0) {
                 $distributor_money = array(
@@ -210,16 +217,21 @@ class Errandorder {
                 $o2o_distributor_moneylog_model->changeO2oDistributorMoney('order_errand', $distributor_money);
             }
 
+            $data = array();
+            $data['order_id'] = $errand_order_info['o2o_errand_order_id'];
+            $data['log_role'] = $role;
+            $data['log_user'] = '';
+            $data['log_msg'] = '跑腿订单确认收货,配送费：' . $o2o_errand_order_amount;
+            model('orderlog')->addErrandOrderlog($data);
+
             Db::commit();
             return ds_callback(true, '操作成功');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Db::rollback();
             return ds_callback(false, $e->getMessage());
         }
-        
     }
-    
-    
+
     /*
      * 评价跑腿订单
      * @access public
@@ -263,15 +275,22 @@ class Errandorder {
                     throw new \think\Exception('评论更新失败', 10006);
                 }
             }
+
+            $data = array();
+            $data['order_id'] = $o2o_errand_order_info['o2o_errand_order_id'];
+            $data['log_role'] = 'member';
+            $data['log_user'] = '';
+            $data['log_msg'] = '跑腿订单评价';
+            model('orderlog')->addErrandOrderlog($data);
+            Db::commit();
         } catch (\Exception $e) {
             Db::rollback();
             return ds_callback(false, $e->getMessage());
         }
-        Db::commit();
+
         return ds_callback(true, '操作成功');
     }
-    
-    
+
     /*
      * 付款跑腿订单
      * @access public
@@ -285,50 +304,58 @@ class Errandorder {
      */
 
     public function payO2oErrandOrder($out_trade_no, $payment_code, $trade_no, $operator, $payment_time = '') {
-   
 
-            $o2o_errand_order_info = Db::name('o2o_errand_order')->where(array('o2o_errand_order_sn' => $out_trade_no))->lock(true)->find();
-            if (!$o2o_errand_order_info) {
-                throw new \think\Exception('订单不存在', 10006);
-            }
-            if ($o2o_errand_order_info['o2o_errand_order_state'] != ORDER_STATE_NEW) {
-                throw new \think\Exception('该订单不可支付', 10006);
-            }
-            //支付被冻结的充值卡
-            $predeposit_model = model('predeposit');
-            if ($o2o_errand_order_info['o2o_errand_order_rcb_amount'] > 0) {
-                $data_pd = array();
-                $data_pd['member_id'] = $o2o_errand_order_info['member_id'];
-                $data_pd['member_name'] = $o2o_errand_order_info['member_name'];
-                $data_pd['amount'] = $o2o_errand_order_info['o2o_errand_order_rcb_amount'];
-                $data_pd['order_sn'] = $o2o_errand_order_info['o2o_errand_order_sn'];
-                $predeposit_model->changeRcb('order_comb_pay', $data_pd);
-            }
-            //支付被冻结的预存款
-            if ($o2o_errand_order_info['o2o_errand_order_pd_amount'] > 0) {
-                $data_pd = array();
-                $data_pd['member_id'] = $o2o_errand_order_info['member_id'];
-                $data_pd['member_name'] = $o2o_errand_order_info['member_name'];
-                $data_pd['amount'] = $o2o_errand_order_info['o2o_errand_order_pd_amount'];
-                $data_pd['order_sn'] = $o2o_errand_order_info['o2o_errand_order_sn'];
-                $predeposit_model->changePd('order_comb_pay', $data_pd);
-            }
-            if ($payment_time) {
-                $payment_time = strtotime($payment_time);
-            } else {
-                $payment_time = TIMESTAMP;
-            }
-            
-            $o2o_errand_order_model = model('o2o_errand_order');
-            $result = $o2o_errand_order_model->editO2oErrandOrder(array('o2o_errand_order_payment_code' => $payment_code, 'o2o_errand_order_payment_sn' => $trade_no, 'o2o_errand_order_state' => ORDER_STATE_PAY, 'o2o_errand_order_payment_time' => $payment_time), array('o2o_errand_order_id' => $o2o_errand_order_info['o2o_errand_order_id']));
-            
-            if (!$result) {
-                throw new \think\Exception('订单更新失败', 10006);
-            }
 
+        $o2o_errand_order_info = Db::name('o2o_errand_order')->where(array('o2o_errand_order_sn' => $out_trade_no))->lock(true)->find();
+        if (!$o2o_errand_order_info) {
+            throw new \think\Exception('订单不存在', 10006);
+        }
+        if ($o2o_errand_order_info['o2o_errand_order_state'] != ORDER_STATE_NEW) {
+            throw new \think\Exception('该订单不可支付', 10006);
+        }
+        //支付被冻结的充值卡
+        $predeposit_model = model('predeposit');
+        $log_msg = '';
+        if ($o2o_errand_order_info['o2o_errand_order_rcb_amount'] > 0) {
+            $data_pd = array();
+            $data_pd['member_id'] = $o2o_errand_order_info['member_id'];
+            $data_pd['member_name'] = $o2o_errand_order_info['member_name'];
+            $data_pd['amount'] = $o2o_errand_order_info['o2o_errand_order_rcb_amount'];
+            $data_pd['order_sn'] = $o2o_errand_order_info['o2o_errand_order_sn'];
+            $log_msg .= ',使用充值卡支付:' . $o2o_errand_order_info['o2o_errand_order_rcb_amount'];
+            $predeposit_model->changeRcb('order_comb_pay', $data_pd);
+        }
+        //支付被冻结的预存款
+        if ($o2o_errand_order_info['o2o_errand_order_pd_amount'] > 0) {
+            $data_pd = array();
+            $data_pd['member_id'] = $o2o_errand_order_info['member_id'];
+            $data_pd['member_name'] = $o2o_errand_order_info['member_name'];
+            $data_pd['amount'] = $o2o_errand_order_info['o2o_errand_order_pd_amount'];
+            $data_pd['order_sn'] = $o2o_errand_order_info['o2o_errand_order_sn'];
+            $log_msg .= ',使用预存款支付:' . $o2o_errand_order_info['o2o_errand_order_pd_amount'];
+            $predeposit_model->changePd('order_comb_pay', $data_pd);
+        }
+        if ($payment_time) {
+            $payment_time = strtotime($payment_time);
+        } else {
+            $payment_time = TIMESTAMP;
+        }
+
+        $o2o_errand_order_model = model('o2o_errand_order');
+        $result = $o2o_errand_order_model->editO2oErrandOrder(array('o2o_errand_order_payment_code' => $payment_code, 'o2o_errand_order_payment_sn' => $trade_no, 'o2o_errand_order_state' => ORDER_STATE_PAY, 'o2o_errand_order_payment_time' => $payment_time), array('o2o_errand_order_id' => $o2o_errand_order_info['o2o_errand_order_id']));
+
+        $data = array();
+        $data['order_id'] = $o2o_errand_order_info['o2o_errand_order_id'];
+        $data['log_role'] = $operator;
+        $data['log_user'] = '';
+        $data['log_msg'] = '跑腿订单付款' . $log_msg;
+        model('orderlog')->addErrandOrderlog($data);
+
+        if (!$result) {
+            throw new \think\Exception('订单更新失败', 10006);
+        }
     }
-    
-    
+
     /**
      * 充值卡支付
      * 如果充值卡足够就单独支付了该订单，如果不足就暂时冻结，等API支付成功了再彻底扣除
@@ -342,29 +369,38 @@ class Errandorder {
             return $order_info;
         $predeposit_model = model('predeposit');
 
+        $canPay = false;
         $order_amount = round($order_info['o2o_errand_order_amount'] - $order_info['o2o_errand_order_rcb_amount'] - $order_info['o2o_errand_order_pd_amount'], 2);
         $data_pd = array();
         $data_pd['member_id'] = $buyer_info['member_id'];
         $data_pd['member_name'] = $buyer_info['member_name'];
-        $data_pd['amount'] = $order_amount;
         $data_pd['order_sn'] = $order_info['o2o_errand_order_sn'];
 
-
-        $o2o_errand_order_model = model('o2o_errand_order');
-        if ($available_rcb_amount >= $order_amount) {
-            $this->payO2oErrandOrder($order_info['o2o_errand_order_sn'], 'predeposit', '', 'member');
-        } else {
-            $data_pd['amount'] = $available_rcb_amount;
-        }
-            //暂冻结预存款,后面还需要 API彻底完成支付
-            $predeposit_model->changeRcb('order_freeze', $data_pd);
-            //预存款支付金额保存到订单
-            $data_order = array();
-            $order_info['o2o_errand_order_rcb_amount'] = $data_order['o2o_errand_order_rcb_amount'] = round($order_info['o2o_errand_order_rcb_amount'] + $data_pd['amount'], 2);
-            $result = $o2o_errand_order_model->editO2oErrandOrder($data_order, array('o2o_errand_order_id' => $order_info['o2o_errand_order_id']));
-            if (!$result) {
-                throw new \think\Exception('订单更新失败', 10006);
+        //暂冻结充值卡,后面还需要 API彻底完成支付
+        if ($available_rcb_amount > 0 && $order_amount > 0) {
+            if ($available_rcb_amount >= $order_amount) {
+                $data_pd['amount'] = $order_amount;
+                $canPay = true;
+            } else {
+                $data_pd['amount'] = $available_rcb_amount;
+                $canPay = false;
             }
+        }
+        $o2o_errand_order_model = model('o2o_errand_order');
+        //暂冻结预存款,后面还需要 API彻底完成支付
+        $predeposit_model->changeRcb('order_freeze', $data_pd);
+        //预存款支付金额保存到订单
+        $data_order = array();
+        $order_info['o2o_errand_order_rcb_amount'] = $data_order['o2o_errand_order_rcb_amount'] = round($order_info['o2o_errand_order_rcb_amount'] + $data_pd['amount'], 2);
+        $result = $o2o_errand_order_model->editO2oErrandOrder($data_order, array('o2o_errand_order_id' => $order_info['o2o_errand_order_id']));
+        if (!$result) {
+            throw new \think\Exception('订单更新失败', 10006);
+        }
+
+        if ($canPay) {
+            $this->payO2oErrandOrder($order_info['o2o_errand_order_sn'], 'predeposit', '', 'member');
+        }
+
         return $order_info;
     }
 
@@ -382,31 +418,38 @@ class Errandorder {
 
         $predeposit_model = model('predeposit');
 
+        $canPay = false;
         $order_amount = round($order_info['o2o_errand_order_amount'] - $order_info['o2o_errand_order_rcb_amount'] - $order_info['o2o_errand_order_pd_amount'], 2);
         $data_pd = array();
         $data_pd['member_id'] = $buyer_info['member_id'];
         $data_pd['member_name'] = $buyer_info['member_name'];
-        $data_pd['amount'] = $order_amount;
         $data_pd['order_sn'] = $order_info['o2o_errand_order_sn'];
 
-        $o2o_errand_order_model = model('o2o_errand_order');
-        if ($available_pd_amount >= $order_amount) {
-            $this->payO2oErrandOrder($order_info['o2o_errand_order_sn'], 'predeposit', '', 'member');
-        } else {
-            //暂冻结预存款,后面还需要 API彻底完成支付
-            $data_pd['amount'] = $available_pd_amount;
+        //暂冻结预存款,后面还需要 API彻底完成支付
+        if ($available_pd_amount > 0 && $order_amount > 0) {
+            if ($available_pd_amount >= $order_amount) {
+                $data_pd['amount'] = $order_amount;
+                $canPay = true;
+            } else {
+                $data_pd['amount'] = $available_pd_amount;
+                $canPay = false;
+            }
         }
+
+        $o2o_errand_order_model = model('o2o_errand_order');
         $predeposit_model->changePd('order_freeze', $data_pd);
         //预存款支付金额保存到订单
         $data_order = array();
         $order_info['o2o_errand_order_pd_amount'] = $data_order['o2o_errand_order_pd_amount'] = round($order_info['o2o_errand_order_pd_amount'] + $data_pd['amount'], 2);
         $result = $o2o_errand_order_model->editO2oErrandOrder($data_order, array('o2o_errand_order_id' => $order_info['o2o_errand_order_id']));
-            if (!$result) {
-                throw new \think\Exception('订单更新失败', 10006);
-            }
+        if (!$result) {
+            throw new \think\Exception('订单更新失败', 10006);
+        }
+
+        if ($canPay) {
+            $this->payO2oErrandOrder($order_info['o2o_errand_order_sn'], 'predeposit', '', 'member');
+        }
+
         return $order_info;
     }
-    
-    
-    
 }

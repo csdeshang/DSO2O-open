@@ -6,7 +6,7 @@ use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -161,6 +161,9 @@ public $page_info;
      * @return type
      */
     public function addEvaluatestore($data) {
+        dcache($data['seval_storeid'], 'evaluate_store_info');
+        $storeclass_id=Db::name('store')->where(array(array('store_id','=',$data['seval_storeid'])))->value('storeclass_id');
+        dcache($storeclass_id, 'sc_evaluate_store_info');
         return Db::name('evaluatestore')->insertGetId($data);
     }
 
@@ -172,6 +175,12 @@ public $page_info;
      * @return type
      */
     public function delEvaluatestore($condition) {
+        $storeid_array = Db::name('evaluatestore')->where($condition)->column('seval_storeid');
+        foreach ($storeid_array as $store_id) {
+            dcache($store_id, 'evaluate_store_info');
+            $storeclass_id=Db::name('store')->where(array(array('store_id','=',$store_id)))->value('storeclass_id');
+            dcache($storeclass_id, 'sc_evaluate_store_info');
+        }
         return Db::name('evaluatestore')->where($condition)->delete();
     }
 

@@ -1,11 +1,12 @@
 <?php
 
 namespace app\common\model;
+
 use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,10 +16,10 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Rcblog extends BaseModel
-{
+class Rcblog extends BaseModel {
+
     public $page_info;
-    
+
     /**
      * 获取列表
      * @access public
@@ -28,10 +29,9 @@ class  Rcblog extends BaseModel
      * @param string $order 排序
      * @return array
      */
-    public function getRechargecardBalanceLogList($condition, $pagesize, $order)
-    {
-        $res =Db::name('rcblog')->where($condition)->order($order)->paginate(['list_rows'=>$pagesize,'query' => request()->param()],false);
-        $this->page_info=$res;
+    public function getRechargecardBalanceLogList($condition, $pagesize, $order) {
+        $res = Db::name('rcblog')->where($condition)->order($order)->paginate(['list_rows' => $pagesize, 'query' => request()->param()], false);
+        $this->page_info = $res;
         return $res->items();
     }
 }

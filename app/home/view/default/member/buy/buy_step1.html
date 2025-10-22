@@ -52,8 +52,8 @@
         {include file="default/member/buy/buy_invoice" /}
         {include file="default/member/buy/buy_goods_list" /}
         {include file="default/member/buy/buy_amount" /}
-        <!-- 订单来源1为PC 2为手机 -->
-        <input value="1" type="hidden" name="order_from">
+        <!-- 订单来源 -->
+        <input value="PC" type="hidden" name="order_from">
         <!-- 来源于购物车标志 -->
         <input value="{$ifcart}" type="hidden" name="ifcart">
         <!-- offline/online -->

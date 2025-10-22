@@ -256,7 +256,7 @@ function ds_encrypt($txt, $key = '') {
     if (empty($txt))
         return $txt;
     if (empty($key))
-        $key = md5(config('ds_config.setup_date'));
+        $key = md5(config('ds_config.site_uniqid'));
     $chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.";
     $ikey = "-x6g6ZWm2G9g_vr0Bo.pOq3kRIxsZ6rm";
     $nh1 = rand(0, 64);
@@ -301,7 +301,7 @@ function ds_decrypt($txt, $key = '', $ttl = 0) {
     if (empty($txt))
         return $txt;
     if (empty($key))
-        $key = md5(config('ds_config.setup_date'));
+        $key = md5(config('ds_config.site_uniqid'));
 
     $chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.";
     $ikey = "-x6g6ZWm2G9g_vr0Bo.pOq3kRIxsZ6rm";
@@ -503,12 +503,15 @@ function get_member_id_by_XDSKEY() {
     if (!$key) {
         return;
     }
-    $mbusertoken_model = model('mbusertoken');
-    $mb_user_token_info = $mbusertoken_model->getMbusertokenInfoByToken($key);
-    if (empty($mb_user_token_info)) {
+    $condition = array();
+    $condition[] = array('platform_type', '=', 'member');
+    $condition[] = array('platform_token', '=', $key);
+
+    $platformtoken_info = model('platformtoken')->getPlatformtokenInfo($condition);
+    if (empty($platformtoken_info)) {
         return;
     } else {
-        return $mb_user_token_info['member_id'];
+        return $platformtoken_info['platform_userid'];
     }
 }
 
@@ -1156,113 +1159,6 @@ function getDistance($lat1, $lng1, $lat2, $lng2, $len_type = 1, $decimal = 2) {
     return round($s, $decimal);
 }
 
-function word_filter_access_token(){
-    $appid=config('ds_config.word_filter_appid');
-    $secret=config('ds_config.word_filter_secret');
-    $access_token=config('ds_config.word_filter_access_token');
-    $access_token_expire=config('ds_config.word_filter_access_token_expire');
-    if(!$access_token || $access_token_expire<TIMESTAMP){
-        $res=http_request('https://aip.baidubce.com/oauth/2.0/token','POST',array(
-            'grant_type'=>'client_credentials',
-            'client_id'=>$appid,
-            'client_secret'=>$secret,
-        ));
-        $res = json_decode($res, true);
-        if(isset($res['error'])){
-            return ds_callback(false, $res['error_description']);
-        }
-        $access_token=$res['access_token'];
-        $expires_in=$res['expires_in'];
-        
-        $config_model = model('config');
-        $update_array=array(
-            'word_filter_access_token'=>$access_token,
-            'word_filter_access_token_expire'=>TIMESTAMP+$expires_in
-        );
-        $config_model->editConfig($update_array);
-    }
-    return ds_callback(true,'',$access_token);
-}
-/**
- * 敏感词过滤
- * @param type $text
- * @return boolean
- */
-function word_filter($text) {
-    $data=array();
-    $data['text']=$text;
-    $data['if_sensitive']=false;
-    if(config('ds_config.word_filter_open')!=1){
-        return ds_callback(true, '', $data);
-    }
-
-    $res=word_filter_access_token();
-    if(!$res['code']){
-        return $res;
-    }
-    $access_token=$res['data'];
-    $res=http_request('https://aip.baidubce.com/rest/2.0/solution/v1/text_censor/v2/user_defined?access_token='.$access_token,'POST',array(
-        'text'=> $text
-        ));
-    $res = json_decode($res, true);
-    if(isset($res['error_code'])){
-        return ds_callback(false, $res['error_msg']);
-    }
-    if($res['conclusionType']==2){
-        $data['if_sensitive']=true;
-        $data['sensitive_msg']=array();
-        $data['sensitive_word']=array();
-        foreach($res['data'] as $val){
-            $data['sensitive_msg'][]=$val['msg'];
-            foreach($val['hits'] as $v){
-                $data['sensitive_word']=array_merge($data['sensitive_word'],$v['words']);
-                $data['text']=str_replace($v['words'],'**',$data['text']);
-            }
-        }
-    }
-    return ds_callback(true, '', $data);
-}
-
-
-/**
- * 敏感图过滤
- * @param type $text
- * @return boolean
- */
-function image_filter($img_url) {
-    $data=array();
-    $data['if_sensitive']=false;
-    if(config('ds_config.word_filter_open')!=1){
-        return ds_callback(true, '', $data);
-    }
-    $res=word_filter_access_token();
-    if(!$res['code']){
-        return $res;
-    }
-    $access_token=$res['data'];
-    $image=imgToBase64($img_url);
-    if(empty($image)){
-        return ds_callback(false, 'image empty');
-    }
-    $res=http_request('https://aip.baidubce.com/rest/2.0/solution/v1/img_censor/v2/user_defined?access_token='.$access_token,'POST',array(
-        'image'=> $image['content']
-        ),array(
-            'Content-Type: application/x-www-form-urlencoded'
-        ));
-    $res = json_decode($res, true);
-    if(isset($res['error_code'])){
-        return ds_callback(false, $res['error_msg']);
-    }
-    if($res['conclusionType']==2){
-        $data['if_sensitive']=true;
-        $data['sensitive_msg']=array();
-        foreach($res['data'] as $val){
-            $data['sensitive_msg'][]=$val['msg'];
-        }
-    }
-    return ds_callback(true, '', $data);
-}
-
 /**
  * 获取文字首字母
  * @param type $str
@@ -1379,4 +1275,24 @@ function getOSFromUserAgent() {
         }
     }   
     return '未知系统';
+}
+
+//获取来源
+function get_clienttype(){
+    return request()->header('from-clienttype') != null? request()->header('from-clienttype'):'unknow';
+}
+
+//获取指定长度的随机字符串
+function get_rand_str($length = 6) {
+    $chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    $str = '';
+    for ($i = 0; $i < $length; $i++) {
+        $str .= $chars[mt_rand(0, strlen($chars) - 1)];
+    }
+    return $str;
+}
+
+//获取随机昵称
+function get_rand_nickname($prefix='昵称'){
+    return $prefix.rand(100000,999999);
 }

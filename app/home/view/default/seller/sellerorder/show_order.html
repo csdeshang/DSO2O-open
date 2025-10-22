@@ -28,7 +28,7 @@
                                 <ul>
                                     {if $order_info.payment_name}
                                     <li>{$Think.lang.store_order_pay_method}{$Think.lang.ds_colon}<span>{$order_info.payment_name}
-                                            <?php if($order_info['payment_code'] != 'offline' && !in_array($order_info['order_state'],array(ORDER_STATE_CANCEL,ORDER_STATE_NEW))) { ?>
+                                            <?php if(!in_array($order_info['order_state'],array(ORDER_STATE_CANCEL,ORDER_STATE_NEW))) { ?>
                                             ({$Think.lang.payment_order}{$Think.lang.ds_colon}{$order_info.pay_sn})
                                             <?php } ?>
                                         </span></li>
@@ -83,21 +83,12 @@
             <dl>
                 <dt><i class="iconfont green">&#xe64d;</i>{$Think.lang.store_order_state}：</dt>
                 <dd>
-                    {if $order_info.payment_code == 'offline'}
-                    {$Think.lang.order_payment_steps4}
-                    {else /}
                     {$Think.lang.order_payment_steps5}
-                    {/if}
                 </dd>
             </dl>
             <ul>
-                {if $order_info.payment_code == 'offline'}
-                <li>{$Think.lang.successful_ordering_tips1}</li>
-                <li>{$Think.lang.successful_ordering_tips2}</li>
-                {else /}
                 <li>{$Think.lang.successful_ordering_tips3}{:get_order_payment_name($order_info['payment_code'])}{$Think.lang.successful_ordering_tips4}{$order_info.pay_sn}”。</li>
                 <li>{$Think.lang.successful_ordering_tips5}</li>
-                {/if}
             </ul>
         </div>
         {/if}
@@ -161,13 +152,11 @@
             <dd class="bg"></dd>
             <dd class="date" title="">{$Think.lang.store_order_add_time}{$order_info.add_time|date="Y-m-d H:i:s"}</dd>
         </dl>
-        {if $order_info.payment_code != 'offline'}
         <dl class="{if intval($order_info['payment_time'])}current{/if}">
             <dt>{$Think.lang.sellerorder_pay_order}</dt>
             <dd class="bg"> </dd>
             <dd class="date" title="{$Think.lang.store_show_order_pay_time}">{$order_info.payment_time|date="Y-m-d H:i:s"}</dd>
         </dl>
-        {/if}
         <dl class="{if $order_info.o2o_order_pickup_time}current{/if}">
             <dt>{$Think.lang.merchant_delivery}</dt>
             <dd class="bg"> </dd>

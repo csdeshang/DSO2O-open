@@ -135,7 +135,6 @@ class  Buy extends BaseMember {
 
         //重新计算在线支付金额
         $pay_amount_online = 0;
-        $pay_amount_offline = 0;
         //订单总支付金额(不包含货到付款)
         $pay_amount = 0;
 
@@ -143,19 +142,12 @@ class  Buy extends BaseMember {
 
             $payed_amount = floatval($order_info['rcb_amount']) + floatval($order_info['pd_amount']);
             //计算相关支付金额
-            if ($order_info['payment_code'] != 'offline') {
                 if ($order_info['order_state'] == ORDER_STATE_NEW) {
                     $pay_amount_online += ds_price_format(floatval($order_info['order_amount']) - $payed_amount);
                 }
                 $pay_amount += floatval($order_info['order_amount']);
-            } else {
-                $pay_amount_offline += floatval($order_info['order_amount']);
-            }
 
             //显示支付方式与支付结果
-            if ($order_info['payment_code'] == 'offline') {
-                $order_list[$key]['payment_state'] = lang('cart_step2_arrival_pay');
-            } else {
                 $order_list[$key]['payment_state'] = lang('cart_step2_online_pay');
                 if ($payed_amount > 0) {
                     $payed_tips = '';
@@ -167,21 +159,18 @@ class  Buy extends BaseMember {
                     }
                     $order_list[$key]['order_amount'] .= " ( {$payed_tips} )";
                 }
-            }
         }
         View::assign('order_list', $order_list);
 
         //如果线上线下支付金额都为0，转到支付成功页
-        if (empty($pay_amount_online) && empty($pay_amount_offline)) {
+        if (empty($pay_amount_online)) {
             $this->redirect('Buy/pay_ok', ['pay_sn' => $pay_sn, 'pay_amount' => ds_price_format($pay_amount)]);
         }
 
         //输出订单描述
         if (empty($pay_amount_online)) {
             $order_remind = lang('successful_ordering_delivery');
-        } elseif (empty($pay_amount_offline)) {
-            $order_remind = lang('timely_payment');
-        } else {
+        }  else {
             $order_remind = lang('payment_soon_possible');
         }
         View::assign('order_remind', $order_remind);
@@ -197,7 +186,7 @@ class  Buy extends BaseMember {
                 $this->error(lang('appropriate_payment_method'),'home/Memberorder/index');
             }
             foreach ($payment_list as $key => $payment) {
-                if(in_array($payment['payment_code'], array('predeposit','offline'))){
+                if(in_array($payment['payment_code'], array('predeposit'))){
                     unset($payment_list[$key]);
                 }
             }
@@ -236,7 +225,7 @@ class  Buy extends BaseMember {
 		//显示支付接口列表
 		$payment_model = model('payment');
 		$condition = array();
-		$condition[] = array('payment_code','not in',array('offline', 'predeposit'));
+		$condition[] = array('payment_code','not in',array('predeposit'));
 		$condition[] = array('payment_state','=',1);
 		$condition[] = array('payment_platform','=','pc');
 		$payment_list = $payment_model->getPaymentList($condition);
@@ -280,7 +269,7 @@ class  Buy extends BaseMember {
         //显示支付接口列表
         $payment_model = model('payment');
         $condition = array();
-        $condition[] = array('payment_code','not in',array('offline', 'predeposit'));
+        $condition[] = array('payment_code','not in',array('predeposit'));
         $condition[] = array('payment_state','=',1);
         $condition[] = array('payment_platform','=','pc');
         $payment_list = $payment_model->getPaymentList($condition);
@@ -425,30 +414,33 @@ class  Buy extends BaseMember {
 
             echo View::fetch($this->template_dir.'buy_address_add');
         } else {
+            
+            //验证器在model中,需要判断必填
+            $address_realname = input('post.true_name');
+            if(empty($address_realname)){
+                exit(json_encode(array('state' => false, 'msg' => lang('param_error'))));
+            }
+            
             $data = array(
                 'member_id' => session('member_id'),
-                'address_realname' => input('post.true_name'),
+                'address_realname' => $address_realname,
                 'area_id' => intval(input('post.area_id')),
                 'city_id' => intval(input('post.city_id')),
                 'area_info'=>input('post.area_info'),
                 'address_detail' => input('post.address'),
-				'house_number' => input('post.house_number'),
+		'house_number' => input('post.house_number'),
                 'address_tel_phone' => input('post.tel_phone'),
                 'address_mob_phone' => input('post.mob_phone'),
                 'address_longitude' => input('post.longitude'),
                 'address_latitude' => input('post.latitude'),
                 'address_is_default' => 0,
             );
-            $buy_validate = ds_validate('buy');
-            if (!$buy_validate->scene('add_addr')->check($data)) {
-                exit(json_encode(array('state' => false, 'msg' => $buy_validate->getError())));
-            }
 
             $insert_id = model('address')->addAddress($data);
             if ($insert_id) {
                 exit(json_encode(array('state' => true, 'addr_id' => $insert_id)));
             } else {
-                exit(json_encode(array('state' => true, 'msg' => lang('add_cart_failed'))));
+                exit(json_encode(array('state' => false, 'msg' => lang('add_cart_failed'))));
             }
         }
     }

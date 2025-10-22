@@ -23,4 +23,6 @@ $lang['bonusreceive_price'] = '领取金额';
 $lang['bonusreceive_transformed'] = '是否转入预存款';
 
 $lang['bonus_randomprice_error']='随机金额或红包总面额错误';
+
+$lang['bonus_fixedprice_error']='固定金额或红包总面额错误';
 return $lang;

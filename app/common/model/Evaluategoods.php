@@ -3,9 +3,10 @@
 namespace app\common\model;
 use think\facade\Db;
 
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,7 +16,7 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Evaluategoods extends BaseModel {
+class Evaluategoods extends BaseModel {
 
     public $page_info;
 
@@ -190,6 +191,10 @@ class  Evaluategoods extends BaseModel {
      * @return bool
      */
     public function editEvaluategoods($update, $condition) {
+        $goodsid_array = Db::name('evaluategoods')->where($condition)->column('geval_goodsid');
+        foreach ($goodsid_array as $goods_id) {
+            dcache($goods_id, 'goods_evaluation');
+        }
         return Db::name('evaluategoods')->where($condition)->update($update);
     }
 
@@ -201,6 +206,10 @@ class  Evaluategoods extends BaseModel {
      * @return bool
      */
     public function delEvaluategoods($condition) {
+        $goodsid_array = Db::name('evaluategoods')->where($condition)->column('geval_goodsid');
+        foreach ($goodsid_array as $goods_id) {
+            dcache($goods_id, 'goods_evaluation');
+        }
         return Db::name('evaluategoods')->where($condition)->delete();
     }
 

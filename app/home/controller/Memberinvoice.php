@@ -71,15 +71,10 @@ class  Memberinvoice extends BaseMember {
         } else {
             $data = $this->get_data();
             $data['member_id'] = session('member_id');
-            $memberinvoice_validate = ds_validate('invoice');
-            $scene='';
             if($data['invoice_state']==1){
-                $scene = 'invoice_1_update';
+                $this->validate($data, 'app\common\validate\Invoice.invoice_1_update');
             }else{
-                $scene = 'invoice_2_update';
-            }
-            if (!$memberinvoice_validate->scene($scene)->check($data)) {
-                ds_json_encode(10001, $memberinvoice_validate->getError());
+                $this->validate($data, 'app\common\validate\Invoice.invoice_2_update');
             }
 
             $invoice_model = model('invoice');
@@ -113,15 +108,10 @@ class  Memberinvoice extends BaseMember {
             return View::fetch($this->template_dir . 'form');
         } else {
             $data = $this->get_data();
-            $memberinvoice_validate = ds_validate('invoice');
-            $scene='';
             if($data['invoice_state']==1){
-                $scene = 'invoice_1_update';
+                $this->validate($data, 'app\common\validate\Invoice.invoice_1_update');
             }else{
-                $scene = 'invoice_2_update';
-            }
-            if (!$memberinvoice_validate->scene($scene)->check($data)) {
-                ds_json_encode(10001, $memberinvoice_validate->getError());
+                $this->validate($data, 'app\common\validate\Invoice.invoice_2_update');
             }
 
             $result = $invoice_model->editInvoice($data, array('member_id' => session('member_id'), 'invoice_id' => $invoice_id));

@@ -2,11 +2,11 @@
 
 namespace app\common\validate;
 
-
 use think\Validate;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -16,19 +16,22 @@ use think\Validate;
  * ============================================================================
  * 验证器
  */
-class  Snsmember extends Validate
-{
+class Snsmember extends Validate {
+
     protected $rule = [
-        'membertag_name'=>'require',
-        'membertag_sort'=>'require|number',
+        'mtag_name' => 'require|length:0,20',
+        'mtag_sort' => 'number|between:0,255',
+        'mtag_desc' => 'length:0,50',
     ];
     protected $message = [
-        'membertag_name.require'=>'会员标签名称不能为空',
-        'membertag_sort.require'=>'会员标签排序只能为数字',
-        'membertag_sort.number'=>'会员标签排序只能为数字',
+        'mtag_name.require' => '会员标签名称不能为空',
+        'mtag_name.length' => '会员标签名称长度不能大于20',
+        'mtag_sort.number' => '排序必须为0-255间数字',
+        'mtag_sort.between' => '排序必须为0-255间数字',
+        'mtag_desc.length' => '会员标签描述长度不能大于50',
     ];
     protected $scene = [
-        'tag_add' => ['membertag_name', 'membertag_sort'],
-        'tag_edit' => ['membertag_name', 'membertag_sort'],
+        'tag_add' => ['mtag_name', 'mtag_sort', 'mtag_desc'],
+        'tag_edit' => ['mtag_name', 'mtag_sort', 'mtag_desc'],
     ];
 }

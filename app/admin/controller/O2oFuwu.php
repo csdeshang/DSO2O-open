@@ -124,19 +124,12 @@ class O2oFuwu extends AdminControl {
                 'o2o_fuwu_account_name' => input('post.o2o_fuwu_account_name'),
                 'o2o_fuwu_account_password' => input('post.o2o_fuwu_account_password'),
             );
-            $o2o_fuwu_account_validate = ds_validate('o2o_fuwu_account');
-            if (!$o2o_fuwu_account_validate->scene('o2o_fuwu_account_add')->check($o2o_fuwu_account_data)) {
-                $this->error($o2o_fuwu_account_validate->getError());
-            }
+            $this->validate($o2o_fuwu_account_data, 'app\common\validate\O2oFuwuAccount.o2o_fuwu_account_add');
 
             $o2o_fuwu_organization_data = array(
                 'o2o_fuwu_organization_type' => input('post.o2o_fuwu_organization_type'),
             );
-
-            $o2o_fuwu_organization_validate = ds_validate('o2o_fuwu_organization');
-            if (!$o2o_fuwu_organization_validate->scene('o2o_fuwu_organization_add')->check($o2o_fuwu_organization_data)) {
-                $this->error($o2o_fuwu_organization_validate->getError());
-            }
+            $this->validate($o2o_fuwu_organization_data, 'app\common\validate\O2oFuwuOrganization.o2o_fuwu_organization_add');
 
             $result = $o2o_fuwu_account_model->getO2oFuwuAccountInfo(array('o2o_fuwu_account_name' => $o2o_fuwu_account_data['o2o_fuwu_account_name']));
             if ($result) {
@@ -166,11 +159,12 @@ class O2oFuwu extends AdminControl {
                 if (!$o2o_fuwu_account_model->editO2oFuwuAccount(array('o2o_fuwu_organization_id' => $o2o_fuwu_organization_id), array('o2o_fuwu_account_id' => $o2o_fuwu_account_id))) {
                     throw new \think\Exception('绑定服务机构失败', 10006);
                 }
+                Db::commit();
             } catch (\Exception $e) {
                 Db::rollback();
                 $this->error($e->getMessage());
             }
-            Db::commit();
+            
 
             $this->log(lang('ds_add') . '服务机构账号' . "[{$o2o_fuwu_account_data['o2o_fuwu_account_name']}]");
             dsLayerOpenSuccess(lang('ds_common_op_succ'), url('O2oFuwu/edit', ['id' => $o2o_fuwu_organization_id]));
@@ -188,7 +182,11 @@ class O2oFuwu extends AdminControl {
             $this->error(lang('o2o_fuwu_empty'));
         }
         if (!request()->isPost()) {
-            $this->get_common_data();
+            
+            $o2o_fuwu_class_model = model('o2o_fuwu_class');
+            $class_list = $o2o_fuwu_class_model->getO2oFuwuClassList(array('o2o_fuwu_class_parent_id' => 0));
+            View::assign('class_list', $class_list);
+        
             View::assign('o2o_fuwu_array', $o2o_fuwu_array);
             $o2o_fuwu_upload_model = model('o2o_fuwu_upload');
             $o2o_fuwu_upload_1_list = $o2o_fuwu_upload_model->getO2oFuwuUploadList(array('o2o_fuwu_upload_type' => 1, 'o2o_fuwu_organization_id' => $o2o_fuwu_array['o2o_fuwu_organization_id'],));
@@ -203,14 +201,10 @@ class O2oFuwu extends AdminControl {
 
             $data = $this->post_data();
 
-
-            $o2o_fuwu_organization_validate = ds_validate('o2o_fuwu_organization');
-            if (!$o2o_fuwu_organization_validate->scene('o2o_fuwu_organization_edit_base')->check($data)) {
-                $this->error($o2o_fuwu_organization_validate->getError());
-            }
-            if (!$o2o_fuwu_organization_validate->scene('o2o_fuwu_organization_edit_operate')->check($data)) {
-                $this->error($o2o_fuwu_organization_validate->getError());
-            }
+            $this->validate($data, 'app\common\validate\O2oFuwuOrganization.o2o_fuwu_organization_edit_base');
+            
+            $this->validate($data, 'app\common\validate\O2oFuwuOrganization.o2o_fuwu_organization_edit_operate');
+                    
             $data['o2o_fuwu_organization_birthday'] = strtotime($data['o2o_fuwu_organization_birthday']);
             //头像
             if (!empty($_FILES['_pic']['name'])) {
@@ -224,7 +218,7 @@ class O2oFuwu extends AdminControl {
 
             }
             if (isset($data['o2o_fuwu_organization_avatar']) && $o2o_fuwu_array['o2o_fuwu_organization_avatar']) {
-                @unlink($upload_file . '/' . $o2o_fuwu_array['o2o_fuwu_organization_avatar']);
+                ds_del_pic(ATTACH_O2O_FUWU_ORGANIZATION . '/' . $o2o_fuwu_array['o2o_fuwu_organization_id'],$o2o_fuwu_array['o2o_fuwu_organization_avatar']);
             }
             $result = $o2o_fuwu_organization_model->editO2oFuwuOrganization($data, array('o2o_fuwu_organization_id' => $id));
             if ($result) {
@@ -276,11 +270,6 @@ class O2oFuwu extends AdminControl {
         }
     }
 
-    public function get_common_data() {
-        $o2o_fuwu_class_model = model('o2o_fuwu_class');
-        $class_list = $o2o_fuwu_class_model->getO2oFuwuClassList(array('o2o_fuwu_class_parent_id' => 0));
-        View::assign('class_list', $class_list);
-    }
 
     public function post_data() {
         $open = explode(',', input('post.o2o_fuwu_organization_open'));

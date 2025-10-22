@@ -113,26 +113,26 @@ class  O2oDistributorMoney extends AdminControl {
         }
         $o2o_distributor_moneylog_model = model('o2o_distributor_moneylog');
         $condition = array();
-        $condition[]=array('o2o_distributor_moneylog_id','=',$id);
-        $condition[]=array('o2o_distributor_moneylog_payment_state','=',2);
+        $condition[] = array('o2o_distributor_moneylog_id', '=', $id);
+        $condition[] = array('o2o_distributor_moneylog_payment_state', '=', 2);
         $info = $o2o_distributor_moneylog_model->getO2oDistributorMoneyLogInfo($condition);
         if (empty($info)) {
             $this->error('配送员申请提现状态错误');
         }
-        if(!request()->isPost()){
+        if (!request()->isPost()) {
             View::assign('info', $info);
             return View::fetch();
-        }else{
-            
+        } else {
+
             $verify_reason = input('param.verify_reason');
-            if(empty($verify_reason)){
+            if (empty($verify_reason)) {
                 $this->error('请输入备注信息');
             }
-            
+
             $verify_state = intval(input('param.verify_state'));
-            
+
+            Db::startTrans();
             try {
-                Db::startTrans();
 
                 if ($verify_state == 1) {
                     //审核通过,扣除申请冻结资金
@@ -153,10 +153,10 @@ class  O2oDistributorMoney extends AdminControl {
                     $o2o_distributor_moneylog_model->changeO2oDistributorMoney('cash_del', $distributor_money);
                     $payment_state = 4;
                 }
-                
+
                 //修改配送员申请提现的状态
-                $o2o_distributor_moneylog_model->editO2oDistributorMoneylog($condition,array('o2o_distributor_moneylog_payment_state'=>$payment_state));
-                
+                $o2o_distributor_moneylog_model->editO2oDistributorMoneylog($condition, array('o2o_distributor_moneylog_payment_state' => $payment_state));
+
                 Db::commit();
                 $this->log('审核配送员提现', 1);
                 dsLayerOpenSuccess(lang('ds_common_op_succ'));

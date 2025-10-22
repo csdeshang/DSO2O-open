@@ -48,7 +48,7 @@ class  Snsalbum extends BaseMember {
             $ap_info = Db::name('snsalbumpic')->where(array('ap_id' => $v, 'member_id' => session('member_id')))->find();
             if (empty($ap_info))
                 continue;
-            @unlink(BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . ATTACH_MALBUM . DIRECTORY_SEPARATOR . session('member_id') . DIRECTORY_SEPARATOR . $ap_info['ap_cover']);
+            ds_del_pic(ATTACH_MALBUM.'/'.session('member_id'),$ap_info['ap_cover']);
             $res = Db::name('snsalbumpic')->delete($ap_info['ap_id']);
         }
         if ($res){
@@ -94,7 +94,7 @@ class  Snsalbum extends BaseMember {
             exit;
         }
 
-        list($width, $height, $type, $attr) = getimagesize(ds_get_pic(ATTACH_MALBUM . DIRECTORY_SEPARATOR . $member_id, $img_path));
+        list($width, $height, $type, $attr) = getimagesize($_FILES['file']['tmp_name']);
 
         $insert = array();
         $insert['ap_name'] = $img_path;

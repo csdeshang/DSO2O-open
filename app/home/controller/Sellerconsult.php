@@ -115,6 +115,9 @@ class  Sellerconsult extends BaseSeller
         $condtion = array();
         $condtion['store_id'] = session('store_id');
         $condtion['consult_id'] = $consult_id;
+        
+        $this->validate($update, 'app\common\validate\Consult.edit');
+        
         $state = $consult_model->editConsult($condtion, $update);
         if ($state) {
             $consult_info = $consult_model->getConsultInfo(array('consult_id' => $consult_id));

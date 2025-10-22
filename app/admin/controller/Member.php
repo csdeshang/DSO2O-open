@@ -4,9 +4,10 @@ namespace app\admin\controller;
 use think\facade\View;
 use think\facade\Db;
 use think\facade\Lang;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -16,7 +17,7 @@ use think\facade\Lang;
  * ============================================================================
  * 控制器
  */
-class  Member extends AdminControl {
+class Member extends AdminControl {
 
     public function initialize() {
         parent::initialize();
@@ -106,7 +107,7 @@ class  Member extends AdminControl {
         } else {
             $member_model = model('member');
             $data = array(
-                'member_name' => input('post.member_name'),
+                'member_name' => trim(input('post.member_name')),
                 'member_password' => input('post.member_password'),
                 'member_email' => input('post.member_email'),
                 'member_truename' => input('post.member_truename'),
@@ -117,10 +118,6 @@ class  Member extends AdminControl {
                 'member_loginnum' => 0,
                 'inform_allow' => 1, //默认允许举报商品
             );
-            $member_validate = ds_validate('member');
-            if (!$member_validate->scene('add')->check($data)){
-                $this->error($member_validate->getError());
-            }
             $result = $member_model->addMember($data);
             if ($result) {
                 dsLayerOpenSuccess(lang('ds_common_op_succ'));
@@ -132,16 +129,15 @@ class  Member extends AdminControl {
 
     public function edit() {
         //注：pathinfo地址参数不能通过get方法获取，查看“获取PARAM变量”
-        $member_id = input('param.member_id');
+        $member_id = intval(input('param.member_id'));
         if (empty($member_id)) {
             $this->error(lang('param_error'));
         }
         $member_model = model('member');
-        
             $condition = array();
             $condition[] = array('member_id','=',$member_id);
             $member_array = $member_model->getMemberInfo($condition);
-        if (!request()->isPost()) {    
+        if (!request()->isPost()) {
             View::assign('member_array', $member_array);
             return View::fetch();
         } else {
@@ -149,7 +145,6 @@ class  Member extends AdminControl {
             if($member_mobile==encrypt_show($member_array['member_mobile'],4,4)){
                 $member_mobile=$member_array['member_mobile'];
             }
-
             $data = array(
                 'member_email' => input('post.member_email'),
                 'member_truename' => input('post.member_truename'),
@@ -176,13 +171,11 @@ class  Member extends AdminControl {
             if (input('post.member_paypwd')) {
                 $data['member_paypwd'] = md5(input('post.member_paypwd'));
             }
+            
+            //用于验证器 的 unique 
+            $data['member_id'] = $member_id;
 
-            $member_validate = ds_validate('member');
-            if (!$member_validate->scene('edit')->check($data)){
-                $this->error($member_validate->getError());
-            }
-
-            $result = $member_model->editMember(array('member_id'=>intval($member_id)),$data,intval($member_id));
+            $result = $member_model->editMember(array('member_id'=>$member_id),$data,$member_id);
             if ($result>=0) {
                 dsLayerOpenSuccess(lang('ds_common_op_succ'));
             } else {
@@ -196,7 +189,7 @@ class  Member extends AdminControl {
      */
     public function ajax() {
         $branch = input('param.branch');
-
+        $condition=array();
         switch ($branch) {
             /**
              * 验证会员是否重复
@@ -265,15 +258,15 @@ class  Member extends AdminControl {
         $menu_array = array(
             array(
                 'name' => 'member',
-                'text' => '管理',
-                'url' => url('Member/member')
+                'text' => lang('ds_manage'),
+                'url' => (string)url('Member/member')
             ),
         );
         if (request()->action() == 'add' || request()->action() == 'member') {
             $menu_array[] = array(
                 'name' => 'add',
-                'text' => '新增',
-                'url' => "javascript:dsLayerOpen('".url('Member/add')."','新增用户')"
+                'text' => lang('ds_add'),
+                'url' => "javascript:dsLayerOpen('".(string)url('Member/add')."','".lang('ds_add')."')"
             );
         }
         return $menu_array;

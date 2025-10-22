@@ -54,7 +54,7 @@ class sendStoremsg {
             $param['site_name'] = config('ds_config.site_name');
             $member_id=Db::name('store')->where(array('store_id'=>$this->store_id))->value('member_id');
             if($member_id){
-                $openid=Db::name('member')->where(array('member_id'=>$member_id))->value('member_wxopenid');
+                $openid=Db::name('member')->where(array('member_id'=>$member_id))->value('member_h5_wxopenid');
                 if($openid){
                     $tm_data = array(
                         "first" => array(

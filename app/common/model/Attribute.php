@@ -3,9 +3,10 @@
 namespace app\common\model;
 use think\facade\Db;
 
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,7 +16,7 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Attribute extends BaseModel {
+class Attribute extends BaseModel {
 
     const SHOW0 = 0;    // 不显示
     const SHOW1 = 1;    // 显示
@@ -42,7 +43,7 @@ class  Attribute extends BaseModel {
      * @return array
      */
     public function getAttributeShowList($condition, $field = '*') {
-        $condition[]=array('attr_show','=',self::SHOW1);
+        $condition[] = array('attr_show','=',self::SHOW1);
         return $this->getAttributeList($condition, $field);
     }
 

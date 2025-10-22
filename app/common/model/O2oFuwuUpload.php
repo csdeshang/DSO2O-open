@@ -95,7 +95,7 @@ class  O2oFuwuUpload extends BaseModel {
         foreach($o2o_fuwu_upload as $item){
             //删除图片
             if($item['o2o_fuwu_upload_url']){
-                @unlink(BASE_UPLOAD_PATH . '/' . ATTACH_O2O_FUWU_ORGANIZATION . '/' . $item['o2o_fuwu_organization_id'] . '/' . $item['o2o_fuwu_upload_url']);
+                ds_del_pic(ATTACH_O2O_FUWU_ORGANIZATION . '/' . $item['o2o_fuwu_organization_id'],$item['o2o_fuwu_upload_url']);
             }
         }
         return Db::name('o2o_fuwu_upload')->where($condition)->delete();

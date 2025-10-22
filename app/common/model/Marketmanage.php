@@ -6,7 +6,7 @@ use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -39,11 +39,11 @@ class Marketmanage extends BaseModel {
     /**
      * 取单个营销活动的内容
      * @author csdeshang
-     * @param array $conditions 检索条件
+     * @param array $condition 检索条件
      * @return array 数组类型的返回结果
      */
-    public function getOneMarketmanage($conditions,$lock=false) {
-        return Db::name('marketmanage')->where($conditions)->lock($lock)->find();
+    public function getOneMarketmanage($condition) {
+        return Db::name('marketmanage')->where($condition)->find();
     }
 
     /**
@@ -53,9 +53,6 @@ class Marketmanage extends BaseModel {
      * @return bool 布尔类型的返回结果
      */
     public function addMarketmanage($data) {
-        if (empty($data)) {
-            return false;
-        }
         return Db::name('marketmanage')->insertGetId($data);
     }
 
@@ -80,12 +77,15 @@ class Marketmanage extends BaseModel {
      * @return array $rs_row 返回数组形式的查询结果
      */
     public function delMarketmanage($marketmanage_id) {
+        $condition = array();
+        $condition[] = array('marketmanage_id','=',$marketmanage_id);
+        
         //删除主表
-        $result = Db::name('marketmanage')->where('marketmanage_id',$marketmanage_id)->delete();
+        $result = Db::name('marketmanage')->where($condition)->delete();
         //删除奖品表
-        Db::name('marketmanageaward')->where('marketmanage_id',$marketmanage_id)->delete();
+        Db::name('marketmanageaward')->where($condition)->delete();
         //删除领取记录表
-        Db::name('marketmanagelog')->where('marketmanage_id',$marketmanage_id)->delete();
+        Db::name('marketmanagelog')->where($condition)->delete();
         return $result;
     }
     /**
@@ -124,8 +124,8 @@ class Marketmanage extends BaseModel {
      * @param array $pagesize 分页信息
      * @return array 数组类型的返回结果
      */
-    public function getMarketmanageAwardList($condition,$lock=false) {
-        $result = Db::name('marketmanageaward')->where($condition)->order('marketmanageaward_level asc')->lock($lock)->select()->toArray();
+    public function getMarketmanageAwardList($condition) {
+        $result = Db::name('marketmanageaward')->where($condition)->order('marketmanageaward_level asc')->select()->toArray();
         return $result;
     }
 

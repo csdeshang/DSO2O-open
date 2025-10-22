@@ -1,11 +1,12 @@
 <?php
 
 namespace app\common\model;
+
 use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,25 +16,37 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Storemoneylog extends BaseModel {
+class Storemoneylog extends BaseModel {
 
     //订单确认收货
-    const TYPE_ORDER_SUCCESS=1;
-    const TYPE_WITHDRAW=2;
-    const TYPE_ADMIN=3;
-    const TYPE_VERIFY=4;
-    const TYPE_DEPOSIT_OUT=5;
-    const TYPE_DEPOSIT_IN=6;
-    
+    const TYPE_ORDER_SUCCESS = 1;
+    //提现
+    const TYPE_WITHDRAW = 2;
+    const TYPE_ADMIN = 3;
+    //提现审核
+    const TYPE_VERIFY = 4;
+    //店铺保证金转出（增加金额）
+    const TYPE_DEPOSIT_OUT = 5;
+    //店铺保证金转入（扣除金额）
+    const TYPE_DEPOSIT_IN = 6;
+    //用户资金转入
+    const TYPE_MEMBER_IN = 7;
+    //用户资金转出
+    const TYPE_MEMBER_OUT = 8;
     //店铺参加营销活动费用
-    const TYPE_STORE_COST=9;
-    const TYPE_ORDER_REFUND=10;
-    
-    const STATE_VALID=1;
-    const STATE_WAIT=2;
-    const STATE_AGREE=3;
-    const STATE_REJECT=4;
-    
+    const TYPE_STORE_COST = 9;
+    //店铺退款
+    const TYPE_ORDER_REFUND = 10;
+    //storemoneylog_state 字段
+    //有效
+    const STATE_VALID = 1;
+    //提现申请
+    const STATE_WAIT = 2;
+    //提现审核同意
+    const STATE_AGREE = 3;
+    //提现审核拒绝
+    const STATE_REJECT = 4;
+
     public $page_info;
 
     /**
@@ -44,7 +57,7 @@ class  Storemoneylog extends BaseModel {
      * @return int
      */
     public function getStoremoneylogWithdrawCount($condition = array()) {
-        return Db::name('storemoneylog')->where(array('storemoneylog_type'=>self::TYPE_WITHDRAW))->where($condition)->count();
+        return Db::name('storemoneylog')->where(array('storemoneylog_type' => self::TYPE_WITHDRAW))->where($condition)->count();
     }
 
     /**
@@ -55,11 +68,12 @@ class  Storemoneylog extends BaseModel {
      * @param type $fields 字段
      * @return array
      */
-    public function getStoremoneylogInfo($condition = array(),$fields='') {
+    public function getStoremoneylogInfo($condition = array(), $fields = '') {
 
-            $pdlog_list_paginate = Db::name('storemoneylog')->where($condition)->field($fields)->find();
-            return $pdlog_list_paginate;
+        $pdlog_list_paginate = Db::name('storemoneylog')->where($condition)->field($fields)->find();
+        return $pdlog_list_paginate;
     }
+
     /**
      * 取得资金变更日志信息
      * @access public
@@ -68,11 +82,12 @@ class  Storemoneylog extends BaseModel {
      * @param type $data 字段
      * @return array
      */
-    public function editStoremoneylog($condition = array(),$data=array()) {
+    public function editStoremoneylog($condition = array(), $data = array()) {
 
-            $pdlog_list_paginate = Db::name('storemoneylog')->where($condition)->update($data);
-            return $pdlog_list_paginate;
+        $pdlog_list_paginate = Db::name('storemoneylog')->where($condition)->update($data);
+        return $pdlog_list_paginate;
     }
+
     /**
      * 取得资金变更日志列表
      * @access public
@@ -86,7 +101,7 @@ class  Storemoneylog extends BaseModel {
      */
     public function getStoremoneylogList($condition = array(), $pagesize = '', $fields = '*', $order = '', $limit = 0) {
         if ($pagesize) {
-            $pdlog_list_paginate = Db::name('storemoneylog')->where($condition)->field($fields)->order($order)->paginate(['list_rows'=>$pagesize,'query' => request()->param()],false);
+            $pdlog_list_paginate = Db::name('storemoneylog')->where($condition)->field($fields)->order($order)->paginate(['list_rows' => $pagesize, 'query' => request()->param()], false);
             $this->page_info = $pdlog_list_paginate;
             return $pdlog_list_paginate->items();
         } else {
@@ -94,7 +109,6 @@ class  Storemoneylog extends BaseModel {
             return $pdlog_list_paginate;
         }
     }
-
 
     /**
      * 变更资金
@@ -104,39 +118,51 @@ class  Storemoneylog extends BaseModel {
      * @return type
      */
     public function changeStoremoney($data = array()) {
-        if(!isset($data['store_id'])){
+        if (!isset($data['store_id'])) {
             throw new \think\Exception(lang('param_error'), 10006);
         }
-        $store_info=Db::name('store')->where('store_id',$data['store_id'])->field('store_avaliable_money,store_freeze_money,store_name')->lock(true)->find();
-        if(!$store_info){
+        $store_info = Db::name('store')->where('store_id', $data['store_id'])->field('store_avaliable_money,store_freeze_money,store_name')->lock(true)->find();
+        if (!$store_info) {
             throw new \think\Exception(lang('ds_store_is_not_exist'), 10006);
         }
-        $data['store_name']=$store_info['store_name'];
-        $store_data=array();
-        if(isset($data['store_avaliable_money']) && $data['store_avaliable_money']!=0){
-            if($data['store_avaliable_money']<0 && $store_info['store_avaliable_money']<abs($data['store_avaliable_money'])){//检查资金是否充足
+        $data['store_name'] = $store_info['store_name'];
+        $store_data = array();
+        if (isset($data['storemoneylog_avaliable_money']) && $data['storemoneylog_avaliable_money'] != 0) {
+            if ($data['storemoneylog_avaliable_money'] < 0 && $store_info['store_avaliable_money'] < abs($data['storemoneylog_avaliable_money'])) {//检查资金是否充足
                 throw new \think\Exception(lang('ds_store_avaliable_money_is_not_enough'), 10006);
             }
-            $store_data['store_avaliable_money']=bcadd($store_info['store_avaliable_money'],$data['store_avaliable_money'],2);
+            $store_data['store_avaliable_money'] = bcadd($store_info['store_avaliable_money'], $data['storemoneylog_avaliable_money'], 2);
         }
-        if(isset($data['store_freeze_money']) && $data['store_freeze_money']!=0){
-            if($data['store_freeze_money']<0 && $store_info['store_freeze_money']<abs($data['store_freeze_money'])){//检查资金是否充足
+        if (isset($data['storemoneylog_freeze_money']) && $data['storemoneylog_freeze_money'] != 0) {
+            if ($data['storemoneylog_freeze_money'] < 0 && $store_info['store_freeze_money'] < abs($data['storemoneylog_freeze_money'])) {//检查资金是否充足
                 throw new \think\Exception(lang('ds_store_freeze_money_is_not_enough'), 10006);
             }
-            $store_data['store_freeze_money']=bcadd($store_info['store_freeze_money'],$data['store_freeze_money'],2);
+            $store_data['store_freeze_money'] = bcadd($store_info['store_freeze_money'], $data['storemoneylog_freeze_money'], 2);
         }
-        if(!empty($store_data)){
-            if(!Db::name('store')->where('store_id',$data['store_id'])->update($store_data)){
+        if (!empty($store_data)) {
+            if (!Db::name('store')->where('store_id', $data['store_id'])->update($store_data)) {
                 throw new \think\Exception(lang('ds_store_money_adjust_fail'), 10006);
             }
         }
-        $insert=Db::name('storemoneylog')->insertGetId($data);
-        if(!$insert){
+
+        //店铺资金记录 插入最新余额
+        //店铺可用资金
+        if (isset($store_data['store_avaliable_money'])) {
+            $data['storemoneylog_avaliable_total_money'] = $store_data['store_avaliable_money'];
+        } else {
+            $data['storemoneylog_avaliable_total_money'] = $store_info['store_avaliable_money'];
+        }
+        //店铺冻结资金
+        if (isset($store_data['store_freeze_money'])) {
+            $data['storemoneylog_freeze_total_money'] = $store_data['store_freeze_money'];
+        } else {
+            $data['storemoneylog_freeze_total_money'] = $store_info['store_freeze_money'];
+        }
+
+        $insert = Db::name('storemoneylog')->insertGetId($data);
+        if (!$insert) {
             throw new \think\Exception(lang('ds_store_money_log_insert_fail'), 10006);
         }
         return $insert;
     }
-
-
-
 }

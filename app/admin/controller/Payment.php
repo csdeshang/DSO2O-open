@@ -1,11 +1,13 @@
 <?php
 
 namespace app\admin\controller;
+
 use think\facade\View;
 use think\facade\Lang;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * DSMall多用户商城
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,11 +17,11 @@ use think\facade\Lang;
  * ============================================================================
  * 控制器
  */
-class  Payment extends AdminControl {
+class Payment extends AdminControl {
 
     public function initialize() {
         parent::initialize();
-        Lang::load(base_path() . 'admin/lang/'.config('lang.default_lang').'/payment.lang.php');
+        Lang::load(base_path() . 'admin/lang/' . config('lang.default_lang') . '/payment.lang.php');
     }
 
     /**
@@ -28,61 +30,60 @@ class  Payment extends AdminControl {
     public function index() {
         $payment_model = model('payment');
         //获取数据库中已安装的支付方式
-        $install_payment_list = $payment_model->getPaymentList(array(array('payment_code','<>', 'predeposit')));
-        $install_payment_list = ds_change_arraykey($install_payment_list,'payment_code');
+        $install_payment_list = $payment_model->getPaymentList(array(array('payment_code', '<>', 'predeposit')));
+        $install_payment_list = ds_change_arraykey($install_payment_list, 'payment_code');
         //获取已存在的支付列表文件
         $file_payment_list = $payment_model->get_builtin();
-        
+
         $payment_platform = input('param.payment_platform');
-        if(!in_array($payment_platform, array('pc','h5','app'))){
+        if (!in_array($payment_platform, array('pc', 'h5', 'app'))) {
             $payment_platform = 'pc';
         }
-        
-        foreach ($file_payment_list as $key => $value)
-        {
-            if($value['payment_platform'] != $payment_platform){
+
+        foreach ($file_payment_list as $key => $value) {
+            if ($value['payment_platform'] != $payment_platform) {
                 unset($file_payment_list[$key]);
                 continue;
             }
-            if(array_key_exists($key, $install_payment_list)){
+            if (array_key_exists($key, $install_payment_list)) {
                 $file_payment_list[$key]['install'] = 1;
                 //已安装的支付，配置信息使用数据库中配置信息
                 $file_payment_list[$key]['payment_config'] = $install_payment_list[$key]['payment_config'];
                 $file_payment_list[$key]['payment_state'] = $install_payment_list[$key]['payment_state'];
-            }else{
+            } else {
                 $file_payment_list[$key]['install'] = 0;
                 $file_payment_list[$key]['payment_state'] = 0;
             }
         }
-        
+
         View::assign('payment_list', $file_payment_list);
-        $this->setAdminCurItem('index_'.$payment_platform);
+        $this->setAdminCurItem('index_' . $payment_platform);
         return View::fetch();
     }
+
     /**
      * 安装支付方式
      */
-    function install()
-    {
+    function install() {
         $payment_code = input('param.payment_code');
         $payment_mod = model('payment');
         //如果是小程序支付、微信JS支付、微信H5支付、微信APP支付则必须先开启微信扫码支付
-        if(in_array($payment_code,array('wxpay_minipro','wxpay_jsapi','wxpay_h5','wxpay_app'))){
-            $payment=model('payment')->getPaymentInfo(array('payment_code'=>'wxpay_native'));
-            if(empty($payment) || empty(unserialize($payment['payment_config']))){
-                ds_json_encode('10001', '请先开启并配置微信扫码支付');
+        if (in_array($payment_code, array('wxpay_minipro', 'wxpay_jsapi', 'wxpay_h5', 'wxpay_app'))) {
+            $payment = model('payment')->getPaymentInfo(array('payment_code' => 'wxpay_native'));
+            if (empty($payment) || empty(unserialize($payment['payment_config']))) {
+                ds_json_encode('10001', lang('please_open_wechat_payment'));
             }
         }
         //如果是支付宝H5支付则开启支付宝支付
-        if(in_array($payment_code,array('alipay_h5'))){
-            $payment=model('payment')->getPaymentInfo(array('payment_code'=>'alipay'));
-            if(empty($payment) || empty(unserialize($payment['payment_config']))){
-                ds_json_encode('10001', '请先开启并配置支付宝PC支付');
+        if (in_array($payment_code, array('alipay_h5'))) {
+            $payment = model('payment')->getPaymentInfo(array('payment_code' => 'alipay'));
+            if (empty($payment) || empty(unserialize($payment['payment_config']))) {
+                ds_json_encode('10001', lang('please_open_alipay_payment'));
             }
         }
-        
-        
-        $payment = model('payment')->getPaymentInfo(array('payment_code'=>$payment_code));
+
+
+        $payment = model('payment')->getPaymentInfo(array('payment_code' => $payment_code));
         if (empty($payment)) {
             $file_payment = include_once(PLUGINS_PATH . '/payments/' . $payment_code . '/payment.info.php');
             $data['payment_code'] = $file_payment['payment_code'];
@@ -91,15 +92,16 @@ class  Payment extends AdminControl {
             $data['payment_platform'] = $file_payment['payment_platform'];
             $data['payment_config'] = serialize(array());
             $resutlt = $payment_mod->addPayment($data);
-            if($resutlt){
+            if ($resutlt) {
                 ds_json_encode('10000', lang('ds_common_op_succ'));
-            }else{
+            } else {
                 ds_json_encode('10001', lang('ds_common_op_fail'));
             }
         } else {
             ds_json_encode('10001', lang('ds_common_op_fail'));
         }
     }
+
     /**
      * 编辑
      */
@@ -149,7 +151,6 @@ class  Payment extends AdminControl {
                         $upload_file = PLUGINS_PATH . '/payments/' . $install_payment['payment_code'] . '/asserts';
                         $file = request()->file('cfg_value2_' . $i);
 
-
                         $file_config = array(
                             'disks' => array(
                                 'local' => array(
@@ -175,25 +176,23 @@ class  Payment extends AdminControl {
             dsLayerOpenSuccess(lang('ds_common_op_succ'));
         }
     }
-    
+
     /**
      * 删除支付方式,卸载
      */
-    public function del()
-    {
+    public function del() {
         $payment_model = model('payment');
         $payment_code = trim(input('param.payment_code'));
+        $condition = array();
         $condition[] = array('payment_code', '=', $payment_code);
         $result = $payment_model->delPayment($condition);
-        if($result){
+        if ($result) {
             ds_json_encode('10000', lang('ds_common_op_succ'));
-        }else{
+        } else {
             ds_json_encode('10001', lang('ds_common_op_fail'));
         }
     }
-    
 
-    
     /**
      * 获取卖家栏目列表,针对控制器下的栏目
      */
@@ -202,22 +201,21 @@ class  Payment extends AdminControl {
             array(
                 'name' => 'index_pc',
                 'text' => lang('payment_index_pc'),
-                'url' => url('Payment/index')
+                'url' => (string) url('Payment/index')
             ),
             array(
                 'name' => 'index_h5',
                 'text' => lang('payment_index_h5'),
-                'url' => url('Payment/index',['payment_platform'=>'h5'])
+                'url' => (string) url('Payment/index', ['payment_platform' => 'h5'])
             ),
             array(
                 'name' => 'index_app',
                 'text' => lang('payment_index_app'),
-                'url' => url('Payment/index',['payment_platform'=>'app'])
+                'url' => (string) url('Payment/index', ['payment_platform' => 'app'])
             ),
         );
         return $menu_array;
     }
-
 }
 
 ?>

@@ -7,7 +7,7 @@ use think\facade\Db;
 use app\common\model\Storemoneylog;
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能 店铺资金
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -17,7 +17,7 @@ use app\common\model\Storemoneylog;
  * ============================================================================
  * 控制器
  */
-class  Storemoney extends AdminControl {
+class Storemoney extends AdminControl {
 
     public function initialize() {
         parent::initialize();
@@ -47,6 +47,10 @@ class  Storemoney extends AdminControl {
         if (!empty($mname)) {
             $condition[]=array('store_name','like','%'.$mname.'%');
         }
+        $store_id = intval(input('get.store_id'));
+        if ($store_id>0) {
+            $condition[] = array('store_id', '=', $store_id);
+        }
         $storemoneylog_model = model('storemoneylog');
         $list_log = $storemoneylog_model->getStoremoneylogList($condition, 10, '*', 'storemoneylog_id desc');
         View::assign('show_page', $storemoneylog_model->page_info->render());
@@ -62,10 +66,11 @@ class  Storemoney extends AdminControl {
      * 提现列表
      */
     public function withdraw_list() {
-        $condition = array('storemoneylog_type'=>Storemoneylog::TYPE_WITHDRAW,);
+        $condition = array();
+        $condition[] = array('storemoneylog_type','=',Storemoneylog::TYPE_WITHDRAW);
         $paystate_search = input('param.paystate_search');
         if (isset($paystate_search) && $paystate_search !== '') {
-            $condition[] = array('storedepositlog_state','=',intval($paystate_search));
+            $condition[] = array('storemoneylog_state','=',intval($paystate_search));
         }
 
         $storemoneylog_model = model('storemoneylog');
@@ -116,7 +121,6 @@ class  Storemoney extends AdminControl {
         $storemoneylog_model = model('storemoneylog');
         $condition = array();
         $condition[] = array('storemoneylog_id','=',$id);
-
         $info = $storemoneylog_model->getStoremoneylogInfo($condition);
         if (!is_array($info) || count($info) < 0) {
             $this->error(lang('admin_storemoney_record_error'));
@@ -136,17 +140,18 @@ class  Storemoney extends AdminControl {
                 'storemoneylog_add_time'=>TIMESTAMP,
             );
             if(input('param.verify_state')==1){//通过
-                    $data['store_freeze_money']=-$info['store_freeze_money'];
+                    $data['storemoneylog_freeze_money']=-$info['storemoneylog_freeze_money'];
                     $storemoneylog_state=Storemoneylog::STATE_AGREE;
             }else{
-                $data['store_avaliable_money']=$info['store_freeze_money'];
-                    $data['store_freeze_money']=-$info['store_freeze_money'];
+                $data['storemoneylog_avaliable_money']=$info['storemoneylog_freeze_money'];
+                    $data['storemoneylog_freeze_money']=-$info['storemoneylog_freeze_money'];
                     $storemoneylog_state=Storemoneylog::STATE_REJECT;
             }
             $admininfo = $this->getAdminInfo();
-            $data['storemoneylog_desc']=lang('order_admin_operator')."【" . $admininfo['admin_name'] . "】".((input('param.verify_state')==1)?lang('ds_pass'):lang('ds_refuse')).lang('seller_name')."【" . $info['store_name'] . "】".lang('admin_storemoney_log_stage_cash').'：'.input('param.verify_reason');
+            $data['storemoneylog_desc']=lang('order_admin_operator')."【" . $admininfo['admin_name'] . "】".((input('param.verify_state')==1)?lang('ds_pass'):lang('ds_refuse')).lang('ds_seller_name')."【" . $info['store_name'] . "】".lang('admin_storemoney_log_stage_cash').'：'.input('param.verify_reason');
+            
+            Db::startTrans();
             try {
-                Db::startTrans();
                 $storemoneylog_model->changeStoremoney($data);
                 //修提现状态
                 if(!$storemoneylog_model->editStoremoneylog(array('storemoneylog_id'=>$id,'storemoneylog_state'=>Storemoneylog::STATE_WAIT),array('storemoneylog_state'=>$storemoneylog_state))){
@@ -187,10 +192,7 @@ class  Storemoney extends AdminControl {
                 'operatetype' => input('post.operatetype'),
                 'lg_desc' => input('post.lg_desc'),
             );
-            $storedeposit_validate = ds_validate('storedeposit');
-            if (!$storedeposit_validate->scene('adjust')->check($data)){
-                $this->error($storedeposit_validate->getError());
-            }
+            $this->validate($data, 'app\common\validate\Storedeposit.adjust');
 
             $money = abs(floatval(input('post.amount')));
             if ($money <= 0) {
@@ -228,30 +230,31 @@ class  Storemoney extends AdminControl {
             );
             switch ($operatetype) {
                 case 1:
-                    $data['store_avaliable_money']=$money;
-                    $log_msg = lang('order_admin_operator')."【" . $admininfo['admin_name'] . "】".lang('ds_handle').lang('seller_name')."【" . $store_info['store_name'] . "】".lang('ds_store_money')."【".lang('admin_storemoney_artificial_operatetype_add')."】，".lang('admin_storemoney_price') . $money;
+                    $data['storemoneylog_avaliable_money']=$money;
+                    $log_msg = lang('order_admin_operator')."【" . $admininfo['admin_name'] . "】".lang('ds_handle').lang('ds_seller_name')."【" . $store_info['store_name'] . "】".lang('ds_store_money')."【".lang('admin_storemoney_artificial_operatetype_add')."】，".lang('admin_storemoney_price') . $money;
                     break;
                 case 2:
-                    $data['store_avaliable_money']=-$money;
-                    $log_msg = lang('order_admin_operator')."【" . $admininfo['admin_name'] . "】".lang('ds_handle').lang('seller_name')."【" . $store_info['store_name'] . "】".lang('ds_store_money')."【".lang('admin_storemoney_artificial_operatetype_reduce')."】，".lang('admin_storemoney_price') . $money;
+                    $data['storemoneylog_avaliable_money']=-$money;
+                    $log_msg = lang('order_admin_operator')."【" . $admininfo['admin_name'] . "】".lang('ds_handle').lang('ds_seller_name')."【" . $store_info['store_name'] . "】".lang('ds_store_money')."【".lang('admin_storemoney_artificial_operatetype_reduce')."】，".lang('admin_storemoney_price') . $money;
                     break;
                 case 3:
-                    $data['store_avaliable_money']=-$money;
-                    $data['store_freeze_money']=$money;
-                    $log_msg = lang('order_admin_operator')."【" . $admininfo['admin_name'] . "】".lang('ds_handle').lang('seller_name')."【" . $store_info['store_name'] . "】".lang('ds_store_money')."【".lang('admin_storemoney_artificial_operatetype_freeze')."】，".lang('admin_storemoney_price') . $money;
+                    $data['storemoneylog_avaliable_money']=-$money;
+                    $data['storemoneylog_freeze_money']=$money;
+                    $log_msg = lang('order_admin_operator')."【" . $admininfo['admin_name'] . "】".lang('ds_handle').lang('ds_seller_name')."【" . $store_info['store_name'] . "】".lang('ds_store_money')."【".lang('admin_storemoney_artificial_operatetype_freeze')."】，".lang('admin_storemoney_price') . $money;
                     break;
                 case 4:
-                    $data['store_avaliable_money']=$money;
-                    $data['store_freeze_money']=-$money;
-                    $log_msg = lang('order_admin_operator')."【" . $admininfo['admin_name'] . "】".lang('ds_handle').lang('seller_name')."【" . $store_info['store_name'] . "】".lang('ds_store_money')."【".lang('admin_storemoney_artificial_operatetype_unfreeze')."】，".lang('admin_storemoney_price') . $money;
+                    $data['storemoneylog_avaliable_money']=$money;
+                    $data['storemoneylog_freeze_money']=-$money;
+                    $log_msg = lang('order_admin_operator')."【" . $admininfo['admin_name'] . "】".lang('ds_handle').lang('ds_seller_name')."【" . $store_info['store_name'] . "】".lang('ds_store_money')."【".lang('admin_storemoney_artificial_operatetype_unfreeze')."】，".lang('admin_storemoney_price') . $money;
                     break;
                 default:
                     $this->error(lang('ds_common_op_fail'), 'Storemoney/index');
                     break;
             }
             $data['storemoneylog_desc']=$log_msg;
+            
+            Db::startTrans();
             try {
-                Db::startTrans();
                 $storemoneylog_model->changeStoremoney($data);
                 Db::commit();
                 $this->log($log_msg, 1);
@@ -288,22 +291,22 @@ class  Storemoney extends AdminControl {
             array(
                 'name' => 'index',
                 'text' => lang('admin_storemoney_loglist'),
-                'url' => url('Storemoney/index')
+                'url' => (string)url('Storemoney/index')
             ),
             array(
                 'name' => 'withdraw_list',
                 'text' => lang('admin_storemoney_cashmanage'),
-                'url' => url('Storemoney/withdraw_list')
+                'url' => (string)url('Storemoney/withdraw_list')
             ),
             array(
                 'name' => 'withdraw_set',
                 'text' => lang('admin_storemoney_withdraw_set'),
-                'url' => url('Storemoney/withdraw_set')
+                'url' => (string)url('Storemoney/withdraw_set')
             ),
             array(
                 'name' => 'adjust',
                 'text' => lang('admin_storemoney_adjust'),
-                'url' => "javascript:dsLayerOpen('".url('Storemoney/adjust')."','".lang('admin_storemoney_adjust')."')"
+                'url' => "javascript:dsLayerOpen('".(string)url('Storemoney/adjust')."','".lang('admin_storemoney_adjust')."')"
             ),
         );
         return $menu_array;

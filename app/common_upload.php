@@ -5,63 +5,76 @@
  */
 
 function ds_upload_pic($upload_path, $file_name, $save_name = '', $file_ext = ALLOW_IMG_EXT) {
+    //判断是否上传图片
+    if (empty($_FILES[$file_name]['name'])) {
+        return ds_callback(false, '未获取到上传文件');
+    }
+
+    //验证上传文件格式
     $file_object = request()->file($file_name);
-
-    $disk='local'.rand(0,100);
-    $file_config = array(
-        'disks' => array(
-            $disk => array(
-                'root' => BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . $upload_path
-            )
-        )
-    );
-    config($file_config, 'filesystem');
+    if ($file_ext == 'mp4') {
+        $fileSize = ALLOW_VIDEO_SIZE;
+    } else {
+        $fileSize = ALLOW_IMG_SIZE;
+    }
     try {
-        validate(['image' => 'fileSize:' . ALLOW_IMG_SIZE . '|fileExt:' . $file_ext])
+        validate(['image' => 'fileSize:' . $fileSize . '|fileExt:' . $file_ext])
                 ->check(['image' => $file_object]);
-        if ($save_name) {
-            $temp = explode('.', $save_name);
-            if (count($temp) < 2) {
-                $save_name .= '.png';
-            }
-        }
-        $res=image_filter($_FILES[$file_name]['tmp_name']);
-        if(!$res['code']){
-            throw new \think\Exception($res['msg'], 10006);
-        }
-        if($res['data']['if_sensitive']){
-            throw new \think\Exception(implode('、', $res['data']['sensitive_msg']), 10006);
-        }
-        $upload_type = config('ds_config.upload_type');
-        if ($upload_type == 'alioss') {//远程保存
-            if (!$save_name) {
-                $save_name = date('YmdHis') . rand(10000, 99999) . '.png';
-            }
-            $accessId = config('ds_config.alioss_accessid');
-            $accessSecret = config('ds_config.alioss_accesssecret');
-            $bucket = config('ds_config.alioss_bucket');
-            $endpoint = config('ds_config.alioss_endpoint');
-            $aliendpoint_type = config('ds_config.aliendpoint_type') == '1' ? true : false;
-
-            $object = $upload_path . '/' . 'alioss_' . $save_name;
-            $filePath = $_FILES[$file_name]['tmp_name'];
-            require_once root_path() . 'vendor/aliyuncs/oss-sdk-php/autoload.php';
-            $OssClient = new \OSS\OssClient($accessId, $accessSecret, $endpoint, $aliendpoint_type);
-            $fileinfo = $OssClient->uploadFile($bucket, $object, $filePath);
-            $img_path = $fileinfo['info']['url'];
-            $file_name = substr(strrchr($img_path, "/"), 1);
-        } else {
-            if ($save_name) {
-                $file_name = \think\facade\Filesystem::disk($disk)->putFileAs('', $file_object, $save_name);
-            } else {
-                $file_name = \think\facade\Filesystem::disk($disk)->putFile('', $file_object, 'uniqid');
-            }
-        }
-        return ds_callback(true, '', array('file_name' => $file_name));
     } catch (\Exception $e) {
         return ds_callback(false, $e->getMessage());
     }
+
+    // 未包含文件名
+    if (!$save_name) {
+        $save_name = date('YmdHis') . rand(10000, 99999);
+    }
+    //文件未带后缀,获取后缀名称
+    if (!strpos($save_name, '.')) {
+        $save_name .= '.' . pathinfo($_FILES[$file_name]['name'], PATHINFO_EXTENSION);
+    }
+    $upload_type = config('ds_config.upload_type');
+    if ($upload_type == 'alioss') {//远程保存
+        //阿里云 图片上传
+        return upload_alioss($upload_path, $file_name, $save_name);
+    } else {
+        //本地存储
+        $file_config = array(
+            'disks' => array(
+                'local' => array(
+                    'root' => BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . $upload_path
+                )
+            )
+        );
+        config($file_config, 'filesystem');
+        try {
+            $file_name = \think\facade\Filesystem::putFileAs('', $file_object, $save_name);
+            return ds_callback(true, '', array('file_name' => $file_name));
+        } catch (\Exception $e) {
+            return ds_callback(false, $e->getMessage());
+        }
+    }
 }
+
+/**
+ * 删除单个文件
+ * @param type $upload_path
+ * @param type $file
+ */
+function ds_del_pic($upload_path,$file){
+    
+    $upload_type=explode('_', $file);
+    if(in_array($upload_type['0'], array('alioss', 'cos'))){
+        if ($upload_type['0'] == 'alioss') {
+            //阿里云图片删除
+            $alioss_object = array();
+            $alioss_object[] = $upload_path . '/' . $file;
+            return del_alioss($alioss_object);
+        }
+    }else{
+        @unlink(BASE_UPLOAD_PATH.'/'.$upload_path . '/' . $file);
+    }
+}
+
 /**
  * 取得图片的完整URL路径
  * 
@@ -150,70 +163,103 @@ function ds_unlink($upload_path, $file_name) {
  */
 function upload_albumpic($upload_path, $file_name = 'file', $save_name) {
     //判断是否上传图片
-    if (!empty($_FILES[$file_name]['name'])) {
-        $res=image_filter($_FILES[$file_name]['tmp_name']);
-        if(!$res['code']){
-            return array('code' => '10001', 'message' => $res['msg'], 'result' => '');
-        }
-        if($res['data']['if_sensitive']){
-            return array('code' => '10001', 'message' => implode('、', $res['data']['sensitive_msg']), 'result' => '');
-        }
-        
-        $upload_type = config('ds_config.upload_type');
-        //远程保存
-        if ($upload_type == 'alioss') {
-            $accessId = config('ds_config.alioss_accessid');
-            $accessSecret = config('ds_config.alioss_accesssecret');
-            $bucket = config('ds_config.alioss_bucket');
-            $endpoint = config('ds_config.alioss_endpoint');
-            $aliendpoint_type = config('ds_config.aliendpoint_type') == '1' ? true : false;
-            if (!strpos($save_name, '.')) {
-                $save_name .= '.' . pathinfo($_FILES[$file_name]['name'], PATHINFO_EXTENSION);
-            }
-            $object = $upload_path . '/' . 'alioss_' . $save_name;
-            $filePath = $_FILES[$file_name]['tmp_name'];
-            require_once root_path() . 'vendor/aliyuncs/oss-sdk-php/autoload.php';
-            $OssClient = new \OSS\OssClient($accessId, $accessSecret, $endpoint, $aliendpoint_type);
-            try {
-                $fileinfo = $OssClient->uploadFile($bucket, $object, $filePath);
-                return array('code' => '10000', 'message' => '', 'result' => $fileinfo['info']['url']);
-            } catch (OssException $e) {
-                return array('code' => '10001', 'message' => $e->getMessage(), 'result' => '');
-            }
-        } elseif ($upload_type == 'local') {
-            //本地图片保存
-            $file_object = request()->file($file_name);
-            $upload_path = BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . $upload_path;
-            $file_config = array(
-                'disks' => array(
-                    'local' => array(
-                        'root' => $upload_path
-                    )
+    if (empty($_FILES[$file_name]['name'])) {
+        return ds_callback(false, '未获取到上传文件');
+    }
+
+    //验证上传文件格式
+    $file_object = request()->file($file_name);
+    try {
+        validate(['image' => 'fileSize:' . ALLOW_IMG_SIZE . '|fileExt:' . ALLOW_IMG_EXT])
+                ->check(['image' => $file_object]);
+    } catch (\Exception $e) {
+        return ds_callback(false, $e->getMessage());
+    }
+
+    //文件未带后缀,获取后缀名称
+    if (!strpos($save_name, '.')) {
+        $save_name .= '.' . pathinfo($_FILES[$file_name]['name'], PATHINFO_EXTENSION);
+    }
+
+    $upload_type = config('ds_config.upload_type');
+    //远程保存
+    if ($upload_type == 'alioss') {
+        //阿里云 上传
+        return upload_alioss($upload_path, $file_name, $save_name);
+    } elseif ($upload_type == 'local') {
+        //本地图片保存
+        $upload_path = BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . $upload_path;
+        $file_config = array(
+            'disks' => array(
+                'local' => array(
+                    'root' => $upload_path
                 )
-            );
-            config($file_config, 'filesystem');
-            try {
-                $temp = explode('.', $save_name);
-                if (count($temp) < 2) {
-                    $save_name .= '.png';
-                }
-                validate(['image' => 'fileSize:' . ALLOW_IMG_SIZE . '|fileExt:' . ALLOW_IMG_EXT])
-                        ->check(['image' => $file_object]);
-                $file_name = \think\facade\Filesystem::putFileAs('', $file_object, $save_name);
-                $img_path = $upload_path . '/' . $file_name;
-                create_albumpic_thumb($upload_path, $file_name);
-                return array('code' => '10000', 'message' => '', 'result' => $img_path);
-            } catch (\Exception $e) {
-                $error = $e->getMessage();
-                $data['code'] = '10001';
-                $data['message'] = $error;
-                $data['result'] = $_FILES[$file_name]['name'];
-                return $data;
-            }
+            )
+        );
+        config($file_config, 'filesystem');
+        try {
+            $file_name = \think\facade\Filesystem::putFileAs('', $file_object, $save_name);
+            //本地上传文件 生成缩略图
+            create_albumpic_thumb($upload_path, $file_name);
+            return ds_callback(true, '', array('file_name' => $file_name));
+        } catch (\Exception $e) {
+            return ds_callback(false, $e->getMessage());
         }
-        //预留文件类型检测
-    } else {
-        return array('code' => '10001', 'message' => '', 'result' => '');
+    }
+    //预留文件类型检测
+}
+
+/**
+ * 阿里云OSS 上传
+ * @param type $upload_path
+ * @param type $file_name
+ * @param string $save_name
+ * @return type
+ */
+function upload_alioss($upload_path, $file_name, $save_name) {
+    $accessId = config('ds_config.alioss_accessid');
+    $accessSecret = config('ds_config.alioss_accesssecret');
+    $bucket = config('ds_config.alioss_bucket');
+    $endpoint = config('ds_config.alioss_endpoint');
+    $aliendpoint_type = config('ds_config.aliendpoint_type') == '1' ? true : false;
+
+    $object = $upload_path . '/' . 'alioss_' . $save_name;
+    $filePath = $_FILES[$file_name]['tmp_name'];
+    require_once root_path() . 'vendor/aliyuncs/oss-sdk-php/autoload.php';
+    $OssClient = new \OSS\OssClient($accessId, $accessSecret, $endpoint, $aliendpoint_type);
+    try {
+        $fileinfo = $OssClient->uploadFile($bucket, $object, $filePath);
+        // 根据图片路径 获取文件名
+        $file_name = substr(strrchr($fileinfo['info']['url'], "/"), 1);
+        return ds_callback(true,'',array('file_name' => $file_name));
+    } catch (OssException $e) {
+        return ds_callback(false,$e->getMessage());
+    }
+}
+
+
+/**
+ * 删除阿里云OSS文件
+ * @param type $object  单个文件完整路径或数组
+ */
+function del_alioss($object) {
+    if(empty($object)){
+        return ds_callback(true, '');
+    }
+    //外网存储图片删除
+    $accessId = config('ds_config.alioss_accessid');
+    $accessSecret = config('ds_config.alioss_accesssecret');
+    $bucket = config('ds_config.alioss_bucket');
+    $endpoint = config('ds_config.alioss_endpoint');
+    $aliendpoint_type = config('ds_config.aliendpoint_type') == '1' ? true : false;
+    require_once root_path() . 'vendor/aliyuncs/oss-sdk-php/autoload.php';
+    $OssClient = new \OSS\OssClient($accessId, $accessSecret, $endpoint, $aliendpoint_type);
+    try {
+        //deleteObjects  批量删除  deleteObject 单个文件删除
+        $OssClient->deleteObjects($bucket, $object);
+        return ds_callback(true, '');
+    } catch (OssException $e) {
+        return ds_callback(false, $e->getMessage());
     }
 }
 
@@ -250,25 +296,16 @@ function create_albumpic_thumb($upload_path, $file_name) {
 
 function del_albumpic($pic_list) {
     if (!empty($pic_list) && is_array($pic_list)) {
-        $count = '0';
-        foreach ($pic_list as $val) {
-            $upload_type = explode('_', $val['apic_cover']);
-            if ($upload_type['0'] == 'alioss') {
-                $count++;
-            }
-        }
+        
         $image_ext = explode(',', GOODS_IMAGES_EXT);
-
+        
+        $alioss_object = array();
         foreach ($pic_list as $v) {
             $upload_type = explode('_', $v['apic_cover']);
             //外网存储图片
             if (in_array($upload_type['0'], array('alioss', 'cos'))) {
                 if ($upload_type['0'] == 'alioss') {
-                    if ($count > 1) {
-                        $object[] = ATTACH_GOODS . '/' . $v['store_id'] . '/' . date('Ymd',$v['apic_uploadtime']) . '/' . $v['apic_cover'];
-                    } else {
-                        $object = ATTACH_GOODS . '/' . $v['store_id'] . '/' . date('Ymd',$v['apic_uploadtime']) . '/' . $v['apic_cover'];
-                    }
+                    $alioss_object[] = ATTACH_GOODS . '/' . $v['store_id'] . '/' . date('Ymd', $v['apic_uploadtime']) . '/' . $v['apic_cover'];
                 }
             } else {
                 $upload_path = BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . ATTACH_GOODS . DIRECTORY_SEPARATOR . $v['store_id'] . DIRECTORY_SEPARATOR . date('Ymd',$v['apic_uploadtime']);
@@ -281,70 +318,8 @@ function del_albumpic($pic_list) {
         }
         $upload_type = config('ds_config.upload_type');
         if ($upload_type == 'alioss') {
-            //外网存储图片删除
-            $accessId = config('ds_config.alioss_accessid');
-            $accessSecret = config('ds_config.alioss_accesssecret');
-            $bucket = config('ds_config.alioss_bucket');
-            $endpoint = config('ds_config.alioss_endpoint');
-            $aliendpoint_type = config('ds_config.aliendpoint_type') == '1' ? true : false;
-            require_once root_path() . 'vendor/aliyuncs/oss-sdk-php/autoload.php';
-            $OssClient = new \OSS\OssClient($accessId, $accessSecret, $endpoint, $aliendpoint_type);
-            try {
-                if (is_array($object)) {
-                    $OssClient->deleteObjects($bucket, $object);
-                } else {
-                    $OssClient->deleteObject($bucket, $object);
-                }
-                return array('code' => '10000', 'message' => '', 'result' => '');
-            } catch (OssException $e) {
-                return array('code' => '10001', 'message' => $e->getMessage(), 'result' => '');
-            }
+            //阿里云 图片删除
+            return del_alioss($alioss_object);
         }
-        return array('code' => '10001', 'message' => '', 'result' => '');
     }
-}
-
-/**
- * 获取图片的Base64编码(不支持url)
- *
- * @param $img_file 传入本地图片地址
- *
- * @return string
- */
-function imgToBase64($img_file) {
-    $data=array();
-    $img_base64 = '';
-    if (file_exists($img_file)) {
-        $app_img_file = $img_file; // 图片路径
-        $img_info = getimagesize($app_img_file); // 取得图片的大小，类型等
-
-        //echo '<pre>' . print_r($img_info, true) . '</pre><br>';
-        $fp = fopen($app_img_file, "r"); // 图片是否可读权限
-
-        if ($fp) {
-            $filesize = filesize($app_img_file);
-            $content = fread($fp, $filesize);
-            $file_content = base64_encode($content); // base64编码
-            switch ($img_info[2]) {           //判读图片类型
-                case 1: $img_type = "gif";
-                    break;
-                case 2: $img_type = "jpg";
-                    break;
-                case 3: $img_type = "png";
-                    break;
-            }
-
-            $img_base64 = 'data:image/' . $img_type . ';base64,' . $file_content;//合成图片的base64编码
-
-        }
-        fclose($fp);
-        $data=array(
-            'type'=>$img_type,
-            'content'=>$file_content,
-            'result'=>$img_base64
-        );
-    }
-
-    
-    return $data; //返回图片的base64
 }

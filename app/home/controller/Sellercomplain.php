@@ -122,10 +122,7 @@ class  Sellercomplain extends BaseSeller {
         $input = array();
         $input['appeal_message'] = input('post.input_appeal_message');
 
-        $sellercomplain_validate = ds_validate('sellercomplain');
-        if (!$sellercomplain_validate->scene('appeal_save')->check($input)) {
-            $this->error($sellercomplain_validate->getError());
-        }
+        $this->validate($input, 'app\common\validate\Complain.appeal_save');
         
         //上传图片
         $appeal_pic = array();

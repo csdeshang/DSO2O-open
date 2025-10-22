@@ -134,8 +134,16 @@ class  Store extends AdminControl {
             if (trim(input('post.end_time')) != '') {
                 $time = strtotime(input('post.end_time'));
             }
+            
+            $store_name = input('post.store_name');
+            //验证器在model层,验证器未有必填项,在此验证
+            if(empty($store_name)){
+                $this->error(lang('please_input_store_name_p'));
+            }
+            
             $update_array = array();
-            $update_array['store_name'] = trim(input('post.store_name'));
+            $update_array['store_id'] = $store_id;
+            $update_array['store_name'] = $store_name;
             $update_array['storeclass_id'] = intval(input('post.storeclass_id'));
             $update_array['grade_id'] = intval(input('post.grade_id'));
             $update_array['store_endtime'] = $time;
@@ -153,30 +161,19 @@ class  Store extends AdminControl {
                 //店铺开启后商品不在自动上架，需要手动操作
                 $update_array['store_close_info'] = '';
             }
-            if($update_array['store_name']!=$store_array['store_name']){
-                $goods_model = model('goods');
-                $goods_model->editGoodsCommon(array('store_name'=>$update_array['store_name']), array('store_id'=>$store_id));
-                $goods_model->editGoods(array('store_name'=>$update_array['store_name']), array('store_id'=>$store_id));
-            }
             $result = $store_model->editStore($update_array, array('store_id' => $store_id));
+            
+            //当修改了店铺修改 store_name , 则同时修改数据中其他相关的store_name
+            if ($result && $store_name != $store_array['store_name']) {
+                $store_model->updateAllStorename($store_id, $store_name);
+            }
+            
             $store_type = model('Storejoinin')->editStorejoinin($data, $condition);
             if ($result || $store_type) {
-                //店铺名称修改处理 
-                $store_name = trim(input('post.store_name'));
-                $store_info = $store_model->getStoreInfoByID($store_id);
-                if (!empty($store_name)) {
-                    $where = array();
-                    $where[] = array('store_id', '=', $store_id);
-                    $update = array();
-                    $update['store_name'] = $store_name;
-                    $bllGoods = $store_model->editGoodscommon($where, $update);
-                    $bllGoods = $store_model->editGoods($where, $update);
-                }
-
-                $this->log(lang('ds_edit') . lang('store') . '[' . input('post.store_name') . ']', 1);
+                $this->log(lang('ds_edit') . lang('store') . '[' . $store_name . ']', 1);
                 $this->success(lang('ds_common_save_succ'), url('Store/store'));
             } else {
-                $this->log(lang('ds_edit') . lang('store') . '[' . input('post.store_name') . ']', 1);
+                $this->log(lang('ds_edit') . lang('store') . '[' . $store_name . ']', 1);
                 $this->error(lang('ds_common_save_fail'));
             }
         }
@@ -685,44 +682,46 @@ class  Store extends AdminControl {
         $param['joinin_message'] = input('post.joinin_message');
 
         if (input('post.verify_type') === 'pass') {
-			Db::startTrans();
-			try{
-				$store_model->setStoreOpen($joinin_detail,$param);
-			}catch(\Exception $e) {
-				Db::rollback();
-				$this->error($e->getMessage());
-			}
-			Db::commit();
-				dsLayerOpenSuccess(lang('ds_common_op_succ'));
-			} else {
-				Db::startTrans();
-				try{
-					$predeposit_model = model('predeposit');
-					if($joinin_detail['rcb_amount']>0){
-						$data_pd = array();
-						$data_pd['member_id'] = $joinin_detail['member_id'];
-						$data_pd['member_name'] = $joinin_detail['member_name'];
-						$data_pd['amount'] = $joinin_detail['rcb_amount'];
-						$data_pd['order_sn'] = $joinin_detail['pay_sn'];
-						$predeposit_model->changeRcb('storejoinin_cancel', $data_pd);
-					}
-					if($joinin_detail['pd_amount']>0){
-						$data_pd = array();
-						$data_pd['member_id'] = $joinin_detail['member_id'];
-						$data_pd['member_name'] = $joinin_detail['member_name'];
-						$data_pd['amount'] = $joinin_detail['pd_amount'];
-						$data_pd['order_sn'] = $joinin_detail['pay_sn'];
-						$predeposit_model->changePd('storejoinin_cancel', $data_pd);
-					}
-					//改变店铺状态
-					$storejoinin_model->editStorejoinin($param, array('member_id' => input('param.member_id')));
-				}catch(\Exception $e) {
-					Db::rollback();
-					$this->error($e->getMessage());
-				}
-			Db::commit();
-			dsLayerOpenSuccess(lang('ds_common_op_succ'));
-		}
+            Db::startTrans();
+            try {
+                $store_model->setStoreOpen($joinin_detail, $param);
+                Db::commit();
+            } catch (\Exception $e) {
+                Db::rollback();
+                $this->error($e->getMessage());
+            }
+            
+            dsLayerOpenSuccess(lang('ds_common_op_succ'));
+        } else {
+            Db::startTrans();
+            try {
+                $predeposit_model = model('predeposit');
+                if ($joinin_detail['rcb_amount'] > 0) {
+                    $data_pd = array();
+                    $data_pd['member_id'] = $joinin_detail['member_id'];
+                    $data_pd['member_name'] = $joinin_detail['member_name'];
+                    $data_pd['amount'] = $joinin_detail['rcb_amount'];
+                    $data_pd['order_sn'] = $joinin_detail['pay_sn'];
+                    $predeposit_model->changeRcb('storejoinin_cancel', $data_pd);
+                }
+                if ($joinin_detail['pd_amount'] > 0) {
+                    $data_pd = array();
+                    $data_pd['member_id'] = $joinin_detail['member_id'];
+                    $data_pd['member_name'] = $joinin_detail['member_name'];
+                    $data_pd['amount'] = $joinin_detail['pd_amount'];
+                    $data_pd['order_sn'] = $joinin_detail['pay_sn'];
+                    $predeposit_model->changePd('storejoinin_cancel', $data_pd);
+                }
+                //改变店铺状态
+                $storejoinin_model->editStorejoinin($param, array('member_id' => input('param.member_id')));
+                Db::commit();
+            } catch (\Exception $e) {
+                Db::rollback();
+                $this->error($e->getMessage());
+            }
+            
+            dsLayerOpenSuccess(lang('ds_common_op_succ'));
+        }
     }
 
     /**
@@ -797,24 +796,32 @@ class  Store extends AdminControl {
             $seller_name = $member_name;
             $store_name = input('post.store_name');
 
-            if (strlen($member_name) < 3 || strlen($member_name) > 15)
-                $this->error('账号名称必须是3~15位');
-
-            if (strlen($member_password) < 6)
-                $this->error('登录密码不能短于6位');
-
-            if (!$this->checkMemberName($member_name))
-                $this->error('店主账号已被占用');
+            //store验证器在 model层,避免其他影响, 必填项在控制器进行判断
+            if(empty($store_name)){
+                $this->error('店铺名不能为空');
+            }
             
-            if (!$this->checkSellerName($member_name))
-                $this->error(lang('member_name_exist'));
+            if (strlen($member_name) < 3 || strlen($member_name) > 15){
+                $this->error('账号名称必须是3~15位');
+            }
 
-            try {
-                $memberId = model('member')->addMember(array(
-                    'member_name' => $member_name,
-                    'member_password' => $member_password,
-                ));
-            } catch (Exception $ex) {
+            if (strlen($member_password) < 6){
+                $this->error('登录密码不能短于6位');
+            }
+
+            if (!$this->checkMemberName($member_name)){
+                $this->error('店主账号已被占用');
+            }
+            
+            if (!$this->checkSellerName($member_name)){
+                $this->error(lang('member_name_exist'));
+            }
+                
+            $memberId = model('member')->addMember(array(
+                'member_name' => $member_name,
+                'member_password' => $member_password,
+            ));
+            if (!$memberId) {
                 $this->error('店主账号新增失败');
             }
 

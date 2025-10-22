@@ -7,7 +7,7 @@ use think\facade\Lang;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能 营销活动
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -277,12 +277,12 @@ class Marketmanage extends AdminControl {
             array(
                 'name' => 'index',
                 'text' => lang('ds_manage'),
-                'url' => url('Marketmanage/index', ['type' => input('param.type')])
+                'url' => (string)url('Marketmanage/index', ['type' => input('param.type')])
             ),
             array(
                 'name' => 'add',
                 'text' => lang('ds_add'),
-                'url' => "javascript:dsLayerOpen('" . url('Marketmanage/add', ['type' => input('param.type')]) . "','".lang('ds_add')."')"
+                'url' => "javascript:dsLayerOpen('" . (string)url('Marketmanage/add', ['type' => input('param.type')]) . "','".lang('ds_add')."')"
             ),
         );
         return $menu_array;

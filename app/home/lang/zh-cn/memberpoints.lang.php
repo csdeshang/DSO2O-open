@@ -257,4 +257,12 @@ $lang['balance_withdrawal'] = '余额提现';
 $lang['withdrawal_application'] = '提现申请';
 $lang['verification_code_sending_failed'] = '验证码发送失败';
 
+
+
+$lang['system_occur_error'] = '系统发生错误';
+$lang['not_bind_mobile'] = '您还未绑定手机号码';
+$lang['not_bind_email'] = '您还未绑定邮箱号';
+
+$lang['signin_repeat'] = '您今日已签到';
+$lang['signin_success'] = '签到成功！积分+';
 return $lang;

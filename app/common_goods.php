@@ -222,10 +222,9 @@ function sns_thumb($image_name = '', $type = '')
  * 取得积分商品缩略图的完整URL路径
  *
  * @param string $imgurl 商品名称
- * @param string $type 缩略图类型  值为small
  * @return string
  */
-function pointprod_thumb($image_name = '', $type = '')
+function pointprod_thumb($image_name = '')
 {
 
     if (empty($image_name)) {
@@ -332,7 +331,7 @@ function get_order_refund_state($refund_state) {
  */
 function get_order_payment_name($payment_code)
 {
-    return str_replace(array('offline', 'online', 'alipay', 'alipay_h5', 'alipay_app', 'wxpay_native', 'wxpay_jsapi', 'wxpay_h5', 'wxpay_app', 'wxpay_minipro', 'predeposit'), array('货到付款', '在线付款', '支付宝PC支付', '支付宝手机支付', '支付宝APP支付', '微信扫码支付', '微信公众号支付', '微信H5支付', '微信APP支付', '小程序支付', '站内余额支付'), $payment_code);
+    return str_replace(array('online', 'alipay', 'alipay_h5', 'alipay_app', 'wxpay_native', 'wxpay_jsapi', 'wxpay_h5', 'wxpay_app', 'wxpay_minipro', 'predeposit'), array('在线付款', '支付宝PC支付', '支付宝手机支付', '支付宝APP支付', '微信扫码支付', '微信公众号支付', '微信H5支付', '微信APP支付', '小程序支付', '站内余额支付'), $payment_code);
 }
 
 /**

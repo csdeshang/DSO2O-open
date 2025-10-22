@@ -1,11 +1,12 @@
 <?php
 
 namespace app\common\model;
+
 use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,10 +16,10 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Sellerlog extends BaseModel {
+class Sellerlog extends BaseModel {
 
     public $page_info;
- 
+
     /**
      * 读取列表
      * @access public
@@ -30,11 +31,11 @@ class  Sellerlog extends BaseModel {
      * @return array
      */
     public function getSellerlogList($condition, $pagesize = '', $order = '', $field = '*') {
-        if($pagesize){
-            $result = Db::name('sellerlog')->field($field)->where($condition)->order($order)->paginate(['list_rows'=>$pagesize,'query' => request()->param()],false);
+        if ($pagesize) {
+            $result = Db::name('sellerlog')->field($field)->where($condition)->order($order)->paginate(['list_rows' => $pagesize, 'query' => request()->param()], false);
             $this->page_info = $result;
             return $result->items();
-        }else{
+        } else {
             $result = Db::name('sellerlog')->field($field)->where($condition)->order($order)->select()->toArray();
             return $result;
         }
@@ -73,5 +74,4 @@ class  Sellerlog extends BaseModel {
     public function delSellerlog($condition) {
         return Db::name('sellerlog')->where($condition)->delete();
     }
-
 }

@@ -2,11 +2,11 @@
 
 namespace app\common\model;
 
-
 use think\facade\Db;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -47,23 +47,23 @@ class Snsfriend extends BaseModel {
         switch ($type) {
             case 'simple':
                 $data = Db::name('snsfriend')->where($condition)->field($field);
-             
+
                 break;
             case 'detail':
                 $data = Db::name('snsfriend')->alias('snsfriend')->where($condition)->field($field)->join('member member', 'snsfriend.friend_tomid=member.member_id');
-             
+
                 break;
             case 'fromdetail':
                 $data = Db::name('snsfriend')->alias('snsfriend')->where($condition)->field($field)->join('member member', 'snsfriend.friend_frommid=member.member_id');
-                
+
                 break;
         }
-        if($pagesize){
-            $data= $data->paginate(['list_rows'=>$pagesize,'query' => request()->param()],false);
+        if ($pagesize) {
+            $data = $data->paginate(['list_rows' => $pagesize, 'query' => request()->param()], false);
             $this->page_info = $data;
             $friend_list = $data->items();
-        }else{
-            $friend_list= $data->select()->toArray();
+        } else {
+            $friend_list = $data->select()->toArray();
         }
         return $friend_list;
     }
@@ -77,9 +77,8 @@ class Snsfriend extends BaseModel {
      * @param type $member_list 会员列表
      * @return array
      */
-    public function getFriendList($condition = array(), $limit = 50, $member_list = array())
-    {
-        $list = Db::name('snsfriend')->where($condition)->order('friend_addtime desc')->paginate(['list_rows'=>$limit,'query' => request()->param()],false);
+    public function getFriendList($condition = array(), $limit = 50, $member_list = array()) {
+        $list = Db::name('snsfriend')->where($condition)->order('friend_addtime desc')->paginate(['list_rows' => $limit, 'query' => request()->param()], false);
         if ($list) {
             foreach ($list as $k => $v) {
                 $member = array();
@@ -91,9 +90,10 @@ class Snsfriend extends BaseModel {
                 $member_list[$u_id] = $member;
             }
         }
-        $this->page_info=$list;
+        $this->page_info = $list;
         return $member_list;
     }
+
     /**
      * 获取好友详细
      * @access public
@@ -149,5 +149,4 @@ class Snsfriend extends BaseModel {
         }
         return Db::name('snsfriend')->where($condition)->delete();
     }
-
 }

@@ -63,7 +63,7 @@
             {foreach name="prod_list" item="v"}
             <tr class="hover" id="ds_row_{$v.pgoods_id}">
                 <td><input type="checkbox" name="pg_id[]" value="{$v.pgoods_id}" class="checkitem"></td>
-                <td class="picture"><div class="size-44x44"><span class="thumb size-44x44"><i></i><img src="{$v.pgoods_image_small}" onload="javascript:ResizeImage(this,44,44);"/></span></div></td>
+                <td class="picture"><div class="size-44x44"><span class="thumb size-44x44"><i></i><img src="{$v.pgoods_image_url}" onload="javascript:ResizeImage(this,44,44);"/></span></div></td>
                 <td><a href="{:url('home/Pointprod/pinfo',['id'=>$v.pgoods_id])}" target="_blank" >{$v.pgoods_name}</a></td>
                 <td class="align-center">{$v.pgoods_points}</td>
                 <td class="align-center">{$v.pgoods_price}</td>

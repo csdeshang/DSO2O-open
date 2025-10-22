@@ -155,8 +155,8 @@
                             <dt>{$Think.lang.mapak_type}</dt>
                             <dd>
                                 <label class="radio-label">
-                                    <i  class="radio-common {if !$list_config.mapak_type || $list_config.mapak_type =='1'}selected{/if}">
-                                        <input type="radio" value="1" name="mapak_type" class='gaoderadio' {if !$list_config.mapak_type || $list_config.mapak_type =='1'} checked="checked"{/if}>
+                                    <i  class="radio-common {if $list_config.mapak_type =='1'}selected{/if}">
+                                        <input type="radio" value="1" name="mapak_type" class='gaoderadio' {if $list_config.mapak_type =='1'} checked="checked"{/if}>
                                     </i>
                                     <span>{$Think.lang.gaode_map}</span>
                                 </label>

@@ -1,11 +1,13 @@
 <?php
 
 namespace app\admin\controller;
+
 use think\facade\View;
 use think\facade\Lang;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能 品牌管理
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,13 +17,13 @@ use think\facade\Lang;
  * ============================================================================
  * 控制器
  */
-class  Brand extends AdminControl {
+class Brand extends AdminControl {
 
     const EXPORT_SIZE = 1000;
 
     public function initialize() {
         parent::initialize();
-        Lang::load(base_path() . 'admin/lang/'.config('lang.default_lang').'/brand.lang.php');
+        Lang::load(base_path() . 'admin/lang/' . config('lang.default_lang') . '/brand.lang.php');
     }
 
     /**
@@ -55,16 +57,18 @@ class  Brand extends AdminControl {
 
         $brand_model = model('brand');
         if (request()->isPost()) {
-            $data = [
-                'brand_name' => input('post.brand_name'), 'brand_initial' => input('post.brand_initial'),
-                'brand_sort' => input('post.brand_sort')
-            ];
-            $brand_validate = ds_validate('brand');
-
-            if (!$brand_validate->scene('brand_add')->check($data)) {
-                $this->error($brand_validate->getError());
-            } else {
+ 
                 $insert_array = array();
+                $insert_array['brand_name'] = trim(input('post.brand_name'));
+                $insert_array['brand_initial'] = strtoupper(input('post.brand_initial'));
+                $insert_array['gc_id'] = input('post.class_id');
+                $insert_array['brand_class'] = trim(input('post.brand_class'));
+                $insert_array['brand_recommend'] = trim(input('post.brand_recommend'));
+                $insert_array['brand_sort'] = intval(input('post.brand_sort'));
+                $insert_array['brand_showtype'] = intval(input('post.brand_showtype')) == 1 ? 1 : 0;
+                
+                $this->validate($insert_array, 'app\common\validate\Brand.brand_add');
+                
                 if (!empty($_FILES['_pic']['name'])) {
                     $res=ds_upload_pic(ATTACH_BRAND,'_pic');
                     if($res['code']){
@@ -73,16 +77,10 @@ class  Brand extends AdminControl {
                         $this->error($res['msg']);
                     }
                 }
-                $insert_array['brand_name'] = trim(input('post.brand_name'));
-                $insert_array['brand_initial'] = strtoupper(input('post.brand_initial'));
-                $insert_array['gc_id'] = input('post.class_id');
-                $insert_array['brand_class'] = trim(input('post.brand_class'));
                 if (!empty($brand_pic)) {
                     $insert_array['brand_pic'] = $brand_pic;
                 }
-                $insert_array['brand_recommend'] = trim(input('post.brand_recommend'));
-                $insert_array['brand_sort'] = intval(input('post.brand_sort'));
-                $insert_array['brand_showtype'] = intval(input('post.brand_showtype')) == 1 ? 1 : 0;
+
                 $result = $brand_model->addBrand($insert_array);
                 if ($result) {
                     $this->log(lang('ds_add') . lang('brand_index_brand') . '[' . input('post.brand_name') . ']', 1);
@@ -90,7 +88,6 @@ class  Brand extends AdminControl {
                 } else {
                     $this->error(lang('ds_common_save_fail'));
                 }
-            }
         } else {
             $brand_array = [
                 'brand_id' => '',
@@ -119,14 +116,20 @@ class  Brand extends AdminControl {
         $brand_model = model('brand');
 
         if (request()->isPost()) {
-            $data = [
-                'brand_name' => input('post.brand_name'), 'brand_initial' => input('post.brand_initial'),
-                'brand_sort' => input('post.brand_sort')
-            ];
-            $brand_validate = ds_validate('brand');
-            if (!$brand_validate->scene('brand_edit')->check($data)) {
-                $this->error($brand_validate->getError());
-            } else {
+            
+                $brand_info = $brand_model->getBrandInfo(array('brand_id' => intval(input('post.brand_id'))));
+                
+                $update_array = array();
+                $update_array['brand_name'] = trim(input('post.brand_name'));
+                $update_array['brand_initial'] = strtoupper(input('post.brand_initial'));
+                $update_array['gc_id'] = input('post.class_id');
+                $update_array['brand_class'] = trim(input('post.brand_class'));
+                $update_array['brand_recommend'] = intval(input('post.brand_recommend'));
+                $update_array['brand_sort'] = intval(input('post.brand_sort'));
+                $update_array['brand_showtype'] = intval(input('post.brand_showtype')) == 1 ? 1 : 0;
+                
+                $this->validate($update_array, 'app\common\validate\Brand.brand_edit');
+                
                 if (!empty($_FILES['_pic']['name'])) {
                     $res=ds_upload_pic(ATTACH_BRAND,'_pic');
                     if($res['code']){
@@ -135,24 +138,15 @@ class  Brand extends AdminControl {
                         $this->error($res['msg']);
                     }
                 }
-                $brand_info = $brand_model->getBrandInfo(array('brand_id' => intval(input('post.brand_id'))));
-                $where = array();
-                $where[] = array('brand_id', '=', intval(input('post.brand_id')));
-                $update_array = array();
-                $update_array['brand_name'] = trim(input('post.brand_name'));
-                $update_array['brand_initial'] = strtoupper(input('post.brand_initial'));
-                $update_array['gc_id'] = input('post.class_id');
-                $update_array['brand_class'] = trim(input('post.brand_class'));
                 if (!empty($brand_pic)) {
                     $update_array['brand_pic'] = $brand_pic;
                 }
-                $update_array['brand_recommend'] = intval(input('post.brand_recommend'));
-                $update_array['brand_sort'] = intval(input('post.brand_sort'));
-                $update_array['brand_showtype'] = intval(input('post.brand_showtype')) == 1 ? 1 : 0;
-                $result = $brand_model->editBrand($where, $update_array);
-                if ($result>=0) {
+                $condition = array();
+                $condition[] = array('brand_id', '=', intval(input('post.brand_id')));
+                $result = $brand_model->editBrand($condition, $update_array);
+                if ($result >= 0) {
                     if (!empty(input('post.brand_pic')) && !empty($brand_info['brand_pic'])) {
-                        @unlink(BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . ATTACH_BRAND . DIRECTORY_SEPARATOR . $brand_info['brand_pic']);
+                        ds_del_pic(ATTACH_BRAND,$brand_info['brand_pic']);
                     }
                     $this->log(lang('ds_edit') . lang('brand_index_brand') . '[' . input('post.brand_name') . ']', 1);
                     dsLayerOpenSuccess(lang('ds_common_save_succ'));
@@ -160,7 +154,6 @@ class  Brand extends AdminControl {
                     $this->log(lang('ds_edit') . lang('brand_index_brand') . '[' . input('post.brand_name') . ']', 0);
                     $this->error(lang('ds_common_save_fail'));
                 }
-            }
         } else {
             $brand_info = $brand_model->getBrandInfo(array('brand_id' => intval(input('param.brand_id'))));
             if (empty($brand_info)) {
@@ -185,7 +178,9 @@ class  Brand extends AdminControl {
             ds_json_encode(10001, lang('param_error'));
         }
         $brand_mod = model('brand');
-        $brand_mod->delBrand(array(array('brand_id','in', implode(',', $brand_id_array))));
+        $condition = array();
+        $condition[] = array('brand_id', 'in', $brand_id_array);
+        $brand_mod->delBrand($condition);
         $this->log(lang('ds_del') . lang('brand_index_brand') . '[ID:' . $brand_id . ']', 1);
         ds_json_encode(10000, lang('ds_common_del_succ'));
     }
@@ -199,7 +194,7 @@ class  Brand extends AdminControl {
          * 对申请品牌进行操作 通过，拒绝
          */
         if (request()->isPost()) {
-            $del_id_array = input('post.del_id/a');#获取数组
+            $del_id_array = input('post.del_id/a'); #获取数组
             if (!empty($del_id_array)) {
                 switch (input('post.type')) {
                     case 'pass':
@@ -210,7 +205,9 @@ class  Brand extends AdminControl {
                         }
                         $update_array = array();
                         $update_array['brand_apply'] = 1;
-                        $brand_model->editBrand(array(array('brand_id','in', $brandid_array)), $update_array);
+                        $condition = array();
+                        $condition[] = array('brand_id', 'in', $brandid_array);
+                        $brand_model->editBrand($condition, $update_array);
                         $this->log(lang('brand_apply_pass') . '[ID:' . implode(',', $brandid_array) . ']', null);
                         $this->success(lang('brand_apply_passed'));
                         break;
@@ -220,7 +217,9 @@ class  Brand extends AdminControl {
                         foreach ($del_id_array as $v) {
                             $brandid_array[] = intval($v);
                         }
-                        $brand_model->delBrand(array(array('brand_id','in', $brandid_array)));
+                        $condition = array();
+                        $condition[] = array('brand_id', 'in', $brandid_array);
+                        $brand_model->delBrand($condition);
                         $this->log(lang('ds_del') . lang('brand_index_brand') . '[ID:' . implode(',', $del_id_array) . ']', 1);
                         $this->success(lang('ds_common_del_succ'));
                         break;
@@ -237,10 +236,10 @@ class  Brand extends AdminControl {
              */
             $condition = array();
             if (!empty(input('param.search_brand_name'))) {
-                $condition[] = array('brand_name','like', '%' . trim(input('param.search_brand_name')) . '%');
+                $condition[] = array('brand_name', 'like', '%' . trim(input('param.search_brand_name')) . '%');
             }
             if (!empty(input('param.search_brand_class'))) {
-                $condition[] = array('brand_class','like', '%' . trim(input('param.search_brand_class')) . '%');
+                $condition[] = array('brand_class', 'like', '%' . trim(input('param.search_brand_class')) . '%');
             }
             $brand_list = $brand_model->getBrandNoPassedList($condition, '*', 10);
 
@@ -305,9 +304,8 @@ class  Brand extends AdminControl {
                 /**
                  * 判断是否有重复
                  */
-                $condition = array();
-                $condition[] = array('brand_name','=',trim(input('param.value')));
-                $condition[] = array('brand_id','<>', intval(input('param.id')));
+                $condition[] = array('brand_name', '=', trim(input('param.value')));
+                $condition[] = array('brand_id', '<>', intval(input('param.id')));
                 $result = $brand_model->getBrandList($condition);
                 if (empty($result)) {
                     $brand_model->editBrand(array('brand_id' => intval(input('param.id'))), array('brand_name' => trim(input('param.value'))));
@@ -339,9 +337,8 @@ class  Brand extends AdminControl {
              * 验证品牌名称是否有重复
              */
             case 'check_brand_name':
-                $condition = array();
-                $condition[] = array('brand_name','=',trim(input('param.brand_name')));
-                $condition[] = array('brand_id','<>', intval(input('param.id')));
+                $condition[] = array('brand_name', '=', trim(input('param.brand_name')));
+                $condition[] = array('brand_id', '<>', intval(input('param.id')));
                 $result = $brand_model->getBrandList($condition);
                 if (empty($result)) {
                     echo 'true';
@@ -398,7 +395,7 @@ class  Brand extends AdminControl {
      * @param array $data
      */
     private function createExcel($data = array()) {
-        Lang::load(base_path() .'admin/lang/'.config('lang.default_lang').'/export.lang.php');
+        Lang::load(base_path() . 'admin/lang/' . config('lang.default_lang') . '/export.lang.php');
         $excel_obj = new \excel\Excel();
         $excel_data = array();
         //设置样式
@@ -430,19 +427,19 @@ class  Brand extends AdminControl {
     protected function getAdminItemList() {
         $menu_array = array(
             array(
-                'name' => 'index', 
+                'name' => 'index',
                 'text' => lang('ds_manage'),
-                'url' => url('Brand/index'),
+                'url' => (string) url('Brand/index'),
             ),
             array(
                 'name' => 'brand_add',
-                'text' => lang('ds_add'), 
-                'url' => "javascript:dsLayerOpen('".url('Brand/brand_add')."','添加')"
+                'text' => lang('ds_add'),
+                'url' => "javascript:dsLayerOpen('" . (string) url('Brand/brand_add') . "','" . lang('ds_add') . "')"
             ),
             array(
-                'name' => 'brand_apply', 
+                'name' => 'brand_apply',
                 'text' => lang('brand_index_to_audit'),
-                'url' => url('Brand/brand_apply')
+                'url' => (string) url('Brand/brand_apply')
             )
         );
         return $menu_array;

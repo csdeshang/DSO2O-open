@@ -1,11 +1,12 @@
 <?php
 
 namespace app\common\model;
+
 use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,9 +16,8 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Storegoodsclass extends BaseModel {
+class Storegoodsclass extends BaseModel {
 
- 
     /**
      * 单个类别内容提取
      * @access public
@@ -41,9 +41,6 @@ class  Storegoodsclass extends BaseModel {
      * @return bool 
      */
     public function addStoregoodsclass($data) {
-        if (empty($data)) {
-            return false;
-        }
         $result = Db::name('storegoodsclass')->insertGetId($data);
         if ($result) {
             $this->_dStoregoodsclassCache($data['store_id']);
@@ -51,16 +48,16 @@ class  Storegoodsclass extends BaseModel {
         return $result;
     }
 
-
     /**
      * 类别修改
      * @access public
      * @author csdeshang
      * @param type $data
      * @param type $where
+     * @param type $store_id
      * @return boolean
      */
-    public function editStoregoodsclass($data, $where,$store_id) {
+    public function editStoregoodsclass($data, $where, $store_id) {
         if (empty($data)) {
             return false;
         }
@@ -78,7 +75,7 @@ class  Storegoodsclass extends BaseModel {
      * @param type $where 条件
      * @return boolean
      */
-    public function delStoregoodsclass($where,$store_id) {
+    public function delStoregoodsclass($where, $store_id) {
         if (empty($where)) {
             return false;
         }
@@ -241,7 +238,6 @@ class  Storegoodsclass extends BaseModel {
     private function _dStoregoodsclassCache($store_id) {
         return dcache($store_id, 'store_goods_class');
     }
-
 }
 
 ?>

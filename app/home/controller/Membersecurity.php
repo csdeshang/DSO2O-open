@@ -37,36 +37,33 @@ class  Membersecurity extends BaseMember {
      * 绑定邮箱 - 发送邮件
      */
     public function send_bind_email() {
-        $email = input('param.email');
+        $member_email = input('param.email');
 
-        $membersecurity_validate = ds_validate('membersecurity');
-        if (!$membersecurity_validate->scene('send_bind_email')->check(array('email'=>$email))) {
-            ds_json_encode(10001,$membersecurity_validate->getError());
-        }
+        $this->validate(array('member_email'=>$member_email), 'app\common\validate\Singlefield.member_email');
 
         $member_model = model('member');
         $condition = array();
-        $condition[] = array('member_email','=',$email);
-        $condition[] = array('member_id','<>',session('member_id'));
+        $condition[] = array('member_email', '=', $member_email);
+        $condition[] = array('member_id', '<>', session('member_id'));
         $member_info = $member_model->getMemberInfo($condition, 'member_id');
         if ($member_info) {
-            ds_json_encode(10001,lang('mailbox_has_been_used'));
+            ds_json_encode(10001, lang('mailbox_has_been_used'));
         }
- 
-				
-				//验证发送频率
+
+
+        //验证发送频率
         $verify_code_model = model('verify_code');
-				$result=$verify_code_model->isVerifyCodeFrequant(5,1);
-        if(!$result['code']){
-					ds_json_encode(10001, $result['msg']);
-				}
-        
-        $verify_code = $verify_code_model->genVerifyCode(5,1);
+        $result = $verify_code_model->isVerifyCodeFrequant(5, 1);
+        if (!$result['code']) {
+            ds_json_encode(10001, $result['msg']);
+        }
+
+        $verify_code = $verify_code_model->genVerifyCode(5, 1);
         if (!$verify_code) {
-					ds_json_encode(10001, lang('system_error'));
-				}
-				
-        $uid = base64_encode(ds_encrypt(session('member_id') . ' ' . $email));
+            ds_json_encode(10001, lang('system_error'));
+        }
+
+        $uid = base64_encode(ds_encrypt(session('member_id') . ' ' . $member_email));
         $verify_url = HOME_SITE_URL . '/Login/bind_email.html?uid=' . $uid . '&hash=' . md5($verify_code);
 
         $mailtemplates_model = model('mailtemplates');
@@ -80,10 +77,10 @@ class  Membersecurity extends BaseMember {
         $message = htmlspecialchars_decode($message);
 
         $ob_email = new \sendmsg\Email();
-        $result = $ob_email->send_sys_email($email, $subject, $message);
+        $result = $ob_email->send_sys_email($member_email, $subject, $message);
         if ($result) {
-						$ip = request()->ip();
-						$flag = $verify_code_model->addVerifyCode(array(
+            $ip = request()->ip();
+            $flag = $verify_code_model->addVerifyCode(array(
                 'verify_code_type' => 5,
                 'verify_code' => $verify_code,
                 'verify_code_user_type' => 1,
@@ -95,15 +92,15 @@ class  Membersecurity extends BaseMember {
             if (!$flag) {
                 ds_json_encode(10001, lang('system_error'));
             }
-					
-					
+
+
             $data = array();
-            $data['member_email'] = $email;
+            $data['member_email'] = $member_email;
             $data['member_emailbind'] = 0;
-            $member_model->editMember(array('member_id' => session('member_id')), $data,session('member_id'));
-            ds_json_encode(10000,lang('verify_mail_been_sent_mailbox'));
+            $member_model->editMember(array('member_id' => session('member_id')), $data, session('member_id'));
+            ds_json_encode(10000, lang('verify_mail_been_sent_mailbox'));
         } else {
-            ds_json_encode(10001,lang('system_error'));
+            ds_json_encode(10001, lang('system_error'));
         }
     }
 
@@ -147,13 +144,9 @@ class  Membersecurity extends BaseMember {
             }
             
             $verify_code = input('post.auth_code');
-            $validate_data = array(
-                'verify_code' => $verify_code,
-            );
-            $verify_code_validate = ds_validate('verify_code');
-            if (!$verify_code_validate->scene('verify_code_search')->check($validate_data)) {
-                $this->error($verify_code_validate->getError());
-            }
+            
+            $this->validate(array('verify_code'=>$verify_code), 'app\common\validate\Singlefield.verify_code');
+            
             $verify_code_model = model('verify_code');
             if (!$verify_code_model->getVerifyCodeInfo(array(array('verify_code_type' ,'=', 6), array('verify_code_user_type' ,'=', 1), array('verify_code_user_id' ,'=', session('member_id')), array('verify_code' ,'=', $verify_code), array('verify_code_add_time','>', TIMESTAMP - VERIFY_CODE_INVALIDE_MINUTE * 60)))) {
                 $this->error(lang('validation_fails'));
@@ -252,10 +245,9 @@ class  Membersecurity extends BaseMember {
             'password' => input('post.password'), 
             'confirm_password' => input('post.confirm_password'),
         );
-        $membersecurity_validate = ds_validate('membersecurity');
-        if (!$membersecurity_validate->scene('modify_pwd')->check($data)) {
-            ds_json_encode(10001, $membersecurity_validate->getError());
-        }
+        
+        $this->validate($data, 'app\common\validate\Membersecurity.modify_pwd');
+        
         if ($data['password'] != $data['confirm_password']) {
             ds_json_encode(10001, lang('two_password_inconsistencies'));
         }
@@ -293,10 +285,8 @@ class  Membersecurity extends BaseMember {
             'password' => input('post.password'),
             'confirm_password' => input('post.confirm_password'),
         );
-        $membersecurity_validate = ds_validate('membersecurity');
-        if (!$membersecurity_validate->scene('modify_paypwd')->check($data)) {
-            ds_json_encode(10001,$membersecurity_validate->getError());
-        }
+        
+        $this->validate($data, 'app\common\validate\Membersecurity.modify_paypwd');
 
         if ($data['password'] != $data['confirm_password']) {
             ds_json_encode(10001,lang('two_password_inconsistencies'));
@@ -319,35 +309,23 @@ class  Membersecurity extends BaseMember {
         $member_model = model('member');
         $member_model->getMemberInfoByID(session('member_id'));
         if (request()->isPost()) {
-            $data = array(
-                'mobile' => input('post.mobile'),
-                'vcode' => input('post.vcode'),
-            );
 
-            $membersecurity_validate = ds_validate('membersecurity');
-            if (!$membersecurity_validate->scene('modify_mobile')->check($data)) {
-                ds_json_encode(10001,$membersecurity_validate->getError());
+            $member_mobile = input('post.mobile');
+            $verify_code = input('post.vcode');
+            
+            $data = array(
+                'member_mobile' => input('post.mobile'),
+                'verify_code' => $verify_code,
+            );
+            $this->validate($data, 'app\common\validate\Membersecurity.modify_mobile');
+
+            $verify_code_model = model('verify_code');
+            if (!$verify_code_model->getVerifyCodeInfo(array(array('verify_code_type', '=', 4), array('verify_code_user_type', '=', 1), array('verify_code_user_id', '=', session('member_id')), array('verify_code', '=', $verify_code), array('verify_code_add_time', '>', TIMESTAMP - VERIFY_CODE_INVALIDE_MINUTE * 60)))) {
+                ds_json_encode(10001, lang('mobile_verification_code_error'));
             }
 
-            
-						
-						$verify_code=input('post.vcode');
-						$validate_data=array(
-							'verify_code'=>$verify_code,
-				
-						);
-						$verify_code_validate = ds_validate('verify_code');
-						if (!$verify_code_validate->scene('verify_code_search')->check($validate_data)) {
-							ds_json_encode(10001,$verify_code_validate->getError());
-							
-						}
-						$verify_code_model=model('verify_code');
-						if(!$verify_code_model->getVerifyCodeInfo(array(array('verify_code_type','=',4),array('verify_code_user_type','=',1),array('verify_code_user_id','=',session('member_id')),array('verify_code','=',$verify_code),array('verify_code_add_time','>',TIMESTAMP-VERIFY_CODE_INVALIDE_MINUTE*60)))){
-							ds_json_encode(10001,lang('mobile_verification_code_error'));
-						}
-						
-            $member_model->editMember(array('member_id' => session('member_id')), array('member_mobilebind' => 1),session('member_id'));
-            ds_json_encode(10000,lang('phone_number_bound_successfully'));
+            $member_model->editMember(array('member_id' => session('member_id')), array('member_mobilebind' => 1), session('member_id'));
+            ds_json_encode(10000, lang('phone_number_bound_successfully'));
         }
     }
 
@@ -355,16 +333,16 @@ class  Membersecurity extends BaseMember {
      * 修改手机号 - 发送验证码
      */
     public function send_modify_mobile() {
-        $mobile = input('param.mobile');
-        $membersecurity_validate = ds_validate('membersecurity');
-        if (!$membersecurity_validate->scene('send_modify_mobile')->check(array('mobile' => $mobile))) {
-            exit(json_encode(array('state' => 'false', 'msg' => $membersecurity_validate->getError())));
+        $member_mobile = input('param.mobile');
+        $singlefield_validate = ds_validate('singlefield');
+        if (!$singlefield_validate->scene('member_mobile')->check(array('member_mobile' => $member_mobile))) {
+            exit(json_encode(array('state' => 'false', 'msg' => $singlefield_validate->getError())));
         }
 
         $member_model = model('member');
         $condition = array();
-        $condition[] = array('member_mobile','=',$mobile);
-        $condition[] = array('member_id','<>',session('member_id'));
+        $condition[] = array('member_mobile', '=', $mobile);
+        $condition[] = array('member_id', '<>', session('member_id'));
         $member_info = $member_model->getMemberInfo($condition, 'member_id');
         if ($member_info) {
             exit(json_encode(array('state' => 'false', 'msg' => lang('please_change_another_phone_number'))));
@@ -372,57 +350,56 @@ class  Membersecurity extends BaseMember {
 
         //验证发送频率
         $verify_code_model = model('verify_code');
-				$result=$verify_code_model->isVerifyCodeFrequant(4,1);
-        if(!$result['code']){
-					exit(json_encode(array('state' => 'false', 'msg' => $result['msg'])));
-				}
-        
-        $verify_code = $verify_code_model->genVerifyCode(4,1);
+        $result = $verify_code_model->isVerifyCodeFrequant(4, 1);
+        if (!$result['code']) {
+            exit(json_encode(array('state' => 'false', 'msg' => $result['msg'])));
+        }
+
+        $verify_code = $verify_code_model->genVerifyCode(4, 1);
         if (!$verify_code) {
-					exit(json_encode(array('state' => 'false', 'msg' => lang('system_error'))));
-				}
-				
+            exit(json_encode(array('state' => 'false', 'msg' => lang('system_error'))));
+        }
+
 
         $mailtemplates_model = model('mailtemplates');
         $tpl_info = $mailtemplates_model->getTplInfo(array('mailmt_code' => 'modify_mobile'));
         $param = array();
         $param['code'] = $verify_code;
-        $ten_param=array($verify_code);
+        $ten_param = array($verify_code);
         $message = ds_replace_text($tpl_info['mailmt_content'], $param);
-        
-        $smslog_param=array(
-                    'ali_template_code'=>$tpl_info['ali_template_code'],
-                    'ali_template_param'=>$param,
-                    'ten_template_code'=>$tpl_info['ten_template_code'],
-                    'ten_template_param'=>$ten_param,
-                    'message'=>$message,
-                );
-        $result = model('smslog')->sendSms($mobile, $smslog_param,4,$verify_code);
+
+        $smslog_param = array(
+            'ali_template_code' => $tpl_info['ali_template_code'],
+            'ali_template_param' => $param,
+            'ten_template_code' => $tpl_info['ten_template_code'],
+            'ten_template_param' => $ten_param,
+            'message' => $message,
+        );
+        $result = model('smslog')->sendSms($member_mobile, $smslog_param, 4, $verify_code);
 
 
         if (!$result['state']) {
             exit(json_encode(array('state' => 'false', 'msg' => $result['message'])));
         }
-						$ip = request()->ip();
-						$flag = $verify_code_model->addVerifyCode(array(
-                'verify_code_type' => 4,
-                'verify_code' => $verify_code,
-                'verify_code_user_type' => 1,
-                'verify_code_user_id' => session('member_id'),
-                'verify_code_user_name' => session('member_name'),
-                'verify_code_add_time' => TIMESTAMP,
-                'verify_code_ip' => $ip,
-            ));
-            if (!$flag) {
-                exit(json_encode(array('state' => 'false', 'msg' => lang('system_error'))));
-            }
-        $update = $member_model->editMember(array('member_id' => session('member_id')), array('member_mobile' => $mobile),session('member_id'));
+        $ip = request()->ip();
+        $flag = $verify_code_model->addVerifyCode(array(
+            'verify_code_type' => 4,
+            'verify_code' => $verify_code,
+            'verify_code_user_type' => 1,
+            'verify_code_user_id' => session('member_id'),
+            'verify_code_user_name' => session('member_name'),
+            'verify_code_add_time' => TIMESTAMP,
+            'verify_code_ip' => $ip,
+        ));
+        if (!$flag) {
+            exit(json_encode(array('state' => 'false', 'msg' => lang('system_error'))));
+        }
+        $update = $member_model->editMember(array('member_id' => session('member_id')), array('member_mobile' => $member_mobile), session('member_id'));
         if (!$update) {
             exit(json_encode(array('state' => 'false', 'msg' => lang('modified_phone_same_original_one'))));
-        }else{
+        } else {
             exit(json_encode(array('state' => 'true', 'msg' => lang('send_success'))));
         }
-
     }
 
     /**

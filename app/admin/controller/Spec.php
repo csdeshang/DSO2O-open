@@ -7,9 +7,10 @@
 namespace app\admin\controller;
 use think\facade\View;
 use think\facade\Lang;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能 规格
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -19,7 +20,7 @@ use think\facade\Lang;
  * ============================================================================
  * 控制器
  */
-class  Spec extends AdminControl {
+class Spec extends AdminControl {
 
     public function initialize() {
         parent::initialize();
@@ -27,7 +28,8 @@ class  Spec extends AdminControl {
     }
 
     public function index() {
-        /**
+        
+         /**
          * 查询条件
          */
         $where = array();
@@ -61,14 +63,12 @@ class  Spec extends AdminControl {
         } else {
             $data = array(
                 'sp_name' => input('post.sp_name'),
-                'sp_sort' => input('post.sp_sort'),
-                'gc_id' => input('post.gc_id'),
+                'sp_sort' => intval(input('post.sp_sort')),
+                'gc_id' => intval(input('post.gc_id')),
                 'gc_name' => input('post.gc_name'),
             );
-            $spec_validate = ds_validate('spec');
-            if (!$spec_validate->scene('spec_add')->check($data)) {
-                $this->error($spec_validate->getError());
-            }
+            
+            $this->validate($data, 'app\common\validate\Spec.spec_add');
 
             $spec_model= model('spec');
             $result=$spec_model->addSpec($data);
@@ -82,7 +82,7 @@ class  Spec extends AdminControl {
 
     public function spec_edit() {
         //注：pathinfo地址参数不能通过get方法获取，查看“获取PARAM变量”
-        $sp_id = input('param.sp_id');
+        $sp_id = intval(input('param.sp_id'));
         if (empty($sp_id)) {
             $this->error(lang('param_error'));
         }
@@ -96,18 +96,15 @@ class  Spec extends AdminControl {
         } else {
             $data = array(
                 'sp_name' => input('post.sp_name'),
-                'sp_sort' => input('post.sp_sort'),
-                'gc_id' => input('post.gc_id'),
+                'sp_sort' => intval(input('post.sp_sort')),
+                'gc_id' => intval(input('post.gc_id')),
                 'gc_name' => input('post.gc_name'),
             );
-            $spec_validate = ds_validate('spec');
-            if (!$spec_validate->scene('spec_edit')->check($data)) {
-                $this->error($spec_validate->getError());
-            }
+            $this->validate($data, 'app\common\validate\Spec.spec_edit');
 
             $spec_model= model('spec');
             $condition=array();
-            $condition[]=array('sp_id','=',$sp_id);
+            $condition[] = array('sp_id','=',$sp_id);
             $result=$spec_model->editSpec($data, $condition);
             if ($result>=0) {
                 dsLayerOpenSuccess(lang('ds_common_op_succ'));
@@ -139,13 +136,13 @@ class  Spec extends AdminControl {
         $menu_array = array(
             array(
                 'name' => 'index',
-                'text' => '管理',
-                'url' => url('Spec/index')
+                'text' => lang('ds_spec'),
+                'url' => (string)url('Spec/index')
             ),
             array(
                 'name' => 'spec_add',
-                'text' => '新增规格',
-                'url' => "javascript:dsLayerOpen('".url('Spec/spec_add')."','新增规格')"
+                'text' => lang('ds_new'),
+                'url' => "javascript:dsLayerOpen('".(string)url('Spec/spec_add')."','".lang('ds_new')."')"
             ),
         );
         return $menu_array;

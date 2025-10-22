@@ -1,16 +1,12 @@
 <?php
 
-/**
- * 秒杀活动商品模型 
- *
- */
-
 namespace app\common\model;
+
 use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -20,13 +16,12 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Pxianshigoods extends BaseModel {
+class Pxianshigoods extends BaseModel {
 
     public $page_info;
 
     const XIANSHI_GOODS_STATE_CANCEL = 0;
     const XIANSHI_GOODS_STATE_NORMAL = 1;
-
 
     /**
      * 读取秒杀商品列表
@@ -41,7 +36,7 @@ class  Pxianshigoods extends BaseModel {
      */
     public function getXianshigoodsList($condition, $pagesize = null, $order = '', $field = '*', $limit = 0) {
         if ($pagesize) {
-            $res = Db::name('pxianshigoods')->field($field)->where($condition)->order($order)->paginate(['list_rows'=>$pagesize,'query' => request()->param()],false);
+            $res = Db::name('pxianshigoods')->field($field)->where($condition)->order($order)->paginate(['list_rows' => $pagesize, 'query' => request()->param()], false);
             $this->page_info = $res;
             return $res->items();
         } else {
@@ -69,9 +64,9 @@ class  Pxianshigoods extends BaseModel {
         }
         return $xianshigoods_list;
     }
-    
+
     /**
-     * 获取秒杀列表
+     * 获取秒杀折列表
      * @access public
      * @author csdeshang
      * @param type $condition 条件
@@ -93,7 +88,6 @@ class  Pxianshigoods extends BaseModel {
 
         return $xianshigoods_id_list;
     }
-
 
     /**
      * 根据条件读取限制折扣商品信息
@@ -121,7 +115,7 @@ class  Pxianshigoods extends BaseModel {
         }
 
         $condition = array();
-        $condition[] = array('xianshigoods_id','=',$xianshigoods_id);
+        $condition[] = array('xianshigoods_id', '=', $xianshigoods_id);
         $xianshigoods_info = $this->getXianshigoodsInfo($condition);
 
         if ($store_id > 0 && $xianshigoods_info['store_id'] != $store_id) {
@@ -141,9 +135,9 @@ class  Pxianshigoods extends BaseModel {
     public function addXianshigoods($xianshigoods_info) {
         $xianshigoods_info['xianshigoods_state'] = self::XIANSHI_GOODS_STATE_NORMAL;
         $xianshigoods_id = Db::name('pxianshigoods')->insertGetId($xianshigoods_info);
-        if($xianshigoods_id){
+        if ($xianshigoods_id) {
             // 发布秒杀锁定商品
-            $this->_lockGoods($xianshigoods_info['goods_commonid'],$xianshigoods_info['goods_id']);
+            $this->_lockGoods($xianshigoods_info['goods_commonid'], $xianshigoods_info['goods_id']);
         }
         // 删除商品秒杀缓存
         $this->_dGoodsXianshiCache($xianshigoods_info['goods_id']);
@@ -170,7 +164,7 @@ class  Pxianshigoods extends BaseModel {
                     // 删除商品秒杀缓存
                     $this->_dGoodsXianshiCache($val['goods_id']);
                     // 插入对列 更新促销价格
-                    model('cron')->addCron(array('cron_exetime'=>TIMESTAMP,'cron_type'=>'updateGoodsPromotionPriceByGoodsId','cron_value'=>serialize($val['goods_id'])));
+                    model('cron')->addCron(array('cron_exetime' => TIMESTAMP, 'cron_type' => 'updateGoodsPromotionPriceByGoodsId', 'cron_value' => serialize($val['goods_id'])));
                 }
             }
         }
@@ -190,11 +184,11 @@ class  Pxianshigoods extends BaseModel {
         if ($result) {
             if (!empty($xianshigoods_list)) {
                 foreach ($xianshigoods_list as $val) {
-                    $this->_unlockGoods($val['goods_commonid'],$val['goods_id']);
+                    $this->_unlockGoods($val['goods_commonid'], $val['goods_id']);
                     // 删除商品秒杀缓存
                     $this->_dGoodsXianshiCache($val['goods_id']);
                     // 插入对列 更新促销价格
-                    model('cron')->addCron(array('cron_exetime'=>TIMESTAMP,'cron_type'=>'updateGoodsPromotionPriceByGoodsId','cron_value'=>serialize($val['goods_id'])));
+                    model('cron')->addCron(array('cron_exetime' => TIMESTAMP, 'cron_type' => 'updateGoodsPromotionPriceByGoodsId', 'cron_value' => serialize($val['goods_id'])));
                 }
             }
         }
@@ -209,7 +203,7 @@ class  Pxianshigoods extends BaseModel {
      * @return string
      */
     public function getXianshigoodsExtendInfo($xianshi_info) {
-        $xianshi_info['goods_url'] = (string)url('Goods/index', array('goods_id' => $xianshi_info['goods_id']));
+        $xianshi_info['goods_url'] = (string) url('/home/Goods/index', array('goods_id' => $xianshi_info['goods_id']));
         $xianshi_info['image_url'] = goods_cthumb($xianshi_info['goods_image'], 60, $xianshi_info['store_id']);
         $xianshi_info['xianshigoods_price'] = ds_price_format($xianshi_info['xianshigoods_price']);
         $xianshi_info['xianshi_discount'] = number_format($xianshi_info['xianshigoods_price'] / $xianshi_info['goods_price'] * 10, 1, '.', '') . '折';
@@ -225,29 +219,28 @@ class  Pxianshigoods extends BaseModel {
      */
     public function getXianshigoodsCommendList($count = 4) {
         $condition = array();
-        $condition[]=array('xianshigoods_state','=',self::XIANSHI_GOODS_STATE_NORMAL);
-        $condition[]=array('xianshigoods_starttime','<', TIMESTAMP);
-        $condition[]=array('xianshigoods_end_time','>', TIMESTAMP);
+        $condition[] = array('xianshigoods_state', '=', self::XIANSHI_GOODS_STATE_NORMAL);
+        $condition[] = array('xianshigoods_starttime', '<', TIMESTAMP);
+        $condition[] = array('xianshigoods_end_time', '>', TIMESTAMP);
         $xianshi_list = $this->getXianshigoodsExtendList($condition, null, 'xianshigoods_recommend desc', '*', $count);
         return $xianshi_list;
     }
 
-     /**
+    /**
      * 锁定商品
      * @access private
      * @author csdeshang
      * @param type $goods_commonid 商品编号
      */
-    private function _lockGoods($goods_commonid,$goods_id)
-    {
+    private function _lockGoods($goods_commonid, $goods_id) {
         $condition = array();
-        $condition[] = array('goods_commonid','=',$goods_commonid);
+        $condition[] = array('goods_commonid', '=', $goods_commonid);
 
         $goods_model = model('goods');
         $goods_model->editGoodsCommonLock($condition);
-        
+
         $condition = array();
-        $condition[] = array('goods_id','=',$goods_id);
+        $condition[] = array('goods_id', '=', $goods_id);
         $goods_model->editGoodsLock($condition);
     }
 
@@ -257,15 +250,14 @@ class  Pxianshigoods extends BaseModel {
      * @author csdeshang
      * @param type $goods_commonid 商品编号ID
      */
-    private function _unlockGoods($goods_commonid,$goods_id)
-    {
+    private function _unlockGoods($goods_commonid, $goods_id) {
         $goods_model = model('goods');
         $goods_model->editGoodsUnlock(array('goods_id' => $goods_id));
-        if(!$goods_model->getGoodsCount(array('goods_commonid' => $goods_commonid,'goods_lock'=>1))){
+        if (!$goods_model->getGoodsCount(array('goods_commonid' => $goods_commonid, 'goods_lock' => 1))) {
             $goods_model->editGoodsCommonUnlock(array('goods_commonid' => $goods_commonid));
         }
     }
-    
+
     /**
      * 根据商品编号查询是否有可用秒杀活动，如果有返回秒杀活动，没有返回null
      * @access public
@@ -276,9 +268,10 @@ class  Pxianshigoods extends BaseModel {
     public function getXianshigoodsInfoByGoodsID($goods_id) {
         $info = $this->_rGoodsXianshiCache($goods_id);
         if (empty($info)) {
-            $condition[]=array('xianshigoods_state','=',self::XIANSHI_GOODS_STATE_NORMAL);
-            $condition[]=array('xianshigoods_end_time','>', TIMESTAMP);
-            $condition[]=array('goods_id','=',$goods_id);
+            $condition = array();
+            $condition[] = array('xianshigoods_state', '=', self::XIANSHI_GOODS_STATE_NORMAL);
+            $condition[] = array('xianshigoods_end_time', '>', TIMESTAMP);
+            $condition[] = array('goods_id', '=', $goods_id);
             $xianshigoods_list = $this->getXianshigoodsExtendList($condition, null, 'xianshigoods_starttime asc', '*', 1);
             $info['info'] = isset($xianshigoods_list[0]) ? serialize($xianshigoods_list[0]) : serialize("");
             $this->_wGoodsXianshiCache($goods_id, $info);
@@ -312,10 +305,10 @@ class  Pxianshigoods extends BaseModel {
      */
     private function _getXianshigoodsListByGoods($goods_id_string) {
         $condition = array();
-        $condition[]=array('xianshigoods_state','=',self::XIANSHI_GOODS_STATE_NORMAL);
-        $condition[]=array('xianshigoods_starttime','<', TIMESTAMP);
-        $condition[]=array('xianshigoods_end_time','>', TIMESTAMP);
-        $condition[]=array('goods_id','in', $goods_id_string);
+        $condition[] = array('xianshigoods_state', '=', self::XIANSHI_GOODS_STATE_NORMAL);
+        $condition[] = array('xianshigoods_starttime', '<', TIMESTAMP);
+        $condition[] = array('xianshigoods_end_time', '>', TIMESTAMP);
+        $condition[] = array('goods_id', 'in', $goods_id_string);
         $xianshigoods_list = $this->getXianshigoodsExtendList($condition, null, 'xianshigoods_id desc', '*');
         return $xianshigoods_list;
     }
@@ -353,5 +346,4 @@ class  Pxianshigoods extends BaseModel {
     private function _dGoodsXianshiCache($goods_id) {
         return dcache($goods_id, 'goods_xianshi');
     }
-
 }

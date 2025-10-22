@@ -136,7 +136,7 @@ $lang['mansong_apply_verify_success_glog_desc'] = '购买满即送活动%s个月
 $lang['set_renewal']				= '套餐续费';
 $lang['set_expiration_time']				= '套餐过期时间';
 $lang['no_packages_currently_available']				= '当前没有可用套餐，请先购买套餐';
-$lang['notice_package_renewal6']				= '相关费用会在店铺的账期结算中扣除';
+$lang['notice_package_renewal6']				= '相关费用会在店铺的资金中扣除';
 
 //mansong_add
 $lang['delete_selected_gifts']				= '删除已选择的礼品';

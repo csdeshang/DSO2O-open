@@ -37,10 +37,14 @@ class MemberAuth extends BaseMember
             $member_array['member_auth_state'] = 1;
             $member_array['member_idcard'] = input('post.member_idcard');
             $member_array['member_truename'] = input('post.member_truename');
-            $member_validate = ds_validate('member');
-                if (!$member_validate->scene('auth')->check($member_array)) {
-                    ds_json_encode(10001,$member_validate->getError());
-                }
+                
+            if(empty($member_array['member_truename'])){
+                ds_json_encode(10001,'需要填写真实姓名');
+            }
+            if(empty($member_array['member_idcard'])){
+                ds_json_encode(10001,'需要填写身份证号');
+            }
+                
             if(!$this->member_info['member_idcard_image1']){
               ds_json_encode(10001,lang('member_idcard_image1_require'));
             }    
@@ -95,7 +99,7 @@ class MemberAuth extends BaseMember
         if(!in_array($file_name,array('member_idcard_image1','member_idcard_image2','member_idcard_image3'))){
             ds_json_encode(10001,lang('param_error'));
         }
-        @unlink(BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . ATTACH_IDCARD_IMAGE . DIRECTORY_SEPARATOR . $this->member_info[$file_name]);
+        ds_del_pic(ATTACH_IDCARD_IMAGE,$this->member_info[$file_name]);
         $member_array=array();
         $member_array[$file_name] = '';
         $member_model = model('member');

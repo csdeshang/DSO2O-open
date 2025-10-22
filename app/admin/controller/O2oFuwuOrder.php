@@ -33,7 +33,7 @@ class  O2oFuwuOrder extends AdminControl {
         
         foreach ($order_list as $order_id => $order_info) {
             $order_list[$order_id]['o2o_fuwu_order_state_text']= $order_model->getO2oFuwuOrderStateText($order_info['o2o_fuwu_order_state']);
-            $btn_list=$order_model->getO2oFuwuOrderBtn($order_info,'admin');
+            $btn_list=model('fuwuorder','logic')->getO2oFuwuOrderBtn($order_info,'admin');
             $order_list[$order_id]= array_merge($order_list[$order_id],$btn_list);
         }
 
@@ -83,8 +83,7 @@ class  O2oFuwuOrder extends AdminControl {
      */
     private function _order_cancel($order_info) {
         $order_id = $order_info['o2o_fuwu_order_id'];
-        $order_model = $order_model = model('o2o_fuwu_order');;
-        $result=$order_model->cancelO2oFuwuOrder(array('o2o_fuwu_order_id'=>$order_id),'admin');
+        $result=model('fuwuorder','logic')->cancelO2oFuwuOrder(array('o2o_fuwu_order_id'=>$order_id),'admin');
         if(!$result['code']){
             ds_json_encode(10001, $result['msg']);
         }else{
@@ -99,8 +98,9 @@ class  O2oFuwuOrder extends AdminControl {
      */
     private function _order_receive_pay($order_info, $post) {
         $order_id = $order_info['o2o_fuwu_order_id'];
-        $order_model = $order_model = model('o2o_fuwu_order');
-        $btn_list=$order_model->getO2oFuwuOrderBtn($order_info,'admin');
+        $fuwuorder_logic = model('fuwuorder','logic');
+        
+        $btn_list=$fuwuorder_logic->getO2oFuwuOrderBtn($order_info,'admin');
         if (!$btn_list['if_pay']) {
             return ds_callback(false, '无权操作');
         }
@@ -109,9 +109,9 @@ class  O2oFuwuOrder extends AdminControl {
             View::assign('order_info', $order_info);
             //显示支付接口列表
             $payment_list = model('payment')->getPaymentOpenList();
-            //去掉预存款和货到付款
+            //去掉预存款
             foreach ($payment_list as $key => $value) {
-                if ($value['payment_code'] == 'predeposit' || $value['payment_code'] == 'offline') {
+                if ($value['payment_code'] == 'predeposit') {
                     unset($payment_list[$key]);
                 }
             }
@@ -121,10 +121,10 @@ class  O2oFuwuOrder extends AdminControl {
         } else {
             Db::startTrans();
             try {
-                $result = $order_model->payO2oFuwuOrder($order_info['o2o_fuwu_order_sn'],$post['payment_code'],$post['trade_no'], 'admin',$post['payment_time']);
+                $result = $fuwuorder_logic->payO2oFuwuOrder($order_info['o2o_fuwu_order_sn'],$post['payment_code'],$post['trade_no'], 'admin',$this->admin_info['admin_name'],$post['payment_time']);
                 $this->log('将订单改为已收款状态,' . lang('order_number') . ':' . $order_info['o2o_fuwu_order_sn'], 1);
                 Db::commit();
-                return $result;
+                return ds_callback(true, lang('ds_common_op_succ'));
             } catch (\Exception $e) {
                 Db::rollback();
                 return ds_callback(false, $e->getMessage());
@@ -141,8 +141,8 @@ class  O2oFuwuOrder extends AdminControl {
         if ($order_id <= 0) {
             $this->error(lang('miss_order_number'));
         }
-        $order_model = $order_model = model('o2o_fuwu_order');;
-        $order_info = $order_model->getO2oFuwuOrderInfo(array('o2o_fuwu_order_id' => $order_id));
+        $order_model = model('o2o_fuwu_order');;
+        $order_info = $order_model->getO2oFuwuOrderInfo(array('o2o_fuwu_order_id' => $order_id),'*',array('orderlog'));
         $order_info['o2o_fuwu_order_state_text']= $order_model->getO2oFuwuOrderStateText($order_info['o2o_fuwu_order_state']);
         View::assign('order_info', $order_info);
         View::assign('order_goods_spec_list',model('o2o_fuwu_order_goods_spec')->getO2oFuwuOrderGoodsSpecList(array('o2o_fuwu_order_id' => $order_id)));

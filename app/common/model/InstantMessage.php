@@ -8,7 +8,7 @@ use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -22,7 +22,7 @@ class  InstantMessage extends BaseModel {
 
     public $page_info;
     /**
-     * 获取店铺通知列表
+     * 获取通知列表
      * @access public
      * @author csdeshang
      * @param type $condition
@@ -40,7 +40,7 @@ class  InstantMessage extends BaseModel {
         }
     }
     /**
-     * 取得店铺通知信息
+     * 取得通知信息
      * @access public
      * @author csdeshang 
      * @param array $condition 检索条件
@@ -53,7 +53,7 @@ class  InstantMessage extends BaseModel {
     }
     
     /**
-     * 添加店铺通知信息
+     * 添加通知信息
      * @access public
      * @author csdeshang  
      * @param array $data 参数数据
@@ -159,7 +159,7 @@ class  InstantMessage extends BaseModel {
     }
     
     /**
-     * 编辑店铺通知信息
+     * 编辑通知信息
      * @access public
      * @author csdeshang 
      * @param array $data 更新数据
@@ -171,7 +171,7 @@ class  InstantMessage extends BaseModel {
     }
 
     /**
-     * 获取店铺通知数量
+     * 获取通知数量
      * @access public
      * @author csdeshang 
      * @param array $condition 条件

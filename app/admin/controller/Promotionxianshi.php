@@ -6,9 +6,11 @@
 namespace app\admin\controller;
 use think\facade\View;
 use think\facade\Lang;
+use think\facade\Db;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能 限时秒杀
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -18,7 +20,7 @@ use think\facade\Lang;
  * ============================================================================
  * 控制器
  */
-class  Promotionxianshi extends AdminControl
+class Promotionxianshi extends AdminControl
 {
     public function initialize()
     {
@@ -51,7 +53,7 @@ class  Promotionxianshi extends AdminControl
         if (!empty(input('param.state'))) {
             $condition[]=array('xianshi_state','=',intval(input('param.state')));
         }
-        $xianshi_list = $xianshi_model->getXianshiList($condition, 10, 'xianshi_state desc, xianshi_end_time desc');
+        $xianshi_list = $xianshi_model->getXianshiList($condition, 10, Db::raw('FIELD(xianshi_state, 1,0,2,3), xianshi_end_time desc'));
         View::assign('xianshi_list', $xianshi_list);
         View::assign('show_page', $xianshi_model->page_info->render());
         View::assign('xianshi_state_array', $xianshi_model->getXianshiStateArray());
@@ -91,7 +93,7 @@ class  Promotionxianshi extends AdminControl
         if($xianshi_id_array === FALSE){
             ds_json_encode(10001, lang('param_error'));
         }
-        $condition = array(array('xianshi_id','in', $xianshi_id_array));
+        $condition = array(array('xianshi_id' ,'in', $xianshi_id_array));
         $result = $xianshi_model->delXianshi($condition);
         if ($result) {
             $this->log('删除秒杀活动，活动编号' . $xianshi_id);
@@ -174,20 +176,20 @@ class  Promotionxianshi extends AdminControl
     }
 
     /**
-     * ajax修改信息
+     * ajax修改抢购信息
      */
     public function ajax()
     {
         $result = true;
         $update_array = array();
-        $where = array();
+        $condition = array();
 
         switch (input('param.branch')) {
             case 'recommend':
                 $pxianshigoods_model = model('pxianshigoods');
                 $update_array['xianshigoods_recommend'] = input('param.value');
-                $where[]=array('xianshigoods_id','=',input('param.id'));
-                $result = $pxianshigoods_model->editXianshigoods($update_array, $where);
+                $condition[] = array('xianshigoods_id','=',input('param.id'));
+                $result = $pxianshigoods_model->editXianshigoods($update_array, $condition);
                 break;
         }
 
@@ -229,20 +231,20 @@ class  Promotionxianshi extends AdminControl
     {
         $menu_array = array(
             array(
-                'name' => 'xianshi_list', 'text' => lang('xianshi_list'), 'url' => url('Promotionxianshi/index')
+                'name' => 'xianshi_list', 'text' => lang('xianshi_list'), 'url' => (string)url('Promotionxianshi/index')
             ), array(
                 'name' => 'xianshi_quota', 'text' => lang('xianshi_quota'),
-                'url' => url('Promotionxianshi/xianshi_quota')
+                'url' => (string)url('Promotionxianshi/xianshi_quota')
             ), array(
                 'name' => 'xianshi_setting',
                 'text' => lang('xianshi_setting'),
-                'url' => "javascript:dsLayerOpen('".url('Promotionxianshi/xianshi_setting')."','".lang('xianshi_setting')."')"
+                'url' => "javascript:dsLayerOpen('".(string)url('Promotionxianshi/xianshi_setting')."','".lang('xianshi_setting')."')"
             ),
         );
         if (request()->action() == 'xianshi_detail')
             $menu_array[] = array(
                 'name' => 'xianshi_detail', 'text' => lang('xianshi_detail'),
-                'url' => url('Promotionxianshi/xianshi_detail')
+                'url' => (string)url('Promotionxianshi/xianshi_detail')
             );
         return $menu_array;
     }

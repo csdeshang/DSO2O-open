@@ -1,11 +1,13 @@
 <?php
 
 namespace app\admin\controller;
+
 use think\facade\View;
 use think\facade\Lang;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,11 +17,11 @@ use think\facade\Lang;
  * ============================================================================
  * 控制器
  */
-class  Link extends AdminControl {
+class Link extends AdminControl {
 
     public function initialize() {
         parent::initialize();
-        Lang::load(base_path() . 'admin/lang/'.config('lang.default_lang').'/link.lang.php');
+        Lang::load(base_path() . 'admin/lang/' . config('lang.default_lang') . '/link.lang.php');
     }
 
     public function index() {
@@ -33,7 +35,7 @@ class  Link extends AdminControl {
 
         View::assign('link_list', $link_list);
         View::assign('show_page', $link_model->page_info->render());
-        
+
         View::assign('filtered', $condition ? 1 : 0); //是否有查询条件
         $this->setAdminCurItem('index');
         return View::fetch('');
@@ -54,6 +56,13 @@ class  Link extends AdminControl {
             View::assign('link', $link);
             return View::fetch('form');
         } else {
+            $data = array(
+                'link_title' => input('post.link_title'),
+                'link_url' => input('post.link_url'),
+                'link_sort' => input('post.link_sort'),
+            );
+            $this->validate($data, 'app\common\validate\Link.add');
+            
             //上传图片
             $link_pic = '';
             if ($_FILES['link_pic']['name'] != '') {
@@ -65,21 +74,11 @@ class  Link extends AdminControl {
                     $this->error($res['msg']);
                 }
             }
-
-            $data = array(
-                'link_title' => input('post.link_title'),
-                'link_pic' => $link_pic,
-                'link_url' => input('post.link_url'),
-                'link_sort' => input('post.link_sort'),
-            );
-            $link_validate = ds_validate('link');
-            if (!$link_validate->scene('add')->check($data)) {
-                $this->error($link_validate->getError());
-            }
-
+            $data['link_pic'] = $link_pic;
+            
             $result = model('link')->addLink($data);
             if ($result) {
-                dsLayerOpenSuccess(lang('ds_common_save_succ'),url('Link/index'));
+                dsLayerOpenSuccess(lang('ds_common_save_succ'), (string) url('Link/index'));
             } else {
                 $this->error(lang('ds_common_save_fail'));
             }
@@ -90,7 +89,7 @@ class  Link extends AdminControl {
      * 编辑友情链接
      * */
     public function edit() {
-        $link_id = input('param.link_id');
+        $link_id = intval(input('param.link_id'));
         if (empty($link_id)) {
             $this->error(lang('param_error'));
         }
@@ -104,29 +103,26 @@ class  Link extends AdminControl {
                 'link_sort' => input('post.link_sort'),
                 'link_url' => input('post.link_url'),
             );
+            
+            $this->validate($data, 'app\common\validate\Link.edit');
+            
             //上传图片
             if ($_FILES['link_pic']['name'] != '') {
-                $upload_file = BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . DIR_ADMIN . DIRECTORY_SEPARATOR . 'link';
                 $file_name = date('YmdHis') . rand(10000, 99999).'.png';
                 $res=ds_upload_pic(DIR_ADMIN . DIRECTORY_SEPARATOR . 'link','link_pic',$file_name);
                 if($res['code']){
                     $file_name=$res['data']['file_name'];
                     $data['link_pic'] = $file_name;
                     //删除原有友情链接图片
-                    @unlink($upload_file . DIRECTORY_SEPARATOR . $link['link_pic']);
+                    ds_del_pic(DIR_ADMIN.'/link',$link['link_pic']);
                 }else{
                     $this->error($res['msg']);
                 }
             }
 
-            $link_validate = ds_validate('link');
-            if (!$link_validate->scene('edit')->check($data)) {
-                $this->error($link_validate->getError());
-            }
-
             $result = model('link')->editLink($data, $link_id);
-            if ($result>=0) {
-                dsLayerOpenSuccess(lang('ds_common_save_succ'),url('Link/index'));
+            if ($result >= 0) {
+                dsLayerOpenSuccess(lang('ds_common_save_succ'), (string) url('Link/index'));
             } else {
                 $this->error(lang('ds_common_save_fail'));
             }
@@ -172,13 +168,13 @@ class  Link extends AdminControl {
         $menu_array = array(
             array(
                 'name' => 'index',
-                'text' => '管理',
-                'url' => url('Link/index')
+                'text' => lang('ds_manage'),
+                'url' => (string) url('Link/index')
             ),
             array(
                 'name' => 'add',
-                'text' => '新增',
-                'url' => "javascript:dsLayerOpen('".url('Link/add')."','新增')"
+                'text' => lang('ds_add'),
+                'url' => "javascript:dsLayerOpen('" . (string) url('Link/add') . "','" . lang('ds_add') . "')"
             )
         );
         return $menu_array;

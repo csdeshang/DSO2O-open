@@ -145,24 +145,8 @@ class  Memberinform extends BaseMember {
         $input['inform_handle_member_id'] = 0;
         $input['inform_handle_datetime'] = 1;
 
-        //验证输入的数据
-        $data = [
-            'inform_content' => $input["inform_content"],
-            'informsubject_content' => $input["informsubject_content"]
-        ];
+        $this->validate($input, 'app\common\validate\Inform.add');
         
-        $res=word_filter($input['inform_content']);
-        if(!$res['code']){
-            $this->error($res['msg']);
-        }
-        $input['inform_content']=$res['data']['text'];
-        
-
-        $inform_validate = ds_validate('inform');
-        if (!$inform_validate->scene('inform_save')->check($data)) {
-            $this->error($inform_validate->getError());
-        }
-
         //保存
         if ($inform_model->addInform($input)) {
             $this->success(lang('inform_success'),url('Memberinform/index'));
@@ -253,7 +237,7 @@ class  Memberinform extends BaseMember {
         //删除图片
         if (!empty($inform_pics)) {
             foreach ($inform_pics as $pic) {
-                $this->inform_delete_pic($pic);
+                ds_del_pic(ATTACH_PATH . '/inform', $pic);
             }
         }
         $inform_model->delInform(array('inform_id' => $inform_id));
@@ -317,20 +301,6 @@ class  Memberinform extends BaseMember {
         }
         return $pic_name;
     }
-
-    /*
-     * 上传用户提供的举报图片
-     */
-
-    private function inform_delete_pic($pic_name) {
-
-        //上传路径
-        $pic = BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . ATTACH_PATH . DIRECTORY_SEPARATOR . 'inform' . DIRECTORY_SEPARATOR . $pic_name;
-        if (file_exists($pic)) {
-            @unlink($pic);
-        }
-    }
-
 
     /*
      * 根据举报类型id获取，举报具体列表

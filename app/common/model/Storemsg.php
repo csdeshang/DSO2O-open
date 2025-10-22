@@ -1,10 +1,12 @@
 <?php
+
 namespace app\common\model;
+
 use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -14,8 +16,8 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Storemsg extends BaseModel
-{
+class Storemsg extends BaseModel {
+
     public $page_info;
 
     /**
@@ -28,7 +30,6 @@ class  Storemsg extends BaseModel
     public function addStoremsg($data) {
         $data['storemsg_addtime'] = TIMESTAMP;
         $storemsg_id = Db::name('storemsg')->insertGetId($data);
-
         return $storemsg_id;
     }
 
@@ -54,7 +55,6 @@ class  Storemsg extends BaseModel
      */
     public function getStoremsgInfo($condition, $field = '*') {
         return Db::name('storemsg')->field($field)->where($condition)->find();
-
     }
 
     /**
@@ -68,8 +68,8 @@ class  Storemsg extends BaseModel
      * @return type
      */
     public function getStoremsgList($condition, $field = '*', $pagesize = '0', $order = 'storemsg_id desc') {
-        $return =Db::name('storemsg')->field($field)->where($condition)->order($order)->paginate(['list_rows'=>$pagesize,'query' => request()->param()],false);
-        $this->page_info=$return;
+        $return = Db::name('storemsg')->field($field)->where($condition)->order($order)->paginate(['list_rows' => $pagesize, 'query' => request()->param()], false);
+        $this->page_info = $return;
         return $return->items();
     }
 

@@ -92,29 +92,26 @@ class  Sellergoodsclass extends BaseSeller {
      */
     public function goods_class_save() {
         $storegoodsclass_model = model('storegoodsclass');
+        
+        $class_array = array();
+        $class_array['storegc_name'] = input('post.storegc_name');
+        $class_array['storegc_parent_id'] = intval(input('post.storegc_parent_id', 0));
+        $class_array['storegc_state'] = intval(input('post.storegc_state'));
+        $class_array['store_id'] = session('store_id');
+        $class_array['storegc_sort'] = intval(input('post.storegc_sort'));
+        
+        $this->validate($class_array, 'app\common\validate\Storegoodsclass.save');
+        
         if (input('post.type') == 'edit') {
 
             $storegc_id = intval(input('post.storegc_id'));
             if ($storegc_id <= 0) {
                 ds_json_encode(10001, lang('param_error'));
             }
-            $class_array = array();
-            if (input('post.storegc_name') != '') {
-                $class_array['storegc_name'] = input('post.storegc_name');
+            if ($class_array['storegc_parent_id'] == $storegc_id) {
+                ds_json_encode(10001, lang('storegc_parent_goods_class_equal_self_error'));
             }
-            if (input('post.storegc_parent_id') != '') {
-                $class_array['storegc_parent_id'] = input('post.storegc_parent_id');
-            }
-            if (input('post.storegc_state') != '') {
-                $class_array['storegc_state'] = input('post.storegc_state');
-            }
-            if (input('post.storegc_sort') != '') {
-                $class_array['storegc_sort'] = input('post.storegc_sort');
-            }
-			if ($class_array['storegc_parent_id'] == $storegc_id) {
-				ds_json_encode(10001,lang('storegc_parent_goods_class_equal_self_error'));
-			}
-			
+
             $condition = array();
             $condition[] = array('store_id','=',session('store_id'));
             $condition[] = array('storegc_id','=',intval(input('post.storegc_id')));
@@ -125,12 +122,7 @@ class  Sellergoodsclass extends BaseSeller {
                 ds_json_encode(10001, lang('ds_common_save_fail'));
             }
         } else {
-            $class_array = array();
-            $class_array['storegc_name'] = input('post.storegc_name');
-            $class_array['storegc_parent_id'] = input('post.storegc_parent_id', 0);
-            $class_array['storegc_state'] = input('post.storegc_state');
-            $class_array['store_id'] = session('store_id');
-            $class_array['storegc_sort'] = input('post.storegc_sort');
+            
             $state = $storegoodsclass_model->addStoregoodsclass($class_array);
             if ($state) {
                 ds_json_encode(10000, lang('ds_common_save_succ'));

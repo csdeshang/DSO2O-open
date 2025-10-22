@@ -98,13 +98,35 @@ class  O2oDistributor extends BaseModel {
         foreach($o2o_distributor_array as $item){
             //删除头像
             if($item['o2o_distributor_avatar']){
-                @unlink(BASE_UPLOAD_PATH . DIRECTORY_SEPARATOR . ATTACH_O2O_DISTRIBUTOR . DIRECTORY_SEPARATOR . $item['o2o_distributor_avatar']);
+                ds_del_pic(ATTACH_O2O_DISTRIBUTOR,$item['o2o_distributor_avatar']);
             }
         }
         return Db::name('O2oDistributor')->where($condition)->delete();
     }
     
+    //生成配送员Token
+    public function getO2oDistributorToken($o2o_distributor_id, $o2o_distributor_name) {
+        //生成新的token
+        $platformtoken_data = array();
+        $token = md5($o2o_distributor_name . strval(TIMESTAMP) . strval(rand(0, 999999)));
+        $platformtoken_data['platform_userid'] = $o2o_distributor_id;
+        $platformtoken_data['platform_username'] = $o2o_distributor_name;
+        $platformtoken_data['platform_token'] = $token;
+        $platformtoken_data['platform_type'] = 'distributor';
+        $platformtoken_data['platform_logintime'] = TIMESTAMP;
+        $platformtoken_data['platform_operationtime'] = TIMESTAMP;
+        $platformtoken_data['platform_clienttype'] = get_clienttype();
+        $platformtoken_data['platform_devicetype'] = getOSFromUserAgent();
 
+        $result = model('platformtoken')->addPlatformtoken($platformtoken_data);
+        
+        if ($result) {
+            return $token;
+        } else {
+            return null;
+        }
+    }
+    
 }
 
 ?>

@@ -1,11 +1,12 @@
 <?php
 
 namespace app\common\model;
+
 use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,8 +16,7 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  Sellergroup extends BaseModel {
-
+class Sellergroup extends BaseModel {
 
     /**
      * 读取列表
@@ -41,7 +41,6 @@ class  Sellergroup extends BaseModel {
         $result = Db::name('sellergroup')->where($condition)->find();
         return $result;
     }
-
 
     /**
      * 判断是否存在
@@ -92,5 +91,4 @@ class  Sellergroup extends BaseModel {
     public function delSellergroup($condition) {
         return Db::name('sellergroup')->where($condition)->delete();
     }
-
 }

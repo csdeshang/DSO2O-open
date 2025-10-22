@@ -26,9 +26,12 @@ $lang['explog_stage'] = '操作阶段';
 $lang['explog_desc'] = '操作描述';
 $lang['ds_exppoints_manage'] = '经验值管理';
 $lang['ds_exppoints_setting'] = '规则设置';
+$lang['ds_exppoints_edit'] = '经验值调整';
 $lang['ds_member_grade'] = '会员等级';
 
+$lang['exppoints_index_help1'] = '经验值管理，展示了会员经验值增减情况的详细情况，经验值前无符号表示增加，有符号“-”表示减少';
 
+$lang['exppoints_greater_than'] = '经验值应大于';
 
 
 /**
@@ -51,4 +54,18 @@ $lang['admin_exppoints_short_error'] = '经验值不足，会员当前经验值�
 $lang['admin_exppoints_addmembername_error'] = '请输入会员名';
 $lang['admin_exppoints_member_tip'] = '会员';
 $lang['admin_exppoints_member_tip_2'] = ', 当前经验值数为';
+
+/*经验值规则设置*/
+$lang['membergrade_index_help1'] = '当会员符合某个级别后将自动升至该级别，请谨慎设置会员级别';
+$lang['membergrade_index_help2'] = '建议：一、级别应该是逐层递增，例如“级别2”所需经验值要高于“级别1”；二、设置的第一个级别所需经验值应为0；三、请填写完整的级别信息';
+$lang['membergrade_level_name']= '级别名称';
+$lang['membergrade_exppoints'] = '经验值';
+$lang['membergrade_add'] = '新增等级';
+$lang['membergrade_remove'] = '移除';
+
+$lang['please_complete_info'] = '请将信息填写完整';
+$lang['should_be_integer'] = '应为整数';
+
+$lang['membergrade_exppoints_list'] = '经验值明细';
+
 return $lang;

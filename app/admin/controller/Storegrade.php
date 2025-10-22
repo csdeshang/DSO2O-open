@@ -39,29 +39,18 @@ class  Storegrade extends AdminControl {
         } else {
             $data = array(
                 'storegrade_name' => input('post.storegrade_name'),
-                'storegrade_goods_limit' => input('post.storegrade_goods_limit'),
-                'storegrade_album_limit' => input('post.storegrade_album_limit'),
-                'storegrade_space_limit' => input('post.storegrade_space_limit'),
+                'storegrade_goods_limit' => intval(input('post.storegrade_goods_limit')),
+                'storegrade_album_limit' => intval(input('post.storegrade_album_limit')),
+                'storegrade_space_limit' => intval(input('post.storegrade_space_limit')),
                 //默认附加超文本编辑
                 'storegrade_function' => implode('|', array('editor_multimedia')),
                 'storegrade_price' => intval(input('post.storegrade_price')),
                 'storegrade_description' => input('post.storegrade_description'),
-                'storegrade_sort' => input('post.storegrade_sort'),
+                'storegrade_sort' => intval(input('post.storegrade_sort')),
             );
+            
+            $this->validate($data, 'app\common\validate\Storegrade.add');
 
-            $storegrade_validate = ds_validate('storegrade');
-            if (!$storegrade_validate->scene('add')->check($data)){
-                $this->error($storegrade_validate->getError());
-            }
-
-            //验证等级名称
-            if (!$this->checkGradeName(array('storegrade_name' => trim(input('post.storegrade_name'))))) {
-                $this->error(lang('now_store_grade_name_is_there'));
-            }
-            //验证级别是否存在
-            if (!$this->checkGradeSort(array('storegrade_sort' => trim(input('post.storegrade_sort'))))) {
-                $this->error(lang('add_gradesortexist'));
-            }
             $result = model('storegrade')->addStoregrade($data);
             if ($result) {
                 dsLayerOpenSuccess(lang('ds_common_op_succ'),url('Storegrade/index'));
@@ -77,35 +66,30 @@ class  Storegrade extends AdminControl {
         if (empty($storegrade_id)) {
             $this->error(lang('param_error'));
         }
+        $storegrade = model('storegrade')->getOneStoregrade($storegrade_id);
+        if(empty($storegrade)){
+            ds_json_encode(10001, lang('param_error'));
+        }
         if (!request()->isPost()) {
-            $storegrade = model('storegrade')->getOneStoregrade($storegrade_id);
             View::assign('storegrade', $storegrade);
             return View::fetch('form');
         } else {
 
             $data = array(
+                'storegrade_id'=>$storegrade_id,
                 'storegrade_name' => input('post.storegrade_name'),
-                'storegrade_goods_limit' => input('post.storegrade_goods_limit'),
-                'storegrade_album_limit' => input('post.storegrade_album_limit'),
-                'storegrade_space_limit' => input('post.storegrade_space_limit'),
+                'storegrade_goods_limit' => intval(input('post.storegrade_goods_limit')),
+                'storegrade_album_limit' => intval(input('post.storegrade_album_limit')),
+                'storegrade_space_limit' => intval(input('post.storegrade_space_limit')),
                 //默认附加超文本编辑
                 'storegrade_function' => implode('|', array('editor_multimedia')),
                 'storegrade_price' => intval(input('post.storegrade_price')),
                 'storegrade_description' => input('post.storegrade_description'),
-                'storegrade_sort' => input('post.storegrade_sort'),
+                'storegrade_sort' => intval(input('post.storegrade_sort')),
             );
-            $storegrade_validate = ds_validate('storegrade');
-            if (!$storegrade_validate->scene('edit')->check($data)){
-                $this->error($storegrade_validate->getError());
-            }
-            //验证等级名称
-            if (!$this->checkGradeName(array('storegrade_name' => trim(input('post.storegrade_name')), 'storegrade_id' => intval(input('param.storegrade_id'))))) {
-                $this->error(lang('now_store_grade_name_is_there'));
-            }
-            //验证级别是否存在
-            if (!$this->checkGradeSort(array('storegrade_sort' => trim(input('post.storegrade_sort')), 'storegrade_id' => intval(input('param.storegrade_id'))))) {
-                $this->error(lang('add_gradesortexist'));
-            }
+            
+            $this->validate($data, 'app\common\validate\Storegrade.edit');
+            
             $result = model('storegrade')->editStoregrade($storegrade_id,$data);
             if ($result>=0) {
                 dsLayerOpenSuccess(lang('ds_common_op_succ'),url('Storegrade/index'));
@@ -136,44 +120,6 @@ class  Storegrade extends AdminControl {
         }
     }
 
-    /**
-     * 查询店铺等级名称是否存在
-     */
-    private function checkGradeName($param) {
-        $storegrade_model = model('storegrade');
-        $condition[]=array('storegrade_name','=',$param['storegrade_name']);
-
-        if (isset($param['storegrade_id'])) {
-            $storegrade_id = intval($param['storegrade_id']);
-            $condition[]=array('storegrade_id','<>', $storegrade_id);
-        }
-        $list = $storegrade_model->getStoregradeList($condition);
-        if (empty($list)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * 查询店铺等级是否存在
-     */
-    private function checkGradeSort($param) {
-        $storegrade_model = model('storegrade');
-        $condition = array();
-        $condition[]=array('storegrade_sort','=',$param['storegrade_sort']);
-        if (isset($param['storegrade_id'])) {
-            $storegrade_id = intval($param['storegrade_id']);
-            $condition[]=array('storegrade_id','<>', $storegrade_id);
-        }
-        $list = array();
-        $list = $storegrade_model->getStoregradeList($condition);
-        if (is_array($list) && count($list) > 0) {
-            return false;
-        } else {
-            return true;
-        }
-    }
 
     /**
      * 判断店铺等级是否能删除

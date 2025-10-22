@@ -90,7 +90,23 @@ abstract class BaseController
             $v->batch(true);
         }
 
-        return $v->failException(true)->check($data);
+//        return $v->failException(true)->check($data);
+        if (!$v->check($data)){
+            $this->validateMsg($v->getError());
+        }
+    }
+    
+    //根据来源返回不同错误展示信息
+    protected function validateMsg($message){
+        $module = app('http')->getName();
+        $isAjax = request()->isAjax();
+        if ($module == 'api' || $isAjax) {
+            ds_json_encode(10001, $message);
+        }elseif ($module == 'admin' || $module == 'home') {
+            $this->error($message);
+        }else{
+            ds_json_encode(10001, '控制器验证器返回错误');
+        }
     }
     
     /**

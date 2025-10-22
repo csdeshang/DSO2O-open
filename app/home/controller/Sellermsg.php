@@ -261,15 +261,6 @@ class  Sellermsg extends BaseSeller {
             ds_json_encode(10001, lang('param_error'));
         }
         
-        $data = [
-            'storems_short_number' => input('post.storems_short_number'),
-            'storems_mail_number' => input('post.storems_mail_number'),
-        ];
-        $sellermsg_validate = ds_validate('sellermsg');
-        if (!$sellermsg_validate->scene('save_msg_setting')->check($data)) {
-            ds_json_encode(10001, $sellermsg_validate->getError());
-        }
-        
         $smt_info = model('storemsgtpl')->getStoremsgtplInfo(array('storemt_code' => $code), 'storemt_code,storemt_name,storemt_message_switch,storemt_message_forced,storemt_short_switch,smt_short_forced,storemt_mail_switch,storemt_mail_forced,storemt_weixin_switch,storemt_weixin_forced');
 
         // 保存
@@ -302,6 +293,9 @@ class  Sellermsg extends BaseSeller {
             $data['storems_weixin_switch'] = 0;
         }
         $data['storems_mail_number'] = input('post.storems_mail_number', '');
+        
+        $this->validate($data, 'app\common\validate\Storemsgsetting.save');
+        
         $conditiion = array();
         $conditiion['storemt_code'] = $smt_info['storemt_code'];
         $conditiion['store_id'] = session('store_id');

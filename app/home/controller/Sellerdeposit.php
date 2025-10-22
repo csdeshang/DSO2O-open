@@ -5,11 +5,13 @@
  */
 
 namespace app\home\controller;
+
 use think\facade\View;
 use think\facade\Db;
 use think\facade\Lang;
 use app\common\model\Storedepositlog;
 use app\common\model\Storemoneylog;
+
 /**
  * ============================================================================
  * DSO2O多用户商城
@@ -22,7 +24,7 @@ use app\common\model\Storemoneylog;
  * ============================================================================
  * 控制器
  */
-class  Sellerdeposit extends BaseSeller {
+class Sellerdeposit extends BaseSeller {
 
     public function initialize() {
         parent::initialize();
@@ -33,8 +35,7 @@ class  Sellerdeposit extends BaseSeller {
      * 预存款变更日志
      */
     public function index() {
-        $condition = array(array('store_id' ,'=', session('store_id')));
-
+        $condition = array(array('store_id', '=', session('store_id')));
 
         $query_start_date = input('param.query_start_date');
         $query_end_date = input('param.query_end_date');
@@ -51,7 +52,7 @@ class  Sellerdeposit extends BaseSeller {
 
         $storedepositlog_desc = input('param.storedepositlog_desc');
         if ($storedepositlog_desc) {
-            $condition[]=array('storedepositlog_desc','like', '%' . $storedepositlog_desc . '%');
+            $condition[] = array('storedepositlog_desc', 'like', '%' . $storedepositlog_desc . '%');
         }
         $storedepositlog_model = model('storedepositlog');
         $list_log = $storedepositlog_model->getStoredepositlogList($condition, 10, '*', 'storedepositlog_id desc');
@@ -65,16 +66,18 @@ class  Sellerdeposit extends BaseSeller {
         View::assign('store_info', $store_info);
         return View::fetch($this->template_dir . 'index');
     }
-    
+
     public function recharge_add() {
         $storedepositlog_model = model('storedepositlog');
         if (request()->isPost()) {
             $money = abs(floatval(input('post.pdc_amount')));
             if (!$money) {
-                ds_json_encode(10001,lang('param_error'));
+                ds_json_encode(10001, lang('param_error'));
             }
+
+            Db::startTrans();
             try {
-                Db::startTrans();
+
 
                 $data = array(
                     'store_id' => $this->store_info['store_id'],
@@ -83,11 +86,9 @@ class  Sellerdeposit extends BaseSeller {
                     'storedepositlog_state' => Storedepositlog::STATE_VALID,
                     'storedepositlog_add_time' => TIMESTAMP,
                 );
-                $data['store_avaliable_deposit'] = $money;
-
+                $data['storedepositlog_avaliable_deposit'] = $money;
 
                 $data['storedepositlog_desc'] = lang('sellerdeposit_recharge_deposit');
-
 
                 $storedepositlog_model->changeStoredeposit($data);
                 //从店铺资金中扣除
@@ -98,7 +99,7 @@ class  Sellerdeposit extends BaseSeller {
                     'storemoneylog_type' => Storemoneylog::TYPE_DEPOSIT_IN,
                     'storemoneylog_state' => Storemoneylog::STATE_VALID,
                     'storemoneylog_add_time' => TIMESTAMP,
-                    'store_avaliable_money' => -$money,
+                    'storemoneylog_avaliable_money' => -$money,
                     'storemoneylog_desc' => $data['storedepositlog_desc'],
                 );
                 $storemoneylog_model->changeStoremoney($data2);
@@ -106,10 +107,10 @@ class  Sellerdeposit extends BaseSeller {
                 Db::commit();
             } catch (\Exception $e) {
                 Db::rollback();
-                ds_json_encode(10001,$e->getMessage());
+                ds_json_encode(10001, $e->getMessage());
             }
             $this->recordSellerlog(lang('sellerdeposit_recharge_deposit'));
-            ds_json_encode(10000,lang('ds_common_op_succ'));
+            ds_json_encode(10000, lang('ds_common_op_succ'));
         } else {
             return View::fetch($this->template_dir . 'recharge_add');
         }
@@ -121,15 +122,11 @@ class  Sellerdeposit extends BaseSeller {
     public function withdraw_add() {
         $store_info = Db::name('store')->where(array('store_id' => session('store_id')))->field('store_avaliable_deposit,store_freeze_deposit,store_payable_deposit')->find();
         if (request()->isPost()) {
-            $data=[
-                'pdc_amount'=>floatval(input('post.pdc_amount')),
-            ];
-            $sellerdeposit_validate = ds_validate('sellerdeposit');
-            if (!$sellerdeposit_validate->scene('withdraw_add')->check($data)) {
-                ds_json_encode(10001,$sellerdeposit_validate->getError());
-            }
+
+            $pdc_amount = floatval(input('post.pdc_amount'));
             
-            $pdc_amount = $data['pdc_amount'];
+            $this->validate(array('pdc_amount'=>$pdc_amount), 'app\common\validate\Singlefield.pdc_amount');
+            
             $storedepositlog_model = model('storedepositlog');
 
             $data = array(
@@ -139,20 +136,20 @@ class  Sellerdeposit extends BaseSeller {
                 'storedepositlog_state' => Storedepositlog::STATE_WAIT,
                 'storedepositlog_add_time' => TIMESTAMP,
             );
-            $data['store_avaliable_deposit'] = -$pdc_amount;
-            $data['store_freeze_deposit'] = $pdc_amount;
+            $data['storedepositlog_avaliable_deposit'] = -$pdc_amount;
+            $data['storedepositlog_freeze_deposit'] = $pdc_amount;
 
-
-            $data['storedepositlog_desc'] = lang('sellerdeposit_apply_withdraw').lang('sellerdeposit_avaliable_money');
+            $data['storedepositlog_desc'] = lang('sellerdeposit_apply_withdraw') . lang('sellerdeposit_avaliable_money');
+            
+            Db::startTrans();
             try {
-                Db::startTrans();
                 $storedepositlog_model->changeStoredeposit($data);
                 Db::commit();
                 $this->recordSellerlog(lang('sellerdeposit_apply_withdraw'));
-                ds_json_encode(10000,lang('ds_common_op_succ'));
+                ds_json_encode(10000, lang('ds_common_op_succ'));
             } catch (\Exception $e) {
                 Db::rollback();
-                ds_json_encode(10001,$e->getMessage());
+                ds_json_encode(10001, $e->getMessage());
             }
         } else {
             View::assign('store_withdraw_cycle', config('ds_config.store_withdraw_cycle'));
@@ -168,14 +165,13 @@ class  Sellerdeposit extends BaseSeller {
      */
     public function withdraw_list() {
         $condition = array(
-            array('store_id' ,'=', session('store_id')),
-            array('storedepositlog_type','in',[Storedepositlog::TYPE_WITHDRAW,Storedepositlog::TYPE_RECHARGE]),
+            array('store_id', '=', session('store_id')),
+            array('storedepositlog_type', 'in', [Storedepositlog::TYPE_WITHDRAW, Storedepositlog::TYPE_RECHARGE]),
         );
-
 
         $paystate_search = input('param.paystate_search');
         if (isset($paystate_search) && $paystate_search !== '') {
-            $condition[] = array('storedepositlog_state','=',intval($paystate_search));
+            $condition[] = array('storedepositlog_state', '=', intval($paystate_search));
         }
 
         $storedepositlog_model = model('storedepositlog');
@@ -210,5 +206,4 @@ class  Sellerdeposit extends BaseSeller {
         );
         return $item_list;
     }
-
 }

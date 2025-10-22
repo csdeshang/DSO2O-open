@@ -1,11 +1,12 @@
 <?php
 
 namespace app\common\model;
+
 use think\facade\Db;
 
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,7 +16,7 @@ use think\facade\Db;
  * ============================================================================
  * 数据层模型
  */
-class  VerifyCode extends BaseModel {
+class VerifyCode extends BaseModel {
 
     public $page_info;
 
@@ -30,7 +31,7 @@ class  VerifyCode extends BaseModel {
      */
     public function getVerifyCodeList($condition, $pagesize = '', $order = 'verify_code_id desc') {
         if ($pagesize) {
-            $result = Db::name('VerifyCode')->where($condition)->order($order)->paginate(['list_rows'=>$pagesize,'query' => request()->param()],false);
+            $result = Db::name('VerifyCode')->where($condition)->order($order)->paginate(['list_rows' => $pagesize, 'query' => request()->param()], false);
             $this->page_info = $result;
             return $result->items();
         } else {
@@ -48,7 +49,7 @@ class  VerifyCode extends BaseModel {
      * @return array
      */
     public function getVerifyCodeInfo($condition = array(), $fields = '*') {
-        return Db::name('VerifyCode')->where($condition)->field($fields)->find();
+        return Db::name('VerifyCode')->where($condition)->field($fields)->order('verify_code_id desc')->find();
     }
 
     /**
@@ -94,10 +95,10 @@ class  VerifyCode extends BaseModel {
 
     public function isVerifyCodeFrequant($verify_code_type, $verify_code_user_type) {
         $ip = request()->ip();
-        if ($this->getVerifyCodeCount(array(array('verify_code_ip' ,'=', $ip), array('verify_code_type' ,'=', $verify_code_type), array('verify_code_user_type' ,'=', $verify_code_user_type), array('verify_code_add_time','>', TIMESTAMP - 60)))) {
+        if ($this->getVerifyCodeCount(array(array('verify_code_ip', '=', $ip), array('verify_code_type', '=', $verify_code_type), array('verify_code_user_type', '=', $verify_code_user_type), array('verify_code_add_time', '>', TIMESTAMP - 60)))) {
             return ds_callback(false, '请60秒以后再发');
         }
-        if ($this->getVerifyCodeCount(array(array('verify_code_ip' ,'=', $ip), array('verify_code_type' ,'=', $verify_code_type), array('verify_code_user_type' ,'=', $verify_code_user_type), array('verify_code_add_time','>', strtotime(date('Y-m-d 0:0:0'))))) > 15) {
+        if ($this->getVerifyCodeCount(array(array('verify_code_ip', '=', $ip), array('verify_code_type', '=', $verify_code_type), array('verify_code_user_type', '=', $verify_code_user_type), array('verify_code_add_time', '>', strtotime(date('Y-m-d 0:0:0'))))) > 15) {
             return ds_callback(false, '今天验证码已超15条，不能再发送');
         }
         return ds_callback(true);
@@ -113,7 +114,7 @@ class  VerifyCode extends BaseModel {
     public function genVerifyCode($verify_code_type, $verify_code_user_type) {
         $verify_code = str_pad(strval(rand(0, 999999)), 6, '0', STR_PAD_LEFT);
         $i = 0;
-        while ($i < 100 && $this->getVerifyCodeCount(array(array('verify_code' ,'=', $verify_code), array('verify_code_type' ,'=', $verify_code_type), array('verify_code_user_type' ,'=', $verify_code_user_type), array('verify_code_add_time','>', TIMESTAMP - VERIFY_CODE_INVALIDE_MINUTE * 60)))) {
+        while ($i < 100 && $this->getVerifyCodeCount(array(array('verify_code', '=', $verify_code), array('verify_code_type', '=', $verify_code_type), array('verify_code_user_type', '=', $verify_code_user_type), array('verify_code_add_time', '>', TIMESTAMP - VERIFY_CODE_INVALIDE_MINUTE * 60)))) {
             $verify_code = str_pad(strval(rand(0, 999999)), 6, '0', STR_PAD_LEFT);
             $i++;
         }
@@ -122,7 +123,6 @@ class  VerifyCode extends BaseModel {
         }
         return false;
     }
-
 }
 
 ?>

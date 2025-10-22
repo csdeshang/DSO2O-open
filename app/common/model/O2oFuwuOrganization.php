@@ -96,7 +96,7 @@ class  O2oFuwuOrganization extends BaseModel {
             //删除账号
             Db::name('o2o_fuwu_account')->where(array('o2o_fuwu_organization_id' => $item['o2o_fuwu_organization_id'],))->delete();
             //删除token
-            Db::name('o2o_fuwu_token')->where(array('o2o_fuwu_organization_id' => $item['o2o_fuwu_organization_id'],))->delete();
+            Db::name('platformtoken')->where(array('platform_userid' => $item['o2o_fuwu_organization_id'],'platform_type' => 'fuwu',))->delete();
             //删除商品
             Db::name('o2o_fuwu_goods')->where(array('o2o_fuwu_organization_id' => $item['o2o_fuwu_organization_id'],))->delete();
             //删除商品规格

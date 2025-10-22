@@ -6,8 +6,8 @@
 <div class="dsp-container">
   <div class="dsp-detail">
     <div class="dsp-gift-picture">
-      <a href="{$prodinfo.pgoods_image_max}">
-        <img src="{$prodinfo.pgoods_image_max}">
+      <a href="{$prodinfo.pgoods_image_url}">
+        <img src="{$prodinfo.pgoods_image_url}">
       </a>
     </div>
     
@@ -98,7 +98,7 @@
             <li>
               <div class="gift-pic">
                 <a target="_blank" href="{:url('Pointprod/pinfo',['id'=>$v.pgoods_id])}" title="{$v.pgoods_name}">
-                  <img src="{$v.pgoods_image}" alt="{$v.pgoods_name}" />
+                  <img src="{$v.pgoods_image_url}" alt="{$v.pgoods_name}" />
                 </a>
               </div>
               <div class="gift-name">
@@ -170,7 +170,7 @@
 </div>
 <script src="{$Think.PLUGINS_SITE_ROOT}/jquery.SuperSlide.2.1.1.js"></script>
 <script>
-    jQuery(".dsp-sidebar-container").slide({mainCell:".content ul",prevCell:'.sprite-up',nextCell:'.sprite-down',autoPage:true,effect:"top",vis:3});
+    jQuery(".dsp-sidebar-container").slide({mainCell:".content ul",prevCell:'.sprite-up',nextCell:'.sprite-down',autoPage:true,effect:"top",vis:2});
 </script>
 <script>
  function copy_url()

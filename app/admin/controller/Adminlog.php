@@ -4,9 +4,10 @@ namespace app\admin\controller;
 use think\facade\View;
 use think\facade\Db;
 use think\facade\Lang;
+
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能 管理员日志
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -16,7 +17,7 @@ use think\facade\Lang;
  * ============================================================================
  * 控制器
  */
-class  Adminlog extends AdminControl
+class Adminlog extends AdminControl
 {
     const EXPORT_SIZE = 5000;
     public function initialize()
@@ -78,7 +79,7 @@ class  Adminlog extends AdminControl
             ds_json_encode('10001', lang('param_error'));
         }
         $condition = array();
-        $condition[]=array('adminlog_id','in',$adminlog_id_array);
+        $condition[] = array('adminlog_id','in',$adminlog_id_array);
         $adminlog_model=model('adminlog');
         if (!$adminlog_model->delAdminlog($condition)) {
             $this->log(lang('ds_del').lang('admin_log'), 0);
@@ -184,7 +185,7 @@ class  Adminlog extends AdminControl
             array(
                 'name' => 'loglist',
                 'text' => lang('admin_log'),
-                'url' => url('Adminlog/loglist')
+                'url' => (string)url('Adminlog/loglist')
             )
             );
         return $menu_array;

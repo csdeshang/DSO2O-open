@@ -2,10 +2,9 @@
 
 namespace app\common\model;
 
-
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用文件
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -15,7 +14,7 @@ namespace app\common\model;
  * ============================================================================
  * 数据层模型
  */
-class  Seo extends BaseModel {
+class Seo extends BaseModel {
 
     /**
      * 存放SEO信息
@@ -34,9 +33,9 @@ class  Seo extends BaseModel {
      */
     public function type($type) {
         if (is_array($type)) { //商品分类
-            $this->seo['seo_title'] = isset($type[1])?$type[1]:'';
-            $this->seo['seo_keywords'] = isset($type[2])?$type[2]:'';
-            $this->seo['seo_description'] = isset($type[3])?$type[3]:'';
+            $this->seo['seo_title'] = isset($type[1]) ? $type[1] : '';
+            $this->seo['seo_keywords'] = isset($type[2]) ? $type[2] : '';
+            $this->seo['seo_description'] = isset($type[3]) ? $type[3] : '';
         } else {
             $this->seo = $this->getSeo($type);
         }
@@ -72,8 +71,8 @@ class  Seo extends BaseModel {
             return $this;
         if (is_array($array)) {
             $array_key = array_keys($array);
-            foreach ($array_key as $k=>$val){
-                $array_key[$k]='{'.$val.'}';
+            foreach ($array_key as $k => $val) {
+                $array_key[$k] = '{' . $val . '}';
             }
             foreach ($this->seo as $key => $value) {
                 $this->seo[$key] = str_replace($array_key, array_values($array), $value);

@@ -5,7 +5,7 @@ use think\facade\View;
 use think\facade\Lang;
 /**
  * ============================================================================
- * DSO2O多用户商城
+ * 通用功能 用户反馈
  * ============================================================================
  * 版权所有 2014-2028 长沙德尚网络科技有限公司，并保留所有权利。
  * 网站地址: http://www.csdeshang.com
@@ -42,7 +42,7 @@ class Feedback extends AdminControl
         $feedback_model = model('feedback');
         $feedback_id = input('param.feedback_id');
         $feedback_id_array = ds_delete_param($feedback_id);
-        $condition = array(array('fb_id','in', $feedback_id_array));
+        $condition = array(array('fb_id' ,'in', $feedback_id_array));
         $result = $feedback_model->delFeedback($condition);
         if ($result){
             ds_json_encode(10000, lang('ds_common_op_succ'));
